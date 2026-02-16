@@ -1,0 +1,4963 @@
+/* Veterinary Theme CSS - Transform medical theme to pet/veterinary theme */
+
+/* Veterinary Color Palette */
+:root {
+  /* Primary Colors - Pet/Veterinary Theme */
+  --vet-primary: #4A90E2;        /* Friendly Blue */
+  --vet-primary-dark: #357ABD;     /* Darker Blue */
+  --vet-primary-light: #E8F4FD;    /* Light Blue */
+  
+  /* Secondary Colors */
+  --vet-secondary: #50C878;        /* Pet Green */
+  --vet-secondary-dark: #3FA65F;   /* Darker Green */
+  --vet-secondary-light: #E8F5EE;  /* Light Green */
+  
+  /* Accent Colors */
+  --vet-accent: #FF8C42;           /* Warm Orange */
+  --vet-accent-dark: #E67A22;      /* Darker Orange */
+  --vet-accent-light: #FFF4EC;     /* Light Orange */
+  
+  /* Neutral Colors */
+  --vet-purple: #8B7FD6;          /* Soft Purple */
+  --vet-pink: #FFB6C1;             /* Soft Pink */
+  --vet-teal: #20B2AA;             /* Teal */
+  
+  /* Background Colors */
+  --vet-bg-primary: #F8FAFB;       /* Light Background */
+  --vet-bg-secondary: #FFFFFF;     /* White Background */
+  --vet-bg-tertiary: #F0F7FF;      /* Very Light Blue */
+  
+  /* Text Colors */
+  --vet-text-primary: #2C3E50;     /* Dark Text */
+  --vet-text-secondary: #6C757D;   /* Secondary Text */
+  --vet-text-light: #8492A6;       /* Light Text */
+}
+
+/* Dashboard Theme Overrides */
+.dashboard-widget-box {
+  background: linear-gradient(135deg, var(--vet-bg-secondary) 0%, var(--vet-bg-tertiary) 100%);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.dashboard-widget-box::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--vet-primary) 0%, var(--vet-secondary) 100%);
+}
+
+.dashboard-widget-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+}
+
+.dashboard-widget-icon .dash-icon-box {
+  background: linear-gradient(135deg, var(--vet-primary) 0%, var(--vet-primary-dark) 100%);
+  color: white;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+/* Veterinary Widget Specific Styles */
+.veterinary-widget .dash-icon-box {
+  position: relative;
+}
+
+.veterinary-widget .dash-icon-box::after {
+  content: '🐾';
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  font-size: 0.8rem;
+  background: var(--vet-accent);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dashboard Card Updates */
+.dashboard-card {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(74, 144, 226, 0.08);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.veterinary-card {
+  border-left: 4px solid var(--vet-primary);
+}
+
+.dashboard-card-head {
+  background: linear-gradient(135deg, var(--vet-bg-tertiary) 0%, var(--vet-primary-light) 100%);
+  border-bottom: 2px solid var(--vet-primary);
+  padding: 1.5rem;
+}
+
+.dashboard-card-head h5 {
+  color: var(--vet-primary);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+/* Enhanced Dashboard Header */
+.veterinary-dashboard-header {
+  background: linear-gradient(135deg, var(--vet-bg-secondary) 0%, var(--vet-bg-tertiary) 100%);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(74, 144, 226, 0.08);
+}
+
+.veterinary-dashboard-header .dashboard-title {
+  color: var(--vet-primary);
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.veterinary-dashboard-header .dashboard-subtitle {
+  color: var(--vet-text-secondary);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Table Updates */
+.dashboard-table {
+  background: var(--vet-bg-secondary);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dashboard-table tbody tr {
+  border-bottom: 1px solid var(--vet-primary-light);
+  transition: background-color 0.2s ease;
+}
+
+.dashboard-table tbody tr:hover {
+  background-color: var(--vet-bg-tertiary);
+}
+
+.patient-info-profile h5 a {
+  color: var(--vet-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.patient-info-profile h5 a:hover {
+  color: var(--vet-primary-dark);
+}
+
+/* Badge Updates */
+.badge.table-badge {
+  background: linear-gradient(135deg, var(--vet-secondary) 0%, var(--vet-secondary-dark) 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Action Buttons */
+.text-success-icon {
+  color: var(--vet-secondary) !important;
+  background: var(--vet-secondary-light);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.text-success-icon:hover {
+  background: var(--vet-secondary);
+  color: white !important;
+  transform: scale(1.1);
+}
+
+.text-danger-icon {
+  color: var(--vet-accent) !important;
+  background: var(--vet-accent-light);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.text-danger-icon:hover {
+  background: var(--vet-accent);
+  color: white !important;
+  transform: scale(1.1);
+}
+
+/* Statistics Colors */
+.text-success {
+  color: var(--vet-secondary) !important;
+}
+
+.text-danger {
+  color: var(--vet-accent) !important;
+}
+
+/* Header Dropdown Updates */
+.header-dropdown .dropdown-toggle {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  color: var(--vet-primary);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.header-dropdown .dropdown-toggle:hover {
+  background: var(--vet-primary);
+  color: white;
+}
+
+/* Veterinary Icons - Replace medical icons with pet-friendly ones */
+.dashboard-widget-box:nth-child(1) .dash-icon-box i::before {
+  content: "🐕"; /* Dog icon for patients */
+}
+
+.dashboard-widget-box:nth-child(2) .dash-icon-box i::before {
+  content: "📅"; /* Calendar for today's patients */
+}
+
+.dashboard-widget-box:nth-child(3) .dash-icon-box i::before {
+  content: "⏰"; /* Clock for appointments */
+}
+
+/* Typography Updates */
+.dashboard-content-info h6 {
+  color: var(--vet-text-secondary);
+  font-weight: 500;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dashboard-content-info h4 {
+  color: var(--vet-text-primary);
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Quick Stats Grid */
+.quick-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--vet-bg-tertiary);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--vet-primary);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--vet-text-secondary);
+  font-weight: 500;
+}
+
+.stat-icon {
+  font-size: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Enhanced Patient Grid */
+.recent-patient-grid-boxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.recent-patient-grid {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 12px;
+  background: var(--vet-bg-tertiary);
+  transition: all 0.3s ease;
+}
+
+.recent-patient-grid:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+}
+
+.recent-patient-grid .patient-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 0.5rem;
+  display: block;
+}
+
+.recent-patient-grid .patient-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.recent-patient-grid h5 {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.recent-patient-grid h5 a {
+  color: var(--vet-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.recent-patient-grid h5 a:hover {
+  color: var(--vet-primary-dark);
+}
+
+.recent-patient-grid span.text-muted {
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.date-info p {
+  font-size: 0.75rem;
+  color: var(--vet-text-light);
+  margin: 0;
+}
+
+/* Upcoming Appointment Enhancements */
+.upcoming-patient-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.info-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.img-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.img-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.name-info h6 {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.date-details {
+  text-align: right;
+}
+
+.date-details h6 {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.appointment-card-footer {
+  border-top: 1px solid var(--vet-primary-light);
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-appointments {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .dashboard-widget-box {
+    margin-bottom: 1rem;
+  }
+  
+  .dashboard-widget-icon .dash-icon-box {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+  
+  .dashboard-content-info h4 {
+    font-size: 1.5rem;
+  }
+
+  .quick-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .recent-patient-grid-boxes {
+    grid-template-columns: 1fr;
+  }
+
+  .veterinary-dashboard-header {
+    padding: 1.5rem;
+  }
+
+  .veterinary-dashboard-header .dashboard-title {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .recent-patient-grid-boxes {
+  }
+}
+
+/* Animation and Transitions */
+.dashboard-widget-box,
+.dashboard-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pet-themed decorative elements */
+.dashboard-widget-box::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, var(--vet-primary-light) 0%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0.3;
+  z-index: 0;
+}
+
+.dashboard-content-info,
+.dashboard-widget-icon {
+  position: relative;
+  z-index: 1;
+}
+
+/* Veterinary Dashboard Specific Styles */
+.veterinary-dashboard {
+  background: var(--vet-bg-primary);
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.veterinary-dashboard .content {
+  padding: 0;
+}
+
+/* Pet Owner Information Styling */
+.patient-name-info small {
+  color: var(--vet-text-secondary);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Enhanced Table Styling for Veterinary Theme */
+.veterinary-table .patient-info-profile {
+  position: relative;
+}
+
+.veterinary-table .patient-info-profile::before {
+  content: '🐾';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+/* Veterinary Badge Variants */
+.badge.table-badge {
+  position: relative;
+}
+
+.badge.table-badge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+  border-radius: 20px;
+}
+
+/* Veterinary Card Header Enhancement */
+.veterinary-card .dashboard-card-head::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--vet-primary), var(--vet-secondary), var(--vet-accent));
+}
+
+/* Hover Effects for Veterinary Elements */
+.veterinary-widget:hover .dash-icon-box {
+  transform: rotate(5deg) scale(1.05);
+}
+
+.veterinary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(74, 144, 226, 0.2);
+}
+
+/* Veterinary Status Indicators */
+.veterinary-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.veterinary-status.healthy {
+  background: var(--vet-secondary-light);
+  color: var(--vet-secondary-dark);
+}
+
+.veterinary-status.checkup {
+  background: var(--vet-primary-light);
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-status.emergency {
+  background: var(--vet-accent-light);
+  color: var(--vet-accent-dark);
+}
+
+/* Enhanced Layout Spacing */
+.container-fluid {
+  padding: 0 1rem;
+}
+
+.row.mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+.col-xl-8.mb-4,
+.col-xl-4.mb-4,
+.col-xl-6.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+/* Enhanced Button Styling */
+.btn-outline-primary {
+  border-color: var(--vet-primary);
+  color: var(--vet-primary);
+}
+
+.btn-outline-primary:hover {
+  background: var(--vet-primary);
+  border-color: var(--vet-primary);
+}
+
+.btn-primary {
+  background: var(--vet-primary);
+  border-color: var(--vet-primary);
+}
+
+.btn-primary:hover {
+  background: var(--vet-primary-dark);
+  border-color: var(--vet-primary-dark);
+}
+
+/* Enhanced Card Spacing */
+.dashboard-card-body {
+  padding: 1.5rem;
+}
+
+/* Enhanced Responsive Layout */
+@media (min-width: 1200px) {
+  .container-fluid {
+    max-width: 1400px;
+  }
+}
+
+/* Veterinary Appointments Page Specific Styles */
+.veterinary-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-primary);
+  border: 1px solid var(--vet-primary-light);
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.veterinary-btn-icon:hover {
+  background: var(--vet-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.veterinary-btn-icon.active {
+  background: var(--vet-primary);
+  color: white;
+}
+
+.veterinary-dropdown-btn {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  color: var(--vet-primary);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.veterinary-dropdown-btn:hover {
+  background: var(--vet-primary);
+  color: white;
+}
+
+/* Enhanced Tab Navigation */
+.veterinary-nav-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 2px solid var(--vet-primary-light);
+  padding-bottom: 0;
+  background: linear-gradient(135deg, var(--vet-bg-tertiary) 0%, var(--vet-primary-light) 100%);
+  border-radius: 12px 12px 0 0;
+  padding: 1rem 1.5rem 0;
+  margin: -1rem -1.5rem 0;
+}
+
+.veterinary-tab {
+  background: transparent;
+  border: 2px solid transparent;
+  color: var(--vet-text-secondary);
+  border-radius: 12px 12px 0 0;
+  padding: 1rem 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.veterinary-tab::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--vet-primary);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.veterinary-tab:hover {
+  background: var(--vet-bg-secondary);
+  color: var(--vet-primary);
+  border-color: var(--vet-primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+}
+
+.veterinary-tab:hover::before {
+  transform: scaleX(1);
+}
+
+.veterinary-tab.active {
+  background: var(--vet-bg-secondary);
+  color: var(--vet-primary);
+  border-color: var(--vet-primary);
+  border-bottom-color: var(--vet-bg-secondary);
+  box-shadow: 0 -4px 12px rgba(74, 144, 226, 0.1);
+}
+
+.veterinary-tab.active::before {
+  transform: scaleX(1);
+  background: var(--vet-primary);
+}
+
+.tab-text {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.veterinary-tab-badge {
+  background: linear-gradient(135deg, var(--vet-accent) 0%, var(--vet-accent-dark) 100%);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 24px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(255, 140, 66, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.veterinary-tab.active .veterinary-tab-badge {
+  background: linear-gradient(135deg, var(--vet-secondary) 0%, var(--vet-secondary-dark) 100%);
+  box-shadow: 0 2px 4px rgba(80, 200, 120, 0.3);
+}
+
+/* Tab Content Styling */
+.tab-content {
+  background: var(--vet-bg-secondary);
+  border-radius: 0 0 12px 12px;
+  margin-top: -2px;
+}
+
+.tab-pane {
+  padding: 0;
+}
+
+/* Enhanced Appointment Tab Head */
+.appointment-tab-head {
+  background: var(--vet-bg-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.08);
+}
+
+.appointment-tabs {
+  flex: 1;
+}
+
+.filter-head {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--vet-bg-tertiary);
+  border-left: 1px solid var(--vet-primary-light);
+}
+
+/* Responsive Tab Design */
+@media (max-width: 768px) {
+  .veterinary-nav-tabs {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    margin: -1rem;
+  }
+  
+  .veterinary-tab {
+    min-width: auto;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    justify-content: flex-start;
+  }
+  
+  .veterinary-tab::before {
+    display: none;
+  }
+  
+  .tab-text {
+    font-size: 0.875rem;
+  }
+  
+  .veterinary-tab-badge {
+    margin-left: auto;
+  }
+  
+  .filter-head {
+    padding: 1rem;
+    border-left: none;
+    border-top: 1px solid var(--vet-primary-light);
+  }
+}
+
+@media (max-width: 992px) {
+  .veterinary-nav-tabs {
+    gap: 0.5rem;
+    padding: 1rem 1rem 0;
+    margin: -1rem -1rem 0;
+  }
+  
+  .veterinary-tab {
+    min-width: 120px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .tab-text {
+    font-size: 0.85rem;
+  }
+}
+
+/* Tab Icon Animations */
+.veterinary-tab i {
+  transition: transform 0.3s ease;
+}
+
+.veterinary-tab:hover i {
+  transform: scale(1.1);
+}
+
+.veterinary-tab.active i {
+  transform: scale(1.1);
+  color: var(--vet-primary);
+}
+
+/* Veterinary Sidebar Styling */
+.veterinary-sidebar {
+  background: linear-gradient(180deg, var(--vet-bg-secondary) 0%, var(--vet-bg-tertiary) 100%);
+  border-right: 1px solid var(--vet-primary-light);
+  box-shadow: 2px 0 12px rgba(74, 144, 226, 0.08);
+  height: 100vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+}
+
+/* Veterinary Profile Widget */
+.veterinary-profile-widget {
+  background: linear-gradient(135deg, var(--vet-primary) 0%, var(--vet-primary-dark) 100%);
+  padding: 2rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-profile-widget::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+.veterinary-profile-widget .booking-doc-img {
+  position: relative;
+  display: inline-block;
+}
+
+.veterinary-profile-widget .booking-doc-img img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.3);
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.veterinary-profile-widget .booking-doc-img:hover img {
+  transform: scale(1.05);
+  border-color: rgba(255,255,255,0.5);
+}
+
+.profile-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--vet-accent);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  border: 2px solid white;
+  animation: pulse 2s infinite;
+}
+
+.veterinary-profile-widget .profile-det-info h3 {
+  margin-bottom: 0.5rem;
+}
+
+.veterinary-profile-widget .profile-det-info h3 a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: color 0.2s ease;
+}
+
+.veterinary-profile-widget .profile-det-info h3 a:hover {
+  color: rgba(255,255,255,0.9);
+}
+
+.veterinary-profile-widget .patient-details h5 {
+  color: rgba(255,255,255,0.9);
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.veterinary-role-badge {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.veterinary-role-badge i {
+  color: var(--vet-secondary);
+  font-size: 0.6rem;
+  margin-right: 0.25rem;
+}
+
+/* Veterinary Availability Section */
+.veterinary-available-head {
+  padding: 1.5rem;
+  background: var(--vet-bg-secondary);
+  border-bottom: 1px solid var(--vet-primary-light);
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.veterinary-available-head .input-block {
+  padding: 0 0.5rem;
+}
+
+.veterinary-available-head .form-label {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.veterinary-select {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.5rem;
+  color: var(--vet-text-primary);
+  transition: all 0.3s ease;
+}
+
+.veterinary-select:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+/* Veterinary Dashboard Menu */
+.veterinary-dashboard-menu {
+  padding: 1rem 0;
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li {
+  margin-bottom: 0.25rem;
+  position: relative;
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li a {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: var(--vet-text-primary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  border-left: 3px solid transparent;
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li a:hover {
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-primary);
+  border-left-color: var(--vet-primary);
+  transform: translateX(3px);
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li.active a {
+  background: linear-gradient(90deg, var(--vet-primary-light) 0%, transparent 100%);
+  color: var(--vet-primary);
+  border-left-color: var(--vet-primary);
+  font-weight: 600;
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li a i {
+  width: 20px;
+  text-align: center;
+  margin-right: 0.75rem;
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li a:hover i {
+  transform: scale(1.1);
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li.active a i {
+  color: var(--vet-primary);
+  transform: scale(1.1);
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li a span {
+  flex: 1;
+  font-size: 0.9rem;
+}
+
+.menu-indicator {
+  width: 6px;
+  height: 6px;
+  background: var(--vet-secondary);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li.active .menu-indicator {
+  opacity: 1;
+  animation: pulse 2s infinite;
+}
+
+.veterinary-dashboard-menu .dashboard-menu ul li .unread-msg {
+  background: var(--vet-accent);
+  color: white;
+  padding: 0.125rem 0.375rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+  animation: pulse 2s infinite;
+}
+
+.logout-item a {
+  color: var(--vet-accent) !important;
+  border-top: 1px solid var(--vet-primary-light);
+  margin-top: 1rem;
+  padding-top: 1rem !important;
+}
+
+.logout-item a:hover {
+  background: var(--vet-accent-light) !important;
+  color: var(--vet-accent-dark) !important;
+}
+
+/* Veterinary Sidebar Footer */
+.veterinary-sidebar-footer {
+  background: var(--vet-bg-secondary);
+  border-top: 1px solid var(--vet-primary-light);
+  padding: 1.5rem;
+  margin-top: auto;
+}
+
+.vet-social-links {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.vet-social-links .social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-primary);
+  border-radius: 50%;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid var(--vet-primary-light);
+}
+
+.vet-social-links .social-link:hover {
+  background: var(--vet-primary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Responsive Sidebar */
+@media (max-width: 768px) {
+  .veterinary-sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 280px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+  }
+  
+  .veterinary-sidebar.active {
+    left: 0;
+  }
+  
+  .veterinary-profile-widget {
+    padding: 1.5rem 1rem;
+  }
+  
+  .veterinary-profile-widget .booking-doc-img img {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .veterinary-dashboard-menu .dashboard-menu ul li a {
+    padding: 0.6rem 1rem;
+  }
+  
+  .veterinary-dashboard-menu .dashboard-menu ul li a span {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .veterinary-sidebar {
+    width: 220px;
+  }
+  
+  .veterinary-profile-widget {
+    padding: 1.5rem 1rem;
+  }
+  
+  .veterinary-profile-widget .booking-doc-img img {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .veterinary-dashboard-menu .dashboard-menu ul li a {
+    padding: 0.7rem 1rem;
+  }
+}
+
+/* Sidebar Scrollbar Styling */
+.veterinary-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.veterinary-sidebar::-webkit-scrollbar-track {
+  background: var(--vet-bg-tertiary);
+}
+
+.veterinary-sidebar::-webkit-scrollbar-thumb {
+  background: var(--vet-primary);
+  border-radius: 3px;
+}
+
+.veterinary-sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--vet-primary-dark);
+}
+
+.veterinary-appointment {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-appointment::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--vet-primary) 0%, var(--vet-secondary) 100%);
+}
+
+.veterinary-appointment:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+}
+
+.veterinary-appointment ul {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.veterinary-appointment .patinet-information {
+  flex: 0 0 auto;
+  min-width: 250px;
+}
+
+.veterinary-appointment .patinet-information img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--vet-primary-light);
+}
+
+.veterinary-appointment .patient-info h6 {
+  margin-bottom: 0.25rem;
+}
+
+.veterinary-appointment .patient-info h6 a {
+  color: var(--vet-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.veterinary-appointment .patient-info h6 a:hover {
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-appointment .patient-info small {
+  color: var(--vet-text-secondary);
+  font-size: 0.8rem;
+}
+
+.veterinary-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-primary);
+  border: 1px solid var(--vet-primary-light);
+  transition: all 0.2s ease;
+  text-decoration: none;
+  margin: 0 0.25rem;
+}
+
+.veterinary-action-btn:hover {
+  background: var(--vet-primary);
+  color: white;
+  transform: scale(1.1);
+}
+
+.veterinary-action-btn.text-danger {
+  color: var(--vet-accent);
+  border-color: var(--vet-accent-light);
+}
+
+.veterinary-action-btn.text-danger:hover {
+  background: var(--vet-accent);
+  color: white;
+}
+
+.veterinary-start-btn {
+  background: linear-gradient(135deg, var(--vet-secondary) 0%, var(--vet-secondary-dark) 100%);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: none;
+  display: inline-block;
+}
+
+.veterinary-start-btn:hover {
+  background: linear-gradient(135deg, var(--vet-secondary-dark) 0%, var(--vet-secondary) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(80, 200, 120, 0.3);
+  color: white;
+}
+
+/* Filter Dropdown Enhancements */
+.filter-dropdown-menu {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+}
+
+.filter-set-content-head a {
+  color: var(--vet-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.filter-set-content-head a:hover {
+  color: var(--vet-primary-dark);
+}
+
+.filter-checks .check-title {
+  color: var(--vet-text-primary);
+}
+
+/* Date Range Input Styling */
+.date-range {
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  background: var(--vet-bg-secondary);
+  color: var(--vet-text-primary);
+}
+
+.date-range:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+/* Responsive Design for Appointments */
+@media (max-width: 768px) {
+  .veterinary-appointment ul {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .veterinary-appointment .patinet-information {
+    min-width: 100%;
+  }
+  
+  .veterinary-appointment .appointment-action ul {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  
+  .veterinary-tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .veterinary-badge {
+    margin-left: 0.25rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .veterinary-appointment ul {
+    gap: 1rem;
+  }
+  
+  .veterinary-appointment .patinet-information {
+    min-width: 200px;
+  }
+}
+
+/* Empty State Styling */
+.text-center.py-5 i {
+  color: var(--vet-text-light);
+}
+
+.text-center.py-5 h5 {
+  color: var(--vet-text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.text-center.py-5 p {
+  color: var(--vet-text-secondary);
+  margin-bottom: 0;
+}
+
+/* Enhanced Hover Effects */
+.veterinary-appointment:hover .patinet-information img {
+  border-color: var(--vet-primary);
+  transform: scale(1.05);
+}
+
+.veterinary-appointment:hover .veterinary-start-btn {
+  box-shadow: 0 6px 16px rgba(80, 200, 120, 0.4);
+}
+
+.header.header-custom,
+.header.header-fixed,
+.header.inner-header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--vet-primary-light);
+}
+
+.header .header-nav {
+  min-height: 76px;
+}
+
+.header .main-nav > li > a {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.header .main-nav > li > a:hover,
+.header .main-nav > li.active > a {
+  color: var(--vet-primary);
+}
+
+.header .submenu {
+  border-radius: 14px;
+  border: 1px solid var(--vet-primary-light);
+  box-shadow: 0 14px 40px rgba(74, 144, 226, 0.14);
+}
+
+.header .submenu li a {
+  color: var(--vet-text-primary);
+}
+
+.header .submenu li a:hover {
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-primary-dark);
+}
+
+.header-topbar {
+  background: linear-gradient(90deg, var(--vet-primary-dark) 0%, var(--vet-primary) 55%, var(--vet-secondary) 100%);
+}
+
+.header-topbar .topbar-info,
+.header-topbar .topbar-info p,
+.header-topbar .topbar-info a {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.header-topbar .social-icon a {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.header-topbar .social-icon a:hover {
+  color: #ffffff;
+}
+
+.header .header-navbar-rht .btn-primary-gradient {
+  background: linear-gradient(135deg, var(--vet-primary) 0%, var(--vet-secondary) 100%);
+  border: none;
+  box-shadow: 0 10px 22px rgba(74, 144, 226, 0.22);
+}
+
+.header .header-navbar-rht .btn-primary-gradient:hover {
+  box-shadow: 0 14px 26px rgba(74, 144, 226, 0.28);
+}
+
+.header .header-navbar-rht .btn-dark {
+  background: var(--vet-text-primary);
+  border-color: var(--vet-text-primary);
+}
+
+.footer.inner-footer,
+.footer.footer-one {
+  background: linear-gradient(180deg, var(--vet-bg-tertiary) 0%, #ffffff 80%);
+}
+
+.footer .footer-title,
+.footer .footer-widget h2.footer-title {
+  color: var(--vet-primary-dark);
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.footer .footer-widget p {
+  color: var(--vet-text-secondary);
+}
+
+.footer .footer-menu ul li a,
+.footer .policy-menu li a {
+  color: var(--vet-text-secondary);
+}
+
+.footer .footer-menu ul li a:hover,
+.footer .policy-menu li a:hover {
+  color: var(--vet-primary);
+}
+
+.footer .subscribe-input .form-control,
+.footer .subscribe-form .form-control {
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 999px;
+}
+
+.footer .subscribe-input .btn-primary-gradient {
+  background: linear-gradient(135deg, var(--vet-secondary) 0%, var(--vet-primary) 100%);
+  border: none;
+  border-radius: 999px;
+}
+
+.footer .social-icon ul li a {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  color: var(--vet-primary);
+}
+
+.footer .social-icon ul li a:hover {
+  background: var(--vet-primary);
+  border-color: var(--vet-primary);
+  color: #ffffff;
+}
+
+.footer .footer-bottom {
+  background: linear-gradient(90deg, var(--vet-primary-dark) 0%, var(--vet-primary) 60%, var(--vet-secondary-dark) 100%);
+}
+
+.footer .footer-bottom,
+.footer .footer-bottom p,
+.footer .footer-bottom a {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.footer .footer-bottom a:hover {
+  color: #ffffff;
+}
+
+.footer .payment-method img {
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+/* Enhanced Request Action Buttons */
+.veterinary-accept-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--vet-secondary) 0%, var(--vet-secondary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(80, 200, 120, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-accept-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-accept-btn:hover {
+  background: linear-gradient(135deg, var(--vet-secondary-dark) 0%, var(--vet-secondary) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(80, 200, 120, 0.4);
+  color: white;
+}
+
+.veterinary-accept-btn:hover::before {
+  left: 100%;
+}
+
+.veterinary-accept-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(80, 200, 120, 0.3);
+}
+
+.veterinary-accept-btn i {
+  font-size: 1rem;
+  animation: pulse-check 2s infinite;
+}
+
+@keyframes pulse-check {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.veterinary-reject-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--vet-accent) 0%, var(--vet-accent-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-reject-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-reject-btn:hover {
+  background: linear-gradient(135deg, var(--vet-accent-dark) 0%, var(--vet-accent) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 140, 66, 0.4);
+  color: white;
+}
+
+.veterinary-reject-btn:hover::before {
+  left: 100%;
+}
+
+.veterinary-reject-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 140, 66, 0.3);
+}
+
+.veterinary-reject-btn i {
+  font-size: 1rem;
+  animation: pulse-reject 2s infinite;
+}
+
+@keyframes pulse-reject {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Request Action Container */
+.request-action {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.request-action li {
+  margin: 0;
+}
+
+/* Enhanced Veterinary Pet Cards */
+.veterinary-pet-card {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.08);
+}
+
+.veterinary-pet-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--vet-primary) 0%, var(--vet-secondary) 100%);
+}
+
+.veterinary-pet-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+  border-color: var(--vet-primary);
+}
+
+.veterinary-pet-card .appointment-grid-head {
+  margin-bottom: 1rem;
+}
+
+.veterinary-pet-card .patinet-information {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.veterinary-pet-card .patinet-information a {
+  position: relative;
+  display: block;
+}
+
+.veterinary-pet-card .patinet-information img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--vet-primary-light);
+  transition: all 0.3s ease;
+}
+
+.veterinary-pet-card:hover .patinet-information img {
+  border-color: var(--vet-primary);
+  transform: scale(1.05);
+}
+
+.veterinary-pet-card .pet-type-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  z-index: 1;
+}
+
+.veterinary-pet-card .pet-type-badge .badge {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  background: var(--vet-accent);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(255, 140, 66, 0.3);
+}
+
+.veterinary-pet-card .patient-info {
+  flex: 1;
+}
+
+.veterinary-pet-card .patient-info p {
+  color: var(--vet-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.veterinary-pet-card .patient-info h6 {
+  margin-bottom: 0.5rem;
+}
+
+.veterinary-pet-card .patient-info h6 a {
+  color: var(--vet-primary);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: color 0.2s ease;
+}
+
+.veterinary-pet-card .patient-info h6 a:hover {
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-pet-card .pet-details {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0.75rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.veterinary-pet-card .pet-details li {
+  font-size: 0.8rem;
+  color: var(--vet-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--vet-bg-tertiary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 20px;
+  border: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-pet-card .pet-details i {
+  color: var(--vet-primary);
+  font-size: 0.7rem;
+}
+
+.veterinary-pet-card .owner-info {
+  margin-top: 0.5rem;
+}
+
+.veterinary-pet-card .appointment-info {
+  margin-bottom: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--vet-primary-light);
+  border-bottom: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-pet-card .appointment-info p {
+  margin-bottom: 0.5rem;
+  color: var(--vet-text-secondary);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-pet-card .appointment-info i {
+  color: var(--vet-primary);
+  font-size: 0.9rem;
+}
+
+.veterinary-pet-card .appointment-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.veterinary-pet-card .patient-book p {
+  margin-bottom: 0.5rem;
+  color: var(--vet-text-secondary);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-pet-card .patient-book i {
+  color: var(--vet-primary);
+  font-size: 0.9rem;
+}
+
+.veterinary-pet-card .patient-book span {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+}
+
+.veterinary-pet-card .pet-status {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.veterinary-pet-card .pet-status .badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.veterinary-pet-card .pet-status .badge:contains("Healthy") {
+  background: var(--vet-secondary);
+  color: white;
+}
+
+.veterinary-pet-card .pet-status .badge:contains("Vaccinated") {
+  background: var(--vet-primary);
+  color: white;
+}
+
+.veterinary-pet-card .pet-status .badge:contains("Treatment") {
+  background: var(--vet-accent);
+  color: white;
+}
+
+.veterinary-pet-card .pet-status .badge:contains("Inactive") {
+  background: var(--vet-text-secondary);
+  color: white;
+}
+
+/* Inactive Pet Cards */
+.veterinary-pet-card.inactive {
+  opacity: 0.7;
+  background: var(--vet-bg-tertiary);
+}
+
+.veterinary-pet-card.inactive::before {
+  background: linear-gradient(180deg, var(--vet-text-secondary) 0%, var(--vet-text-light) 100%);
+}
+
+.veterinary-pet-card.inactive:hover {
+  opacity: 0.8;
+}
+
+/* Enhanced Veterinary Slot Buttons */
+.veterinary-slot-box .slot-header {
+  background: linear-gradient(135deg, var(--vet-bg-tertiary) 0%, var(--vet-bg-secondary) 100%);
+  border-bottom: 2px solid var(--vet-primary-light);
+  padding: 1rem 1.5rem;
+  border-radius: 12px 12px 0 0;
+  margin: -1rem -1rem 0 -1rem;
+}
+
+.veterinary-slot-box .slot-header h5 {
+  color: var(--vet-primary-dark);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-slot-box .slot-header ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.veterinary-slot-box .slot-header ul li {
+  margin: 0;
+}
+
+.veterinary-slot-box .add-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--vet-secondary) 0%, var(--vet-secondary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(80, 200, 120, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-slot-box .add-slot::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-slot-box .add-slot:hover {
+  background: linear-gradient(135deg, var(--vet-secondary-dark) 0%, var(--vet-secondary) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(80, 200, 120, 0.4);
+  color: white;
+}
+
+.veterinary-slot-box .add-slot:hover::before {
+  left: 100%;
+}
+
+.veterinary-slot-box .add-slot:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(80, 200, 120, 0.3);
+}
+
+.veterinary-slot-box .add-slot i {
+  font-size: 1rem;
+  animation: pulse-add 2s infinite;
+}
+
+@keyframes pulse-add {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.veterinary-slot-box .delete-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--vet-accent) 0%, var(--vet-accent-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 140, 66, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-slot-box .delete-slot::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-slot-box .delete-slot:hover {
+  background: linear-gradient(135deg, var(--vet-accent-dark) 0%, var(--vet-accent) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 140, 66, 0.4);
+  color: white;
+}
+
+.veterinary-slot-box .delete-slot:hover::before {
+  left: 100%;
+}
+
+.veterinary-slot-box .delete-slot:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(255, 140, 66, 0.3);
+}
+
+.veterinary-slot-box .delete-slot i {
+  font-size: 1rem;
+  animation: pulse-delete 2s infinite;
+}
+
+@keyframes pulse-delete {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Enhanced Time Slots */
+.veterinary-slot-box .slot-body {
+  padding: 1.5rem;
+}
+
+.veterinary-slot-box .time-slots {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.veterinary-slot-box .time-slots li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--vet-bg-tertiary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 25px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--vet-text-primary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-slot-box .time-slots li::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.1), transparent);
+  transition: left 0.3s ease;
+}
+
+.veterinary-slot-box .time-slots li:hover {
+  background: var(--vet-primary-light);
+  border-color: var(--vet-primary);
+  color: var(--vet-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.15);
+}
+
+.veterinary-slot-box .time-slots li:hover::before {
+  left: 100%;
+}
+
+.veterinary-slot-box .time-slots li i {
+  color: var(--vet-primary);
+  font-size: 0.9rem;
+  animation: pulse-clock 3s infinite;
+}
+
+@keyframes pulse-clock {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(5deg); }
+  50% { transform: rotate(0deg); }
+  75% { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.veterinary-slot-box .time-slots li .slot-type {
+  background: var(--vet-secondary);
+  color: white;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+.veterinary-slot-box .time-slots li .slot-space {
+  background: var(--vet-accent);
+  color: white;
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 0.5rem;
+}
+
+/* Enhanced No Slots State */
+.veterinary-no-slots {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: var(--vet-bg-tertiary);
+  border-radius: 12px;
+  border: 2px dashed var(--vet-primary-light);
+  margin: 1rem 0;
+}
+
+.veterinary-no-slots i {
+  color: var(--vet-text-light);
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.veterinary-no-slots p {
+  color: var(--vet-text-secondary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.veterinary-no-slots small {
+  color: var(--vet-text-light);
+  font-size: 0.9rem;
+}
+
+/* Enhanced Form Elements */
+.veterinary-form-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.veterinary-form-wrap .col-form-label {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-form-wrap .col-form-label i {
+  color: var(--vet-primary);
+  font-size: 0.9rem;
+}
+
+.veterinary-input {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--vet-text-primary);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.veterinary-input:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-select {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--vet-text-primary);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.veterinary-select:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+/* Enhanced Veterinary Buttons */
+.veterinary-btn-secondary {
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-primary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-btn-secondary:hover {
+  background: var(--vet-primary-light);
+  color: var(--vet-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.15);
+}
+
+.veterinary-clinic-wrap {
+  background: var(--vet-bg-tertiary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-clinic-wrap h5 {
+  color: var(--vet-primary-dark);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-day-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.veterinary-day-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  color: var(--vet-text-primary);
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.veterinary-day-nav li a:hover,
+.veterinary-day-nav li a.active {
+  background: var(--vet-primary);
+  color: white;
+  border-color: var(--vet-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.15);
+}
+
+/* Enhanced Veterinary Invoices Table */
+.veterinary-invoices-table .veterinary-table {
+  background: var(--vet-bg-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.08);
+}
+
+.veterinary-invoices-table .veterinary-table thead {
+  background: linear-gradient(135deg, var(--vet-primary) 0%, var(--vet-primary-dark) 100%);
+  color: white;
+}
+
+.veterinary-invoices-table .veterinary-table th {
+  border: none;
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.veterinary-invoices-table .veterinary-table tbody tr {
+  border-bottom: 1px solid var(--vet-primary-light);
+  transition: all 0.3s ease;
+}
+
+.veterinary-invoices-table .veterinary-table tbody tr:hover {
+  background: var(--vet-bg-tertiary);
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+}
+
+.veterinary-invoices-table .veterinary-table td {
+  padding: 1rem;
+  vertical-align: middle;
+  border: none;
+}
+
+.veterinary-invoices-table .veterinary-invoice-link {
+  color: var(--vet-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  transition: color 0.2s ease;
+}
+
+.veterinary-invoices-table .veterinary-invoice-link:hover {
+  color: var(--vet-primary-dark);
+  text-decoration: underline;
+}
+
+.veterinary-invoices-table .table-avatar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.veterinary-invoices-table .table-avatar .avatar {
+  position: relative;
+}
+
+.veterinary-invoices-table .table-avatar .veterinary-avatar {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--vet-primary-light);
+  transition: all 0.3s ease;
+}
+
+.veterinary-invoices-table .table-avatar:hover .veterinary-avatar {
+  border-color: var(--vet-primary);
+  transform: scale(1.05);
+}
+
+.veterinary-invoices-table .table-avatar .avatar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.veterinary-invoices-table .table-avatar .avatar-info a {
+  color: var(--vet-text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+}
+
+.veterinary-invoices-table .table-avatar .avatar-info a:hover {
+  color: var(--vet-primary);
+}
+
+.veterinary-invoices-table .table-avatar .avatar-info small {
+  color: var(--vet-text-secondary);
+  font-size: 0.75rem;
+}
+
+.veterinary-invoices-table .pet-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.veterinary-invoices-table .pet-info .pet-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--vet-secondary-light);
+}
+
+.veterinary-invoices-table .pet-info .pet-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.veterinary-invoices-table .pet-info .pet-details strong {
+  color: var(--vet-text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.veterinary-invoices-table .pet-info .pet-details small {
+  color: var(--vet-text-secondary);
+  font-size: 0.75rem;
+}
+
+.veterinary-invoices-table .veterinary-amount {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--vet-primary);
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.veterinary-invoices-table .veterinary-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.veterinary-invoices-table .veterinary-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-primary);
+  border: 1px solid var(--vet-primary-light);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-invoices-table .veterinary-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.1), transparent);
+  transition: left 0.3s ease;
+}
+
+.veterinary-invoices-table .veterinary-action-btn:hover {
+  background: var(--vet-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.2);
+}
+
+.veterinary-invoices-table .veterinary-action-btn:hover::before {
+  left: 100%;
+}
+
+.veterinary-invoices-table .veterinary-action-btn i {
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+}
+
+.veterinary-invoices-table .veterinary-action-btn:hover i {
+  transform: scale(1.1);
+}
+
+.veterinary-invoices-table .veterinary-action-btn.view-btn:hover {
+  background: var(--vet-secondary);
+}
+
+.veterinary-invoices-table .veterinary-action-btn.print-btn:hover {
+  background: var(--vet-accent);
+}
+
+.veterinary-invoices-table .veterinary-action-btn.download-btn:hover {
+  background: var(--vet-primary-dark);
+}
+
+/* Veterinary Search Field */
+.veterinary-search-field {
+  position: relative;
+  max-width: 400px;
+}
+
+.veterinary-search-field .form-control {
+  padding-left: 2.5rem;
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 25px;
+  background: var(--vet-bg-secondary);
+  color: var(--vet-text-primary);
+  transition: all 0.3s ease;
+}
+
+.veterinary-search-field .form-control:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-search-field .search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--vet-text-secondary);
+  font-size: 1rem;
+  z-index: 1;
+}
+
+/* Veterinary Badge Warning */
+.veterinary-badge-warning {
+  background: var(--vet-accent);
+  color: white;
+}
+
+/* Veterinary Payment Methods */
+.veterinary-layout-wrap {
+  background: var(--vet-bg-tertiary);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-layout-wrap .layout-title {
+  margin-bottom: 1.5rem;
+}
+
+.veterinary-layout-wrap .layout-title h4 {
+  color: var(--vet-primary-dark);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-layout-wrap .layout-title p {
+  color: var(--vet-text-secondary);
+  margin-bottom: 0;
+}
+
+.payment-methods-wrapper {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.payment-method-card {
+  background: var(--vet-bg-secondary);
+  border: 2px solid var(--vet-primary-light);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  min-width: 280px;
+}
+
+.payment-method-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--vet-primary-light);
+  transition: all 0.3s ease;
+}
+
+.payment-method-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(74, 144, 226, 0.15);
+  border-color: var(--vet-primary);
+}
+
+.payment-method-card:hover::before {
+  background: var(--vet-primary);
+}
+
+.payment-method-card.active {
+  border-color: var(--vet-secondary);
+  background: var(--vet-bg-tertiary);
+}
+
+.payment-method-card.active::before {
+  background: var(--vet-secondary);
+}
+
+.payment-method-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.payment-method-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--vet-bg-tertiary);
+  border: 2px solid var(--vet-primary-light);
+  border-radius: 12px;
+  padding: 0.5rem;
+}
+
+.payment-method-icon img {
+  max-width: 40px;
+  max-height: 40px;
+  object-fit: contain;
+}
+
+.payment-method-icon i {
+  font-size: 1.5rem;
+  color: var(--vet-primary);
+}
+
+.payment-method-info {
+  flex: 1;
+}
+
+.payment-method-info h6 {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.payment-method-info small {
+  color: var(--vet-text-secondary);
+  font-size: 0.8rem;
+}
+
+.payment-method-action {
+  display: flex;
+  align-items: center;
+}
+
+/* Enhanced Payment Table */
+.veterinary-payment-table .veterinary-table {
+  background: var(--vet-bg-secondary);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.08);
+}
+
+.veterinary-payment-table .veterinary-table thead {
+  background: linear-gradient(135deg, var(--vet-primary) 0%, var(--vet-primary-dark) 100%);
+  color: white;
+}
+
+.veterinary-payment-table .veterinary-table th {
+  border: none;
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.veterinary-payment-table .veterinary-table tbody tr {
+  border-bottom: 1px solid var(--vet-primary-light);
+  transition: all 0.3s ease;
+}
+
+.veterinary-payment-table .veterinary-table tbody tr:hover {
+  background: var(--vet-bg-tertiary);
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+}
+
+.veterinary-payment-table .veterinary-table td {
+  padding: 1rem;
+  vertical-align: middle;
+  border: none;
+}
+
+.veterinary-payment-table .payment-date {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.veterinary-payment-table .payment-date strong {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.veterinary-payment-table .payment-date small {
+  color: var(--vet-text-light);
+  font-size: 0.75rem;
+}
+
+.veterinary-payment-table .payment-method-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.veterinary-payment-table .payment-method-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--vet-bg-tertiary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.veterinary-payment-table .payment-method-icon img {
+  max-width: 24px;
+  max-height: 24px;
+  object-fit: contain;
+}
+
+.veterinary-payment-table .payment-method-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.veterinary-payment-table .payment-method-details strong {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.veterinary-payment-table .payment-method-details small {
+  color: var(--vet-text-secondary);
+  font-size: 0.75rem;
+}
+
+.veterinary-payment-table .payment-amount {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.veterinary-payment-table .payment-amount .amount {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--vet-primary);
+}
+
+.veterinary-payment-table .payment-amount small {
+  color: var(--vet-text-secondary);
+  font-size: 0.75rem;
+}
+
+.veterinary-payment-table .status-badge {
+  background: var(--vet-secondary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Veterinary Profile Settings */
+.veterinary-setting-card {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+.veterinary-setting-card:hover {
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+  border-color: var(--vet-primary);
+}
+
+.setting-title {
+  margin-bottom: 1.5rem;
+}
+
+.setting-title h5 {
+  color: var(--vet-primary-dark);
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Veterinary Avatar Upload */
+.veterinary-avatar-upload {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  padding: 1.5rem;
+  background: var(--vet-bg-tertiary);
+  border-radius: 12px;
+  border: 2px dashed var(--vet-primary-light);
+}
+
+.veterinary-profile-img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--vet-bg-secondary);
+  border: 3px solid var(--vet-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.veterinary-profile-img:hover {
+  border-color: var(--vet-primary);
+  transform: scale(1.05);
+}
+
+.veterinary-profile-img i {
+  font-size: 2rem;
+  color: var(--vet-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.veterinary-profile-img:hover i {
+  color: var(--vet-primary);
+}
+
+.veterinary-profile-img .avatar-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(74, 144, 226, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.veterinary-profile-img:hover .avatar-overlay {
+  opacity: 1;
+}
+
+.veterinary-avatar-upload .upload-img {
+  flex: 1;
+}
+
+.veterinary-avatar-upload .upload-img h5 {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.veterinary-avatar-upload .imgs-load {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.veterinary-change-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--vet-primary);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-change-photo::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-change-photo:hover {
+  background: var(--vet-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.2);
+}
+
+.veterinary-change-photo:hover::before {
+  left: 100%;
+}
+
+.veterinary-change-photo input {
+  display: none;
+}
+
+.veterinary-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--vet-accent);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.veterinary-remove-btn:hover {
+  background: var(--vet-accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 140, 66, 0.2);
+}
+
+.veterinary-form-text {
+  color: var(--vet-text-secondary);
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0;
+}
+
+/* Enhanced Form Elements */
+.veterinary-setting-card .form-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.veterinary-setting-card .form-label {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-setting-card .form-label i {
+  color: var(--vet-primary);
+  font-size: 0.9rem;
+}
+
+.veterinary-setting-card .veterinary-input {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--vet-text-primary);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.veterinary-setting-card .veterinary-input:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-setting-card .veterinary-input::placeholder {
+  color: var(--vet-text-light);
+}
+
+/* Enhanced Input Tags */
+.veterinary-setting-card .input-block {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.veterinary-setting-card .input-tags {
+  flex: 1;
+}
+
+.veterinary-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--vet-secondary);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.veterinary-save-btn:hover {
+  background: var(--vet-secondary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(80, 200, 120, 0.2);
+}
+
+/* Enhanced Membership Section */
+.veterinary-setting-card .membership-content {
+  background: var(--vet-bg-tertiary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-setting-card .membership-content .veterinary-action-btn.delete-btn {
+  background: var(--vet-accent);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-setting-card .membership-content .veterinary-action-btn.delete-btn:hover {
+  background: var(--vet-accent-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 140, 66, 0.2);
+}
+
+.veterinary-setting-card .add-membership-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--vet-secondary);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.veterinary-setting-card .add-membership-info:hover {
+  background: var(--vet-secondary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(80, 200, 120, 0.2);
+}
+
+/* Veterinary Experience Settings */
+.veterinary-experience-accordions {
+  margin-top: 1rem;
+}
+
+.veterinary-experience-accordions .user-accordion-item {
+  margin-bottom: 1rem;
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.veterinary-experience-accordions .user-accordion-item:hover {
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+  border-color: var(--vet-primary);
+}
+
+.veterinary-experience-accordions .veterinary-accordion-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--vet-bg-tertiary);
+  border-bottom: 1px solid var(--vet-primary-light);
+  text-decoration: none;
+  color: var(--vet-text-primary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-experience-accordions .veterinary-accordion-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-experience-accordions .veterinary-accordion-wrap:hover {
+  background: var(--vet-primary-light);
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-experience-accordions .veterinary-accordion-wrap:hover::before {
+  left: 100%;
+}
+
+.veterinary-experience-accordions .veterinary-accordion-wrap.collapsed {
+  background: var(--vet-bg-secondary);
+}
+
+.veterinary-experience-accordions .veterinary-accordion-wrap i {
+  color: var(--vet-primary);
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.veterinary-experience-accordions .veterinary-accordion-wrap:hover i {
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-experience-accordions .experience-title {
+  font-weight: 600;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.veterinary-experience-accordions .delete-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--vet-accent);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.veterinary-experience-accordions .delete-action:hover {
+  color: var(--vet-accent-dark);
+}
+
+.veterinary-experience-accordions .delete-action i {
+  font-size: 0.9rem;
+}
+
+.veterinary-experience-accordions .content-collapse {
+  background: var(--vet-bg-secondary);
+  padding: 2rem;
+}
+
+.veterinary-experience-accordions .add-service-info {
+  background: var(--vet-bg-tertiary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-experience-accordions .add-info {
+  margin-bottom: 0;
+}
+
+.veterinary-experience-accordions .form-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.veterinary-experience-accordions .col-form-label {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-experience-accordions .col-form-label i {
+  color: var(--vet-primary);
+  font-size: 0.9rem;
+}
+
+.veterinary-experience-accordions .veterinary-input {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--vet-text-primary);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.veterinary-experience-accordions .veterinary-input:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-experience-accordions .veterinary-input::placeholder {
+  color: var(--vet-text-light);
+}
+
+.veterinary-experience-accordions .veterinary-select {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--vet-text-primary);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.veterinary-experience-accordions .veterinary-select:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-experience-accordions .form-icon {
+  position: relative;
+}
+
+.veterinary-experience-accordions .form-icon .icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--vet-text-secondary);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.veterinary-experience-accordions .form-check-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--vet-text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.veterinary-experience-accordions .form-check-label:hover {
+  color: var(--vet-primary);
+}
+
+.veterinary-experience-accordions .form-check-label i {
+  color: var(--vet-secondary);
+  font-size: 0.9rem;
+}
+
+.veterinary-experience-accordions .reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-text-primary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.veterinary-experience-accordions .reset:hover {
+  background: var(--vet-primary-light);
+  color: var(--vet-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.15);
+}
+
+/* Veterinary Awards Settings */
+.veterinary-awards-accordions {
+  margin-top: 1rem;
+}
+
+.veterinary-awards-accordions .user-accordion-item {
+  margin-bottom: 1rem;
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.veterinary-awards-accordions .user-accordion-item:hover {
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+  border-color: var(--vet-primary);
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--vet-bg-tertiary);
+  border-bottom: 1px solid var(--vet-primary-light);
+  text-decoration: none;
+  color: var(--vet-text-primary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap:hover {
+  background: var(--vet-primary-light);
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap:hover::before {
+  left: 100%;
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap.collapsed {
+  background: var(--vet-bg-secondary);
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap i {
+  color: var(--vet-accent);
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap:hover i {
+  color: var(--vet-accent-dark);
+}
+
+.veterinary-awards-accordions .award-title {
+  font-weight: 600;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.veterinary-awards-accordions .title {
+  font-weight: 600;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.veterinary-awards-accordions .delete-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--vet-accent);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.veterinary-awards-accordions .delete-action:hover {
+  color: var(--vet-accent-dark);
+}
+
+.veterinary-awards-accordions .delete-action i {
+  font-size: 0.9rem;
+}
+
+.veterinary-awards-accordions .content-collapse {
+  background: var(--vet-bg-secondary);
+  padding: 2rem;
+}
+
+.veterinary-awards-accordions .add-service-info {
+  background: var(--vet-bg-tertiary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-awards-accordions .add-info {
+  margin-bottom: 0;
+}
+
+.veterinary-awards-accordions .form-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.veterinary-awards-accordions .col-form-label {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-awards-accordions .col-form-label i {
+  color: var(--vet-accent);
+  font-size: 0.9rem;
+}
+
+.veterinary-awards-accordions .veterinary-input {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--vet-text-primary);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.veterinary-awards-accordions .veterinary-input:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-awards-accordions .veterinary-input::placeholder {
+  color: var(--vet-text-light);
+}
+
+.veterinary-awards-accordions .form-icon {
+  position: relative;
+}
+
+.veterinary-awards-accordions .form-icon .icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--vet-text-secondary);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.veterinary-awards-accordions .reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-text-primary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.veterinary-awards-accordions .reset:hover {
+  background: var(--vet-primary-light);
+  color: var(--vet-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.15);
+}
+
+/* Award Badge Styles */
+.veterinary-awards-accordions .veterinary-accordion-wrap i.fa-medal {
+  color: var(--vet-secondary);
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap:hover i.fa-medal {
+  color: var(--vet-secondary-dark);
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap i.fa-star {
+  color: var(--vet-accent);
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap:hover i.fa-star {
+  color: var(--vet-accent-dark);
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap i.fa-certificate {
+  color: var(--vet-primary);
+}
+
+.veterinary-awards-accordions .veterinary-accordion-wrap:hover i.fa-certificate {
+  color: var(--vet-primary-dark);
+}
+
+/* Veterinary Business Settings */
+.veterinary-business-wrap {
+  background: var(--vet-bg-tertiary);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-business-wrap h4 {
+  color: var(--vet-primary-dark);
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-day-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.veterinary-day-nav li a {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  color: var(--vet-text-primary);
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-day-nav li a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.1), transparent);
+  transition: left 0.3s ease;
+}
+
+.veterinary-day-nav li a:hover,
+.veterinary-day-nav li a.active {
+  background: var(--vet-primary);
+  color: white;
+  border-color: var(--vet-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.15);
+}
+
+.veterinary-day-nav li a:hover::before,
+.veterinary-day-nav li a.active::before {
+  left: 100%;
+}
+
+.veterinary-business-accordions {
+  margin-top: 2rem;
+}
+
+.veterinary-business-accordions .veterinary-business-item {
+  margin-bottom: 1rem;
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.veterinary-business-accordions .veterinary-business-item:hover {
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+  border-color: var(--vet-primary);
+}
+
+.veterinary-business-accordions .veterinary-business-item.active {
+  border-color: var(--vet-secondary);
+}
+
+.veterinary-business-accordions .veterinary-business-accordion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--vet-bg-tertiary);
+  border-bottom: 1px solid var(--vet-primary-light);
+  text-decoration: none;
+  color: var(--vet-text-primary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-business-accordions .veterinary-business-accordion::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-business-accordions .veterinary-business-accordion:hover {
+  background: var(--vet-primary-light);
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-business-accordions .veterinary-business-accordion:hover::before {
+  left: 100%;
+}
+
+.veterinary-business-accordions .veterinary-business-accordion.collapsed {
+  background: var(--vet-bg-secondary);
+}
+
+.veterinary-business-accordions .veterinary-business-accordion i {
+  color: var(--vet-primary);
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.veterinary-business-accordions .veterinary-business-accordion:hover i {
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-business-accordions .veterinary-edit-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--vet-secondary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.veterinary-business-accordions .veterinary-edit-action:hover {
+  color: var(--vet-secondary-dark);
+}
+
+.veterinary-business-accordions .veterinary-edit-action i {
+  font-size: 0.9rem;
+}
+
+.veterinary-business-accordions .content-collapse {
+  background: var(--vet-bg-secondary);
+  padding: 2rem;
+}
+
+.veterinary-business-accordions .content-collapse .form-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.veterinary-business-accordions .content-collapse .col-form-label {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-business-accordions .content-collapse .col-form-label i {
+  color: var(--vet-primary);
+  font-size: 0.9rem;
+}
+
+.veterinary-business-accordions .content-collapse .veterinary-input {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--vet-text-primary);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.veterinary-business-accordions .content-collapse .veterinary-input:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-business-accordions .content-collapse .veterinary-input::placeholder {
+  color: var(--vet-text-light);
+}
+
+.veterinary-business-accordions .content-collapse .form-icon {
+  position: relative;
+}
+
+.veterinary-business-accordions .content-collapse .form-icon .icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--vet-text-secondary);
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+/* Business Hours Status Indicators */
+.veterinary-business-accordions .veterinary-business-item.active .veterinary-business-accordion {
+  border-left: 4px solid var(--vet-secondary);
+}
+
+.veterinary-business-accordions .veterinary-business-item:not(.active) .veterinary-business-accordion {
+  border-left: 4px solid var(--vet-text-light);
+}
+
+.veterinary-business-accordions .veterinary-business-item:not(.active) .veterinary-business-accordion::after {
+  content: 'Closed';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--vet-accent);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.veterinary-business-accordions .veterinary-business-item.active .veterinary-business-accordion::after {
+  content: 'Open';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--vet-secondary);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Veterinary Clinics Settings */
+.veterinary-clinics-accordions {
+  margin-top: 1rem;
+}
+
+.veterinary-clinics-accordions .user-accordion-item {
+  margin-bottom: 1rem;
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.veterinary-clinics-accordions .user-accordion-item:hover {
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.1);
+  border-color: var(--vet-primary);
+}
+
+.veterinary-clinics-accordions .veterinary-accordion-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--vet-bg-tertiary);
+  border-bottom: 1px solid var(--vet-primary-light);
+  text-decoration: none;
+  color: var(--vet-text-primary);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-clinics-accordions .veterinary-accordion-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-clinics-accordions .veterinary-accordion-wrap:hover {
+  background: var(--vet-primary-light);
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-clinics-accordions .veterinary-accordion-wrap:hover::before {
+  left: 100%;
+}
+
+.veterinary-clinics-accordions .veterinary-accordion-wrap.collapsed {
+  background: var(--vet-bg-secondary);
+}
+
+.veterinary-clinics-accordions .veterinary-accordion-wrap i {
+  color: var(--vet-primary);
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.veterinary-clinics-accordions .veterinary-accordion-wrap:hover i {
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-clinics-accordions .clinic-title {
+  font-weight: 600;
+  font-size: 1rem;
+  flex: 1;
+}
+
+.veterinary-clinics-accordions .delete-action {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--vet-accent);
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.veterinary-clinics-accordions .delete-action:hover {
+  color: var(--vet-accent-dark);
+}
+
+.veterinary-clinics-accordions .delete-action i {
+  font-size: 0.9rem;
+}
+
+.veterinary-clinics-accordions .content-collapse {
+  background: var(--vet-bg-secondary);
+  padding: 2rem;
+}
+
+.veterinary-clinics-accordions .add-service-info {
+  background: var(--vet-bg-tertiary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-clinics-accordions .add-info {
+  margin-bottom: 0;
+}
+
+.veterinary-clinics-accordions .form-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.veterinary-clinics-accordions .col-form-label {
+  color: var(--vet-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-clinics-accordions .col-form-label i {
+  color: var(--vet-primary);
+  font-size: 0.9rem;
+}
+
+.veterinary-clinics-accordions .veterinary-input {
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: var(--vet-text-primary);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.veterinary-clinics-accordions .veterinary-input:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-clinics-accordions .veterinary-input::placeholder {
+  color: var(--vet-text-light);
+}
+
+/* Enhanced Gallery Upload */
+.veterinary-clinics-accordions .veterinary-drop-file {
+  background: var(--vet-bg-secondary);
+  border: 2px dashed var(--vet-primary-light);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-clinics-accordions .veterinary-drop-file::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.05), transparent);
+  transition: left 0.5s ease;
+}
+
+.veterinary-clinics-accordions .veterinary-drop-file:hover {
+  border-color: var(--vet-primary);
+  background: var(--vet-bg-tertiary);
+}
+
+.veterinary-clinics-accordions .veterinary-drop-file:hover::before {
+  left: 100%;
+}
+
+.veterinary-clinics-accordions .veterinary-drop-file p {
+  color: var(--vet-text-secondary);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.veterinary-clinics-accordions .veterinary-drop-file p i {
+  color: var(--vet-primary);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.veterinary-clinics-accordions .veterinary-drop-file input {
+  display: none;
+}
+
+.veterinary-clinics-accordions .veterinary-gallery {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.veterinary-clinics-accordions .veterinary-gallery-item {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.veterinary-clinics-accordions .veterinary-gallery-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.veterinary-clinics-accordions .veterinary-gallery-item img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+.veterinary-clinics-accordions .veterinary-gallery-item .veterinary-remove-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--vet-accent);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.veterinary-clinics-accordions .veterinary-gallery-item:hover .veterinary-remove-btn {
+  opacity: 1;
+}
+
+.veterinary-clinics-accordions .veterinary-gallery-item .veterinary-remove-btn:hover {
+  background: var(--vet-accent-dark);
+  transform: scale(1.1);
+}
+
+.veterinary-clinics-accordions .reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-text-primary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 25px;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.veterinary-clinics-accordions .reset:hover {
+  background: var(--vet-primary-light);
+  color: var(--vet-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.15);
+}
+
+/* Education Badge Styles */
+.veterinary-education-accordions .veterinary-accordion-wrap i.fa-graduation-cap {
+  color: var(--vet-secondary);
+}
+
+.veterinary-education-accordions .veterinary-accordion-wrap:hover i.fa-graduation-cap {
+  color: var(--vet-secondary-dark);
+}
+
+/* Responsive Education Settings */
+@media (max-width: 768px) {
+  .veterinary-education-accordions .veterinary-accordion-wrap {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .veterinary-education-accordions .education-title {
+    font-size: 0.9rem;
+  }
+  
+  .veterinary-education-accordions .content-collapse {
+    padding: 1rem;
+  }
+  
+  .veterinary-education-accordions .add-service-info {
+    padding: 1rem;
+  }
+  
+  .veterinary-education-accordions .form-wrap {
+    margin-bottom: 1rem;
+  }
+  
+  .veterinary-education-accordions .col-form-label {
+    font-size: 0.85rem;
+  }
+  
+  .veterinary-education-accordions .veterinary-input {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .veterinary-education-accordions .veterinary-accordion-wrap {
+    padding: 0.875rem 1.25rem;
+  }
+  
+  .veterinary-education-accordions .content-collapse {
+    padding: 1.5rem;
+  }
+  
+  .veterinary-education-accordions .add-service-info {
+    padding: 1.25rem;
+  }
+  
+  .veterinary-education-accordions .form-wrap {
+    margin-bottom: 1.25rem;
+  }
+}
+
+/* Veterinary Chat Styles */
+.veterinary-chat-container {
+  display: flex;
+  gap: 1.5rem;
+  height: calc(100vh - 200px);
+  max-height: calc(100vh - 200px);
+  background: var(--vet-bg-secondary);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.08);
+}
+
+/* Veterinary Chat Sidebar */
+.veterinary-chat-sidebar {
+  width: 380px;
+  flex-shrink: 0;
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.veterinary-chat-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--vet-primary-light);
+  background: var(--vet-bg-tertiary);
+}
+
+.veterinary-chat-header h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: var(--vet-primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-chat-search {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.veterinary-chat-search .form-control-feedback {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--vet-text-secondary);
+  z-index: 1;
+}
+
+.veterinary-chat-search .veterinary-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 25px;
+  font-size: 0.875rem;
+  background: var(--vet-bg-secondary);
+  color: var(--vet-text-primary);
+  transition: all 0.3s ease;
+}
+
+.veterinary-chat-search .veterinary-input:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-chat-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 1rem;
+}
+
+.veterinary-online-section,
+.veterinary-pinned-section,
+.veterinary-recent-section {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.veterinary-section-header h6 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vet-text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.veterinary-section-header a {
+  font-size: 0.8rem;
+  color: var(--vet-primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.veterinary-section-header a:hover {
+  color: var(--vet-primary-dark);
+}
+
+.veterinary-online-contacts {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding: 0.5rem 0;
+}
+
+.veterinary-online-contact {
+  flex-shrink: 0;
+  width: 45px;
+  height: 45px;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.veterinary-online-contact img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 2px solid var(--vet-secondary-light);
+  transition: all 0.3s ease;
+}
+
+.veterinary-online-contact:hover img {
+  border-color: var(--vet-secondary);
+  transform: scale(1.05);
+}
+
+.veterinary-online-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background: var(--vet-secondary);
+  border: 2px solid white;
+  border-radius: 50%;
+  animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Veterinary Chat Items */
+.veterinary-chat-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.75rem;
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  background: var(--vet-bg-tertiary);
+  border: 1px solid var(--vet-primary-light);
+}
+
+.veterinary-chat-item:hover {
+  background: var(--vet-primary-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.1);
+}
+
+.veterinary-chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-chat-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 2px solid var(--vet-secondary-light);
+  transition: all 0.3s ease;
+}
+
+.veterinary-chat-avatar:hover img {
+  border-color: var(--vet-secondary);
+  transform: scale(1.05);
+}
+
+.veterinary-chat-avatar .veterinary-online-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background: var(--vet-secondary);
+  border: 2px solid white;
+  border-radius: 50%;
+  animation: pulse-green 2s infinite;
+}
+
+.veterinary-chat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.veterinary-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+.veterinary-chat-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--vet-text-primary);
+  margin: 0;
+}
+
+.veterinary-chat-time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--vet-text-secondary);
+}
+
+.veterinary-chat-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.veterinary-chat-icons i {
+  font-size: 0.75rem;
+  color: var(--vet-text-secondary);
+}
+
+.veterinary-chat-icons .veterinary-check {
+  color: var(--vet-secondary);
+}
+
+.veterinary-chat-icons .veterinary-check-double {
+  color: var(--vet-secondary);
+}
+
+.veterinary-chat-icons .veterinary-unread-badge {
+  background: var(--vet-accent);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.125rem 0.5rem;
+  min-width: 20px;
+  text-align: center;
+}
+
+.veterinary-chat-message {
+  display: flex;
+  margin-bottom: 1.5rem;
+  max-width: 75%;
+}
+
+.veterinary-message.veterinary-incoming {
+  align-self: flex-start;
+}
+
+.veterinary-message.veterinary-outgoing {
+  align-self: flex-end;
+  flex-direction: row-reverse;
+  margin-left: auto;
+}
+
+.veterinary-message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin: 0 0.5rem;
+}
+
+.veterinary-message-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 2px solid var(--vet-primary-light);
+}
+
+.veterinary-message-content {
+  flex: 1;
+}
+
+.veterinary-message-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.veterinary-message-header h6 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--vet-text-primary);
+  margin: 0;
+}
+
+.veterinary-message-header span {
+  font-size: 0.75rem;
+  color: var(--vet-text-secondary);
+}
+
+.veterinary-message-bubble {
+  background: var(--vet-bg-tertiary);
+  border-radius: 0 12px 12px 12px;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  color: var(--vet-text-primary);
+  line-height: 1.4;
+}
+
+.veterinary-message.veterinary-outgoing .veterinary-message-bubble {
+  border-radius: 12px 0 12px 12px;
+  background: var(--vet-primary-light);
+  color: var(--vet-text-primary-dark);
+}
+
+.veterinary-message-bubble a {
+  color: var(--vet-primary);
+  text-decoration: none;
+  word-wrap: break-word;
+}
+
+.veterinary-message-bubble img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+}
+
+.veterinary-audio-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.veterinary-audio-message button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: var(--vet-primary);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.veterinary-audio-message button:hover {
+  background: var(--vet-primary-dark);
+  transform: scale(1.05);
+}
+
+.veterinary-audio-waveform {
+  flex: 1;
+  height: 16px;
+  background: var(--vet-bg-tertiary);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-audio-waveform::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--vet-primary), var(--vet-primary-dark));
+  animation: audio-wave 3s infinite;
+}
+
+@keyframes audio-wave {
+  0% { width: 0%; }
+  50% { width: 100%; }
+  100% { width: 0%; }
+}
+
+.veterinary-missed-call {
+  color: var(--vet-accent) !important;
+}
+
+.veterinary-missed-icon {
+  color: var(--vet-accent) !important;
+}
+
+/* Veterinary Chat Details */
+.veterinary-chat-details {
+  flex: 1;
+  background: var(--vet-bg-secondary);
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.veterinary-chat-details-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--vet-primary-light);
+  background: var(--vet-bg-tertiary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.veterinary-chat-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.veterinary-chat-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+}
+
+.veterinary-chat-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 2px solid var(--vet-primary-light);
+}
+
+.veterinary-chat-avatar .veterinary-online-dot {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  background: var(--vet-secondary);
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.veterinary-chat-user-info h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--vet-text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.veterinary-chat-user-info small {
+  font-size: 0.75rem;
+  color: var(--vet-secondary);
+}
+
+.veterinary-chat-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.veterinary-chat-actions button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: var(--vet-bg-tertiary);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vet-text-secondary);
+  transition: all 0.3s ease;
+}
+
+.veterinary-chat-actions button:hover {
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-text-primary);
+  transform: scale(1.05);
+}
+
+.veterinary-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.5rem 1.5rem;
+  padding-bottom: 2rem;
+  min-height: 0;
+}
+
+.veterinary-date-separator {
+  text-align: center;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.veterinary-date-separator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--vet-primary-light);
+}
+
+.veterinary-date-separator span {
+  background: var(--vet-bg-secondary);
+  padding: 0.5rem 1rem;
+  position: relative;
+  color: var(--vet-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 20px;
+}
+
+.veterinary-chat-input-area {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--vet-primary-light);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  background: var(--vet-bg-secondary);
+}
+
+.veterinary-chat-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.veterinary-chat-actions button {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--vet-bg-tertiary);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vet-text-secondary);
+  transition: all 0.3s ease;
+}
+
+.veterinary-chat-actions button:hover {
+  background: var(--vet-bg-tertiary);
+  color: var(--vet-text-primary);
+  transform: scale(1.05);
+}
+
+.veterinary-chat-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--vet-primary-light);
+  border-radius: 25px;
+  font-size: 0.875rem;
+  background: var(--vet-bg-secondary);
+  color: var(--vet-text-primary);
+  transition: all 0.3s ease;
+}
+
+.veterinary-chat-input:focus {
+  border-color: var(--vet-primary);
+  box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+  outline: none;
+}
+
+.veterinary-send-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--vet-primary);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.veterinary-send-button:hover {
+  background: var(--vet-primary-dark);
+  transform: scale(1.05);
+}
+
+/* Responsive Chat */
+@media (max-width: 991px) {
+  .veterinary-chat-container {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .veterinary-chat-sidebar {
+    width: 100%;
+    max-height: 400px;
+  }
+  
+  .veterinary-chat-details {
+    display: none;
+  }
+  
+  .veterinary-chat-details.show {
+    display: flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .veterinary-chat-container {
+    gap: 1rem;
+  }
+  
+  .veterinary-chat-sidebar {
+    width: 100%;
+    max-height: 300px;
+  }
+  
+  .veterinary-chat-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .veterinary-chat-header h4 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .veterinary-chat-search .veterinary-input {
+    padding: 0.5rem 0.75rem 0.5rem 2rem;
+    font-size: 0.8rem;
+  }
+  
+  .veterinary-chat-content {
+    padding: 0 0.5rem;
+  }
+  
+  .veterinary-online-section,
+  .veterinary-pinned-section,
+  .veterinary-recent-section {
+    padding: 0.75rem 0;
+  }
+  
+  .veterinary-section-header h6 {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .veterinary-online-contacts {
+    gap: 0.5rem;
+  }
+  
+  .veterinary-online-contact {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .veterinary-chat-item {
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .veterinary-chat-avatar {
+    width: 36px;
+    height: 36px;
+    margin-right: 0.5rem;
+  }
+  
+  .veterinary-chat-name {
+    font-size: 0.85rem;
+  }
+  
+  .veterinary-chat-time {
+    font-size: 0.7rem;
+  }
+  
+  .veterinary-chat-message {
+    margin-bottom: 1rem;
+  }
+  
+  .veterinary-message-bubble {
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .veterinary-chat-messages {
+    padding: 1rem 1rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .veterinary-chat-input-area {
+    padding: 0.75rem 1rem;
+  }
+  
+  .veterinary-chat-actions button {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .veterinary-chat-input {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .veterinary-send-button {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .veterinary-chat-container {
+    gap: 0.5rem;
+  }
+  
+  .veterinary-chat-sidebar {
+    width: 100%;
+    max-height: 250px;
+  }
+  
+  .veterinary-chat-header {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .veterinary-chat-header h4 {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .veterinary-chat-search .veterinary-input {
+    padding: 0.5rem 0.75rem 0.5rem 2rem;
+    font-size: 0.8rem;
+  }
+  
+  .veterinary-chat-content {
+    padding: 0 0.25rem;
+  }
+  
+  .veterinary-online-section,
+  .veterinary-pinned-section,
+  .veterinary-recent-section {
+    padding: 0.5rem 0;
+  }
+  
+  .veterinary-section-header h6 {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .veterinary-online-contacts {
+    gap: 0.25rem;
+  }
+  
+  .veterinary-online-contact {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .veterinary-chat-item {
+    padding: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .veterinary-chat-avatar {
+    width: 32px;
+    height: 32px;
+    margin-right: 0.5rem;
+  }
+  
+  .veterinary-chat-name {
+    font-size: 0.8rem;
+  }
+  
+  .veterinary-chat-time {
+    font-size: 0.7rem;
+  }
+  
+  .veterinary-message {
+    margin-bottom: 0.75rem;
+  }
+  
+  .veterinary-message-bubble {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .veterinary-chat-messages {
+    padding: 0.75rem 0.75rem;
+    padding-bottom: 1rem;
+  }
+  
+  .veterinary-chat-input-area {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .veterinary-chat-actions button {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .veterinary-chat-input {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .veterinary-send-button {
+    width: 32px;
+    height: 32px;
+  }
+}
