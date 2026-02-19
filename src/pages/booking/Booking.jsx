@@ -283,7 +283,7 @@ const Booking = () => {
             </div>
 
             <div className="text-center">
-              <p className="mb-0">Copyright © {new Date().getFullYear()}. All Rights Reserved, Doccure</p>
+              <p className="mb-0">Copyright © {new Date().getFullYear()}. All Rights Reserved, MyPetPlus</p>
             </div>
           </div>
         </div>

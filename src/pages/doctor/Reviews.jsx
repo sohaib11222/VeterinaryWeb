@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react'
 
 import { useAuth } from '../../contexts/AuthContext'
-import { useReviewsByVeterinarian, useVeterinarianProfile } from '../../queries'
+import { useMyVeterinarianReviews, useVeterinarianProfile } from '../../queries'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const Reviews = () => {
   const { user } = useAuth()
-  const veterinarianId = user?.id || user?._id
 
   const [page, setPage] = useState(1)
   const limit = 10
@@ -14,7 +13,7 @@ const Reviews = () => {
   const { data: profileRes } = useVeterinarianProfile()
   const profile = profileRes?.data ?? profileRes
 
-  const { data: reviewsRes, isLoading, error } = useReviewsByVeterinarian(veterinarianId, { page, limit })
+  const { data: reviewsRes, isLoading, error } = useMyVeterinarianReviews({ page, limit }, { enabled: Boolean(user) })
   const payload = reviewsRes?.data ?? reviewsRes
   const reviews = payload?.reviews || []
   const pagination = payload?.pagination || { page: 1, limit, total: 0, pages: 1 }

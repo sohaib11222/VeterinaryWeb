@@ -53,8 +53,13 @@ const PharmacyRegister = () => {
 
       const role = response?.user?.role
       const status = response?.user?.status
+      const isPhoneVerified = response?.user?.isPhoneVerified
 
       if ((role === 'PET_STORE' || role === 'PARAPHARMACY') && status === 'PENDING') {
+        if (!isPhoneVerified) {
+          navigate('/pharmacy-phone-verification')
+          return
+        }
         navigate('/pet-store-verification-upload')
         return
       }
@@ -80,7 +85,7 @@ const PharmacyRegister = () => {
               <div className="account-content">
                 <div className="row align-items-center justify-content-center">
                   <div className="col-md-7 col-lg-6 login-left">
-                    <img src="/assets/img/login-banner.png" className="img-fluid" alt="Doccure Login" />
+                    <img src="/assets/img/login-banner.png" className="img-fluid" alt="MyPetPlus Login" />
                   </div>
                   <div className="col-md-12 col-lg-6 login-right">
                     <div className="login-header">

@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { toast } from 'react-toastify'
+import { api } from '../../utils/api'
+import { API_ROUTES } from '../../utils/apiConfig'
+import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const DoctorExperienceSettings = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
   const { data, isLoading } = useVeterinarianProfile()
   const updateProfile = useUpdateVeterinarianProfile()
 
@@ -59,6 +65,16 @@ const DoctorExperienceSettings = () => {
       })
 
       toast.success('Experience updated successfully')
+
+      const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
+      const nextProfile = refreshed?.data ?? refreshed
+      const isProfileCompleted = nextProfile?.profileCompleted === true
+      if (!isProfileCompleted) {
+        const nextTabPath = getNextTabPath(location.pathname)
+        if (nextTabPath) {
+          setTimeout(() => navigate(nextTabPath), 500)
+        }
+      }
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || 'Failed to update experience'
       toast.error(message)
@@ -143,7 +159,7 @@ const DoctorExperienceSettings = () => {
                                       className="form-control veterinary-input"
                                       value={exp.hospital}
                                       onChange={(e) => handleChange(index, 'hospital', e.target.value)}
-                                      placeholder="e.g., PetCare Veterinary Clinic"
+                                      placeholder="e.g., MyPetPlus Veterinary Clinic"
                                     />
                                   </div>
                                 </div>

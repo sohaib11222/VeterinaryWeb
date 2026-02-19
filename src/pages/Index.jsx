@@ -22,6 +22,7 @@ import Ourdoctors from '../components/home/Ourdoctors'
 import Feedback from '../components/home/Feedback'
 import Blogsection from '../components/home/Blogsection'
 import Chooseus from '../components/home/Chooseus'
+import InsuranceCompaniesSection from '../components/home/InsuranceCompaniesSection'
 import Footer from '../components/common/Footer'
 import ProgressCircle from '../components/home/ProgressCircle'
 
@@ -149,6 +150,7 @@ const Index = () => {
       <SpecializationsSection />
       <Ourdoctors />
       <Feedback />
+      <InsuranceCompaniesSection />
       <Blogsection />
       <Chooseus />
       <Footer />

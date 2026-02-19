@@ -9,6 +9,7 @@ const tabs = [
   { to: '/doctor-insurance-settings', icon: 'fa-shield-alt', label: 'Insurances' },
   { to: '/doctor-clinics-settings', icon: 'fa-clinic-medical', label: 'Clinics' },
   { to: '/doctor-business-settings', icon: 'fa-clock', label: 'Business Hours' },
+  { to: '/social-media', icon: 'fa-share-nodes', label: 'Social Media' },
 ]
 
 const DoctorProfileTabs = () => {

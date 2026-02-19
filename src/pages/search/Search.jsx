@@ -7,6 +7,7 @@ import { useSpecializations } from '../../queries/specializationQueries'
 import { useFavorites } from '../../queries/favoriteQueries'
 import { useAddFavorite, useRemoveFavorite } from '../../mutations/favoriteMutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import Breadcrumb from '../../components/common/Breadcrumb'
 
 const Search = () => {
   const { user } = useAuth()
@@ -212,23 +213,12 @@ const Search = () => {
 
   return (
     <>
-      {/* Breadcrumb - Search2 style */}
-      <div className="breadcrumb-bar overflow-visible">
+      <Breadcrumb title="Find Veterinarians" li2="Find Veterinarians" />
+
+      <section className="search-page-header">
         <div className="container">
-          <div className="row align-items-center inner-banner">
-            <div className="col-md-12 col-12 text-center">
-              <nav aria-label="breadcrumb" className="page-breadcrumb">
-                <ol className="breadcrumb">
-                  <li className="breadcrumb-item"><Link to="/"><i className="isax isax-home-15"></i></Link></li>
-                  <li className="breadcrumb-item">Veterinarians</li>
-                  <li className="breadcrumb-item active">Find Veterinarians</li>
-                </ol>
-                <h2 className="breadcrumb-title">Find Veterinarians</h2>
-              </nav>
-            </div>
-          </div>
-          <div className="bg-primary-gradient rounded-pill doctors-search-box">
-            <div className="search-box-one rounded-pill">
+          <div className="doctors-search-box doctors-search-box-clean">
+            <div className="search-box-one">
               <form onSubmit={handleSearch}>
                 <div className="search-input search-line">
                   <i className="isax isax-hospital5 bficon"></i>
@@ -255,7 +245,10 @@ const Search = () => {
                   </div>
                 </div>
                 <div className="form-search-btn">
-                  <button className="btn btn-primary d-inline-flex align-items-center rounded-pill" type="submit">
+                  <button
+                    className="btn btn-primary d-inline-flex align-items-center rounded-pill"
+                    type="submit"
+                  >
                     <i className="isax isax-search-normal-15 me-2"></i>Search
                   </button>
                 </div>
@@ -263,16 +256,10 @@ const Search = () => {
             </div>
           </div>
         </div>
-        <div className="breadcrumb-bg">
-          <img src="/assets/img/bg/breadcrumb-bg-01.png" alt="" className="breadcrumb-bg-01" />
-          <img src="/assets/img/bg/breadcrumb-bg-02.png" alt="" className="breadcrumb-bg-02" />
-          <img src="/assets/img/bg/breadcrumb-icon.png" alt="" className="breadcrumb-bg-03" />
-          <img src="/assets/img/bg/breadcrumb-icon.png" alt="" className="breadcrumb-bg-04" />
-        </div>
-      </div>
+      </section>
 
       {/* Page Content - Search2 layout: sidebar + list */}
-      <div className="content mt-5">
+      <div className="content search-page-content">
         <div className="container">
           <div className="row">
             {/* Left sidebar filter */}

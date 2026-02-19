@@ -151,63 +151,63 @@ const Header = () => {
   return (
     <>
       {/* Top Bar for Index Page */}
-      {isIndexPage && (
-        <div className="header-topbar">
-          <div className="container">
-            <div className="topbar-info">
-              <div className="d-flex align-items-center gap-3 header-info">
-                <p><i className="isax isax-message-text5 me-1"></i>info@example.com</p>
-                <p><i className="isax isax-call5 me-1"></i>+1 66589 14556</p>
-              </div>
-              <ul>
-                <li className="header-theme">
-                  <a href="javascript:void(0);" id="dark-mode-toggle" className="theme-toggle">
-                    <i className="isax isax-sun-1"></i>
-                  </a>
-                  <a href="javascript:void(0);" id="light-mode-toggle" className="theme-toggle activate">
-                    <i className="isax isax-moon"></i>
-                  </a>
-                </li>
-                <li className="d-inline-flex align-items-center drop-header">
-                  <div className="dropdown dropdown-country me-3">
-                    <a href="javascript:void(0);" className="d-inline-flex align-items-center" data-bs-toggle="dropdown">
-                      <img src="/assets/img/flags/us-flag.svg" className="me-2" alt="flag" />
-                    </a>
-                    <ul className="dropdown-menu p-2 mt-2">
-                      <li><a className="dropdown-item rounded d-flex align-items-center" href="javascript:void(0);">
-                        <img src="/assets/img/flags/us-flag.svg" className="me-2" alt="flag" />ENG
-                      </a></li>
-                      <li><a className="dropdown-item rounded d-flex align-items-center" href="javascript:void(0);">
-                        <img src="/assets/img/flags/arab-flag.svg" className="me-2" alt="flag" />ARA
-                      </a></li>
-                      <li><a className="dropdown-item rounded d-flex align-items-center" href="javascript:void(0);">
-                        <img src="/assets/img/flags/france-flag.svg" className="me-2" alt="flag" />FRA
-                      </a></li>
-                    </ul>
-                  </div>
-                  <div className="dropdown dropdown-amt">
-                    <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown">USD</a>
-                    <ul className="dropdown-menu p-2 mt-2">
-                      <li><a className="dropdown-item rounded" href="javascript:void(0);">USD</a></li>
-                      <li><a className="dropdown-item rounded" href="javascript:void(0);">YEN</a></li>
-                      <li><a className="dropdown-item rounded" href="javascript:void(0);">EURO</a></li>
-                    </ul>
-                  </div>
-                </li>
-                <li className="social-header">
-                  <div className="social-icon">
-                    <a href="javascript:void(0);"><i className="fa-brands fa-facebook"></i></a>
-                    <a href="javascript:void(0);"><i className="fa-brands fa-x-twitter"></i></a>
-                    <a href="javascript:void(0);"><i className="fa-brands fa-instagram"></i></a>
-                    <a href="javascript:void(0);"><i className="fa-brands fa-linkedin"></i></a>
-                    <a href="javascript:void(0);"><i className="fa-brands fa-pinterest"></i></a>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* {isIndexPage && (
+        // <div className="header-topbar">
+        //   <div className="container">
+        //     <div className="topbar-info">
+        //       <div className="d-flex align-items-center gap-3 header-info">
+        //         <p><i className="isax isax-message-text5 me-1"></i>info@example.com</p>
+        //         <p><i className="isax isax-call5 me-1"></i>+1 66589 14556</p>
+        //       </div>
+        //       <ul>
+        //         <li className="header-theme">
+        //           <a href="javascript:void(0);" id="dark-mode-toggle" className="theme-toggle">
+        //             <i className="isax isax-sun-1"></i>
+        //           </a>
+        //           <a href="javascript:void(0);" id="light-mode-toggle" className="theme-toggle activate">
+        //             <i className="isax isax-moon"></i>
+        //           </a>
+        //         </li>
+        //         <li className="d-inline-flex align-items-center drop-header">
+        //           <div className="dropdown dropdown-country me-3">
+        //             <a href="javascript:void(0);" className="d-inline-flex align-items-center" data-bs-toggle="dropdown">
+        //               <img src="/assets/img/flags/us-flag.svg" className="me-2" alt="flag" />
+        //             </a>
+        //             <ul className="dropdown-menu p-2 mt-2">
+        //               <li><a className="dropdown-item rounded d-flex align-items-center" href="javascript:void(0);">
+        //                 <img src="/assets/img/flags/us-flag.svg" className="me-2" alt="flag" />ENG
+        //               </a></li>
+        //               <li><a className="dropdown-item rounded d-flex align-items-center" href="javascript:void(0);">
+        //                 <img src="/assets/img/flags/arab-flag.svg" className="me-2" alt="flag" />ARA
+        //               </a></li>
+        //               <li><a className="dropdown-item rounded d-flex align-items-center" href="javascript:void(0);">
+        //                 <img src="/assets/img/flags/france-flag.svg" className="me-2" alt="flag" />FRA
+        //               </a></li>
+        //             </ul>
+        //           </div>
+        //           <div className="dropdown dropdown-amt">
+        //             <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown">USD</a>
+        //             <ul className="dropdown-menu p-2 mt-2">
+        //               <li><a className="dropdown-item rounded" href="javascript:void(0);">USD</a></li>
+        //               <li><a className="dropdown-item rounded" href="javascript:void(0);">YEN</a></li>
+        //               <li><a className="dropdown-item rounded" href="javascript:void(0);">EURO</a></li>
+        //             </ul>
+        //           </div>
+        //         </li>
+        //         <li className="social-header">
+        //           <div className="social-icon">
+        //             <a href="javascript:void(0);"><i className="fa-brands fa-facebook"></i></a>
+        //             <a href="javascript:void(0);"><i className="fa-brands fa-x-twitter"></i></a>
+        //             <a href="javascript:void(0);"><i className="fa-brands fa-instagram"></i></a>
+        //             <a href="javascript:void(0);"><i className="fa-brands fa-linkedin"></i></a>
+        //             <a href="javascript:void(0);"><i className="fa-brands fa-pinterest"></i></a>
+        //           </div>
+        //         </li>
+        //       </ul>
+        //     </div>
+        //   </div>
+        // </div>
+      )} */}
 
       {/* Pharmacy Top Header */}
       {isPharmacyIndex && (
@@ -257,7 +257,7 @@ const Header = () => {
                 <div className="col-md-3">
                   <div className="cart-logo">
                     <Link to="/">
-                      <img src="/assets/img/logo.svg" className="img-fluid" alt="Logo" />
+                      <img src="/assets/img/pet-logo.jpg" className="img-fluid" alt="Logo" />
                     </Link>
                   </div>
                 </div>
@@ -330,13 +330,13 @@ const Header = () => {
               </a>
               <Link to="/" className="navbar-brand logo">
                 {location.pathname === '/index-2' || location.pathname === '/index-11' ? (
-                  <img src="/assets/img/logo.png" className="img-fluid" alt="Logo" />
+                  <img src="/assets/img/pet-logo.jpg" className="img-fluid" alt="Logo" />
                 ) : location.pathname === '/index-6' ? (
-                  <img src="/assets/img/footer-logo.png" className="img-fluid" alt="Logo" />
+                  <img src="/assets/img/pet-logo.jpg" className="img-fluid" alt="Logo" />
                 ) : location.pathname === '/index-7' ? (
-                  <img src="/assets/img/veterinary-home-logo.svg" className="img-fluid" alt="Logo" />
+                  <img src="/assets/img/pet-logo.jpg" className="img-fluid" alt="Logo" />
                 ) : (
-                  <img src="/assets/img/logo.svg" className="img-fluid" alt="Logo" />
+                  <img src="/assets/img/pet-logo.jpg" className="img-fluid" alt="Logo" />
                 )}
               </Link>
             </div>
@@ -360,7 +360,7 @@ const Header = () => {
             <div className={`main-menu-wrapper ${isMenuOpen ? 'menu-opened' : ''}`}>
               <div className="menu-header">
                 <Link to="/" className="menu-logo">
-                  <img src="/assets/img/logo.svg" className="img-fluid" alt="Logo" />
+                  <img src="/assets/img/pet-logo.jpg" className="img-fluid" alt="Logo" />
                 </Link>
                 <a id="menu_close" className="menu-close" href="javascript:void(0);" onClick={() => setIsMenuOpen(false)}>
                   <i className="fas fa-times"></i>
@@ -383,7 +383,6 @@ const Header = () => {
                         <li><Link to="/appointments">Appointments</Link></li>
                         <li><Link to="/available-timings">Available Timing</Link></li>
                         <li><Link to="/my-patients">Patients List</Link></li>
-                        <li><Link to="/patient-profile">Patients Profile</Link></li>
                         <li><Link to="/chat-doctor">Chat</Link></li>
                         <li><Link to="/invoices">Invoices</Link></li>
                         <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
@@ -396,9 +395,7 @@ const Header = () => {
                         <li><Link to="/appointments">Appointments</Link></li>
                         <li><Link to="/available-timings">Available Timing</Link></li>
                         <li><Link to="/my-patients">Patients List</Link></li>
-                        <li><Link to="/patient-profile">Patients Profile</Link></li>
                         <li><Link to="/chat-doctor">Chat</Link></li>
-                        <li><Link to="/invoices">Invoices</Link></li>
                         <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
                         <li><Link to="/reviews">Reviews</Link></li>
                         <li><Link to="/doctor-register">Doctor Register</Link></li>
@@ -414,39 +411,18 @@ const Header = () => {
                   <a href="javascript:void(0);">Patients <i className="fas fa-chevron-down"></i></a>
                   <ul className="submenu">
                     <li><Link to="/patient/dashboard">Patient Dashboard</Link></li>
-                    <li className="has-submenu">
-                      <a href="javascript:void(0);">Doctors</a>
-                      <ul className="submenu inner-submenu">
-                        <li><Link to="/map-grid">Map Grid</Link></li>
-                        <li><Link to="/map-list">Map List</Link></li>
-                        <li><Link to="/map-list-availability">Map with Availability</Link></li>
-                      </ul>
-                    </li>
-                    <li className="has-submenu">
-                      <a href="javascript:void(0);">Search Doctor</a>
-                      <ul className="submenu inner-submenu">
+                  
+                    <li className="submenu">
+                      <a href="/search">Search Doctor</a>
+                      {/* <ul className="submenu inner-submenu">
                         <li><Link to="/search">Search Doctor 1</Link></li>
                         <li><Link to="/search-2">Search Doctor 2</Link></li>
-                      </ul>
+                      </ul> */}
                     </li>
-                    <li className="has-submenu">
-                      <a href="javascript:void(0);">Doctor Profile</a>
-                      <ul className="submenu inner-submenu">
-                        <li><Link to="/doctor-profile">Doctor Profile 1</Link></li>
-                        <li><Link to="/doctor-profile-2">Doctor Profile 2</Link></li>
-                      </ul>
-                    </li>
-                    <li className="has-submenu">
-                      <a href="javascript:void(0);">Booking</a>
-                      <ul className="submenu inner-submenu">
-                        <li><Link to="/booking">Booking</Link></li>
-                        <li><Link to="/booking-1">Booking 1</Link></li>
-                        <li><Link to="/booking-2">Booking 2</Link></li>
-                        <li><Link to="/booking-popup">Booking Popup</Link></li>
-                      </ul>
-                    </li>
-                    <li><Link to="/checkout">Checkout</Link></li>
-                    <li><Link to="/booking-success">Booking Success</Link></li>
+                  
+                   
+                    {/* <li><Link to="/checkout">Checkout</Link></li>
+                    <li><Link to="/booking-success">Booking Success</Link></li> */}
                     <li><Link to="/favourites">Favourites</Link></li>
                     <li><Link to="/chat">Chat</Link></li>
                     <li><Link to="/profile-settings">Profile Settings</Link></li>
@@ -460,15 +436,11 @@ const Header = () => {
                 <li className={`has-submenu ${isActive('/pharmacy') || isActive('/product') || isActive('/cart') ? 'active' : ''}`}>
                   <a href="javascript:void(0);">Pharmacy <i className="fas fa-chevron-down"></i></a>
                   <ul className="submenu">
-                    <li><Link to="/pharmacy-index">Pharmacy</Link></li>
-                    <li><Link to="/pharmacy-details">Pharmacy Details</Link></li>
-                    <li><Link to="/pharmacy-search">Pharmacy Search</Link></li>
-                    <li><Link to="/product-all">Product</Link></li>
-                    <li><Link to="/product-description">Product Description</Link></li>
+                   
+                    <li><Link to="/pharmacy-search">Pharmacies</Link></li>
+                    <li><Link to="/product-all">Products</Link></li>
                     <li><Link to="/cart">Cart</Link></li>
-                    <li><Link to="/product-checkout">Product Checkout</Link></li>
-                    <li><Link to="/payment-success">Payment Success</Link></li>
-                    <li><Link to="/pharmacy-register">Pharmacy Register</Link></li>
+                  
                   </ul>
                 </li>
                 )}
@@ -537,14 +509,14 @@ const Header = () => {
                     </Link>
                   </li>
                 )}
-                <li className="header-theme noti-nav">
+                {/* <li className="header-theme noti-nav">
                   <a href="javascript:void(0);" id="dark-mode-toggle" className="theme-toggle">
                     <i className="isax isax-sun-1"></i>
                   </a>
                   <a href="javascript:void(0);" id="light-mode-toggle" className="theme-toggle activate">
                     <i className="isax isax-moon"></i>
                   </a>
-                </li>
+                </li> */}
                 <li className="nav-item dropdown has-arrow logged-item">
                   <a href="javascript:void(0);" className="nav-link ps-0" data-bs-toggle="dropdown">
                     <span className="user-img">

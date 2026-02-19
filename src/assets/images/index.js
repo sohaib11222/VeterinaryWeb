@@ -45,4 +45,4 @@ export { default as doctor_07 } from "/assets/img/doctors/doctor-07.jpg";
 export { default as home_12_why_us } from "/assets/img/kuttabhau.png";
 
 // Default logo
-export { default as logo } from "/assets/img/logo.png";
+export { default as logo } from "/assets/img/pet-logo.jpg";

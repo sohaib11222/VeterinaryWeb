@@ -105,6 +105,8 @@ const DoctorProfile = () => {
   const hasServices = Array.isArray(profile?.services) && profile.services.length > 0
   const hasSpeciality = Array.isArray(profile?.specializations) && profile.specializations.length > 0
   const hasClinics = Array.isArray(profile?.clinics) && profile.clinics.length > 0
+  const insuranceCompanies = Array.isArray(profile?.insuranceCompanies) ? profile.insuranceCompanies : []
+  const hasInsurance = (profile?.convenzionato === true || profile?.acceptsInsurance === true) && insuranceCompanies.length > 0
 
   const doctorName = profile?.userId?.fullName || profile?.userId?.name || 'Veterinarian'
   const doctorImage = getImageUrl(profile?.userId?.profileImage) || '/assets/img/doctors/doc-profile-02.jpg'
@@ -578,7 +580,51 @@ const DoctorProfile = () => {
 
             <div className={`doc-information-details ${activeSection === 'insurance' ? '' : 'd-none'}`} id="insurance">
               <div className="detail-title"><h4>Insurances</h4></div>
-              <p className="text-muted">Insurance information not available.</p>
+              {hasInsurance ? (
+                <div className="row">
+                  {insuranceCompanies.map((ins) => {
+                    const id = ins?._id || ins?.id || ins
+                    const name = typeof ins === 'object' && ins !== null ? (ins.name || 'Insurance') : 'Insurance'
+                    const logoUrl = typeof ins === 'object' && ins !== null ? getImageUrl(ins.logo) : null
+                    return (
+                      <div key={String(id)} className="col-6 col-md-4 col-lg-3 mb-3">
+                        <div className="card" style={{ borderRadius: 12, border: '1px solid #eef1f6' }}>
+                          <div className="card-body text-center" style={{ padding: 14 }}>
+                            {logoUrl ? (
+                              <img
+                                src={logoUrl}
+                                alt={name}
+                                style={{ maxWidth: '100%', maxHeight: 60, objectFit: 'contain' }}
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none'
+                                  const next = e.currentTarget.nextSibling
+                                  if (next?.style) next.style.display = 'flex'
+                                }}
+                              />
+                            ) : null}
+                            <div
+                              style={{
+                                display: logoUrl ? 'none' : 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                height: 60,
+                                background: '#f8f9fa',
+                                borderRadius: 8,
+                                marginBottom: 10,
+                              }}
+                            >
+                              <i className="fa-solid fa-shield-halved text-muted" style={{ fontSize: 22 }}></i>
+                            </div>
+                            <div style={{ fontWeight: 600, fontSize: 13 }}>{name}</div>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <p className="text-muted">Insurance information not available.</p>
+              )}
             </div>
 
             <div className={`doc-information-details ${activeSection === 'services' ? '' : 'd-none'}`} id="services">

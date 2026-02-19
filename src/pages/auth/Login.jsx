@@ -34,6 +34,14 @@ const Login = () => {
         if (status === 'PENDING') {
           navigate('/pending-approval')
         } else if (status === 'APPROVED') {
+          // On first login after approval/registration, prompt onboarding steps (profile -> timings -> subscription)
+          try {
+            if (!localStorage.getItem('vet_onboarding_required')) {
+              localStorage.setItem('vet_onboarding_required', '1')
+            }
+          } catch {
+            // ignore
+          }
           navigate('/doctor/dashboard')
         } else {
           toast.error('Your veterinary account is not active. Please contact support.')
@@ -45,7 +53,9 @@ const Login = () => {
         toast.info('Admin panel is available in a separate application.')
         navigate('/')
       } else if (role === 'PET_STORE') {
-        if (status === 'PENDING') {
+        if (user?.isPhoneVerified === false) {
+          navigate('/pharmacy-phone-verification')
+        } else if (status === 'PENDING') {
           navigate('/pending-approval')
         } else if (status === 'APPROVED') {
           navigate('/pharmacy-admin/dashboard')
@@ -54,7 +64,9 @@ const Login = () => {
           navigate('/login')
         }
       } else if (role === 'PARAPHARMACY') {
-        if (status === 'PENDING') {
+        if (user?.isPhoneVerified === false) {
+          navigate('/pharmacy-phone-verification')
+        } else if (status === 'PENDING') {
           navigate('/pending-approval')
         } else if (status === 'APPROVED') {
           navigate('/pharmacy-admin/dashboard')
@@ -85,7 +97,7 @@ const Login = () => {
                       <i className="fa-solid fa-paw fa-3x text-primary"></i>
                     </div>
                     <h3 className="account-title veterinary-login-title">
-                      <i className="fa-solid fa-heart-pulse me-2"></i>PetCare Login
+                      <i className="fa-solid fa-heart-pulse me-2"></i>MyPetPlus Login
                     </h3>
                     <p className="account-subtitle veterinary-login-subtitle">
                       Access your pet health dashboard
@@ -134,14 +146,14 @@ const Login = () => {
                             Logging in...
                           </>
                         ) : (
-                          'Login to PetCare'
+                          'Login to MyPetPlus'
                         )}
                       </button>
                     </div>
                     <div className="account-footer veterinary-login-footer">
                       <p className="veterinary-footer-text">
                         <i className="fa-solid fa-user-plus me-2"></i>
-                        New to PetCare? <Link to="/register" className="veterinary-register-link">Create Account</Link>
+                        New to MyPetPlus? <Link to="/register" className="veterinary-register-link">Create Account</Link>
                       </p>
                       <div className="veterinary-login-features mt-3">
                         <div className="row text-center">

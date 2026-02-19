@@ -454,7 +454,7 @@ const AvailableTimings = () => {
                       <div className="row">
                         <div className="col-md-6">
                           <select className="select-img veterinary-select">
-                            <option data-image="assets/img/doctors-dashboard/clinic-01.jpg">🐾 PetCare Veterinary Clinic</option>
+                            <option data-image="assets/img/doctors-dashboard/clinic-01.jpg">🐾 MyPetPlus Veterinary Clinic</option>
                             <option data-image="assets/img/doctors-dashboard/clinic-02.jpg">🏥 Animal Medical Center</option>
                           </select>
                         </div>

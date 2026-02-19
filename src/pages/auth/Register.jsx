@@ -78,7 +78,7 @@ const Register = () => {
                       <i className="fa-solid fa-paw fa-3x text-primary"></i>
                     </div>
                     <h3 className="account-title veterinary-register-title">
-                      <i className="fa-solid fa-heart-pulse me-2"></i>Join PetCare
+                      <i className="fa-solid fa-heart-pulse me-2"></i>Join MyPetPlus
                     </h3>
                     <p className="account-subtitle veterinary-register-subtitle">
                       Create your pet health account
@@ -154,7 +154,7 @@ const Register = () => {
                             Creating Account...
                           </>
                         ) : (
-                          'Create PetCare Account'
+                          'Create MyPetPlus Account'
                         )}
                       </button>
                     </div>
@@ -185,7 +185,7 @@ const Register = () => {
                     <div className="account-footer veterinary-register-footer">
                       <p className="veterinary-footer-text">
                         <i className="fa-solid fa-sign-in-alt me-2"></i>
-                        Already have an account? <Link to="/login" className="veterinary-login-link">Login to PetCare</Link>
+                        Already have an account? <Link to="/login" className="veterinary-login-link">Login to MyPetPlus</Link>
                       </p>
                       <div className="veterinary-register-features mt-3">
                         <div className="row text-center">

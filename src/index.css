@@ -14,6 +14,238 @@ body {
   min-height: 100vh;
 }
 
+.about-media-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  height: 100%;
+}
+
+.about-media-grid img {
+  width: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+.about-media-main {
+  height: 100%;
+}
+
+.about-media-main img {
+  height: auto;
+  aspect-ratio: 4 / 5;
+  max-height: 640px;
+}
+
+.about-media-secondary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.about-media-secondary img {
+  min-height: 180px;
+}
+
+.about-inline-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.about-inline-card {
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.about-inline-card h5 {
+  margin-bottom: 6px;
+}
+
+.about-inline-card p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.about-actions {
+  margin-top: 14px;
+}
+
+.about-section .about-content-details p {
+  margin-bottom: 12px;
+}
+
+.about-section .about-content-details p:last-child {
+  margin-bottom: 0;
+}
+
+.about-highlight-card {
+  border-radius: 16px;
+  border: 0;
+  box-shadow: 0 16px 34px rgba(17, 24, 39, 0.08);
+}
+
+.about-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.about-stat {
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: center;
+}
+
+.about-stat h4 {
+  margin: 0;
+  font-weight: 800;
+}
+
+.about-stat p {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+.about-image-card {
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #eef2f7;
+}
+
+.about-image-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
+.about-testimonial-card {
+  border-radius: 16px;
+  border: 1px solid #eef2f7;
+  box-shadow: 0 16px 34px rgba(17, 24, 39, 0.06);
+}
+
+.about-testimonial-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.about-testimonial-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 8px 18px rgba(17, 24, 39, 0.12);
+}
+
+.about-testimonial-text {
+  margin: 0;
+  color: #374151;
+}
+
+@media (min-width: 992px) {
+  .about-inline-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Search pages: prevent overlapping header search box (theme uses negative margin) */
+.search-page-header .doctors-search-box.doctors-search-box-clean {
+  margin: 16px auto 0 !important;
+  padding: 2px;
+}
+
+.search-page-header .doctors-search-box.doctors-search-box-clean .search-box-one {
+  border-radius: 999px;
+}
+
+.content.search-page-content {
+  padding-top: 28px;
+}
+
+@media (max-width: 767.98px) {
+  .content.search-page-content {
+    padding-top: 20px;
+  }
+}
+
+/* Footer: remove veterinary theme gradient from bottom bar */
+.footer.footer-one .footer-bottom {
+  background: #f8fafc !important;
+}
+
+.footer.footer-one .footer-bottom .copyright {
+  border-top: 1px solid #e5e7eb;
+}
+
+.footer.footer-one .footer-bottom .copyright .copyright-text p,
+.footer.footer-one .footer-bottom .copyright .policy-menu li a {
+  color: #6b7280;
+}
+
+/* Breadcrumb: clean top header */
+.breadcrumb-bar.breadcrumb-bar-clean {
+  background: #f8fafc !important;
+  padding: 60px 0 40px !important;
+}
+
+.breadcrumb-bar.breadcrumb-bar-clean .breadcrumb-title {
+  color: #111827 !important;
+  font-size: 40px;
+  line-height: 1.15;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+
+.breadcrumb-bar.breadcrumb-bar-clean .page-breadcrumb ol {
+  font-size: 14px;
+}
+
+.breadcrumb-bar.breadcrumb-bar-clean .page-breadcrumb ol li a {
+  color: #6b7280 !important;
+}
+
+.breadcrumb-bar.breadcrumb-bar-clean .page-breadcrumb ol li.active {
+  color: #111827 !important;
+  font-weight: 600;
+}
+
+.breadcrumb-bar.breadcrumb-bar-clean .page-breadcrumb .breadcrumb-item + .breadcrumb-item:before {
+  color: #9ca3af !important;
+  content: "/";
+  font-size: 14px;
+}
+
+@media (max-width: 767.98px) {
+  .breadcrumb-bar.breadcrumb-bar-clean {
+    padding: 44px 0 28px !important;
+  }
+
+  .breadcrumb-bar.breadcrumb-bar-clean .breadcrumb-title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .about-media-secondary {
+    grid-template-columns: 1fr;
+  }
+
+  .about-media-main img {
+    aspect-ratio: 4 / 5;
+    max-height: 520px;
+  }
+}
+
 .cart-qty-stepper {
   display: inline-flex !important;
   align-items: center !important;

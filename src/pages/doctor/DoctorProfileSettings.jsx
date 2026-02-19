@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { api } from '../../utils/api'
 import { API_ROUTES, getImageUrl } from '../../utils/apiConfig'
 import { toast } from 'react-toastify'
+import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const DoctorProfileSettings = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
   const { data, isLoading } = useVeterinarianProfile()
   const updateProfile = useUpdateVeterinarianProfile()
 
@@ -121,6 +125,16 @@ const DoctorProfileSettings = () => {
           .map((name) => ({ name })),
       })
       toast.success('Profile updated successfully')
+
+      const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
+      const nextProfile = refreshed?.data ?? refreshed
+      const isProfileCompleted = nextProfile?.profileCompleted === true
+      if (!isProfileCompleted) {
+        const nextTabPath = getNextTabPath(location.pathname)
+        if (nextTabPath) {
+          setTimeout(() => navigate(nextTabPath), 500)
+        }
+      }
     } catch (err) {
       toast.error(err?.message || 'Failed to update profile')
     }

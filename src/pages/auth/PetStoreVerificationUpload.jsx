@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import AuthLayout from '../../layouts/AuthLayout'
 import { toast } from 'react-toastify'
+import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 
@@ -48,8 +49,18 @@ const DOCS = [
 
 const PetStoreVerificationUpload = () => {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [filePreviews, setFilePreviews] = useState({})
+
+  useEffect(() => {
+    const role = String(user?.role || '').toUpperCase()
+    if (role === 'PET_STORE' || role === 'PARAPHARMACY') {
+      if (user?.isPhoneVerified === false) {
+        navigate('/pharmacy-phone-verification')
+      }
+    }
+  }, [navigate, user?.isPhoneVerified, user?.role])
 
   const {
     handleSubmit,
@@ -115,7 +126,7 @@ const PetStoreVerificationUpload = () => {
                 <div className="inner-right-login">
                   <div className="login-header">
                     <div className="logo-icon">
-                      <img src="/assets/img/logo.png" alt="doccure-logo" />
+                      <img src="/assets/img/pet-logo.jpg" alt="MyPetPlus logo" />
                     </div>
 
                     <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
@@ -172,7 +183,7 @@ const PetStoreVerificationUpload = () => {
                   </div>
                 </div>
                 <div className="login-bottom-copyright">
-                  <span>© {new Date().getFullYear()} Doccure. All rights reserved.</span>
+                  <span>© {new Date().getFullYear()} MyPetPlus. All rights reserved.</span>
                 </div>
               </div>
             </div>

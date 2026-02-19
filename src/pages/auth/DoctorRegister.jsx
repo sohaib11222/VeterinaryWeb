@@ -46,6 +46,13 @@ const DoctorRegister = () => {
       const response = await registerUser(payload, 'doctor')
       toast.success('Registration successful! Please upload verification documents.')
 
+      // Trigger first-time onboarding prompts after approval/login
+      try {
+        localStorage.setItem('vet_onboarding_required', '1')
+      } catch {
+        // ignore
+      }
+
       const status = response?.user?.status
       if (status === 'PENDING') {
         navigate('/doctor-verification-upload')
@@ -69,12 +76,12 @@ const DoctorRegister = () => {
                 <div className="row align-items-center justify-content-center">
                   <div className="col-md-7 col-lg-6 login-left veterinary-register-left">
                     <div className="veterinary-register-banner">
-                      <img src="/assets/img/login-banner.png" className="img-fluid veterinary-banner-img" alt="PetCare Veterinary Register" />
+                      <img src="/assets/img/login-banner.png" className="img-fluid veterinary-banner-img" alt="MyPetPlus Veterinary Register" />
                       <div className="veterinary-banner-overlay">
                         <div className="veterinary-banner-content">
                           <i className="fa-solid fa-user-doctor fa-3x text-white mb-3"></i>
                           <h4 className="text-white">Join Our Veterinary Team</h4>
-                          <p className="text-white">Become part of PetCare's trusted veterinary network</p>
+                          <p className="text-white">Become part of MyPetPlus's trusted veterinary network</p>
                         </div>
                       </div>
                     </div>

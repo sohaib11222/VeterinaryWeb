@@ -39,6 +39,7 @@ import PharmacyRegister from './pages/auth/PharmacyRegister'
 import PharmacyRegisterStep1 from './pages/auth/PharmacyRegisterStep1'
 import PharmacyRegisterStep2 from './pages/auth/PharmacyRegisterStep2'
 import PharmacyRegisterStep3 from './pages/auth/PharmacyRegisterStep3'
+import PharmacyPhoneVerification from './pages/auth/PharmacyPhoneVerification'
 import PetStoreVerificationUpload from './pages/auth/PetStoreVerificationUpload'
 
 // Doctor Pages
@@ -221,6 +222,14 @@ function App() {
                   }
                 />
                 <Route path="/pharmacy-register" element={<AuthLayout><PharmacyRegister /></AuthLayout>} />
+                <Route
+                  path="/pharmacy-phone-verification"
+                  element={
+                    <ProtectedRoute role={['PET_STORE', 'PARAPHARMACY']} allowPending={true}>
+                      <AuthLayout><PharmacyPhoneVerification /></AuthLayout>
+                    </ProtectedRoute>
+                  }
+                />
                 <Route path="/pharmacy-register-step1" element={<AuthLayout><PharmacyRegisterStep1 /></AuthLayout>} />
                 <Route path="/pharmacy-register-step2" element={<AuthLayout><PharmacyRegisterStep2 /></AuthLayout>} />
                 <Route path="/pharmacy-register-step3" element={<AuthLayout><PharmacyRegisterStep3 /></AuthLayout>} />
@@ -438,7 +447,7 @@ function App() {
               path="/social-media"
               element={
                 <ProtectedRoute role="VETERINARIAN" requireApproved={true}>
-                  <DashboardLayout breadcrumb={{ title: "Doctor", li1: "Social Media", li2: "Social Media" }}><SocialMedia /></DashboardLayout>
+                  <DashboardLayout breadcrumb={{ title: "Doctor", li1: "Doctor Profile", li2: "Doctor Profile" }}><SocialMedia /></DashboardLayout>
                 </ProtectedRoute>
               }
             />

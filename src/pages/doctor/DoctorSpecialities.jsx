@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useSpecializations } from '../../queries/specializationQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { toast } from 'react-toastify'
+import { api } from '../../utils/api'
+import { API_ROUTES } from '../../utils/apiConfig'
+import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const DoctorSpecialities = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
   const { data: profileResponse, isLoading: profileLoading } = useVeterinarianProfile()
   const { data: specializationsResponse, isLoading: specsLoading } = useSpecializations()
   const updateProfile = useUpdateVeterinarianProfile()
@@ -105,6 +111,16 @@ const DoctorSpecialities = () => {
         services: validServices,
       })
       toast.success('Specialties & services updated successfully')
+
+      const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
+      const nextProfile = refreshed?.data ?? refreshed
+      const isProfileCompleted = nextProfile?.profileCompleted === true
+      if (!isProfileCompleted) {
+        const nextTabPath = getNextTabPath(location.pathname)
+        if (nextTabPath) {
+          setTimeout(() => navigate(nextTabPath), 500)
+        }
+      }
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || 'Failed to update'
       toast.error(message)

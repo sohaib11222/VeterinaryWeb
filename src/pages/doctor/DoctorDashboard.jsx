@@ -1,16 +1,23 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
-import { useAppointments, useVeterinarianDashboard } from '../../queries'
+import { useAppointments, useVeterinarianDashboard, useWeeklySchedule } from '../../queries'
 import { useAcceptAppointment, useRejectAppointment } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import ProfileIncompleteModal from '../../components/common/ProfileIncompleteModal'
+import AddTimingsModal from '../../components/common/AddTimingsModal'
+import BuySubscriptionModal from '../../components/common/BuySubscriptionModal'
 
 const DoctorDashboard = () => {
   const acceptAppointment = useAcceptAppointment()
   const rejectAppointment = useRejectAppointment()
+
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [showTimingsModal, setShowTimingsModal] = useState(false)
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false)
 
   const {
     data: dashboardResponse,
@@ -18,6 +25,69 @@ const DoctorDashboard = () => {
   } = useVeterinarianDashboard()
 
   const dashboard = useMemo(() => dashboardResponse?.data ?? dashboardResponse, [dashboardResponse])
+
+  const { data: scheduleResponse, isLoading: scheduleLoading } = useWeeklySchedule()
+  const schedule = useMemo(() => scheduleResponse?.data ?? scheduleResponse, [scheduleResponse])
+
+  const hasAnyWeeklySlot = useMemo(() => {
+    const days = schedule?.data?.days ?? schedule?.days ?? []
+    if (!Array.isArray(days)) return false
+    return days.some((d) => Array.isArray(d?.timeSlots) && d.timeSlots.length > 0)
+  }, [schedule])
+
+  const profileCompleted = dashboard?.profileCompleted === true
+  const hasActiveSubscription = dashboard?.subscription?.hasActiveSubscription === true
+
+  useEffect(() => {
+    if (dashboardLoading) return
+    if (scheduleLoading) return
+
+    let onboardingRequired = false
+    try {
+      onboardingRequired = localStorage.getItem('vet_onboarding_required') === '1'
+    } catch {
+      onboardingRequired = false
+    }
+
+    // Show onboarding modals only when flag is set; otherwise keep it silent.
+    if (!onboardingRequired) {
+      setShowProfileModal(false)
+      setShowTimingsModal(false)
+      setShowSubscriptionModal(false)
+      return
+    }
+
+    if (!profileCompleted) {
+      setShowProfileModal(true)
+      setShowTimingsModal(false)
+      setShowSubscriptionModal(false)
+      return
+    }
+
+    if (!hasAnyWeeklySlot) {
+      setShowProfileModal(false)
+      setShowTimingsModal(true)
+      setShowSubscriptionModal(false)
+      return
+    }
+
+    if (!hasActiveSubscription) {
+      setShowProfileModal(false)
+      setShowTimingsModal(false)
+      setShowSubscriptionModal(true)
+      return
+    }
+
+    // All onboarding requirements met: clear flag.
+    try {
+      localStorage.removeItem('vet_onboarding_required')
+    } catch {
+      // ignore
+    }
+    setShowProfileModal(false)
+    setShowTimingsModal(false)
+    setShowSubscriptionModal(false)
+  }, [dashboardLoading, scheduleLoading, profileCompleted, hasAnyWeeklySlot, hasActiveSubscription])
 
   const { data: appointmentsResponse, isLoading: appointmentsLoading } = useAppointments({ page: 1, limit: 1000 })
   const appointments = useMemo(() => {
@@ -213,6 +283,25 @@ const DoctorDashboard = () => {
 
   return (
     <div className="content veterinary-dashboard">
+      <ProfileIncompleteModal
+        show={showProfileModal}
+        onClose={() => {
+          setShowProfileModal(false)
+        }}
+      />
+      <AddTimingsModal
+        show={showTimingsModal}
+        onClose={() => {
+          setShowTimingsModal(false)
+        }}
+      />
+      <BuySubscriptionModal
+        show={showSubscriptionModal}
+        onClose={() => {
+          setShowSubscriptionModal(false)
+        }}
+      />
+
       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-3 col-xl-2 theiaStickySidebar">

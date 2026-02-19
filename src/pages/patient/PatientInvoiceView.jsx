@@ -75,7 +75,7 @@ const PatientInvoiceView = () => {
                 <div className="row">
                   <div className="col-md-6">
                     <div className="invoice-logo">
-                      <img src="/assets/img/logo.svg" alt="logo" />
+                      <img src="/assets/img/pet-logo.jpg" alt="logo" />
                     </div>
                   </div>
                   <div className="col-md-6">

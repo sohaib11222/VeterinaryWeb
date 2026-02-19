@@ -1,35 +1,89 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
+import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
+import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
+import { api } from '../../utils/api'
+import { API_ROUTES } from '../../utils/apiConfig'
+import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const SocialMedia = () => {
-  const [socialLinks, setSocialLinks] = useState([
-    { platform: 'Facebook', url: '', selected: true },
-    { platform: 'Twitter', url: '', selected: true },
-    { platform: 'LinkedIn', url: '', selected: true },
-    { platform: 'Instagram', url: '', selected: true },
-    { platform: 'YouTube', url: '', selected: false },
-    { platform: 'Pinterest', url: '', selected: false }
-  ])
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const handlePlatformChange = (index, platform) => {
-    const updatedLinks = [...socialLinks]
-    updatedLinks[index].platform = platform
-    setSocialLinks(updatedLinks)
+  const { data: profileRes, isLoading } = useVeterinarianProfile()
+  const updateProfile = useUpdateVeterinarianProfile()
+
+  const profile = profileRes?.data || {}
+
+  const [socialLinks, setSocialLinks] = useState({
+    facebook: '',
+    instagram: '',
+    linkedin: '',
+    twitter: '',
+    website: '',
+  })
+
+  useEffect(() => {
+    const existing = profile?.socialLinks || {}
+    setSocialLinks({
+      facebook: existing.facebook || '',
+      instagram: existing.instagram || '',
+      linkedin: existing.linkedin || '',
+      twitter: existing.twitter || '',
+      website: existing.website || '',
+    })
+  }, [JSON.stringify(profile?.socialLinks || {})])
+
+  const handleChange = (key, value) => {
+    setSocialLinks((prev) => ({ ...prev, [key]: value }))
   }
 
-  const handleUrlChange = (index, url) => {
-    const updatedLinks = [...socialLinks]
-    updatedLinks[index].url = url
-    setSocialLinks(updatedLinks)
+  const validateUrlOrEmpty = (value, label) => {
+    const trimmed = (value || '').trim()
+    if (!trimmed) return ''
+    try {
+      new URL(trimmed)
+      return trimmed
+    } catch {
+      toast.error(`Invalid ${label} URL`)
+      return null
+    }
   }
 
-  const addNewSocialMedia = () => {
-    setSocialLinks([...socialLinks, { platform: 'Facebook', url: '', selected: true }])
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
-  const removeSocialMedia = (index) => {
-    const updatedLinks = socialLinks.filter((_, i) => i !== index)
-    setSocialLinks(updatedLinks)
+    const cleaned = {
+      facebook: validateUrlOrEmpty(socialLinks.facebook, 'Facebook'),
+      instagram: validateUrlOrEmpty(socialLinks.instagram, 'Instagram'),
+      linkedin: validateUrlOrEmpty(socialLinks.linkedin, 'LinkedIn'),
+      twitter: validateUrlOrEmpty(socialLinks.twitter, 'Twitter'),
+      website: validateUrlOrEmpty(socialLinks.website, 'Website'),
+    }
+
+    if (Object.values(cleaned).some((v) => v === null)) {
+      return
+    }
+
+    try {
+      await updateProfile.mutateAsync({ socialLinks: cleaned })
+      toast.success('Social media links updated successfully')
+
+      const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
+      const nextProfile = refreshed?.data ?? refreshed
+      const isProfileCompleted = nextProfile?.profileCompleted === true
+      if (!isProfileCompleted) {
+        const nextTabPath = getNextTabPath(location.pathname)
+        if (nextTabPath) {
+          setTimeout(() => navigate(nextTabPath), 500)
+        }
+      }
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || 'Failed to update social media links'
+      toast.error(message)
+    }
   }
 
   return (
@@ -52,69 +106,114 @@ const SocialMedia = () => {
                 </div>
               </div>
             </div>
-            
-            <div className="add-btn text-end mb-4">
-              <button onClick={addNewSocialMedia} className="btn veterinary-btn-primary prime-btn add-social-media">
-                <i className="fa-solid fa-plus me-2"></i>
-                Add New Social Media
-              </button>
-            </div>
+            <DoctorProfileTabs />
+
             <div className="card veterinary-card">
               <div className="card-body">
-                <form className="social-media-form">
-                  {socialLinks.map((link, index) => (
-                    <div key={index} className="social-media-links d-flex align-items-center mb-3">
-                      <div className="input-block input-block-new select-social-link me-3">
-                        <select 
-                          className="select veterinary-input" 
-                          value={link.platform}
-                          onChange={(e) => handlePlatformChange(index, e.target.value)}
-                        >
-                          <option value="Facebook">Facebook</option>
-                          <option value="Twitter">Twitter</option>
-                          <option value="LinkedIn">LinkedIn</option>
-                          <option value="Instagram">Instagram</option>
-                          <option value="YouTube">YouTube</option>
-                          <option value="Pinterest">Pinterest</option>
-                        </select>
-                      </div>
-                      <div className="input-block input-block-new flex-fill me-3">
-                        <input 
-                          type="text" 
-                          className="form-control veterinary-input" 
-                          placeholder={`Add ${link.platform} URL for your veterinary practice`}
-                          value={link.url}
-                          onChange={(e) => handleUrlChange(index, e.target.value)}
-                        />
-                      </div>
-                      <div className="social-media-icon me-2">
-                        {link.platform === 'Facebook' && <i className="fa-brands fa-facebook fa-lg text-primary"></i>}
-                        {link.platform === 'Twitter' && <i className="fa-brands fa-twitter fa-lg text-info"></i>}
-                        {link.platform === 'LinkedIn' && <i className="fa-brands fa-linkedin fa-lg text-primary"></i>}
-                        {link.platform === 'Instagram' && <i className="fa-brands fa-instagram fa-lg text-danger"></i>}
-                        {link.platform === 'YouTube' && <i className="fa-brands fa-youtube fa-lg text-danger"></i>}
-                        {link.platform === 'Pinterest' && <i className="fa-brands fa-pinterest fa-lg text-danger"></i>}
-                      </div>
-                      {socialLinks.length > 1 && (
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() => removeSocialMedia(index)}
-                        >
-                          <i className="fa-solid fa-trash"></i>
-                        </button>
-                      )}
+                <form className="social-media-form" onSubmit={handleSubmit}>
+                  <div className="social-media-links d-flex align-items-center mb-3">
+                    <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
+                      <label className="col-form-label mb-0">Facebook</label>
                     </div>
-                  ))}
-                  
+                    <div className="input-block input-block-new flex-fill me-3">
+                      <input
+                        type="url"
+                        className="form-control veterinary-input"
+                        placeholder="Add Facebook URL"
+                        value={socialLinks.facebook}
+                        onChange={(e) => handleChange('facebook', e.target.value)}
+                        disabled={isLoading || updateProfile.isPending}
+                      />
+                    </div>
+                    <div className="social-media-icon me-2">
+                      <i className="fa-brands fa-facebook fa-lg text-primary"></i>
+                    </div>
+                  </div>
+
+                  <div className="social-media-links d-flex align-items-center mb-3">
+                    <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
+                      <label className="col-form-label mb-0">Instagram</label>
+                    </div>
+                    <div className="input-block input-block-new flex-fill me-3">
+                      <input
+                        type="url"
+                        className="form-control veterinary-input"
+                        placeholder="Add Instagram URL"
+                        value={socialLinks.instagram}
+                        onChange={(e) => handleChange('instagram', e.target.value)}
+                        disabled={isLoading || updateProfile.isPending}
+                      />
+                    </div>
+                    <div className="social-media-icon me-2">
+                      <i className="fa-brands fa-instagram fa-lg text-danger"></i>
+                    </div>
+                  </div>
+
+                  <div className="social-media-links d-flex align-items-center mb-3">
+                    <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
+                      <label className="col-form-label mb-0">LinkedIn</label>
+                    </div>
+                    <div className="input-block input-block-new flex-fill me-3">
+                      <input
+                        type="url"
+                        className="form-control veterinary-input"
+                        placeholder="Add LinkedIn URL"
+                        value={socialLinks.linkedin}
+                        onChange={(e) => handleChange('linkedin', e.target.value)}
+                        disabled={isLoading || updateProfile.isPending}
+                      />
+                    </div>
+                    <div className="social-media-icon me-2">
+                      <i className="fa-brands fa-linkedin fa-lg text-primary"></i>
+                    </div>
+                  </div>
+
+                  <div className="social-media-links d-flex align-items-center mb-3">
+                    <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
+                      <label className="col-form-label mb-0">Twitter</label>
+                    </div>
+                    <div className="input-block input-block-new flex-fill me-3">
+                      <input
+                        type="url"
+                        className="form-control veterinary-input"
+                        placeholder="Add Twitter URL"
+                        value={socialLinks.twitter}
+                        onChange={(e) => handleChange('twitter', e.target.value)}
+                        disabled={isLoading || updateProfile.isPending}
+                      />
+                    </div>
+                    <div className="social-media-icon me-2">
+                      <i className="fa-brands fa-twitter fa-lg text-info"></i>
+                    </div>
+                  </div>
+
+                  <div className="social-media-links d-flex align-items-center mb-3">
+                    <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
+                      <label className="col-form-label mb-0">Website</label>
+                    </div>
+                    <div className="input-block input-block-new flex-fill me-3">
+                      <input
+                        type="url"
+                        className="form-control veterinary-input"
+                        placeholder="Add Website URL"
+                        value={socialLinks.website}
+                        onChange={(e) => handleChange('website', e.target.value)}
+                        disabled={isLoading || updateProfile.isPending}
+                      />
+                    </div>
+                    <div className="social-media-icon me-2">
+                      <i className="fa-solid fa-globe fa-lg text-secondary"></i>
+                    </div>
+                  </div>
+
                   <div className="form-set-button mt-4">
-                    <button type="button" className="btn veterinary-btn-secondary me-2">
+                    <Link to="/doctor/dashboard" className="btn veterinary-btn-secondary me-2">
                       <i className="fa-solid fa-times me-2"></i>
                       Cancel
-                    </button>
-                    <button type="submit" className="btn veterinary-btn-primary">
+                    </Link>
+                    <button type="submit" className="btn veterinary-btn-primary" disabled={isLoading || updateProfile.isPending}>
                       <i className="fa-solid fa-save me-2"></i>
-                      Save Changes
+                      {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
                     </button>
                   </div>
                 </form>
