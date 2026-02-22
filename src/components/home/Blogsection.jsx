@@ -145,15 +145,33 @@ const Blogsection = () => {
                     <div className="blog-inner-right-fourt">
                       <Link to={b.link}>
                         <div className="blog-inner-right-img">
-                          <img
-                            src={b.coverImg}
-                            alt="image"
-                            className="img-fluid "
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src = Veterinary_blog_01;
+                          <div
+                            style={{
+                              position: 'relative',
+                              width: '100%',
+                              paddingBottom: '56.25%', // 16:9 aspect ratio
+                              overflow: 'hidden',
+                              borderRadius: '8px',
+                              backgroundColor: '#f8f9fa',
                             }}
-                          />
+                          >
+                            <img
+                              src={b.coverImg}
+                              alt="image"
+                              style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                              }}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = Veterinary_blog_01;
+                              }}
+                            />
+                          </div>
                           <div className="blog-inner-top-content">
                             <img
                               src={b.authorImg}

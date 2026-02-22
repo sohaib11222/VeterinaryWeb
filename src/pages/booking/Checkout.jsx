@@ -252,11 +252,11 @@ const Checkout = () => {
                             onChange={() => setPaymentMethod('PAYPAL')}
                           />
                           <span className="checkmark"></span>
-                          PayPal
+                          Stripe
                         </label>
                       </div>
 
-                      <div className="payment-list">
+                      {/* <div className="payment-list">
                         <label className="payment-radio">
                           <input
                             type="radio"
@@ -267,7 +267,7 @@ const Checkout = () => {
                           <span className="checkmark"></span>
                           Test Payment (Demo)
                         </label>
-                      </div>
+                      </div> */}
 
                       <div className="terms-accept mt-4">
                         <div className="custom-checkbox">

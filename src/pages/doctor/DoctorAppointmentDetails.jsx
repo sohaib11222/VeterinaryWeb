@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 
 import { useAppointment, useLatestWeightRecord, useVaccines } from '../../queries'
+import { getImageUrl } from '../../utils/apiConfig'
 import {
   useAcceptAppointment,
   useRejectAppointment,
@@ -42,6 +43,16 @@ const DoctorAppointmentDetails = () => {
 
   const owner = appointment?.petOwnerId || {}
   const pet = appointment?.petId || {}
+
+  // In some payloads the UI expects patient profile image (like react-conversion).
+  // For Veterinary, appointments list uses pet.photo, so prioritize that.
+  const patientImage =
+    getImageUrl(appointment?.patientId?.profileImage) ||
+    getImageUrl(owner?.profileImage) ||
+    getImageUrl(pet?.photo) ||
+    getImageUrl(pet?.image) ||
+    getImageUrl(pet?.profileImage) ||
+    '/assets/img/doctors-dashboard/profile-02.jpg'
   const dateStr = appointment?.appointmentDate ? new Date(appointment.appointmentDate).toLocaleDateString() : ''
   const timeStr = appointment?.appointmentTime || ''
   const status = String(appointment?.status || '').toUpperCase()
@@ -182,7 +193,31 @@ const DoctorAppointmentDetails = () => {
                 <li>
                   <div className="patinet-information">
                     <a href="#">
-                      <img src="/assets/img/doctors-dashboard/profile-02.jpg" alt="Pet" />
+                      <div
+                        style={{
+                          width: '64px',
+                          height: '64px',
+                          borderRadius: '50%',
+                          overflow: 'hidden',
+                          backgroundColor: '#f0f0f0',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <img
+                          src={patientImage}
+                          alt="Patient"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            display: 'block',
+                          }}
+                          onError={(e) => {
+                            e.currentTarget.onerror = null
+                            e.currentTarget.src = '/assets/img/doctors-dashboard/profile-02.jpg'
+                          }}
+                        />
+                      </div>
                     </a>
                     <div className="patient-info">
                       <p>{appointment.appointmentNumber || appointment._id}</p>

@@ -95,17 +95,12 @@ const DoctorVerificationUpload = () => {
                     </div>
                     <div className="step-list">
                       <ul>
-                        <li>
-                          <a href="#" className="active-done">1</a>
-                        </li>
-                        <li>
-                          <a href="#" className="active-done">2</a>
-                        </li>
+                       
                         <li>
                           <a href="#" className="active-done">3</a>
                         </li>
                         <li>
-                          <a href="#" className="active">4</a>
+                          <a href="#" className="active">2</a>
                         </li>
                       </ul>
                     </div>

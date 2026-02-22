@@ -214,10 +214,7 @@ const SubscriptionPlans = () => {
                             id="card"
                             defaultChecked
                           />
-                          <label className="form-check-label" htmlFor="card">
-                            <i className="fa-solid fa-credit-card me-2"></i>
-                            Credit/Debit Card
-                          </label>
+                          
                         </div>
                         <div className="form-check mb-2">
                           <input
@@ -228,7 +225,7 @@ const SubscriptionPlans = () => {
                           />
                           <label className="form-check-label" htmlFor="paypal">
                             <i className="fa-solid fa-dollar-sign me-2"></i>
-                            PayPal
+                            Stripe
                           </label>
                         </div>
                         <div className="form-check">
@@ -238,32 +235,10 @@ const SubscriptionPlans = () => {
                             name="paymentMethod"
                             id="bank"
                           />
-                          <label className="form-check-label" htmlFor="bank">
-                            <i className="fa-solid fa-building-columns me-2"></i>
-                            Bank Transfer
-                          </label>
+                          
                         </div>
                       </div>
-                      <div className="card-details">
-                        <div className="mb-3">
-                          <label className="form-label">Card Number</label>
-                          <input type="text" className="form-control veterinary-input" placeholder="1234 5678 9012 3456" />
-                        </div>
-                        <div className="row">
-                          <div className="col-md-6 mb-3">
-                            <label className="form-label">Expiry Date</label>
-                            <input type="text" className="form-control veterinary-input" placeholder="MM/YY" />
-                          </div>
-                          <div className="col-md-6 mb-3">
-                            <label className="form-label">CVV</label>
-                            <input type="text" className="form-control veterinary-input" placeholder="123" />
-                          </div>
-                        </div>
-                        <div className="mb-3">
-                          <label className="form-label">Cardholder Name</label>
-                          <input type="text" className="form-control veterinary-input" placeholder="John Doe" />
-                        </div>
-                      </div>
+                     
                     </div>
                     <div className="modal-footer">
                       <button

@@ -18,7 +18,7 @@ const stableParamsKey = (params = {}) => {
 
 export const useAnnouncements = (params = {}) =>
   useQuery({
-    queryKey: ['announcements', params],
+    queryKey: ['announcements', stableParamsKey(params)],
     queryFn: () => api.get(API_ROUTES.ANNOUNCEMENTS.LIST, { params }),
   })
 

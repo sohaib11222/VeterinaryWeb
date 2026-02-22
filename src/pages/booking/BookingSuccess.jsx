@@ -39,7 +39,7 @@ const BookingSuccess = () => {
                         </>
                       ) : null}
                     </p>
-                    <Link to="/invoice-view" className="btn btn-primary view-inv-btn">
+                    <Link to="/patient-appointments" className="btn btn-primary view-inv-btn">
                       View Invoice
                     </Link>
                   </div>

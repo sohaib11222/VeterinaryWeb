@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useMemo } from 'react'
 
 import { useAppointments } from '../../queries'
+import { getImageUrl } from '../../utils/apiConfig'
 
 const DoctorAppointmentsGrid = () => {
   const { data: appointmentsResponse, isLoading } = useAppointments({ limit: 50 })
@@ -21,6 +22,7 @@ const DoctorAppointmentsGrid = () => {
         const timeStr = a.appointmentTime || ''
         const appointmentId = a._id
         const detailsUrl = appointmentId ? `/doctor-appointment-details?id=${appointmentId}` : '/doctor-appointment-details'
+        const petImg = getImageUrl(pet.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'
         return {
           _id: a._id,
           appointmentId,
@@ -29,6 +31,53 @@ const DoctorAppointmentsGrid = () => {
           dateTime: `${dateStr} ${timeStr}`.trim(),
           visitType: a.reason || 'Consultation',
           detailsUrl,
+          petImg,
+        }
+      })
+  }, [appointments])
+
+  const completedAppointments = useMemo(() => {
+    return appointments
+      .filter((a) => String(a.status || '').toUpperCase() === 'COMPLETED')
+      .map((a) => {
+        const pet = a.petId || {}
+        const dateStr = a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString() : ''
+        const timeStr = a.appointmentTime || ''
+        const appointmentId = a._id
+        const detailsUrl = appointmentId ? `/doctor-appointment-details?id=${appointmentId}` : '/doctor-appointment-details'
+        const petImg = getImageUrl(pet.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'
+        return {
+          _id: a._id,
+          appointmentId,
+          id: a.appointmentNumber || a._id,
+          patientName: pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : 'Pet',
+          dateTime: `${dateStr} ${timeStr}`.trim(),
+          visitType: a.reason || 'Consultation',
+          detailsUrl,
+          petImg,
+        }
+      })
+  }, [appointments])
+
+  const cancelledAppointments = useMemo(() => {
+    return appointments
+      .filter((a) => ['CANCELLED', 'REJECTED'].includes(String(a.status || '').toUpperCase()))
+      .map((a) => {
+        const pet = a.petId || {}
+        const dateStr = a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString() : ''
+        const timeStr = a.appointmentTime || ''
+        const appointmentId = a._id
+        const detailsUrl = appointmentId ? `/doctor-appointment-details?id=${appointmentId}` : '/doctor-appointment-details'
+        const petImg = getImageUrl(pet.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'
+        return {
+          _id: a._id,
+          appointmentId,
+          id: a.appointmentNumber || a._id,
+          patientName: pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : 'Pet',
+          dateTime: `${dateStr} ${timeStr}`.trim(),
+          visitType: a.reason || 'Consultation',
+          detailsUrl,
+          petImg,
         }
       })
   }, [appointments])
@@ -240,7 +289,14 @@ const DoctorAppointmentsGrid = () => {
                         <div className="appointment-grid-head">
                           <div className="patinet-information">
                             <Link to={apt.detailsUrl}>
-                              <img src="/public/assets/img/doctors-dashboard/profile-01.jpg" alt="User Image" />
+                              <img
+                                src={apt.petImg}
+                                alt="Pet Image"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null
+                                  e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
+                                }}
+                              />
                             </Link>
                             <div className="patient-info">
                               <p>{apt.id}</p>
@@ -289,84 +345,102 @@ const DoctorAppointmentsGrid = () => {
         </div>
         <div className="tab-pane fade" id="pills-cancel" role="tabpanel" aria-labelledby="pills-cancel-tab">
           <div className="row">
-            {/* Cancelled appointment grids */}
-            <div className="col-xl-4 col-lg-6 col-md-12 d-flex">
-              <div className="appointment-wrap appointment-grid-wrap">
-                <ul>
-                  <li>
-                    <div className="appointment-grid-head">
-                      <div className="patinet-information">
-                        <Link to="/doctor-cancelled-appointment">
-                          <img src="/public/assets/img/doctors-dashboard/profile-01.jpg" alt="User Image" />
-                        </Link>
-                        <div className="patient-info">
-                          <p>#Apt0001</p>
-                          <h6><Link to="/doctor-cancelled-appointment">Adrian</Link></h6>
+            {cancelledAppointments.length > 0 ? (
+              cancelledAppointments.map((apt) => (
+                <div key={apt._id} className="col-xl-4 col-lg-6 col-md-12 d-flex">
+                  <div className="appointment-wrap appointment-grid-wrap">
+                    <ul>
+                      <li>
+                        <div className="appointment-grid-head">
+                          <div className="patinet-information">
+                            <Link to={apt.detailsUrl}>
+                              <img
+                                src={apt.petImg}
+                                alt="Pet Image"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null
+                                  e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
+                                }}
+                              />
+                            </Link>
+                            <div className="patient-info">
+                              <p>{apt.id}</p>
+                              <h6><Link to={apt.detailsUrl}>{apt.patientName}</Link></h6>
+                            </div>
+                          </div>
+                          <div className="grid-user-msg">
+                            <span className="video-icon"><a href="#"><i className="isax isax-video5"></i></a></span>
+                          </div>
                         </div>
-                      </div>
-                      <div className="grid-user-msg">
-                        <span className="video-icon"><a href="#"><i className="isax isax-video5"></i></a></span>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="appointment-info">
-                    <p><i className="isax isax-clock5"></i>11 Nov 2024 10.45 AM</p>
-                    <ul className="d-flex apponitment-types">
-                      <li>General Visit</li>
+                      </li>
+                      <li className="appointment-info">
+                        <p><i className="isax isax-clock5"></i>{apt.dateTime}</p>
+                        <ul className="d-flex apponitment-types">
+                          <li>{apt.visitType}</li>
+                        </ul>
+                      </li>
+                      <li className="appointment-detail-btn">
+                        <Link to={apt.detailsUrl} className="start-link w-100">View Details</Link>
+                      </li>
                     </ul>
-                  </li>
-                  <li className="appointment-detail-btn">
-                    <Link to="/doctor-cancelled-appointment" className="start-link w-100">View Details</Link>
-                  </li>
-                </ul>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-md-12 text-center py-4">
+                <p className="text-muted">No cancelled appointments.</p>
               </div>
-            </div>
-            <div className="col-md-12">
-              <div className="loader-item text-center">
-                <a href="javascript:void(0);" className="btn btn-load">Load More</a>
-              </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="tab-pane fade" id="pills-complete" role="tabpanel" aria-labelledby="pills-complete-tab">
           <div className="row">
-            {/* Completed appointment grids */}
-            <div className="col-xl-4 col-lg-6 col-md-12 d-flex">
-              <div className="appointment-wrap appointment-grid-wrap">
-                <ul>
-                  <li>
-                    <div className="appointment-grid-head">
-                      <div className="patinet-information">
-                        <Link to="/doctor-completed-appointment">
-                          <img src="/public/assets/img/doctors-dashboard/profile-01.jpg" alt="User Image" />
-                        </Link>
-                        <div className="patient-info">
-                          <p>#Apt0001</p>
-                          <h6><Link to="/doctor-completed-appointment">Adrian</Link></h6>
+            {completedAppointments.length > 0 ? (
+              completedAppointments.map((apt) => (
+                <div key={apt._id} className="col-xl-4 col-lg-6 col-md-12 d-flex">
+                  <div className="appointment-wrap appointment-grid-wrap">
+                    <ul>
+                      <li>
+                        <div className="appointment-grid-head">
+                          <div className="patinet-information">
+                            <Link to={apt.detailsUrl}>
+                              <img
+                                src={apt.petImg}
+                                alt="Pet Image"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null
+                                  e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
+                                }}
+                              />
+                            </Link>
+                            <div className="patient-info">
+                              <p>{apt.id}</p>
+                              <h6><Link to={apt.detailsUrl}>{apt.patientName}</Link></h6>
+                            </div>
+                          </div>
+                          <div className="grid-user-msg">
+                            <span className="video-icon"><a href="#"><i className="isax isax-video5"></i></a></span>
+                          </div>
                         </div>
-                      </div>
-                      <div className="grid-user-msg">
-                        <span className="video-icon"><a href="#"><i className="isax isax-video5"></i></a></span>
-                      </div>
-                    </div>
-                  </li>
-                  <li className="appointment-info">
-                    <p><i className="isax isax-clock5"></i>11 Nov 2024 10.45 AM</p>
-                    <ul className="d-flex apponitment-types">
-                      <li>General Visit</li>
+                      </li>
+                      <li className="appointment-info">
+                        <p><i className="isax isax-clock5"></i>{apt.dateTime}</p>
+                        <ul className="d-flex apponitment-types">
+                          <li>{apt.visitType}</li>
+                        </ul>
+                      </li>
+                      <li className="appointment-detail-btn">
+                        <Link to={apt.detailsUrl} className="start-link w-100">View Details</Link>
+                      </li>
                     </ul>
-                  </li>
-                  <li className="appointment-detail-btn">
-                    <Link to="/doctor-completed-appointment" className="start-link w-100">View Details</Link>
-                  </li>
-                </ul>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-md-12 text-center py-4">
+                <p className="text-muted">No completed appointments.</p>
               </div>
-            </div>
-            <div className="col-md-12">
-              <div className="loader-item text-center">
-                <a href="javascript:void(0);" className="btn btn-load">Load More</a>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

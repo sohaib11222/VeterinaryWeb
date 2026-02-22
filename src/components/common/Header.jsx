@@ -519,12 +519,20 @@ const Header = () => {
                 </li> */}
                 <li className="nav-item dropdown has-arrow logged-item">
                   <a href="javascript:void(0);" className="nav-link ps-0" data-bs-toggle="dropdown">
-                    <span className="user-img">
+                    <span className="user-img" style={{ display: 'inline-block', width: '31px', height: '31px', overflow: 'hidden', borderRadius: '50%' }}>
                       <img
-                        className="rounded-circle"
+                        className="avatar-img rounded-circle"
                         src={userImage}
                         width="31"
+                        height="31"
                         alt="User"
+                        style={{
+                          width: '31px',
+                          height: '31px',
+                          objectFit: 'cover',
+                          borderRadius: '50%',
+                          display: 'block',
+                        }}
                         onError={(e) => {
                           e.currentTarget.onerror = null
                           e.currentTarget.src = '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
@@ -534,11 +542,18 @@ const Header = () => {
                   </a>
                   <div className="dropdown-menu dropdown-menu-end">
                     <div className="user-header">
-                      <div className="avatar avatar-sm">
+                      <div className="avatar avatar-sm" style={{ width: '40px', height: '40px', overflow: 'hidden', borderRadius: '50%' }}>
                         <img
                           src={userImage}
                           alt="User"
                           className="avatar-img rounded-circle"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: '50%',
+                            display: 'block',
+                          }}
                           onError={(e) => {
                             e.currentTarget.onerror = null
                             e.currentTarget.src = '/assets/img/doctors-dashboard/doctor-profile-img.jpg'

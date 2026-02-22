@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 
 import { useAuth } from '../../contexts/AuthContext'
 import { usePets, useVeterinarianPublicProfile, useWeeklyAvailableSlotsForDate } from '../../queries'
+import { getImageUrl } from '../../utils/apiConfig'
 
 const Booking = () => {
   const navigate = useNavigate()
@@ -37,6 +38,16 @@ const Booking = () => {
     vetProfile?.userId?.fullName ||
     vetProfile?.name ||
     'Veterinarian'
+
+  const vetImage = getImageUrl(vetProfile?.userId?.profileImage) || getImageUrl(vetProfile?.profileImage) || '/assets/img/clients/client-15.jpg'
+
+  // Console log for debugging vet image
+  console.log('Booking - vetProfile:', vetProfile)
+  console.log('Booking - vetProfile?.userId?.profileImage:', vetProfile?.userId?.profileImage)
+  console.log('Booking - vetProfile?.profileImage:', vetProfile?.profileImage)
+  console.log('Booking - getImageUrl(vetProfile?.userId?.profileImage):', getImageUrl(vetProfile?.userId?.profileImage))
+  console.log('Booking - getImageUrl(vetProfile?.profileImage):', getImageUrl(vetProfile?.profileImage))
+  console.log('Booking - final vetImage:', vetImage)
 
   const { data: slotsResponse, isLoading: slotsLoading } = useWeeklyAvailableSlotsForDate({
     veterinarianId,
@@ -156,7 +167,10 @@ const Booking = () => {
                       <div className="card-body">
                         <div className="d-flex align-items-center flex-wrap rpw-gap-2 row-gap-2">
                           <span className="avatar avatar-xxxl avatar-rounded me-2 flex-shrink-0">
-                            <img src="/assets/img/clients/client-15.jpg" alt="" />
+                            <img src={vetImage} alt="" onError={(e) => {
+                              e.currentTarget.onerror = null
+                              e.currentTarget.src = '/assets/img/clients/client-15.jpg'
+                            }} />
                           </span>
                           <div>
                             <h4 className="mb-1">{vetLoading ? 'Loading...' : vetName}</h4>
