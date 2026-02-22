@@ -28,6 +28,13 @@ const PatientSidebar = () => {
     getImageUrl(user?.profileImage) ||
     '/assets/img/doctors-dashboard/profile-06.jpg'
 
+  // Console log image URLs for debugging
+  console.log('PatientSidebar - latestUser profileImage:', latestUser?.profileImage)
+  console.log('PatientSidebar - user profileImage:', user?.profileImage)
+  console.log('PatientSidebar - getImageUrl(latestUser?.profileImage):', getImageUrl(latestUser?.profileImage))
+  console.log('PatientSidebar - getImageUrl(user?.profileImage):', getImageUrl(user?.profileImage))
+  console.log('PatientSidebar - final profileImage:', profileImage)
+
   return (
     <div className="profile-sidebar veterinary-sidebar">
       {/* Veterinary Profile Widget */}

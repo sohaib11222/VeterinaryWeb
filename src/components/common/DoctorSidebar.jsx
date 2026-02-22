@@ -43,6 +43,13 @@ const DoctorSidebar = () => {
     getImageUrl(user?.profileImage) ||
     '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
 
+  // Console log image URLs for debugging
+  console.log('DoctorSidebar - vetUser profileImage:', vetUser?.profileImage)
+  console.log('DoctorSidebar - user profileImage:', user?.profileImage)
+  console.log('DoctorSidebar - getImageUrl(vetUser?.profileImage):', getImageUrl(vetUser?.profileImage))
+  console.log('DoctorSidebar - getImageUrl(user?.profileImage):', getImageUrl(user?.profileImage))
+  console.log('DoctorSidebar - final profileImage:', profileImage)
+
   // Availability (mirrors react-conversion: isAvailableOnline false => not available)
   const currentAvailabilityValue = useMemo(() => {
     if (vetProfile?.isAvailableOnline === false) return 'not-available'
