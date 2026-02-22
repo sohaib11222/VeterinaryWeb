@@ -48,7 +48,8 @@ const Feedback = () => {
 
   const reviews = useMemo(() => {
     const payload = reviewsRes?.data ?? reviewsRes;
-    return payload?.reviews || [];
+    // API can return wrapped payload: { success, message, data: { reviews } }
+    return payload?.reviews || payload?.data?.reviews || payload?.data?.data?.reviews || [];
   }, [reviewsRes]);
 
   const testimonialCards = useMemo(() => {
@@ -123,6 +124,7 @@ const Feedback = () => {
                 <p>What our customers says about us</p>
               </div>
               <Owlcarousel
+                key={`testimonials-${testimonialCards.length}`}
                 className="feedback-slider-fourteen owl-theme aos"
                 data-aos="fade-up"
                 {...carouselOptions}
