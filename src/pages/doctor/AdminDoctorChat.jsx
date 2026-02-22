@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useQueryClient } from '@tanstack/react-query'
 
@@ -9,6 +10,7 @@ import { getImageUrl } from '../../utils/apiConfig'
 
 const AdminDoctorChat = () => {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const currentUserId = user?.id || user?._id
   const currentUserImage = getImageUrl(user?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
@@ -572,7 +574,12 @@ const AdminDoctorChat = () => {
             <div className="admin-doctor-chat-container">
               <div className="chat-list-sidebar">
                 <div className="chat-list-header">
-                  <h4>Admin Chats</h4>
+                  <div className="d-flex align-items-center justify-content-between mb-3">
+                    <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate(-1)}>
+                      <i className="fa-solid fa-chevron-left me-1"></i> Back
+                    </button>
+                    <h4 className="mb-0">Admin Chats</h4>
+                  </div>
                 </div>
                 <div className="chat-list-content">
                   {conversationsLoading ? (

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { useOrders } from '../../queries/orderQueries'
@@ -7,6 +7,7 @@ import { useCancelOrder, usePayForOrder } from '../../mutations/orderMutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const OrderHistory = () => {
+  const navigate = useNavigate()
   const [filter, setFilter] = useState('all')
 
   const statusParam = filter === 'all' ? '' : filter.toUpperCase()
@@ -65,7 +66,12 @@ const OrderHistory = () => {
           </div>
           <div className="col-lg-12 col-xl-12">
             <div className="dashboard-header">
-              <h3>Order History</h3>
+              <div className="d-flex align-items-center mb-3">
+                <button className="btn btn-outline-secondary me-3" onClick={() => navigate(-1)}>
+                  <i className="fa-solid fa-chevron-left me-1"></i> Back
+                </button>
+                <h3 className="mb-0">Order History</h3>
+              </div>
             </div>
 
             {/* Filter Tabs */}

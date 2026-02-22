@@ -27,8 +27,17 @@ export const getImageUrl = (path) => {
   const t = path.trim()
   if (!t) return null
   if (t.startsWith('http://') || t.startsWith('https://')) return t
+
+  // In production, many reverse proxies only forward /api to Node.
+  // Serve uploads via /api/uploads to avoid relying on /uploads being forwarded.
+  const normalized = t.startsWith('/') ? t : `/${t}`
+  if (normalized.startsWith('/uploads/')) {
+    const base = String(API_BASE_URL || '').replace(/\/+$/, '')
+    return `${base}${normalized}`
+  }
+
   const origin = getApiOrigin()
-  return `${origin}${t.startsWith('/') ? t : `/${t}`}`
+  return `${origin}${normalized}`
 }
 
 // All backend routes grouped by domain

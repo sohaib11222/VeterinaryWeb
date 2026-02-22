@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { usePets, useWeightRecords } from '../../queries'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const WeightRecords = () => {
+  const navigate = useNavigate()
   const [selectedPetId, setSelectedPetId] = useState('')
   const [page, setPage] = useState(1)
 
@@ -60,10 +62,15 @@ const WeightRecords = () => {
         <div className="row mb-4">
           <div className="col-12">
             <div className="veterinary-dashboard-header">
-              <h2 className="dashboard-title">
-                <i className="fa-solid fa-weight-scale me-3"></i>
-                Weight Records
-              </h2>
+              <div className="d-flex align-items-center mb-3">
+                <button className="btn btn-outline-secondary me-3" onClick={() => navigate(-1)}>
+                  <i className="fa-solid fa-chevron-left me-1"></i> Back
+                </button>
+                <h2 className="dashboard-title mb-0">
+                  <i className="fa-solid fa-weight-scale me-3"></i>
+                  Weight Records
+                </h2>
+              </div>
               <p className="dashboard-subtitle">Track your pet's weight history recorded during appointments</p>
             </div>
           </div>

@@ -99,13 +99,13 @@ const PatientSidebar = () => {
                 <div className="menu-indicator"></div>
               </Link>
             </li>
-            <li className={isActive('/patient-accounts') ? 'active' : ''}>
+            {/* <li className={isActive('/patient-accounts') ? 'active' : ''}>
               <Link to="/patient-accounts">
                 <i className="fa-solid fa-wallet"></i>
                 <span>Wallet</span>
                 <div className="menu-indicator"></div>
               </Link>
-            </li>
+            </li> */}
             <li className={isActive('/patient-invoices') ? 'active' : ''}>
               <Link to="/patient-invoices">
                 <i className="fa-solid fa-file-invoice"></i>
@@ -120,13 +120,7 @@ const PatientSidebar = () => {
                 <div className="menu-indicator"></div>
               </Link>
             </li>
-            <li className={isActive('/documents-download') ? 'active' : ''}>
-              <Link to="/documents-download">
-                <i className="fa-solid fa-download"></i>
-                <span>Pet Documents</span>
-                <div className="menu-indicator"></div>
-              </Link>
-            </li>
+          
             <li className={isActive('/patient-notifications') ? 'active' : ''}>
               <Link to="/patient-notifications">
                 <i className="fa-solid fa-bell"></i>
@@ -145,13 +139,7 @@ const PatientSidebar = () => {
                 )}
               </Link>
             </li>
-            <li className={isActive('/medical-details') ? 'active' : ''}>
-              <Link to="/medical-details">
-                <i className="fa-solid fa-heart-pulse"></i>
-                <span>Pet Vitals</span>
-                <div className="menu-indicator"></div>
-              </Link>
-            </li>
+          
             <li className={isActive('/clinic-map') ? 'active' : ''}>
               <Link to="/clinic-map">
                 <i className="fa-solid fa-map-location-dot"></i>

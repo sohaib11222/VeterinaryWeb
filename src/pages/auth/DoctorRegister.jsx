@@ -7,6 +7,8 @@ import { useAuth } from '../../contexts/AuthContext'
 import { toast } from 'react-toastify'
 import AuthLayout from '../../layouts/AuthLayout'
 
+const vetRegisterBannerImage = '/assets/img/pharmacyregister.jpg'
+
 const schema = yup.object({
   name: yup
     .string()
@@ -74,9 +76,18 @@ const DoctorRegister = () => {
             <div className="col-md-8 offset-md-2">
               <div className="account-content veterinary-doctor-register-container">
                 <div className="row align-items-center justify-content-center">
-                  <div className="col-md-7 col-lg-6 login-left veterinary-register-left">
+                  <div className="col-md-7 col-lg-6 login-left veterinary-register-left" style={{ display: 'block' }}>
                     <div className="veterinary-register-banner">
-                      <img src="/assets/img/login-banner.png" className="img-fluid veterinary-banner-img" alt="MyPetPlus Veterinary Register" />
+                      <img
+                        src={vetRegisterBannerImage}
+                        className="img-fluid veterinary-banner-img"
+                        alt="MyPetPlus Veterinary Register"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null
+                          e.currentTarget.src = '/assets/img/login-banner.png'
+                        }}
+                      />
                       <div className="veterinary-banner-overlay">
                         <div className="veterinary-banner-content">
                           <i className="fa-solid fa-user-doctor fa-3x text-white mb-3"></i>

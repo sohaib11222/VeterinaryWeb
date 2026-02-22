@@ -7,6 +7,8 @@ import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../contexts/AuthContext'
 
+const pharmacyBannerImage = '/assets/img/pharmacyregister.jpg'
+
 const schema = yup.object({
   name: yup.string().min(2, 'Name must be at least 2 characters').max(50, 'Name must be less than 50 characters').required('Name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
@@ -84,8 +86,17 @@ const PharmacyRegister = () => {
             <div className="col-md-8 offset-md-2">
               <div className="account-content">
                 <div className="row align-items-center justify-content-center">
-                  <div className="col-md-7 col-lg-6 login-left">
-                    <img src="/assets/img/login-banner.png" className="img-fluid" alt="MyPetPlus Login" />
+                  <div className="col-md-7 col-lg-6 login-left" style={{ display: 'block' }}>
+                    <img
+                      src={pharmacyBannerImage}
+                      className="img-fluid"
+                      alt="MyPetPlus Pharmacy Register"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null
+                        e.currentTarget.src = '/assets/img/login-banner.png'
+                      }}
+                    />
                   </div>
                   <div className="col-md-12 col-lg-6 login-right">
                     <div className="login-header">
@@ -151,16 +162,7 @@ const PharmacyRegister = () => {
                         <span className="or-line"></span>
                         <span className="span-or">or</span>
                       </div>
-                      <div className="social-login-btn">
-                        <a href="javascript:void(0);" className="btn w-100">
-                          <img src="/assets/img/icons/google-icon.svg" alt="google-icon" />
-                          Sign in With Google
-                        </a>
-                        <a href="javascript:void(0);" className="btn w-100">
-                          <img src="/assets/img/icons/facebook-icon.svg" alt="fb-icon" />
-                          Sign in With Facebook
-                        </a>
-                      </div>
+                    
                       <div className="account-signup">
                         <p>
                           Already have account? <Link to="/login">Sign In</Link>

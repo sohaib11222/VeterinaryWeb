@@ -256,13 +256,13 @@ const DoctorSidebar = () => {
                 <div className="menu-indicator"></div>
               </Link>
             </li>
-            <li className={isActive('/social-media') ? 'active' : ''}>
+            {/* <li className={isActive('/social-media') ? 'active' : ''}>
               <Link to="/social-media">
                 <i className="fa-solid fa-shield-halved"></i>
                 <span>Social Media</span>
                 <div className="menu-indicator"></div>
               </Link>
-            </li>
+            </li> */}
             <li className={isActive('/doctor-change-password') ? 'active' : ''}>
               <Link to="/doctor-change-password">
                 <i className="fa-solid fa-key"></i>

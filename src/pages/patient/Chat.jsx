@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { useAuth } from '../../contexts/AuthContext'
@@ -9,6 +9,7 @@ import { getImageUrl } from '../../utils/apiConfig'
 
 const Chat = () => {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const conversationIdFromUrl = searchParams.get('conversationId')
@@ -793,7 +794,12 @@ const Chat = () => {
               {/* Left Sidebar - Chat List */}
               <div className="chat-list-sidebar">
                 <div className="chat-list-header">
-                  <h4>All Chats</h4>
+                  <div className="d-flex align-items-center justify-content-between mb-3">
+                    <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate(-1)}>
+                      <i className="fa-solid fa-chevron-left me-1"></i> Back
+                    </button>
+                    <h4 className="mb-0">All Chats</h4>
+                  </div>
                   <div className="chat-search-box">
                     <span className="form-control-feedback">
                       <i className="fa-solid fa-magnifying-glass"></i>
