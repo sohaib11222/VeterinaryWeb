@@ -89,10 +89,10 @@ const Index = () => {
                 </h1>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit,</p>
                 <div className="banner-btns-fourteen ">
-                  <Link to="/consultation" className="btn btn-primary me-2">
+                  <Link to="/search" className="btn btn-primary me-2">
                     Start a Consult
                   </Link>
-                  <Link to="/booking" className="btn btn-primary ">
+                  <Link to="/search" className="btn btn-primary ">
                     Schedule a Call
                   </Link>
                 </div>
