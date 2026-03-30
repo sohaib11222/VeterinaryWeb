@@ -308,7 +308,8 @@ const Chat = () => {
   }
 
   useEffect(() => {
-    if (!appointmentIdFromUrl || didAutoOpenRef.current) return
+    if (!appointmentIdFromUrl) return
+    if (didAutoOpenRef.current) return
     if (!appointment) return
 
     const vetId = appointment?.veterinarianId && (typeof appointment.veterinarianId === 'object' ? appointment.veterinarianId._id : appointment.veterinarianId)
@@ -316,14 +317,19 @@ const Chat = () => {
     const aptId = appointment?._id
     if (!vetId || !ownerId || !aptId) return
 
-    didAutoOpenRef.current = true
-    getOrCreateConversation
-      .mutateAsync({ veterinarianId: vetId, petOwnerId: ownerId, appointmentId: aptId })
-      .then((res) => {
+    let stopped = false
+    let lastError = ''
+
+    const tryOpen = async () => {
+      if (stopped || didAutoOpenRef.current) return
+      try {
+        const res = await getOrCreateConversation.mutateAsync({ veterinarianId: vetId, petOwnerId: ownerId, appointmentId: aptId })
         const payload = res?.data ?? res
         const conv = payload?.data ?? payload
         const convId = conv?._id
         if (!convId) return
+
+        didAutoOpenRef.current = true
         setSelectedConversationId(convId)
         setSearchParams((prev) => {
           const next = new URLSearchParams(prev)
@@ -331,10 +337,28 @@ const Chat = () => {
           next.set('appointmentId', String(aptId))
           return next
         })
-      })
-      .catch((err) => {
-        toast.error(err?.message || 'Unable to open chat for this appointment')
-      })
+      } catch (err) {
+        const msg = err?.message || 'Unable to open chat for this appointment'
+        // If it's a time-window error, keep retrying silently.
+        const isTimeWindow =
+          msg.includes('Communication will be available') ||
+          msg.includes('appointment time') ||
+          msg.includes('window')
+        if (!isTimeWindow && msg !== lastError) {
+          lastError = msg
+          toast.error(msg)
+        }
+      }
+    }
+
+    // Try immediately, then retry until the window opens.
+    tryOpen()
+    const interval = window.setInterval(tryOpen, 15_000)
+
+    return () => {
+      stopped = true
+      window.clearInterval(interval)
+    }
   }, [appointmentIdFromUrl, appointment, getOrCreateConversation, setSearchParams])
 
   useEffect(() => {

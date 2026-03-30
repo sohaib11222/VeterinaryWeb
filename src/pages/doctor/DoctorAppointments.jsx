@@ -1,11 +1,15 @@
-import { Link } from 'react-router-dom'
-import { useMemo } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
 
 import { useAppointments } from '../../queries'
+import { useGetOrCreateConversation } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const DoctorAppointments = () => {
+  const navigate = useNavigate()
   const { data: appointmentsResponse, isLoading } = useAppointments({ limit: 50 })
+  const getOrCreateConversation = useGetOrCreateConversation()
+  const [chatAlert, setChatAlert] = useState('')
 
   const appointments = useMemo(() => {
     const payload = appointmentsResponse?.data?.data ?? appointmentsResponse?.data ?? appointmentsResponse
@@ -37,6 +41,7 @@ const DoctorAppointments = () => {
         detailsUrl,
         status,
         appointmentDate: a.appointmentDate,
+        _raw: a,
       }
     })
   }, [appointments])
@@ -81,6 +86,31 @@ const DoctorAppointments = () => {
           <p className="text-muted">{emptyText}</p>
         </div>
       )
+    }
+
+    const handleOpenChat = async (apt) => {
+      const appointmentId = apt?._id
+      const ownerId = apt?._raw?.petOwnerId && (typeof apt._raw.petOwnerId === 'object' ? apt._raw.petOwnerId._id : apt._raw.petOwnerId)
+      if (!appointmentId || !ownerId) {
+        setChatAlert('Unable to open chat for this appointment')
+        return
+      }
+
+      setChatAlert('')
+      try {
+        const res = await getOrCreateConversation.mutateAsync({ veterinarianId: String(apt._raw?.veterinarianId?._id || apt._raw?.veterinarianId || ''), petOwnerId: ownerId, appointmentId })
+        const payload = res?.data ?? res
+        const conv = payload?.data ?? payload
+        const convId = conv?._id
+        if (!convId) {
+          setChatAlert('Unable to open chat for this appointment')
+          return
+        }
+        navigate(`/chat-doctor?conversationId=${encodeURIComponent(String(convId))}&appointmentId=${encodeURIComponent(String(appointmentId))}`)
+      } catch (err) {
+        const msg = err?.response?.data?.message || err?.message || 'Unable to open chat for this appointment'
+        setChatAlert(msg)
+      }
     }
 
     return list.map((apt) => (
@@ -130,13 +160,15 @@ const DoctorAppointments = () => {
                 </Link>
               </li>
               <li>
-                <Link
-                  to={apt._id ? `/chat-doctor?appointmentId=${apt._id}` : '/chat-doctor'}
-                  className="veterinary-action-btn"
+                <button
+                  type="button"
+                  className="veterinary-action-btn border-0 bg-transparent"
                   title="Chat"
+                  onClick={() => handleOpenChat(apt)}
+                  disabled={getOrCreateConversation.isPending}
                 >
                   <i className="fa-solid fa-comments"></i>
-                </Link>
+                </button>
               </li>
             </ul>
           </li>
@@ -162,6 +194,11 @@ const DoctorAppointments = () => {
             {/* Sidebar is handled by DashboardLayout */}
           </div>
           <div className="col-lg-12 col-xl-12">
+            {chatAlert ? (
+              <div className="alert alert-warning" role="alert">
+                {chatAlert}
+              </div>
+            ) : null}
             {/* Veterinary Appointments Header */}
             <div className="row mb-4">
               <div className="col-12">

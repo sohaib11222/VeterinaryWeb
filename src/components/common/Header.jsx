@@ -15,6 +15,7 @@ const Header = () => {
   const { user, logout } = useAuth()
   const { getCartItemCount } = useCart()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [openMobileSubmenu, setOpenMobileSubmenu] = useState(null)
   const [hasGoogleTranslateBanner, setHasGoogleTranslateBanner] = useState(false)
   const role = user?.role
   const userId = user?.id || user?._id
@@ -127,6 +128,28 @@ const Header = () => {
       window.removeEventListener('resize', checkGoogleTranslateBanner)
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    document.documentElement.classList.toggle('menu-opened', Boolean(isMenuOpen))
+
+    return () => {
+      document.documentElement.classList.remove('menu-opened')
+    }
+  }, [isMenuOpen])
+
+  useEffect(() => {
+    setIsMenuOpen(false)
+    setOpenMobileSubmenu(null)
+  }, [location.pathname])
+
+  const toggleMobileSubmenu = (key) => (e) => {
+    if (typeof window === 'undefined') return
+    if (window.innerWidth > 991) return
+    e.preventDefault()
+    e.stopPropagation()
+    setOpenMobileSubmenu((prev) => (prev === key ? null : key))
+  }
 
   // Determine header class based on route
   const getHeaderClass = () => {
@@ -310,9 +333,19 @@ const Header = () => {
         </>
       )}
 
+      <div
+        className={`sidebar-overlay ${isMenuOpen ? 'opened' : ''}`}
+        onClick={() => setIsMenuOpen(false)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') setIsMenuOpen(false)
+        }}
+      />
+
       {/* Main Header */}
       <header
-        className={getHeaderClass()}
+        className={`${getHeaderClass()} ${isMenuOpen ? 'menu-opened' : ''}`}
         style={{
           marginTop: hasGoogleTranslateBanner ? '42px' : '0',
           transition: 'margin-top 0.3s ease',
@@ -375,8 +408,17 @@ const Header = () => {
                 {/* Doctors Menu - only for veterinarians (or public when not logged in) */}
                 {showDoctorsNav && (
                 <li className={`has-submenu ${isActive('/doctor') || isActive('/appointments') ? 'active' : ''}`}>
-                  <a href="javascript:void(0);">Doctors <i className="fas fa-chevron-down"></i></a>
-                  <ul className="submenu">
+                  <a
+                    href="javascript:void(0);"
+                    onClick={toggleMobileSubmenu('doctors')}
+                    aria-expanded={openMobileSubmenu === 'doctors'}
+                  >
+                    Doctors <i className="fas fa-chevron-down"></i>
+                  </a>
+                  <ul
+                    className="submenu"
+                    style={{ display: openMobileSubmenu === 'doctors' ? 'block' : undefined }}
+                  >
                     {role === ROLES.VETERINARIAN && (
                       <>
                         <li><Link to="/doctor/dashboard">Doctor Dashboard</Link></li>
@@ -408,12 +450,21 @@ const Header = () => {
                 {/* Patients Menu - only for pet owners (or public when not logged in) */}
                 {showPatientsNav && (
                 <li className={`has-submenu ${isActive('/patient') || isActive('/search') || isActive('/booking') ? 'active' : ''}`}>
-                  <a href="javascript:void(0);">Patients <i className="fas fa-chevron-down"></i></a>
-                  <ul className="submenu">
+                  <a
+                    href="javascript:void(0);"
+                    onClick={toggleMobileSubmenu('patients')}
+                    aria-expanded={openMobileSubmenu === 'patients'}
+                  >
+                    Patients <i className="fas fa-chevron-down"></i>
+                  </a>
+                  <ul
+                    className="submenu"
+                    style={{ display: openMobileSubmenu === 'patients' ? 'block' : undefined }}
+                  >
                     <li><Link to="/patient/dashboard">Patient Dashboard</Link></li>
                   
-                    <li className="submenu">
-                      <a href="/search">Search Doctor</a>
+                    <li>
+                      <Link to="/search">Search Doctor</Link>
                       {/* <ul className="submenu inner-submenu">
                         <li><Link to="/search">Search Doctor 1</Link></li>
                         <li><Link to="/search-2">Search Doctor 2</Link></li>
@@ -434,8 +485,17 @@ const Header = () => {
                 {/* Pharmacy Menu - pet owners, pet store, admin (or public when not logged in) */}
                 {showPharmacyNav && (
                 <li className={`has-submenu ${isActive('/pharmacy') || isActive('/product') || isActive('/cart') ? 'active' : ''}`}>
-                  <a href="javascript:void(0);">Pharmacy <i className="fas fa-chevron-down"></i></a>
-                  <ul className="submenu">
+                  <a
+                    href="javascript:void(0);"
+                    onClick={toggleMobileSubmenu('pharmacy')}
+                    aria-expanded={openMobileSubmenu === 'pharmacy'}
+                  >
+                    Pharmacy <i className="fas fa-chevron-down"></i>
+                  </a>
+                  <ul
+                    className="submenu"
+                    style={{ display: openMobileSubmenu === 'pharmacy' ? 'block' : undefined }}
+                  >
                    
                     <li><Link to="/pharmacy-search">Pharmacies</Link></li>
                     <li><Link to="/product-all">Products</Link></li>
@@ -472,13 +532,8 @@ const Header = () => {
                   </div>
                 </li>
                 <li>
-                  <Link to="/login" className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill">
+                  <Link to="/register" className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill">
                     <i className="isax isax-lock-1 me-1"></i>Sign Up
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/register" className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill">
-                    <i className="isax isax-user-tick me-1"></i>Register
                   </Link>
                 </li>
               </ul>
@@ -509,6 +564,16 @@ const Header = () => {
                     </Link>
                   </li>
                 )}
+
+                <li>
+                  <a
+                    className="btn btn-md btn-dark d-inline-flex align-items-center rounded-pill"
+                    href="javascript:void(0);"
+                    onClick={handleLogout}
+                  >
+                    <i className="isax isax-logout me-1"></i>Sign Out
+                  </a>
+                </li>
                 {/* <li className="header-theme noti-nav">
                   <a href="javascript:void(0);" id="dark-mode-toggle" className="theme-toggle">
                     <i className="isax isax-sun-1"></i>

@@ -10,6 +10,219 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.home-hero-v2 {
+  position: relative;
+  width: 100%;
+  min-height: 560px;
+  padding: 90px 0 70px;
+  background-image: url('/assets/img/mainhero.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.home-hero-v2__overlay {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+}
+
+.home-hero-v2 .container {
+  position: relative;
+  z-index: 1;
+}
+
+.home-hero-v2__content {
+  max-width: 560px;
+  color: #ffffff;
+}
+
+.home-hero-v2__title {
+  margin: 0 0 12px;
+  font-weight: 700;
+  font-size: 58px;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.home-hero-v2__subtitle {
+  margin: 0 0 22px;
+  font-size: 22px;
+  line-height: 1.35;
+  opacity: 0.95;
+  color: #ffffff;
+}
+
+.home-hero-v2__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.home-hero-v2__actions .btn {
+  border-radius: 10px;
+  padding: 14px 22px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.home-hero-v2__actions .btn.btn-outline-light {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.85);
+}
+
+.home-hero-v2__actions .btn.btn-outline-light:hover,
+.home-hero-v2__actions .btn.btn-outline-light:focus {
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+body.home-hero-header-transparent header.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 991.98px) {
+  body > .sidebar-overlay {
+    display: none !important;
+  }
+
+  .sidebar-overlay {
+    pointer-events: none;
+  }
+
+  .sidebar-overlay.opened {
+    pointer-events: auto;
+  }
+
+  html.menu-opened .header .header-nav .main-menu-wrapper,
+  header.menu-opened .header-nav .main-menu-wrapper {
+    z-index: 10003;
+    transform: translateX(0) !important;
+    -webkit-transform: translateX(0) !important;
+    -ms-transform: translateX(0) !important;
+    pointer-events: auto !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    overflow-y: auto !important;
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .sidebar-overlay.opened {
+    z-index: 10002;
+    pointer-events: auto;
+  }
+
+  body.home-hero-header-transparent .header .header-nav .main-menu-wrapper {
+    z-index: 10003;
+  }
+
+  body.home-hero-header-transparent #mobile_btn {
+    z-index: 2300;
+  }
+
+  body.home-hero-header-transparent .menu-opened .main-menu-wrapper {
+    z-index: 10003;
+  }
+
+  body.home-hero-header-transparent .sidebar-overlay.opened {
+    z-index: 10002;
+  }
+
+  html.menu-opened body.home-hero-header-transparent .header .header-nav .main-menu-wrapper,
+  body.home-hero-header-transparent header.menu-opened .header-nav .main-menu-wrapper {
+    transform: translateX(0) !important;
+    -webkit-transform: translateX(0) !important;
+    -ms-transform: translateX(0) !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    overflow-y: auto !important;
+    display: block !important;
+    visibility: visible !important;
+  }
+}
+
+body.home-hero-header-transparent header.header.inner-header {
+  background: transparent !important;
+}
+
+body.home-hero-header-transparent .home-hero-v2 {
+  padding-top: 140px;
+}
+
+@media (max-width: 991.98px) {
+  .home-hero-v2 {
+    min-height: 520px;
+    padding: 70px 0 60px;
+  }
+
+  body.home-hero-header-transparent .home-hero-v2 {
+    padding-top: 120px;
+  }
+
+  .home-hero-v2__title {
+    font-size: 46px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .home-hero-v2 {
+    min-height: 460px;
+    padding: 60px 0 50px;
+  }
+
+  body.home-hero-header-transparent .home-hero-v2 {
+    padding-top: 110px;
+  }
+
+  .home-hero-v2__title {
+    font-size: 34px;
+  }
+
+  .home-hero-v2__subtitle {
+    font-size: 16px;
+  }
+
+  .home-hero-v2 {
+    background-image: url('/assets/img/phonebanner.png');
+    background-position: center;
+  }
+
+  .home-hero-v2 .row {
+    justify-content: center;
+  }
+
+  .home-hero-v2__content {
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .home-hero-v2__actions {
+    justify-content: center;
+  }
+}
+
+.insurance-companies-section .owl-nav {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.insurance-companies-section .owl-nav button {
+  margin-top: 0;
+}
+
 #root {
   min-height: 100vh;
 }

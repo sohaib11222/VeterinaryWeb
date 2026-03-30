@@ -1,11 +1,15 @@
-import { Link } from 'react-router-dom'
-import { useMemo } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useMemo, useState } from 'react'
 
 import { useAppointments } from '../../queries'
+import { useGetOrCreateConversation } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const DoctorAppointmentsGrid = () => {
+  const navigate = useNavigate()
   const { data: appointmentsResponse, isLoading } = useAppointments({ limit: 50 })
+  const getOrCreateConversation = useGetOrCreateConversation()
+  const [chatAlert, setChatAlert] = useState('')
 
   const appointments = useMemo(() => {
     const payload = appointmentsResponse?.data ?? appointmentsResponse
@@ -32,6 +36,7 @@ const DoctorAppointmentsGrid = () => {
           visitType: a.reason || 'Consultation',
           detailsUrl,
           petImg,
+          _raw: a,
         }
       })
   }, [appointments])
@@ -55,6 +60,7 @@ const DoctorAppointmentsGrid = () => {
           visitType: a.reason || 'Consultation',
           detailsUrl,
           petImg,
+          _raw: a,
         }
       })
   }, [appointments])
@@ -78,52 +84,19 @@ const DoctorAppointmentsGrid = () => {
           visitType: a.reason || 'Consultation',
           detailsUrl,
           petImg,
+          _raw: a,
         }
       })
   }, [appointments])
 
   return (
-    <>
-      <div className="dashboard-header">
-        <h3>Appointments</h3>
-        <ul className="header-list-btns">
-          <li>
-            <div className="input-block dash-search-input">
-              <input type="text" className="form-control" placeholder="Search" />
-              <span className="search-icon"><i className="isax isax-search-normal"></i></span>
-            </div>
-          </li>
-          <li>
-            <div className="view-icons">
-              <Link to="/appointments"><i className="isax isax-grid-7"></i></Link>
-            </div>
-          </li>
-          <li>
-            <div className="view-icons">
-              <Link to="/doctor-appointments-grid" className="active"><i className="fa-solid fa-th"></i></Link>
-            </div>
-          </li>
-          <li>
-            <div className="view-icons">
-              <a href="#"><i className="isax isax-calendar-tick"></i></a>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div className="appointment-tab-head">
-        <div className="appointment-tabs">
-          <ul className="nav nav-pills inner-tab" id="pills-tab" role="tablist">
-            <li className="nav-item" role="presentation">
-              <button className="nav-link active" id="pills-upcoming-tab" data-bs-toggle="pill" data-bs-target="#pills-upcoming" type="button" role="tab" aria-controls="pills-upcoming" aria-selected="false">Upcoming<span>21</span></button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button className="nav-link" id="pills-cancel-tab" data-bs-toggle="pill" data-bs-target="#pills-cancel" type="button" role="tab" aria-controls="pills-cancel" aria-selected="true">Cancelled<span>16</span></button>
-            </li>
-            <li className="nav-item" role="presentation">
-              <button className="nav-link" id="pills-complete-tab" data-bs-toggle="pill" data-bs-target="#pills-complete" type="button" role="tab" aria-controls="pills-complete" aria-selected="true">Completed<span>214</span></button>
-            </li>
-          </ul>
-        </div>
+    <div className="content veterinary-dashboard">
+      <div className="container-fluid">
+        {chatAlert ? (
+          <div className="alert alert-warning" role="alert">
+            {chatAlert}
+          </div>
+        ) : null}
         <div className="filter-head">
           <div className="position-relative daterange-wraper me-2">
             <div className="input-groupicon calender-input">
@@ -268,9 +241,7 @@ const DoctorAppointmentsGrid = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      <div className="tab-content appointment-tab-content">
+        <div className="tab-content appointment-tab-content">
         <div className="tab-pane fade show active" id="pills-upcoming" role="tabpanel" aria-labelledby="pills-upcoming-tab">
           <div className="row">
             {/* Appointment Grid */}
@@ -320,9 +291,39 @@ const DoctorAppointmentsGrid = () => {
                             <Link to={apt.detailsUrl}><i className="isax isax-eye4"></i></Link>
                           </li>
                           <li>
-                            <Link to={apt.appointmentId ? `/chat-doctor?appointmentId=${apt.appointmentId}` : '/chat-doctor'}>
+                            <button
+                              type="button"
+                              className="border-0 bg-transparent p-0"
+                              onClick={async () => {
+                                const appointmentId = apt?.appointmentId
+                                const vetId = apt?._raw?.veterinarianId && (typeof apt._raw.veterinarianId === 'object' ? apt._raw.veterinarianId._id : apt._raw.veterinarianId)
+                                const ownerId = apt?._raw?.petOwnerId && (typeof apt._raw.petOwnerId === 'object' ? apt._raw.petOwnerId._id : apt._raw.petOwnerId)
+                                if (!appointmentId || !vetId || !ownerId) {
+                                  setChatAlert('Unable to open chat for this appointment')
+                                  return
+                                }
+
+                                setChatAlert('')
+                                try {
+                                  const res = await getOrCreateConversation.mutateAsync({ veterinarianId: vetId, petOwnerId: ownerId, appointmentId })
+                                  const payload = res?.data ?? res
+                                  const conv = payload?.data ?? payload
+                                  const convId = conv?._id
+                                  if (!convId) {
+                                    setChatAlert('Unable to open chat for this appointment')
+                                    return
+                                  }
+                                  navigate(`/chat-doctor?conversationId=${encodeURIComponent(String(convId))}&appointmentId=${encodeURIComponent(String(appointmentId))}`)
+                                } catch (err) {
+                                  const msg = err?.response?.data?.message || err?.message || 'Unable to open chat for this appointment'
+                                  setChatAlert(msg)
+                                }
+                              }}
+                              disabled={getOrCreateConversation.isPending}
+                              title="Chat"
+                            >
                               <i className="isax isax-messages-25"></i>
-                            </Link>
+                            </button>
                           </li>
                         </ul>
                         <div className="appointment-start">
@@ -444,7 +445,8 @@ const DoctorAppointmentsGrid = () => {
           </div>
         </div>
       </div>
-    </>
+      </div>
+    </div>
   )
 }
 

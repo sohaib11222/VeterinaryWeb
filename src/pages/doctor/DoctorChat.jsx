@@ -248,21 +248,27 @@ const DoctorChat = () => {
   }
 
   useEffect(() => {
-    if (!appointmentIdFromUrl || didAutoOpenRef.current) return
+    if (!appointmentIdFromUrl) return
+    if (didAutoOpenRef.current) return
     if (!appointment || !currentUserId) return
 
     const ownerId = appointment?.petOwnerId && (typeof appointment.petOwnerId === 'object' ? appointment.petOwnerId._id : appointment.petOwnerId)
     const aptId = appointment?._id
     if (!ownerId || !aptId) return
 
-    didAutoOpenRef.current = true
-    getOrCreateConversation
-      .mutateAsync({ veterinarianId: currentUserId, petOwnerId: ownerId, appointmentId: aptId })
-      .then((res) => {
+    let stopped = false
+    let lastError = ''
+
+    const tryOpen = async () => {
+      if (stopped || didAutoOpenRef.current) return
+      try {
+        const res = await getOrCreateConversation.mutateAsync({ veterinarianId: currentUserId, petOwnerId: ownerId, appointmentId: aptId })
         const payload = res?.data ?? res
         const conv = payload?.data ?? payload
         const convId = conv?._id
         if (!convId) return
+
+        didAutoOpenRef.current = true
         setSelectedConversationId(convId)
         setSearchParams((prev) => {
           const next = new URLSearchParams(prev)
@@ -270,8 +276,26 @@ const DoctorChat = () => {
           next.set('appointmentId', String(aptId))
           return next
         })
-      })
-      .catch((err) => toast.error(err?.message || 'Unable to open chat for this appointment'))
+      } catch (err) {
+        const msg = err?.message || 'Unable to open chat for this appointment'
+        const isTimeWindow =
+          msg.includes('Communication will be available') ||
+          msg.includes('appointment time') ||
+          msg.includes('window')
+        if (!isTimeWindow && msg !== lastError) {
+          lastError = msg
+          toast.error(msg)
+        }
+      }
+    }
+
+    tryOpen()
+    const interval = window.setInterval(tryOpen, 15_000)
+
+    return () => {
+      stopped = true
+      window.clearInterval(interval)
+    }
   }, [appointmentIdFromUrl, appointment, currentUserId, getOrCreateConversation, setSearchParams])
 
   useEffect(() => {
