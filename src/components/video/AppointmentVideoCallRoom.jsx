@@ -1,0 +1,215 @@
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { StreamCall, StreamTheme, StreamVideo } from '@stream-io/video-react-sdk'
+
+import * as videoApi from '../../api/video'
+import { useVideoCall } from '../../hooks/useVideoCall'
+import WhatsAppVideoCall from './WhatsAppVideoCall'
+
+// The deployed API has historically returned both { data: { session } } and
+// a flatter { sessionId, streamCallId } response.  Keep the call state usable
+// with either form so a valid ringing call never remains on a blank loader.
+const sessionFromPayload = (payload, fallbackStatus) => {
+  if (!payload) return null
+  const source = payload.session && typeof payload.session === 'object' ? payload.session : {}
+  const sessionId = source._id || source.id || payload.sessionId
+  const streamCallId = source.sessionId || source.callId || payload.streamCallId
+  const status = source.status || payload.status || fallbackStatus
+
+  if (!sessionId && !streamCallId) return null
+  return {
+    ...source,
+    _id: sessionId,
+    sessionId: streamCallId,
+    callId: source.callId || streamCallId,
+    status: status ? String(status).toUpperCase() : null,
+  }
+}
+
+const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallback }) => {
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const appointmentId = searchParams.get('appointmentId')
+  const mode = searchParams.get('mode') === 'answer' ? 'answer' : 'caller'
+  const { client, call, loading, error, startCall, getSession, joinActiveCall, endCall } = useVideoCall(appointmentId)
+  const [session, setSession] = useState(null)
+  const [setupError, setSetupError] = useState(null)
+  const startRef = useRef(false)
+  const joinRef = useRef(false)
+  const sessionRef = useRef(null)
+
+  useEffect(() => {
+    sessionRef.current = session
+  }, [session])
+
+  useEffect(() => {
+    if (!appointmentId || startRef.current) return
+    startRef.current = true
+    let cancelled = false
+
+    const prepare = async () => {
+      try {
+        let payload = mode === 'caller' ? await startCall() : await getSession()
+        // If a previous browser session disappeared without completing its
+        // final request, start a fresh ringing attempt instead of leaving the
+        // user on an "already active" error screen.
+        if (mode === 'caller' && payload?.session?.status === 'ACTIVE') {
+          payload = await startCall({ restartActive: true })
+        }
+        if (!cancelled) {
+          const nextSession = sessionFromPayload(payload, mode === 'caller' ? 'RINGING' : null)
+          if (!nextSession) throw new Error('The video service did not return a call session. Please try again.')
+          setSession(nextSession)
+        }
+      } catch (err) {
+        const message = err?.response?.data?.message || err?.message || 'Unable to prepare the video call'
+        if (mode === 'caller' && /already active/i.test(message)) {
+          try {
+            const payload = await startCall({ restartActive: true })
+            if (!cancelled) {
+              const nextSession = sessionFromPayload(payload, 'RINGING')
+              if (!nextSession) throw new Error('The video service did not return a call session. Please try again.')
+              setSession(nextSession)
+            }
+            return
+          } catch (retryError) {
+            if (!cancelled) setSetupError(retryError?.response?.data?.message || retryError?.message || 'Unable to restart the video call')
+            return
+          }
+        }
+        if (!cancelled) setSetupError(message)
+      }
+    }
+    prepare()
+    return () => { cancelled = true }
+  }, [appointmentId, getSession, mode, startCall])
+
+  useEffect(() => {
+    if (!appointmentId || !['RINGING', 'ACTIVE'].includes(session?.status)) return undefined
+    const timer = window.setInterval(async () => {
+      try {
+        const payload = await getSession()
+        setSession((currentSession) => sessionFromPayload(payload, currentSession?.status) || currentSession)
+      } catch (err) {
+        setSetupError(err?.response?.data?.message || err?.message || 'Unable to update the video call')
+      }
+    }, 2000)
+    return () => window.clearInterval(timer)
+  }, [appointmentId, getSession, session?.status])
+
+  useEffect(() => {
+    if (!['DECLINED', 'MISSED', 'ENDED'].includes(session?.status)) return
+    endCall()
+  }, [endCall, session?.status])
+
+  useEffect(() => {
+    if (session?.status !== 'ACTIVE' || joinRef.current || call) return
+    joinRef.current = true
+    joinActiveCall(session).catch((err) => {
+      joinRef.current = false
+      setSetupError(err?.response?.data?.message || err?.message || 'Unable to connect the video call')
+    })
+  }, [call, joinActiveCall, session?.status])
+
+  useEffect(() => () => {
+    const activeSession = sessionRef.current
+    if (activeSession?._id && ['RINGING', 'ACTIVE'].includes(activeSession.status)) {
+      // Best effort only: React cannot await an unmount cleanup, but this
+      // prevents a browser Back/refresh from stranding the appointment in
+      // ACTIVE and blocking the next valid call attempt.
+      videoApi.endVideoSession(activeSession._id).catch(() => {})
+    }
+  }, [])
+
+  const leave = async () => {
+    try {
+      if (session?._id) await videoApi.endVideoSession(session._id)
+    } catch (err) {
+      toast.warning(err?.response?.data?.message || err?.message || 'The call closed locally, but its status could not be updated yet.')
+    }
+    await endCall()
+    navigate(backPath)
+  }
+
+  if (!appointmentId) {
+    return <CallNotice title="Missing appointment" message="No appointment was supplied for this video call." onBack={() => navigate(backPath)} />
+  }
+
+  if (setupError || error) {
+    return <CallNotice title="Video call unavailable" message={setupError || error} onBack={() => navigate(backPath)} />
+  }
+
+  if (client && call) {
+    return (
+      <StreamVideo client={client}>
+        <StreamCall call={call}>
+          <StreamTheme className="str-video__theme-dark">
+            <WhatsAppVideoCall
+              onEndCall={leave}
+              localRole={localRole}
+              remoteRole={remoteRole}
+              remoteFallback={remoteFallback}
+            />
+          </StreamTheme>
+        </StreamCall>
+      </StreamVideo>
+    )
+  }
+
+  const isRinging = session?.status === 'RINGING'
+  const isJoining = session?.status === 'ACTIVE'
+  const ended = ['DECLINED', 'MISSED', 'ENDED'].includes(session?.status)
+  const missingRingingSupport = session && !session.status
+  if (missingRingingSupport) {
+    return (
+      <CallNotice
+        title="Video-call update required"
+        message="The connected server did not create a ringing call. Deploy the current VeterinaryBackend before trying the call again."
+        onBack={() => navigate(backPath)}
+      />
+    )
+  }
+  if (ended) {
+    return <CallNotice title="Call ended" message="The other participant is no longer available for this call." onBack={() => navigate(backPath)} />
+  }
+
+  return (
+    <div style={waitingStyle}>
+      <div style={waitingCardStyle}>
+        <div className="spinner-border text-primary mb-3" role="status"><span className="visually-hidden">Loading</span></div>
+        <h4 style={{ marginBottom: 8 }}>
+          {isRinging ? `Calling ${remoteRole}…` : isJoining ? 'Joining video call…' : 'Starting video call…'}
+        </h4>
+        <p style={{ color: '#68717d', marginBottom: 22 }}>
+          {isRinging
+            ? `Waiting for the ${remoteRole.toLowerCase()} to accept.`
+            : isJoining
+              ? 'Connecting securely to the call…'
+              : 'Creating your secure call…'}
+        </p>
+        <button className="btn btn-danger rounded-pill px-4" onClick={leave} disabled={loading}>Cancel call</button>
+      </div>
+    </div>
+  )
+}
+
+const CallNotice = ({ title, message, onBack }) => (
+  <div style={waitingStyle}>
+    <div style={waitingCardStyle}>
+      <h4>{title}</h4>
+      <p style={{ color: '#68717d', margin: '12px 0 22px' }}>{message}</p>
+      <button className="btn btn-primary rounded-pill px-4" onClick={onBack}>Back to appointments</button>
+    </div>
+  </div>
+)
+
+const waitingStyle = {
+  minHeight: '100vh', display: 'grid', placeItems: 'center', background: 'linear-gradient(135deg, #f3f7ff, #ffffff)', padding: 24,
+}
+
+const waitingCardStyle = {
+  maxWidth: 420, width: '100%', textAlign: 'center', background: '#fff', borderRadius: 24, padding: '40px 30px', boxShadow: '0 20px 60px rgba(34, 72, 130, 0.16)',
+}
+
+export default AppointmentVideoCallRoom

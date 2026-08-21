@@ -16,6 +16,7 @@ export const useUpsertWeeklyScheduleDay = () => {
     mutationFn: (data) => api.post(API_ROUTES.WEEKLY_SCHEDULE.BASE, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['weekly-schedule'] })
+      queryClient.invalidateQueries({ queryKey: ['veterinarian', 'dashboard'] })
     },
   })
 }
@@ -29,6 +30,7 @@ export const useUpdateAppointmentDuration = () => {
       api.put(`${API_ROUTES.WEEKLY_SCHEDULE.BASE}/duration`, { duration }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['weekly-schedule'] })
+      queryClient.invalidateQueries({ queryKey: ['veterinarian', 'dashboard'] })
     },
   })
 }
@@ -45,6 +47,7 @@ export const useAddTimeSlot = () => {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['weekly-schedule'] })
+      queryClient.invalidateQueries({ queryKey: ['veterinarian', 'dashboard'] })
     },
   })
 }
@@ -61,6 +64,7 @@ export const useUpdateTimeSlot = () => {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['weekly-schedule'] })
+      queryClient.invalidateQueries({ queryKey: ['veterinarian', 'dashboard'] })
     },
   })
 }
@@ -76,6 +80,7 @@ export const useDeleteTimeSlot = () => {
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['weekly-schedule'] })
+      queryClient.invalidateQueries({ queryKey: ['veterinarian', 'dashboard'] })
     },
   })
 }

@@ -47,11 +47,14 @@ const DOCS = [
   },
 ]
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
 const PetStoreVerificationUpload = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
   const [filePreviews, setFilePreviews] = useState({})
+  const [selectedFiles, setSelectedFiles] = useState({})
 
   useEffect(() => {
     const role = String(user?.role || '').toUpperCase()
@@ -74,7 +77,14 @@ const PetStoreVerificationUpload = () => {
     const file = event.target.files?.[0]
     if (!file) return
 
-    setValue(fieldName, file)
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed file size is 10MB.`)
+      event.target.value = ''
+      return
+    }
+
+    setSelectedFiles((prev) => ({ ...prev, [fieldName]: file }))
+    setValue(fieldName, file, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
 
     const reader = new FileReader()
     reader.onloadend = () => {
@@ -92,7 +102,7 @@ const PetStoreVerificationUpload = () => {
 
   const uploadDoc = async (file, docType) => {
     const formData = new FormData()
-    formData.append('petStore', file)
+    formData.append('petStore', file, file.name)
     formData.append('docType', docType)
     return api.upload(API_ROUTES.UPLOAD.PET_STORE_DOCS, formData)
   }
@@ -100,11 +110,19 @@ const PetStoreVerificationUpload = () => {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
+      let uploadedCount = 0
       for (const doc of DOCS) {
-        const file = data?.[doc.key]
-        if (file) {
+        const file = selectedFiles[doc.key] || data?.[doc.key]
+        if (file && (file instanceof File || file instanceof Blob || typeof file?.slice === 'function')) {
           await uploadDoc(file, doc.docType)
+          uploadedCount++
         }
+      }
+
+      if (uploadedCount === 0) {
+        toast.error('Please select at least one document to upload.')
+        setLoading(false)
+        return
       }
 
       toast.success('Verification documents uploaded successfully!')

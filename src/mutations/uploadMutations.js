@@ -9,5 +9,6 @@ export const useUploadChatFile = () =>
 
 export const useUploadChatFiles = () =>
   useMutation({
-    mutationFn: (formData) => api.upload(API_ROUTES.UPLOAD.CHAT_MULTIPLE, formData),
+    mutationFn: ({ formData, onUploadProgress } = {}) =>
+      api.upload(API_ROUTES.UPLOAD.CHAT_MULTIPLE, formData, { onUploadProgress }),
   })

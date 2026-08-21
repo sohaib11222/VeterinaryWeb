@@ -94,7 +94,7 @@ const Login = () => {
                 <div className="account-wrapper veterinary-login-wrapper">
                   <div className="text-center mb-4">
                     <div className="veterinary-login-logo mb-3">
-                      <i className="fa-solid fa-paw fa-3x text-primary"></i>
+                      <i className="fa-solid fa-shield-heart"></i>
                     </div>
                     <h3 className="account-title veterinary-login-title">
                       <i className="fa-solid fa-heart-pulse me-2"></i>MyPetPlus Login
@@ -162,12 +162,12 @@ const Login = () => {
                             <p className="small mb-0">Secure</p>
                           </div>
                           <div className="col-4">
-                            <i className="fa-solid fa-heart text-danger mb-2"></i>
-                            <p className="small mb-0">Pet Care</p>
+                            <i className="fa-solid fa-notes-medical mb-2"></i>
+                            <p className="small mb-0">Care Hub</p>
                           </div>
                           <div className="col-4">
-                            <i className="fa-solid fa-clock text-info mb-2"></i>
-                            <p className="small mb-0">24/7</p>
+                            <i className="fa-solid fa-calendar-check mb-2"></i>
+                            <p className="small mb-0">Always Ready</p>
                           </div>
                         </div>
                       </div>

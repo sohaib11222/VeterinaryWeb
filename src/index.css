@@ -223,6 +223,11 @@ body.home-hero-header-transparent .home-hero-v2 {
   margin-top: 0;
 }
 
+.clients-section-fourteen .feedback-slider-fourteen .owl-nav,
+.main-wrapper.home-twelve .clients-section-fourteen .feedback-slider-fourteen .owl-nav {
+  text-align: center !important;
+}
+
 #root {
   min-height: 100vh;
 }

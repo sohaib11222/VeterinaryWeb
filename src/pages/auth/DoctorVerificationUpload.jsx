@@ -18,56 +18,79 @@ const schema = yup.object({
   digitalSignature: yup.mixed().notRequired(),
 })
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
 const DoctorVerificationUpload = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [filePreviews, setFilePreviews] = useState({})
+  const [selectedFiles, setSelectedFiles] = useState({})
 
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm({
+  const { handleSubmit, formState: { errors }, setValue } = useForm({
     resolver: yupResolver(schema)
   })
 
   const handleFileChange = (fieldName, event) => {
-      const file = event.target.files[0]
-      if (file) {
-        setValue(fieldName, file)
-        // Create preview (store name + data URL for optional thumbnail)
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          setFilePreviews(prev => ({
-            ...prev,
-            [fieldName]: {
-              name: file.name,
-              url: reader.result,
-              type: file.type,
-            },
-          }))
-        }
-        reader.readAsDataURL(file)
+    const file = event.target.files?.[0]
+    if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed file size is 10MB.`)
+        event.target.value = ''
+        return
       }
+
+      setSelectedFiles((prev) => ({ ...prev, [fieldName]: file }))
+      setValue(fieldName, file, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
+
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setFilePreviews((prev) => ({
+          ...prev,
+          [fieldName]: {
+            name: file.name,
+            url: reader.result,
+            type: file.type,
+          },
+        }))
+      }
+      reader.readAsDataURL(file)
+    }
   }
 
   const onSubmit = async (data) => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      toast.error('Session expired or not registered. Please register first.')
+      navigate('/doctor-register')
+      return
+    }
+
     setLoading(true)
     try {
-      // Create FormData for veterinarian documents upload
       const formData = new FormData()
+      let filesCount = 0
 
-      // Backend expects multiple files under the same field name: 'veterinarianDocs'
-      if (data.registrationCertificate) {
-        formData.append('veterinarianDocs', data.registrationCertificate)
-      }
-      if (data.goodStandingCertificate) {
-        formData.append('veterinarianDocs', data.goodStandingCertificate)
-      }
-      if (data.cv) {
-        formData.append('veterinarianDocs', data.cv)
-      }
-      if (data.specialistRegistration) {
-        formData.append('veterinarianDocs', data.specialistRegistration)
-      }
-      if (data.digitalSignature) {
-        formData.append('veterinarianDocs', data.digitalSignature)
+      const fields = [
+        { key: 'registrationCertificate', type: 'REGISTRATION_CERTIFICATE' },
+        { key: 'goodStandingCertificate', type: 'GOOD_STANDING_CERTIFICATE' },
+        { key: 'cv', type: 'CURRICULUM_VITAE' },
+        { key: 'specialistRegistration', type: 'SPECIALIST_REGISTRATION' },
+        { key: 'digitalSignature', type: 'DIGITAL_SIGNATURE' },
+      ]
+
+      fields.forEach(({ key, type }) => {
+        const file = selectedFiles[key] || data?.[key]
+        if (file && (file instanceof File || file instanceof Blob || typeof file?.slice === 'function')) {
+          formData.append('veterinarianDocs', file, file.name || 'document.pdf')
+          formData.append('documentType', type)
+          filesCount++
+        }
+      })
+
+      if (filesCount === 0) {
+        toast.error('Please select at least one document to upload.')
+        setLoading(false)
+        return
       }
 
       await api.upload(API_ROUTES.UPLOAD.VETERINARIAN_DOCS, formData)

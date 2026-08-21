@@ -100,13 +100,14 @@ const PharmacyRegister = () => {
                   </div>
                   <div className="col-md-12 col-lg-6 login-right">
                     <div className="login-header">
-                      <h3>
-                        Pharmacy Register <Link to="/doctor-register">Are you a Doctor?</Link>
-                      </h3>
+                      <div className="logo-icon"><i className="fa-solid fa-briefcase-medical" /></div>
+                      <h3>Join the pharmacy network</h3>
+                      <p>Set up a trusted pharmacy profile for connected veterinary care.</p>
+                      <Link to="/doctor-register" className="small">Are you a veterinarian?</Link>
                     </div>
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                      <div className="mb-3">
-                        <label className="form-label">Account Type</label>
+                    <form className="auth-form-grid" onSubmit={handleSubmit(onSubmit)}>
+                      <div className="mb-3 auth-form-grid__full">
+                        <label className="form-label"><i className="fa-solid fa-building-shield me-2" />Account Type</label>
                         <select
                           className="form-select"
                           value={accountType}
@@ -117,23 +118,23 @@ const PharmacyRegister = () => {
                         </select>
                       </div>
                       <div className="mb-3">
-                        <label className="form-label">Name</label>
+                        <label className="form-label"><i className="fa-solid fa-user-tag me-2" />Name</label>
                         <input type="text" className="form-control" {...register('name')} />
                         {errors.name && <div className="text-danger small mt-1">{errors.name.message}</div>}
                       </div>
                       <div className="mb-3">
-                        <label className="form-label">Email</label>
+                        <label className="form-label"><i className="fa-solid fa-envelope me-2" />Email</label>
                         <input type="email" className="form-control" {...register('email')} />
                         {errors.email && <div className="text-danger small mt-1">{errors.email.message}</div>}
                       </div>
-                      <div className="mb-3">
-                        <label className="form-label">Phone</label>
+                      <div className="mb-3 auth-form-grid__full">
+                        <label className="form-label"><i className="fa-solid fa-phone me-2" />Phone</label>
                         <input className="form-control form-control-lg group_formcontrol form-control-phone" id="phone" type="text" {...register('phone')} />
                         {errors.phone && <div className="text-danger small mt-1">{errors.phone.message}</div>}
                       </div>
                       <div className="mb-3">
                         <div className="form-group-flex">
-                          <label className="form-label">Create Password</label>
+                          <label className="form-label"><i className="fa-solid fa-lock me-2" />Create Password</label>
                         </div>
                         <div className="pass-group">
                           <input type="password" className="form-control pass-input" {...register('password')} />
@@ -143,7 +144,7 @@ const PharmacyRegister = () => {
                       </div>
                       <div className="mb-3">
                         <div className="form-group-flex">
-                          <label className="form-label">Confirm Password</label>
+                          <label className="form-label"><i className="fa-solid fa-lock me-2" />Confirm Password</label>
                         </div>
                         <div className="pass-group">
                           <input type="password" className="form-control pass-input" {...register('password_confirmation')} />
@@ -153,12 +154,12 @@ const PharmacyRegister = () => {
                           <div className="text-danger small mt-1">{errors.password_confirmation.message}</div>
                         )}
                       </div>
-                      <div className="mb-3">
+                      <div className="mb-3 auth-form-grid__full">
                         <button className="btn btn-primary-gradient w-100" type="submit" disabled={loading}>
-                          {loading ? 'Signing Up...' : 'Sign Up'}
+                          <><i className="fa-solid fa-arrow-right-to-bracket me-2" />{loading ? 'Creating secure profile...' : 'Create pharmacy profile'}</>
                         </button>
                       </div>
-                      <div className="login-or">
+                      <div className="login-or auth-form-grid__full">
                         <span className="or-line"></span>
                         <span className="span-or">or</span>
                       </div>

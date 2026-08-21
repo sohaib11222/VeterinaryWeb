@@ -1,14 +1,24 @@
 import { api } from '../utils/api'
 import { API_ROUTES } from '../utils/apiConfig'
 
-export const startVideoSession = async (appointmentId) => {
-  return api.post(API_ROUTES.VIDEO.CREATE, { appointmentId })
+const VIDEO_REQUEST_CONFIG = { timeout: 15_000 }
+
+export const startVideoSession = async (appointmentId, { restartActive = false } = {}) => {
+  return api.post(API_ROUTES.VIDEO.CREATE, { appointmentId, restartActive }, VIDEO_REQUEST_CONFIG)
 }
 
 export const endVideoSession = async (sessionId) => {
-  return api.post(API_ROUTES.VIDEO.END, { sessionId })
+  return api.post(API_ROUTES.VIDEO.END, { sessionId }, VIDEO_REQUEST_CONFIG)
+}
+
+export const acceptVideoSession = async (sessionId) => {
+  return api.post(API_ROUTES.VIDEO.ACCEPT, { sessionId }, VIDEO_REQUEST_CONFIG)
+}
+
+export const getIncomingVideoSessions = async () => {
+  return api.get(API_ROUTES.VIDEO.INCOMING, VIDEO_REQUEST_CONFIG)
 }
 
 export const getVideoSessionByAppointment = async (appointmentId) => {
-  return api.get(API_ROUTES.VIDEO.BY_APPOINTMENT(appointmentId))
+  return api.get(API_ROUTES.VIDEO.BY_APPOINTMENT(appointmentId), VIDEO_REQUEST_CONFIG)
 }

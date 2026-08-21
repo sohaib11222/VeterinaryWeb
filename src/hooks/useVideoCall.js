@@ -1,9 +1,22 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { StreamVideoClient } from '@stream-io/video-react-sdk'
+
 import { useAuth } from '../contexts/AuthContext'
 import * as videoApi from '../api/video'
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY
+const MEDIA_PERMISSION_TIMEOUT_MS = 12_000
+const STREAM_JOIN_TIMEOUT_MS = 20_000
+
+const responseData = (response) => response?.data?.data ?? response?.data ?? response
+
+const within = (promise, timeoutMs, message) => new Promise((resolve, reject) => {
+  const timer = window.setTimeout(() => reject(new Error(message)), timeoutMs)
+  Promise.resolve(promise).then(
+    (value) => { window.clearTimeout(timer); resolve(value) },
+    (error) => { window.clearTimeout(timer); reject(error) }
+  )
+})
 
 export const useVideoCall = (appointmentId) => {
   const { user } = useAuth()
@@ -11,72 +24,78 @@ export const useVideoCall = (appointmentId) => {
   const [call, setCall] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const clientRef = useRef(null)
+  const callRef = useRef(null)
 
-  const requestMediaPermissions = async () => {
+  const requestMediaPermissions = useCallback(async () => {
     if (!navigator.mediaDevices?.getUserMedia) {
-      throw new Error('MediaDevices API is not supported in this browser')
+      throw new Error('Camera and microphone are not supported in this browser')
     }
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      stream.getTracks().forEach((t) => t.stop())
-      return true
+      stream.getTracks().forEach((track) => track.stop())
     } catch (err) {
       if (err?.name === 'NotAllowedError' || err?.name === 'PermissionDeniedError') {
-        throw new Error('Camera and microphone permissions are required for video calls. Please allow access in your browser settings.')
+        throw new Error('Camera and microphone permissions are required. Please allow access in your browser settings.')
       }
       if (err?.name === 'NotFoundError' || err?.name === 'DevicesNotFoundError') {
-        throw new Error('No camera or microphone found. Please connect a camera and microphone to use video calls.')
-      }
-      if (err?.name === 'NotReadableError' || err?.name === 'TrackStartError') {
-        throw new Error('Camera or microphone is already in use by another application. Please close other applications using your camera/microphone.')
+        throw new Error('No camera or microphone was found. Please connect one and try again.')
       }
       throw new Error(`Failed to access camera/microphone: ${err?.message || 'Unknown error'}`)
     }
-  }
+  }, [])
 
-  const initializeCall = useCallback(async () => {
-    if (!appointmentId || !user) return
+  const createStreamCall = useCallback(async (payload) => {
+    if (!STREAM_API_KEY) throw new Error('Missing VITE_STREAM_API_KEY in the frontend environment')
 
-    setLoading(true)
-    setError(null)
+    const streamToken = payload?.streamToken
+    const streamCallId = payload?.streamCallId || payload?.session?.sessionId
+    const userId = user?._id || user?.id
+    if (!streamToken || !streamCallId || !userId) {
+      throw new Error('The video-call connection details are incomplete')
+    }
+
+    const streamClient = new StreamVideoClient({
+      apiKey: STREAM_API_KEY,
+      user: { id: userId, name: user?.fullName || user?.name || user?.email || 'User' },
+      token: streamToken,
+    })
+    const streamCall = streamClient.call('default', streamCallId)
 
     try {
-      if (!STREAM_API_KEY) {
-        throw new Error('Missing VITE_STREAM_API_KEY in frontend environment')
-      }
-
-      const sessionData = await videoApi.getVideoSessionByAppointment(appointmentId)
-      const payload = sessionData?.data ?? sessionData
-      const streamToken = payload?.streamToken
-      const streamCallId = payload?.streamCallId || payload?.sessionId || `appointment-${appointmentId}`
-
-      if (!streamToken) {
-        throw new Error('No Stream token received from backend')
-      }
-
-      const userId = user._id || user.id
-      if (!userId) {
-        throw new Error('Missing user id')
-      }
-
-      const streamClient = new StreamVideoClient({
-        apiKey: STREAM_API_KEY,
-        user: {
-          id: userId,
-          name: user.fullName || user.name || user.email || 'User',
-        },
-        token: streamToken,
-      })
-
-      const streamCall = streamClient.call('default', streamCallId)
-
+      await within(
+        requestMediaPermissions(),
+        MEDIA_PERMISSION_TIMEOUT_MS,
+        'Camera and microphone access timed out. Check the browser permission prompt and try again.'
+      )
+      await within(
+        streamCall.join({ create: true }),
+        STREAM_JOIN_TIMEOUT_MS,
+        'The video service did not connect in time. Please check your connection and call again.'
+      )
+      await Promise.allSettled([streamCall.camera.enable(), streamCall.microphone.enable()])
+      // Keep the live SDK objects in refs before updating React state. The
+      // cleanup must only run on unmount/end, not between setClient/setCall.
+      clientRef.current = streamClient
+      callRef.current = streamCall
       setClient(streamClient)
       setCall(streamCall)
-
       return { streamClient, streamCall }
     } catch (err) {
-      const message = err?.data?.message || err?.response?.data?.message || err?.message || 'Failed to initialize video call'
+      await streamClient.disconnectUser().catch(() => {})
+      throw err
+    }
+  }, [requestMediaPermissions, user])
+
+  const startCall = useCallback(async ({ restartActive = false } = {}) => {
+    if (!appointmentId || !user) return null
+    setLoading(true)
+    setError(null)
+    try {
+      return responseData(await videoApi.startVideoSession(appointmentId, { restartActive }))
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || 'Failed to start video call'
       setError(message)
       throw err
     } finally {
@@ -84,101 +103,55 @@ export const useVideoCall = (appointmentId) => {
     }
   }, [appointmentId, user])
 
-  const startCall = useCallback(async () => {
-    if (!appointmentId || !user) return
+  const getSession = useCallback(async () => {
+    if (!appointmentId || !user) return null
+    try {
+      return responseData(await videoApi.getVideoSessionByAppointment(appointmentId))
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || 'Failed to load video call'
+      setError(message)
+      throw err
+    }
+  }, [appointmentId, user])
 
+  const joinActiveCall = useCallback(async (knownSession = null) => {
     setLoading(true)
     setError(null)
-
     try {
-      if (!STREAM_API_KEY) {
-        throw new Error('Missing VITE_STREAM_API_KEY in frontend environment')
+      const payload = await getSession()
+      const activeSession = payload?.session || knownSession
+      if (activeSession?.status !== 'ACTIVE') {
+        throw new Error('The other participant has not accepted the call yet')
       }
-
-      const sessionData = await videoApi.startVideoSession(appointmentId)
-      const payload = sessionData?.data ?? sessionData
-      const streamToken = payload?.streamToken
-      const streamCallId = payload?.streamCallId || payload?.sessionId || `appointment-${appointmentId}`
-
-      if (!streamToken) {
-        throw new Error('No Stream token received from backend. Please check backend Stream credentials.')
-      }
-
-      const userId = user._id || user.id
-      if (!userId) {
-        throw new Error('Missing user id')
-      }
-
-      const streamClient = new StreamVideoClient({
-        apiKey: STREAM_API_KEY,
-        user: {
-          id: userId,
-          name: user.fullName || user.name || user.email || 'User',
-        },
-        token: streamToken,
-      })
-
-      const streamCall = streamClient.call('default', streamCallId)
-      await requestMediaPermissions()
-
-      await streamCall.join({ create: true })
-
-      try {
-        await streamCall.camera.enable()
-      } catch {}
-      try {
-        await streamCall.microphone.enable()
-      } catch {}
-
-      setClient(streamClient)
-      setCall(streamCall)
-
-      return { streamClient, streamCall }
+      return await createStreamCall({ ...payload, session: activeSession })
     } catch (err) {
-      const message = err?.data?.message || err?.response?.data?.message || err?.message || 'Failed to start video call'
+      const message = err?.response?.data?.message || err?.message || 'Failed to join video call'
       setError(message)
       throw err
     } finally {
       setLoading(false)
     }
-  }, [appointmentId, user])
+  }, [createStreamCall, getSession])
 
   const endCall = useCallback(async () => {
-    const currentCall = call
-    const currentClient = client
-
-    if (currentCall) {
-      try {
-        await currentCall.leave()
-      } catch {}
-    }
-
-    if (currentClient) {
-      try {
-        await currentClient.disconnectUser()
-      } catch {}
-    }
-
+    const currentCall = callRef.current
+    const currentClient = clientRef.current
+    callRef.current = null
+    clientRef.current = null
     setCall(null)
     setClient(null)
-  }, [call, client])
+    await currentCall?.leave().catch(() => {})
+    await currentClient?.disconnectUser().catch(() => {})
+  }, [])
 
-  useEffect(() => {
-    const currentCall = call
-    return () => {
-      if (currentCall) {
-        currentCall.leave().catch(() => {})
-      }
-    }
-  }, [call])
+  useEffect(() => () => {
+    const activeCall = callRef.current
+    const activeClient = clientRef.current
+    callRef.current = null
+    clientRef.current = null
+    activeCall?.leave().catch(() => {})
+    activeClient?.disconnectUser().catch(() => {})
+  }, [])
 
-  return {
-    client,
-    call,
-    loading,
-    error,
-    initializeCall,
-    startCall,
-    endCall,
-  }
+  return { client, call, loading, error, startCall, getSession, joinActiveCall, endCall }
 }

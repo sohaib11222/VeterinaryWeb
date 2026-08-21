@@ -43,3 +43,15 @@ export const useMarkConversationRead = () => {
   })
 }
 
+export const useMarkConversationComplete = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (conversationId) => api.post(API_ROUTES.CHAT.MARK_COMPLETE(conversationId)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['chat', 'conversations'] })
+      queryClient.invalidateQueries({ queryKey: ['chat', 'messages'] })
+      queryClient.invalidateQueries({ queryKey: ['chat', 'unread-count'] })
+    },
+  })
+}
+

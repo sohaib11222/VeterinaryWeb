@@ -20,9 +20,9 @@ export const useConversations = (params = {}, queryOptions = {}) =>
   useQuery({
     queryKey: ['chat', 'conversations', stableParamsKey(params)],
     queryFn: () => api.get(API_ROUTES.CHAT.CONVERSATIONS, { params }),
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    staleTime: 30_000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    staleTime: 0,
     ...queryOptions,
   })
 
@@ -31,9 +31,9 @@ export const useMessages = (conversationId, params = {}, queryOptions = {}) =>
     queryKey: ['chat', 'messages', conversationId, stableParamsKey(params)],
     queryFn: () => api.get(API_ROUTES.CHAT.MESSAGES(conversationId), { params }),
     enabled: !!conversationId,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    staleTime: 10_000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    staleTime: 0,
     ...queryOptions,
   })
 
@@ -41,9 +41,9 @@ export const useUnreadChatCount = (queryOptions = {}) =>
   useQuery({
     queryKey: ['chat', 'unread-count'],
     queryFn: () => api.get(API_ROUTES.CHAT.UNREAD_COUNT),
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    staleTime: 15_000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    staleTime: 0,
     ...queryOptions,
   })
 

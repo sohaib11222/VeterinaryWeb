@@ -1,0 +1,307 @@
+:root {
+  --auth-ink: #12233a;
+  --auth-muted: #65758b;
+  --auth-line: #dce6ec;
+  --auth-teal: #0b8f83;
+  --auth-teal-dark: #075a59;
+  --auth-mint: #dff7ee;
+  --auth-soft: #f5f8fa;
+}
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: minmax(360px, 39%) minmax(0, 1fr);
+  min-height: 100vh;
+  background: var(--auth-soft);
+  color: var(--auth-ink);
+}
+
+.auth-shell__aside {
+  position: sticky;
+  top: 0;
+  display: flex;
+  min-height: 100vh;
+  overflow: hidden;
+  background: linear-gradient(145deg, #063f47 0%, #08776d 48%, #1aa78e 100%);
+  color: #fff;
+}
+
+.auth-shell__aside::before,
+.auth-shell__aside::after {
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 50%;
+  content: '';
+}
+
+.auth-shell__aside::before { right: -230px; bottom: -150px; box-shadow: 0 0 0 58px rgba(255, 255, 255, .045), 0 0 0 116px rgba(255, 255, 255, .035); }
+.auth-shell__aside::after { top: -230px; left: -190px; }
+
+.auth-shell__aside-image {
+  position: absolute;
+  inset: 0;
+  opacity: .23;
+  background: linear-gradient(90deg, rgba(3, 55, 63, .9), rgba(7, 116, 105, .54)), url('/assets/img/bg/veterinary-care-bg.png') center / cover no-repeat;
+  mix-blend-mode: luminosity;
+}
+
+.auth-shell__aside-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(32px, 6vw, 74px);
+}
+
+.auth-shell__brand,
+.auth-shell__mobile-brand > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  width: fit-content;
+  color: inherit;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -.7px;
+  text-decoration: none;
+}
+
+.auth-shell__brand > span:last-child > span,
+.auth-shell__mobile-brand > a > span:last-child > span { color: #42e0bf; }
+
+.auth-shell__brand-mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .4);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .14);
+  font-size: 17px;
+}
+
+.auth-shell__hero { max-width: 490px; margin: auto 0; padding: 74px 0; }
+.auth-shell__eyebrow { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 18px; color: #a7f6df; font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.auth-shell__hero h1 { max-width: 480px; margin: 0; color: #fff; font-size: clamp(38px, 4.1vw, 66px); font-weight: 750; letter-spacing: -2.5px; line-height: 1.04; }
+.auth-shell__hero p { max-width: 420px; margin: 22px 0 0; color: rgba(255, 255, 255, .86); font-size: 17px; line-height: 1.65; }
+.auth-shell__assurances { display: flex; flex-wrap: wrap; gap: 12px 24px; color: rgba(255, 255, 255, .9); font-size: 13px; font-weight: 650; }
+.auth-shell__assurances span { display: inline-flex; align-items: center; gap: 8px; }
+.auth-shell__assurances i { color: #8df2d4; }
+
+.auth-shell__main { display: flex; min-width: 0; align-items: center; justify-content: center; padding: 36px 42px; }
+.auth-shell__surface { width: min(100%, 940px); }
+.auth-shell__mobile-brand { display: none; }
+
+/* Legacy auth templates share the same polished card without requiring a second form implementation. */
+.auth-shell .content,
+.auth-shell .login-content-info { padding: 0; background: transparent; }
+.auth-shell .container,
+.auth-shell .container-fluid { width: 100%; max-width: none; padding: 0; }
+.auth-shell .account-content { width: 100%; max-width: 900px; margin: 0 auto; padding: 0; }
+.auth-shell .veterinary-login-container { max-width: 580px; }
+.auth-shell .content > .container-fluid > .row > [class*='col-'] { width: 100%; max-width: none; flex: 0 0 100%; margin-left: 0; padding-right: 0; padding-left: 0; }
+.auth-shell .account-content > .row { margin-right: 0; margin-left: 0; }
+.auth-shell .account-content > .row > [class*='col-'] { width: 100%; max-width: none; flex: 0 0 100%; margin-left: 0; padding-right: 0; padding-left: 0; }
+.auth-shell .account-box,
+.auth-shell .account-info,
+.auth-shell .login-right,
+.auth-shell .inner-right-login,
+.auth-shell .login-right-wrap,
+.auth-shell .widget-content { border: 1px solid rgba(186, 203, 212, .7); border-radius: 26px; background: rgba(255, 255, 255, .96); box-shadow: 0 24px 60px rgba(18, 54, 70, .12); }
+.auth-shell .account-wrapper,
+.auth-shell .account-info,
+.auth-shell .login-right-wrap,
+.auth-shell .inner-right-login,
+.auth-shell .widget-content { padding: clamp(26px, 3.2vw, 38px); }
+.auth-shell .login-right { width: 100%; margin: 0; }
+.auth-shell .login-right > .inner-right-login { box-shadow: none; }
+.auth-shell .login-right > .login-header:first-child { padding: clamp(26px, 3.2vw, 38px) clamp(26px, 3.2vw, 38px) 0; }
+.auth-shell .login-right > form { padding: 0 clamp(26px, 3.2vw, 38px) clamp(26px, 3.2vw, 38px); }
+.auth-shell .login-right:has(> .inner-right-login) { border: 0; background: transparent; box-shadow: none; }
+.auth-shell .account-info:has(> .widget-content) { border: 0; background: transparent; box-shadow: none; }
+.auth-shell .account-info > .widget-content { padding: 0; border: 0; background: transparent; box-shadow: none; }
+.auth-shell .login-right .login-bottom-copyright { margin-top: 20px; color: var(--auth-muted); font-size: 12px; text-align: center; }
+.auth-shell .login-left { display: none !important; }
+.auth-shell .login-shapes { display: none; }
+
+.auth-shell h1,
+.auth-shell .account-title,
+.auth-shell .login-header h3,
+.auth-shell .login-title h3 { margin: 0 0 8px; color: var(--auth-ink); font-size: clamp(25px, 3vw, 34px); font-weight: 760; letter-spacing: -1px; line-height: 1.2; }
+.auth-shell .account-subtitle,
+.auth-shell .login-header > p,
+.auth-shell .login-title > p { margin: 0 0 18px; color: var(--auth-muted); font-size: 14px; line-height: 1.55; }
+.auth-shell .veterinary-login-logo,
+.auth-shell .veterinary-register-logo,
+.auth-shell .logo-icon { display: grid; width: 52px; height: 52px; place-items: center; margin: 0 0 20px; overflow: hidden; border: 1px solid #c8eee4; border-radius: 16px; background: var(--auth-mint); color: var(--auth-teal-dark); }
+.auth-shell .logo-icon img { width: 100%; height: 100%; object-fit: cover; }
+.auth-shell .veterinary-login-logo i,
+.auth-shell .veterinary-register-logo i,
+.auth-shell .logo-icon i { font-size: 22px; color: var(--auth-teal-dark) !important; }
+
+.auth-shell .form-group,
+.auth-shell .mb-3 { margin-bottom: 14px !important; }
+.auth-shell label,
+.auth-shell .form-label,
+.auth-shell .veterinary-form-label { margin-bottom: 8px; color: #314156; font-size: 13px; font-weight: 700; }
+.auth-shell .veterinary-form-label i,
+.auth-shell label i { color: var(--auth-teal); }
+.auth-shell .form-control,
+.auth-shell .form-select,
+.auth-shell .form-control-phone { min-height: 46px; border: 1px solid var(--auth-line); border-radius: 12px; background: #fff; color: var(--auth-ink); box-shadow: none; font-size: 15px; transition: border-color .16s ease, box-shadow .16s ease, background .16s ease; }
+.auth-shell .form-control::placeholder { color: #a3afba; }
+.auth-shell .form-control:focus,
+.auth-shell .form-select:focus { border-color: var(--auth-teal); box-shadow: 0 0 0 4px rgba(11, 143, 131, .12); }
+.auth-shell .pass-group { position: relative; }
+.auth-shell .pass-group .form-control { padding-right: 48px; }
+.auth-shell .toggle-password,
+.auth-shell .toggle-password1,
+.auth-shell .toggle-password-sub { position: absolute; top: 50%; right: 16px; color: #7f8b98; transform: translateY(-50%); }
+
+.auth-shell .btn-primary,
+.auth-shell .btn-primary-gradient,
+.auth-shell .veterinary-btn-primary,
+.auth-shell .veterinary-btn-primary-gradient { display: inline-flex; min-height: 50px; align-items: center; justify-content: center; border: 0; border-radius: 12px; background: linear-gradient(115deg, #087b73, #16a38d); box-shadow: 0 10px 20px rgba(8, 123, 115, .2); color: #fff; font-weight: 750; transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; }
+.auth-shell .btn-primary:hover,
+.auth-shell .btn-primary-gradient:hover,
+.auth-shell .veterinary-btn-primary:hover,
+.auth-shell .veterinary-btn-primary-gradient:hover { transform: translateY(-1px); box-shadow: 0 14px 25px rgba(8, 123, 115, .28); filter: saturate(1.06); }
+.auth-shell .btn-outline-primary,
+.auth-shell .veterinary-btn-outline-primary { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; border: 1px solid #b9d9d3; border-radius: 12px; background: #f9fcfb; color: #087b73; font-weight: 700; }
+.auth-shell .btn-outline-primary:hover,
+.auth-shell .veterinary-btn-outline-primary:hover { border-color: var(--auth-teal); background: var(--auth-mint); color: #075a59; }
+
+.auth-shell a { color: #087b73; font-weight: 700; text-decoration: none; }
+.auth-shell a:hover { color: #055f5b; text-decoration: underline; }
+.auth-shell .login-or { display: flex; align-items: center; gap: 13px; margin: 24px 0; }
+.auth-shell .or-line { flex: 1; height: 1px; background: #e2e9ed; }
+.auth-shell .span-or { position: static; width: auto; height: auto; padding: 0 2px; background: transparent; color: #8a98a6; font-size: 12px; font-weight: 700; line-height: 1; }
+.auth-shell .social-login-btn .btn,
+.auth-shell .social-login > a { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 10px; border: 1px solid var(--auth-line); border-radius: 12px; background: #fff; color: #405066; font-weight: 700; }
+.auth-shell .social-login-btn .btn:hover,
+.auth-shell .social-login > a:hover { border-color: #aacdc6; background: #f8fcfa; text-decoration: none; }
+.auth-shell .social-login { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.auth-shell .social-login > span { color: var(--auth-muted); font-size: 13px; }
+.auth-shell .social-login > a { width: 42px; min-height: 42px; border-radius: 50%; }
+.auth-shell .social-login > .facebook { color: #3867b7; }
+.auth-shell .social-login > .google { color: #d05245; }
+
+.auth-shell .account-footer,
+.auth-shell .account-signup,
+.auth-shell .dont-have,
+.auth-shell .forgotpass { color: var(--auth-muted); font-size: 14px; text-align: center; }
+.auth-shell .account-footer p,
+.auth-shell .account-signup p { margin: 0; }
+.auth-shell .veterinary-login-features,
+.auth-shell .veterinary-register-features { padding-top: 18px; border-top: 1px solid #e8eef1; }
+.auth-shell .veterinary-login-features i,
+.auth-shell .veterinary-register-features i { color: var(--auth-teal) !important; }
+.auth-shell .veterinary-login-features p,
+.auth-shell .veterinary-register-features p { color: #647489; font-size: 11px; font-weight: 700; }
+.auth-shell .invalid-feedback,
+.auth-shell .text-danger { color: #c84b57 !important; font-size: 12px; font-weight: 600; }
+
+/* Dense, balanced forms: the common registration pairs sit side-by-side on desktop. */
+.auth-shell .auth-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; }
+.auth-shell .auth-form-grid > .auth-form-grid__full,
+.auth-shell .auth-form-grid > .account-footer,
+.auth-shell .auth-form-grid > .account-signup,
+.auth-shell .auth-form-grid > .login-or { grid-column: 1 / -1; }
+.auth-shell .auth-form-grid .veterinary-register-btn,
+.auth-shell .auth-form-grid .veterinary-doctor-register-btn { width: 100%; }
+.auth-shell .auth-role-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 2px 0 12px; }
+.auth-shell .auth-role-options .btn { min-height: 46px; padding: 8px 10px; font-size: 12px; white-space: nowrap; }
+
+/* Keep normal account forms within a laptop-height viewport without sacrificing touch targets. */
+@media (min-width: 992px) and (max-height: 900px) {
+  .auth-shell__main { padding-top: 20px; padding-bottom: 20px; }
+  .auth-shell .account-wrapper,
+  .auth-shell .account-info,
+  .auth-shell .login-right-wrap,
+  .auth-shell .inner-right-login,
+  .auth-shell .widget-content { padding: 24px 28px; }
+  .auth-shell .login-right > .login-header:first-child { padding: 24px 28px 0; }
+  .auth-shell .login-right > form { padding: 0 28px 24px; }
+  .auth-shell .veterinary-login-logo,
+  .auth-shell .veterinary-register-logo,
+  .auth-shell .logo-icon { width: 44px; height: 44px; margin-bottom: 12px; border-radius: 14px; }
+  .auth-shell .account-subtitle,
+  .auth-shell .login-header > p,
+  .auth-shell .login-title > p { margin-bottom: 14px; }
+  .auth-shell .form-group,
+  .auth-shell .mb-3 { margin-bottom: 10px !important; }
+  .auth-shell label,
+  .auth-shell .form-label,
+  .auth-shell .veterinary-form-label { margin-bottom: 5px; }
+  .auth-shell .form-control,
+  .auth-shell .form-select,
+  .auth-shell .form-control-phone { min-height: 44px; }
+  .auth-shell .btn-primary,
+  .auth-shell .btn-primary-gradient,
+  .auth-shell .veterinary-btn-primary,
+  .auth-shell .veterinary-btn-primary-gradient { min-height: 46px; }
+  .auth-shell .login-or { margin: 14px 0; }
+  .auth-shell .auth-role-options { margin: 0 0 9px; }
+  .auth-shell .veterinary-register-features,
+  .auth-shell .veterinary-login-features { display: none; }
+}
+
+/* Registration / verification journeys */
+.auth-shell .step-list ul,
+.auth-shell #progressbar,
+.auth-shell #progressbar1 { display: flex; align-items: center; justify-content: center; gap: 9px; margin: 0 0 30px; padding: 0; list-style: none; }
+.auth-shell .step-list li a { display: grid; width: 30px; height: 30px; place-items: center; border: 1px solid #cfddd9; border-radius: 50%; background: #fff; color: #6d7b88; font-size: 12px; font-weight: 800; }
+.auth-shell .step-list li a.active,
+.auth-shell .step-list li a.active-done { border-color: var(--auth-teal); background: var(--auth-teal); color: #fff; }
+.auth-shell .profile-pic-upload { min-height: 160px; padding: 22px; border: 1.5px dashed #9dcac0; border-radius: 16px; background: #f6fcf9; transition: border-color .15s ease, background .15s ease; }
+.auth-shell .profile-pic-upload:hover { border-color: var(--auth-teal); background: #ecfaf5; }
+.auth-shell .cam-col { display: grid; width: 52px; height: 52px; place-items: center; margin: 0 auto 10px; border-radius: 14px; background: #d9f4ec; }
+.auth-shell .cam-col img { width: 25px; height: 25px; }
+.auth-shell .widget-setcount .step-box { border: 1px solid #dce8e5; border-radius: 12px; background: #f9fcfb; }
+
+/* Inner AuthLayout instances exist on legacy routes. They become transparent so there is only one shell. */
+.auth-shell .auth-shell { display: block; min-height: auto; background: transparent; }
+.auth-shell .auth-shell > .auth-shell__aside,
+.auth-shell .auth-shell > .auth-shell__mobile-brand { display: none; }
+.auth-shell .auth-shell > .auth-shell__main { display: block; padding: 0; }
+.auth-shell .auth-shell > .auth-shell__main > .auth-shell__surface { width: 100%; }
+
+@media (max-width: 991px) {
+  .auth-shell { display: block; background: linear-gradient(160deg, #edf7f5, #f7fafb 44%); }
+  .auth-shell__aside { display: none; }
+  .auth-shell__main { min-height: 100vh; padding: 30px 20px; }
+  .auth-shell__surface { width: min(100%, 720px); }
+  .auth-shell__mobile-brand { display: block; margin-bottom: 26px; color: var(--auth-ink); }
+  .auth-shell__mobile-brand .auth-shell__brand-mark { border-color: #b5dfd5; background: var(--auth-mint); color: var(--auth-teal-dark); }
+}
+
+@media (max-width: 575px) {
+  .auth-shell__main { display: block; padding: 22px 14px; }
+  .auth-shell__mobile-brand { margin: 0 8px 22px; }
+  .auth-shell .account-wrapper,
+  .auth-shell .account-info,
+  .auth-shell .login-right-wrap,
+  .auth-shell .inner-right-login,
+  .auth-shell .widget-content { padding: 26px 20px; border-radius: 20px; }
+  .auth-shell .login-right > .login-header:first-child { padding: 26px 20px 0; }
+  .auth-shell .login-right > form { padding: 0 20px 26px; }
+  .auth-shell .account-box,
+  .auth-shell .account-info,
+  .auth-shell .login-right,
+  .auth-shell .inner-right-login,
+  .auth-shell .login-right-wrap,
+  .auth-shell .widget-content { border-radius: 20px; }
+  .auth-shell h1,
+  .auth-shell .account-title,
+  .auth-shell .login-header h3,
+  .auth-shell .login-title h3 { font-size: 26px; }
+  .auth-shell .form-control,
+  .auth-shell .form-select { min-height: 48px; }
+  .auth-shell .auth-form-grid { display: block; }
+  .auth-shell .auth-role-options { display: grid; grid-template-columns: 1fr; }
+}

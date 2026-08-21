@@ -43,13 +43,6 @@ const DoctorSidebar = () => {
     getImageUrl(user?.profileImage) ||
     '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
 
-  // Console log image URLs for debugging
-  console.log('DoctorSidebar - vetUser profileImage:', vetUser?.profileImage)
-  console.log('DoctorSidebar - user profileImage:', user?.profileImage)
-  console.log('DoctorSidebar - getImageUrl(vetUser?.profileImage):', getImageUrl(vetUser?.profileImage))
-  console.log('DoctorSidebar - getImageUrl(user?.profileImage):', getImageUrl(user?.profileImage))
-  console.log('DoctorSidebar - final profileImage:', profileImage)
-
   // Availability (mirrors react-conversion: isAvailableOnline false => not available)
   const currentAvailabilityValue = useMemo(() => {
     if (vetProfile?.isAvailableOnline === false) return 'not-available'
@@ -77,7 +70,7 @@ const DoctorSidebar = () => {
       {/* Veterinary Profile Widget */}
       <div className="widget-profile veterinary-profile-widget">
         <div className="profile-info-widget">
-          <Link to="/doctor-profile" className="booking-doc-img">
+          <Link to="/doctor-profile-settings" className="booking-doc-img" aria-label="Open profile settings">
             <img
               src={profileImage}
               alt="Veterinarian Image"

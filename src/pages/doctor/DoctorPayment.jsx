@@ -136,7 +136,7 @@ const DoctorPayment = () => {
                         <th>Payment Method</th>
                         <th>Amount</th>
                         <th>Fee</th>
-                        <th>Total Deducted</th>
+                        <th>Wallet Debit</th>
                         <th>Status</th>
                       </tr>
                     </thead>
@@ -238,6 +238,9 @@ const DoctorPayment = () => {
                       max={Number(balance || 0)}
                       step="0.01"
                     />
+                    <small className="form-text text-muted">
+                      Any withdrawal fee is withheld from this payout amount; it does not add to your wallet debit.
+                    </small>
                   </div>
                   <div className="form-group mb-3">
                     <label>

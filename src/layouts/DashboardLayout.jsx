@@ -5,6 +5,7 @@ import PatientSidebar from '../components/common/PatientSidebar'
 import Sidebar from '../components/common/Sidebar'
 import Footer from '../components/common/Footer'
 import Breadcrumb from '../components/common/Breadcrumb'
+import IncomingCallNotifier from '../components/video/IncomingCallNotifier'
 
 const DashboardLayout = ({ children, breadcrumb }) => {
   const location = useLocation()
@@ -85,6 +86,7 @@ const DashboardLayout = ({ children, breadcrumb }) => {
         )}
       </div>
       <Footer />
+      <IncomingCallNotifier />
     </div>
   )
 }

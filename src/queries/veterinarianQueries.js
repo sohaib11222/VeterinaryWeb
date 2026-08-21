@@ -26,6 +26,9 @@ export const useVeterinarianProfile = (options = {}) =>
     queryKey: ['veterinarian', 'profile'],
     queryFn: () => api.get(API_ROUTES.VETERINARIANS.PROFILE),
     enabled: options.enabled ?? true,
+    // Profile settings use this query to seed editable local form state. It is
+    // still refreshed on entry and after mutations, but never mid-edit.
+    meta: { liveRefresh: false },
     ...options,
   })
 

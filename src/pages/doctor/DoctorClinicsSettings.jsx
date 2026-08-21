@@ -31,7 +31,6 @@ const DoctorClinicsSettings = () => {
   const initialClinics = Array.isArray(profile.clinics) ? profile.clinics : []
 
   const [clinics, setClinics] = useState([emptyClinic()])
-  const [uploadingIndex, setUploadingIndex] = useState(null)
 
   useEffect(() => {
     if (initialClinics.length > 0) {
@@ -64,41 +63,6 @@ const DoctorClinicsSettings = () => {
 
   const removeClinic = (index) => {
     setClinics((prev) => prev.filter((_, i) => i !== index))
-  }
-
-  const handleImageUpload = async (clinicIndex, files) => {
-    if (!files?.length) return
-    const formData = new FormData()
-    Array.from(files).forEach((file) => formData.append('clinic', file))
-    setUploadingIndex(clinicIndex)
-    try {
-      const res = await api.upload(API_ROUTES.UPLOAD.CLINIC, formData)
-      const urls = res?.data?.urls || res?.urls || []
-      if (urls.length > 0) {
-        setClinics((prev) =>
-          prev.map((c, i) =>
-            i === clinicIndex
-              ? { ...c, images: [...(c.images || []), ...urls] }
-              : c
-          )
-        )
-        toast.success('Images uploaded. Save changes to update your profile.')
-      }
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to upload images')
-    } finally {
-      setUploadingIndex(null)
-    }
-  }
-
-  const removeImage = (clinicIndex, imageIndex) => {
-    setClinics((prev) =>
-      prev.map((c, i) =>
-        i === clinicIndex
-          ? { ...c, images: (c.images || []).filter((_, j) => j !== imageIndex) }
-          : c
-      )
-    )
   }
 
   const handleSubmit = async (e) => {
@@ -141,8 +105,6 @@ const DoctorClinicsSettings = () => {
       toast.error(message)
     }
   }
-
-  const baseURL = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '')
 
   if (isLoading) {
     return (
@@ -341,56 +303,6 @@ const DoctorClinicsSettings = () => {
                                       }}
                                       placeholder="e.g., -74.0060"
                                     />
-                                  </div>
-                                </div>
-                                <div className="col-md-12">
-                                  <div className="form-wrap">
-                                    <label className="col-form-label">
-                                      <i className="fa-solid fa-images me-2"></i>
-                                      Clinic Gallery
-                                    </label>
-                                    <div className="drop-file veterinary-drop-file">
-                                      <p>
-                                        <i className="fa-solid fa-cloud-upload-alt me-2"></i>
-                                        Drop files or click to upload clinic images
-                                      </p>
-                                      <input
-                                        type="file"
-                                        multiple
-                                        accept="image/*"
-                                        onChange={(e) => {
-                                          if (e.target.files?.length) {
-                                            handleImageUpload(index, e.target.files)
-                                          }
-                                        }}
-                                      />
-                                    </div>
-                                    {uploadingIndex === index && (
-                                      <span className="text-muted small">
-                                        <span className="spinner-border spinner-border-sm me-1" role="status" /> Uploading...
-                                      </span>
-                                    )}
-                                    {clinic.images?.length > 0 && (
-                                      <div className="view-imgs veterinary-gallery mt-2 d-flex flex-wrap gap-2">
-                                        {clinic.images.map((url, imgIndex) => (
-                                          <div key={imgIndex} className="view-img veterinary-gallery-item position-relative">
-                                            <img
-                                              src={url.startsWith('http') ? url : `${baseURL}${url}`}
-                                              alt={`Clinic ${index + 1}`}
-                                              style={{ maxWidth: 120, maxHeight: 80, objectFit: 'cover', borderRadius: 4 }}
-                                            />
-                                            <button
-                                              type="button"
-                                              className="btn btn-sm btn-outline-danger position-absolute top-0 end-0 m-1"
-                                              onClick={() => removeImage(index, imgIndex)}
-                                              aria-label="Remove"
-                                            >
-                                              <i className="fa-solid fa-trash"></i>
-                                            </button>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    )}
                                   </div>
                                 </div>
                                 <div className="col-md-12 text-end mt-2">

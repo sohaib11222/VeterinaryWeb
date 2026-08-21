@@ -109,7 +109,7 @@ const DoctorRegister = () => {
                         <p className="veterinary-register-subtitle">Join our professional veterinary network</p>
                       </div>
                     </div>
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                    <form className="auth-form-grid" onSubmit={handleSubmit(onSubmit)}>
                       <div className="mb-3 veterinary-form-group">
                         <label className="form-label veterinary-form-label">
                           <i className="fa-solid fa-user me-2"></i>Full Name
@@ -134,7 +134,7 @@ const DoctorRegister = () => {
                         />
                         {errors.email && <div className="invalid-feedback veterinary-error-feedback">{errors.email.message}</div>}
                       </div>
-                      <div className="mb-3 veterinary-form-group">
+                      <div className="mb-3 veterinary-form-group auth-form-grid__full">
                         <label className="form-label veterinary-form-label">
                           <i className="fa-solid fa-phone me-2"></i>Phone Number
                         </label>
@@ -174,19 +174,19 @@ const DoctorRegister = () => {
                         />
                         {errors.password_confirmation && <div className="invalid-feedback veterinary-error-feedback">{errors.password_confirmation.message}</div>}
                       </div>
-                      <div className="mb-3 veterinary-register-btn-group">
+                      <div className="mb-3 veterinary-register-btn-group auth-form-grid__full">
                         <button className="btn veterinary-btn-primary-gradient w-100 veterinary-doctor-register-btn" type="submit" disabled={loading}>
                           <i className="fa-solid fa-user-plus me-2"></i>
                           {loading ? 'Registering...' : 'Join Veterinary Team'}
                         </button>
                       </div>
-                      <div className="login-or veterinary-register-divider">
+                      <div className="login-or veterinary-register-divider auth-form-grid__full">
                         <span className="or-line veterinary-or-line"></span>
                         <span className="span-or veterinary-or-text">
-                          <i className="fa-solid fa-paw me-1"></i>or
+                          <i className="fa-solid fa-plus me-1"></i>or
                         </span>
                       </div>
-                      <div className="form-group text-center mb-3 veterinary-patient-register-group">
+                      <div className="form-group text-center mb-3 veterinary-patient-register-group auth-form-grid__full">
                         <Link to="/register" className="btn veterinary-btn-outline-primary w-100 veterinary-patient-register-btn">
                           <i className="fa-solid fa-user me-2"></i>
                           Register as Pet Owner
@@ -204,8 +204,8 @@ const DoctorRegister = () => {
                               <p className="small mb-0">Verified</p>
                             </div>
                             <div className="col-4">
-                              <i className="fa-solid fa-heart text-danger mb-2"></i>
-                              <p className="small mb-0">Pet Care</p>
+                              <i className="fa-solid fa-stethoscope mb-2"></i>
+                              <p className="small mb-0">Clinical Care</p>
                             </div>
                             <div className="col-4">
                               <i className="fa-solid fa-users text-info mb-2"></i>

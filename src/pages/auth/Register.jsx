@@ -75,7 +75,7 @@ const Register = () => {
                 <div className="account-wrapper veterinary-register-wrapper">
                   <div className="text-center mb-4">
                     <div className="veterinary-register-logo mb-3">
-                      <i className="fa-solid fa-paw fa-3x text-primary"></i>
+                      <i className="fa-solid fa-heart-pulse"></i>
                     </div>
                     <h3 className="account-title veterinary-register-title">
                       <i className="fa-solid fa-heart-pulse me-2"></i>Join MyPetPlus
@@ -84,7 +84,7 @@ const Register = () => {
                       Create your pet health account
                     </p>
                   </div>
-                  <form onSubmit={handleSubmit(onSubmit)}>
+                  <form className="auth-form-grid" onSubmit={handleSubmit(onSubmit)}>
                     <div className="form-group veterinary-form-group">
                       <label className="veterinary-form-label">
                         <i className="fa-solid fa-user me-2"></i>Full Name
@@ -109,7 +109,7 @@ const Register = () => {
                       />
                       {errors.email && <div className="invalid-feedback veterinary-error-feedback">{errors.email.message}</div>}
                     </div>
-                    <div className="form-group veterinary-form-group">
+                    <div className="form-group veterinary-form-group auth-form-grid__full">
                       <label className="veterinary-form-label">
                         <i className="fa-solid fa-phone me-2"></i>Phone Number
                       </label>
@@ -145,7 +145,7 @@ const Register = () => {
                       />
                       {errors.password_confirmation && <div className="invalid-feedback veterinary-error-feedback">{errors.password_confirmation.message}</div>}
                     </div>
-                    <div className="form-group text-center veterinary-register-btn-group">
+                    <div className="form-group text-center veterinary-register-btn-group auth-form-grid__full">
                       <button className="btn veterinary-btn-primary account-btn veterinary-register-btn" type="submit" disabled={loading}>
                         <i className="fa-solid fa-user-plus me-2"></i>
                         {loading ? (
@@ -158,28 +158,21 @@ const Register = () => {
                         )}
                       </button>
                     </div>
-                    <div className="login-or veterinary-register-divider">
+                    <div className="login-or veterinary-register-divider auth-form-grid__full">
                       <span className="or-line veterinary-or-line"></span>
                       <span className="span-or veterinary-or-text">
-                        <i className="fa-solid fa-paw me-1"></i>or
+                        <i className="fa-solid fa-plus me-1"></i>or
                       </span>
                     </div>
-                    <div className="form-group text-center veterinary-doctor-register-group">
-                      <Link to="/doctor-register" className="btn veterinary-btn-outline-primary account-btn w-100 veterinary-doctor-register-btn">
-                        <i className="fa-solid fa-user-doctor me-2"></i>
-                        Register as Veterinarian
+                    <div className="auth-role-options auth-form-grid__full">
+                      <Link to="/doctor-register" className="btn veterinary-btn-outline-primary account-btn veterinary-doctor-register-btn">
+                        <i className="fa-solid fa-user-doctor me-2"></i>Veterinarian
                       </Link>
-                    </div>
-                    <div className="form-group text-center veterinary-doctor-register-group mt-2">
-                      <Link to="/pharmacy-register?type=pet_store" className="btn veterinary-btn-outline-primary account-btn w-100 veterinary-doctor-register-btn">
-                        <i className="fa-solid fa-pills me-2"></i>
-                        Register as Pharmacy
+                      <Link to="/pharmacy-register?type=pet_store" className="btn veterinary-btn-outline-primary account-btn veterinary-doctor-register-btn">
+                        <i className="fa-solid fa-pills me-2"></i>Pharmacy
                       </Link>
-                    </div>
-                    <div className="form-group text-center veterinary-doctor-register-group mt-2">
-                      <Link to="/pharmacy-register?type=parapharmacy" className="btn veterinary-btn-outline-primary account-btn w-100 veterinary-doctor-register-btn">
-                        <i className="fa-solid fa-prescription-bottle-medical me-2"></i>
-                        Register as Parapharmacy
+                      <Link to="/pharmacy-register?type=parapharmacy" className="btn veterinary-btn-outline-primary account-btn veterinary-doctor-register-btn">
+                        <i className="fa-solid fa-prescription-bottle-medical me-2"></i>Parapharmacy
                       </Link>
                     </div>
                     <div className="account-footer veterinary-register-footer">
@@ -194,12 +187,12 @@ const Register = () => {
                             <p className="small mb-0">Secure</p>
                           </div>
                           <div className="col-4">
-                            <i className="fa-solid fa-heart text-danger mb-2"></i>
-                            <p className="small mb-0">Pet Care</p>
+                            <i className="fa-solid fa-stethoscope mb-2"></i>
+                            <p className="small mb-0">Care Team</p>
                           </div>
                           <div className="col-4">
-                            <i className="fa-solid fa-gift text-warning mb-2"></i>
-                            <p className="small mb-0">Free</p>
+                            <i className="fa-solid fa-circle-check mb-2"></i>
+                            <p className="small mb-0">Simple Setup</p>
                           </div>
                         </div>
                       </div>

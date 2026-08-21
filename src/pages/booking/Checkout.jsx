@@ -13,7 +13,6 @@ const Checkout = () => {
   const { user } = useAuth()
   const [searchParams] = useSearchParams()
 
-  const [paymentMethod, setPaymentMethod] = useState('CARD')
   const [termsAccepted, setTermsAccepted] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -55,6 +54,7 @@ const Checkout = () => {
   const processPayment = useProcessAppointmentPayment()
 
   const totalAmount = consultationFee || 0
+  const paymentMethod = 'STRIPE'
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -197,77 +197,14 @@ const Checkout = () => {
                       <h4 className="card-title">Payment Method</h4>
 
                       <div className="payment-list">
-                        <label className="payment-radio credit-card-option">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            checked={paymentMethod === 'CARD'}
-                            onChange={() => setPaymentMethod('CARD')}
-                          />
+                        <div className="payment-radio paypal-option d-flex align-items-center">
                           <span className="checkmark"></span>
-                          Credit/Debit Card
-                        </label>
-                        {paymentMethod === 'CARD' && (
-                          <div className="row mt-3">
-                            <div className="col-md-6">
-                              <div className="mb-3 card-label">
-                                <label htmlFor="card_name">Name on Card</label>
-                                <input className="form-control" id="card_name" type="text" placeholder="John Doe" />
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="mb-3 card-label">
-                                <label htmlFor="card_number">Card Number</label>
-                                <input className="form-control" id="card_number" placeholder="4242 4242 4242 4242" type="text" />
-                              </div>
-                            </div>
-                            <div className="col-md-4">
-                              <div className="mb-3 card-label">
-                                <label htmlFor="expiry_month">Expiry Month</label>
-                                <input className="form-control" id="expiry_month" placeholder="MM" type="text" />
-                              </div>
-                            </div>
-                            <div className="col-md-4">
-                              <div className="mb-3 card-label">
-                                <label htmlFor="expiry_year">Expiry Year</label>
-                                <input className="form-control" id="expiry_year" placeholder="YY" type="text" />
-                              </div>
-                            </div>
-                            <div className="col-md-4">
-                              <div className="mb-3 card-label">
-                                <label htmlFor="cvv">CVV</label>
-                                <input className="form-control" id="cvv" type="text" placeholder="123" />
-                              </div>
-                            </div>
+                          <div>
+                            <strong>Stripe</strong>
+                            <small className="d-block text-muted">Secure payment is processed with Stripe.</small>
                           </div>
-                        )}
+                        </div>
                       </div>
-
-                      <div className="payment-list">
-                        <label className="payment-radio paypal-option">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            checked={paymentMethod === 'PAYPAL'}
-                            onChange={() => setPaymentMethod('PAYPAL')}
-                          />
-                          <span className="checkmark"></span>
-                          Stripe
-                        </label>
-                      </div>
-
-                      {/* <div className="payment-list">
-                        <label className="payment-radio">
-                          <input
-                            type="radio"
-                            name="paymentMethod"
-                            checked={paymentMethod === 'DUMMY'}
-                            onChange={() => setPaymentMethod('DUMMY')}
-                          />
-                          <span className="checkmark"></span>
-                          Test Payment (Demo)
-                        </label>
-                      </div> */}
 
                       <div className="terms-accept mt-4">
                         <div className="custom-checkbox">

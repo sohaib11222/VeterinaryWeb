@@ -7,5 +7,8 @@ export const useUserById = (userId, options = {}) =>
     queryKey: ['users', userId],
     queryFn: () => api.get(API_ROUTES.USERS.GET(userId)),
     enabled: Boolean(userId) && (options.enabled ?? true),
+    // Patient profile settings depend on stable form seed data. Mutations still
+    // invalidate this query immediately after a successful save.
+    meta: { liveRefresh: false },
     ...options,
   })

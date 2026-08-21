@@ -13,6 +13,7 @@ export const usePurchaseSubscriptionPlan = () => {
     mutationFn: (data) => api.post(API_ROUTES.SUBSCRIPTIONS.PURCHASE, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subscriptions', 'my'] })
+      queryClient.invalidateQueries({ queryKey: ['veterinarian', 'dashboard'] })
     },
   })
 }

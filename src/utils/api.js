@@ -38,8 +38,15 @@ apiClient.interceptors.response.use(
       if (status === 401) {
         localStorage.removeItem('token')
         localStorage.removeItem('refreshToken')
-        // Hard redirect keeps it simple; can be improved later
         window.location.href = '/login'
+      }
+
+      if (status === 413) {
+        return Promise.reject({
+          status,
+          message: 'Uploaded file size is too large. Please select smaller files (under 10MB each) or compress your PDFs/images.',
+          data,
+        })
       }
 
       return Promise.reject({
@@ -88,12 +95,24 @@ export const api = {
     return res.data
   },
   upload: async (url, formData, config = {}) => {
+    const { headers, ...restConfig } = config
     const res = await apiClient.post(url, formData, {
-      ...config,
+      // Large chat attachments should not be reported as a generic network
+      // failure simply because a mobile upload takes longer than 30 seconds.
+      timeout: 120000,
+      ...restConfig,
       headers: {
-        'Content-Type': 'multipart/form-data',
-        ...(config.headers || {}),
+        ...(headers || {}),
       },
+      transformRequest: [
+        (data, reqHeaders) => {
+          if (reqHeaders) {
+            delete reqHeaders['Content-Type']
+            delete reqHeaders['content-type']
+          }
+          return data
+        },
+      ],
     })
     return res.data
   },

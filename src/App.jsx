@@ -10,6 +10,7 @@ import AuthLayout from './layouts/AuthLayout'
 import DashboardLayout from './layouts/DashboardLayout'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import GoogleTranslate from './components/common/GoogleTranslate'
+import LiveDataRefresh from './components/common/LiveDataRefresh'
 
 // Public Pages - Home
 import Index from './pages/Index'
@@ -171,11 +172,23 @@ import PaymentSuccess from './pages/pharmacy/PaymentSuccess'
 import Error404 from './pages/Error404'
 import Error500 from './pages/Error500'
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // Every data screen fetches current values when it opens. Continuous
+      // refresh for mounted views is handled by LiveDataRefresh below.
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: 1,
+    },
+  },
+})
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
+      <LiveDataRefresh />
       <AuthProvider>
         <CartProvider>
           <BrowserRouter>

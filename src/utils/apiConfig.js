@@ -196,6 +196,7 @@ export const API_ROUTES = {
     SEND: '/chat/send',
     MARK_READ: (conversationId) => `/chat/conversations/${conversationId}/read`,
     UNREAD_COUNT: '/chat/unread-count',
+    MARK_COMPLETE: (conversationId) => `/chat/conversations/${conversationId}/complete`,
   },
 
 
@@ -291,7 +292,9 @@ export const API_ROUTES = {
 
   VIDEO: {
     CREATE: '/video/create',
+    ACCEPT: '/video/accept',
     END: '/video/end',
+    INCOMING: '/video/incoming',
     BY_APPOINTMENT: (appointmentId) => `/video/appointment/${appointmentId}`,
   },
 

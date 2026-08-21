@@ -15,17 +15,18 @@ const ForgotPassword = () => {
                   </div>
                   <div className="col-md-12 col-lg-6 login-right">
                     <div className="login-header">
-                      <h3>Forgot Password</h3>
+                      <div className="logo-icon"><i className="fa-solid fa-key" /></div>
+                      <h3>Reset your password</h3>
                       <p>Enter your email and we will send you a link to reset your password.</p>
                     </div>
                     <form action="/login">
                       <div className="mb-3">
-                        <label className="form-label">Email</label>
+                        <label className="form-label"><i className="fa-solid fa-envelope me-2" />Email address</label>
                         <input className="form-control" type="email" />
                       </div>
                       <div className="mb-3">
                         <button className="btn btn-primary-gradient w-100" type="submit">
-                          Submit
+                          <i className="fa-solid fa-paper-plane me-2" />Send reset link
                         </button>
                       </div>
                       <div className="account-signup">

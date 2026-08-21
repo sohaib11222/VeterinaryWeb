@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 
 import { useAuth } from '../../contexts/AuthContext'
 import { useAppointment, useConversations, useMessages, useUnreadChatCount } from '../../queries'
-import { useGetOrCreateConversation, useMarkConversationRead, useSendMessage, useUploadChatFile } from '../../mutations'
+import { useGetOrCreateConversation, useMarkConversationRead, useSendMessage, useUploadChatFiles } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const Chat = () => {
@@ -28,6 +28,7 @@ const Chat = () => {
   const lastMarkedReadConversationRef = useRef(null)
 
   const [uploadingFiles, setUploadingFiles] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const fileInputRef = useRef(null)
 
   const { data: appointmentResponse } = useAppointment(appointmentIdFromUrl)
@@ -36,7 +37,7 @@ const Chat = () => {
   const getOrCreateConversation = useGetOrCreateConversation()
   const markRead = useMarkConversationRead()
   const sendMessage = useSendMessage()
-  const uploadChatFile = useUploadChatFile()
+  const uploadChatFiles = useUploadChatFiles()
 
   const {
     data: conversationsResponse,
@@ -45,8 +46,8 @@ const Chat = () => {
   } = useConversations(
     { limit: 50 },
     {
-      refetchInterval: 10_000,
-      refetchIntervalInBackground: false,
+      refetchInterval: 5_000,
+      refetchIntervalInBackground: true,
     }
   )
   const conversations = useMemo(() => {
@@ -73,6 +74,7 @@ const Chat = () => {
     () => conversations.find((c) => String(c?._id) === String(selectedConversationId)) || null,
     [conversations, selectedConversationId]
   )
+  const isConversationCompleted = String(selectedConversation?.status || '').toUpperCase() === 'COMPLETED'
 
   const {
     data: messagesResponse,
@@ -83,13 +85,13 @@ const Chat = () => {
     { limit: 100 },
     {
       refetchInterval: selectedConversationId ? 2000 : false,
-      refetchIntervalInBackground: false,
+      refetchIntervalInBackground: true,
     }
   )
 
   useUnreadChatCount({
     refetchInterval: 10_000,
-    refetchIntervalInBackground: false,
+    refetchIntervalInBackground: true,
   })
   const messages = useMemo(() => {
     const payload = messagesResponse?.data ?? messagesResponse
@@ -136,6 +138,13 @@ const Chat = () => {
   }
 
   const handleSend = async () => {
+    if (sendMessage.isPending || uploadingFiles) return
+
+    if (isConversationCompleted) {
+      toast.info('This chat has been marked as completed by the veterinarian.')
+      return
+    }
+
     const text = newMessage.trim()
     if (!text) {
       toast.error('Please enter a message or select a file')
@@ -224,8 +233,20 @@ const Chat = () => {
   }
 
   const handleFileSelect = async (e) => {
+    if (isConversationCompleted) {
+      toast.info('This chat has been marked as completed by the veterinarian.')
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
+
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
+
+    if (files.length > 10) {
+      toast.error('You can send up to 10 files at once.')
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
 
     const maxSize = 50 * 1024 * 1024
     const oversizedFiles = files.filter((f) => f.size > maxSize)
@@ -260,30 +281,27 @@ const Chat = () => {
     }
 
     setUploadingFiles(true)
+    setUploadProgress(0)
     try {
-      const uploadPromises = files.map(async (file) => {
-        const formData = new FormData()
-        formData.append('file', file)
-
-        const res = await uploadChatFile.mutateAsync(formData)
-        const url = res?.data?.url || res?.url
-        if (!url) return null
-
-        const isImage = file.type?.startsWith('image/')
-        return {
-          type: isImage ? 'image' : 'file',
-          url,
-          name: file.name,
-          size: file.size,
-          mimeType: file.type || null,
-        }
+      const formData = new FormData()
+      files.forEach((file) => formData.append('files', file))
+      const res = await uploadChatFiles.mutateAsync({
+        formData,
+        onUploadProgress: (event) => {
+          if (event.total) setUploadProgress(Math.round((event.loaded * 100) / event.total))
+        },
       })
-
-      const uploaded = (await Promise.all(uploadPromises)).filter(Boolean)
-      if (uploaded.length === 0) {
-        toast.error('No files were uploaded successfully')
-        return
+      const urls = res?.data?.urls || res?.urls || []
+      if (!Array.isArray(urls) || urls.length !== files.length) {
+        throw new Error('One or more files could not be uploaded')
       }
+      const uploaded = files.map((file, index) => ({
+        type: file.type?.startsWith('image/') ? 'image' : 'file',
+        url: urls[index],
+        name: file.name,
+        size: file.size,
+        mimeType: file.type || null,
+      }))
 
       const messageText = newMessage.trim()
       const payload = {
@@ -303,6 +321,7 @@ const Chat = () => {
       toast.error(err?.message || 'Failed to upload/send files')
     } finally {
       setUploadingFiles(false)
+      setUploadProgress(0)
       if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
@@ -374,6 +393,12 @@ const Chat = () => {
     lastMarkedReadConversationRef.current = String(selectedConversationId)
     markRead.mutate(selectedConversationId)
   }, [selectedConversationId])
+
+  const handleMessageKeyDown = (event) => {
+    if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return
+    event.preventDefault()
+    handleSend()
+  }
 
   return (
     <>
@@ -753,6 +778,12 @@ const Chat = () => {
           flex-shrink: 0;
           background: #fff;
         }
+        .chat-upload-status {
+          color: #6c757d;
+          font-size: 12px;
+          margin-left: 8px;
+          white-space: nowrap;
+        }
         .chat-input-actions {
           display: flex;
           gap: 8px;
@@ -819,7 +850,7 @@ const Chat = () => {
               <div className="chat-list-sidebar">
                 <div className="chat-list-header">
                   <div className="d-flex align-items-center justify-content-between mb-3">
-                    <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate(-1)}>
+                    <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate('/patient-appointments')}>
                       <i className="fa-solid fa-chevron-left me-1"></i> Back
                     </button>
                     <h4 className="mb-0">All Chats</h4>
@@ -1006,6 +1037,12 @@ const Chat = () => {
                       </div>
                     </div>
 
+                    {isConversationCompleted && (
+                      <div className="alert alert-secondary rounded-0 mb-0 py-2 px-3" role="status">
+                        This chat was marked as completed by the veterinarian. Messages and attachments are now read-only.
+                      </div>
+                    )}
+
                     <div className="chat-messages-area" ref={messagesContainerRef}>
                       {messagesLoading ? (
                         <div className="text-center py-3 text-muted">Loading...</div>
@@ -1084,20 +1121,11 @@ const Chat = () => {
                     {/* Chat Input Area */}
                     <div className="chat-input-area">
                       <div className="chat-input-actions">
-                        <button type="button" title="More options">
-                          <i className="fa-solid fa-ellipsis-vertical"></i>
-                        </button>
-                        <button type="button" title="Emoji">
-                          <i className="fa-regular fa-face-smile"></i>
-                        </button>
-                        <button type="button" title="Voice message">
-                          <i className="fa-solid fa-microphone"></i>
-                        </button>
                         <button
                           type="button"
                           title="Attach"
                           onClick={() => fileInputRef.current?.click()}
-                          disabled={uploadingFiles || sendMessage.isPending}
+                          disabled={uploadingFiles || sendMessage.isPending || isConversationCompleted}
                         >
                           <i className="fa-solid fa-paperclip"></i>
                         </button>
@@ -1113,26 +1141,22 @@ const Chat = () => {
                       <input
                         type="text"
                         className="chat-input-field"
-                        placeholder="Type your message here..."
+                        placeholder={isConversationCompleted ? 'This chat has been marked as completed' : 'Type your message here...'}
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault()
-                            handleSend()
-                          }
-                        }}
-                        disabled={uploadingFiles}
+                        onKeyDown={handleMessageKeyDown}
+                        disabled={uploadingFiles || isConversationCompleted}
                       />
                       <button
                         type="button"
                         className="chat-send-button"
                         title="Send"
                         onClick={handleSend}
-                        disabled={!newMessage.trim() || sendMessage.isPending || uploadingFiles}
+                        disabled={!newMessage.trim() || sendMessage.isPending || uploadingFiles || isConversationCompleted}
                       >
                         <i className="fa-solid fa-paper-plane"></i>
                       </button>
+                      {uploadingFiles && <span className="chat-upload-status">Uploading {uploadProgress}%</span>}
                     </div>
                   </>
                 ) : (
