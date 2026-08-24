@@ -45,10 +45,15 @@ const IncomingCallNotifier = () => {
     if (!incoming?._id) return
     setAnswering(true)
     try {
-      await videoApi.acceptVideoSession(incoming._id)
+      const acceptedPayload = payloadData(await videoApi.acceptVideoSession(incoming._id))
       const appointmentId = incoming.appointmentId?._id || incoming.appointmentId
       const route = role === 'VETERINARIAN' ? '/doctor/video-call' : '/video-call'
-      navigate(`${route}?appointmentId=${appointmentId}&mode=answer`)
+      // End the ringing state first, then join with the exact session and
+      // credentials that the server accepted for this participant.
+      setIncoming(null)
+      navigate(`${route}?appointmentId=${appointmentId}&mode=answer`, {
+        state: { videoCall: acceptedPayload },
+      })
     } catch (err) {
       toast.error(err?.response?.data?.message || err?.message || 'Unable to answer the call')
       setIncoming(null)

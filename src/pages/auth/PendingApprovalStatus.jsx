@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import AuthLayout from '../../layouts/AuthLayout'
 import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
@@ -12,35 +11,19 @@ const PendingApprovalStatus = () => {
   const [checkingStatus, setCheckingStatus] = useState(true)
 
   useEffect(() => {
-    // Check if user is already approved
     const checkApprovalStatus = async () => {
       try {
         const res = await api.get(API_ROUTES.USERS.ME)
         const me = res?.data ?? res
-        if (me) {
-          updateUser(me)
-        }
+        if (me) updateUser(me)
 
         const role = String(me?.role || user?.role || '').toUpperCase()
         const status = String(me?.status || user?.status || '').toUpperCase()
-
         if (status === 'APPROVED') {
-          if (role === 'VETERINARIAN') {
-            navigate('/doctor/dashboard')
-            return
-          }
-          if (role === 'PET_STORE' || role === 'PARAPHARMACY') {
-            navigate('/pharmacy-admin/dashboard')
-            return
-          }
-          navigate('/')
+          navigate(role === 'VETERINARIAN' ? '/doctor/dashboard' : (role === 'PET_STORE' || role === 'PARAPHARMACY') ? '/pharmacy-admin/dashboard' : '/')
           return
         }
-
-        if (status === 'REJECTED' || status === 'BLOCKED') {
-          toast.error('Your account was rejected or blocked. Please update your documents or contact support.')
-        }
-
+        if (status === 'REJECTED' || status === 'BLOCKED') toast.error('Your account was rejected or blocked. Please update your documents or contact support.')
         setCheckingStatus(false)
       } catch (error) {
         console.error('Error checking approval status:', error)
@@ -49,8 +32,6 @@ const PendingApprovalStatus = () => {
     }
 
     checkApprovalStatus()
-
-    // Poll for status updates every 30 seconds
     const interval = setInterval(checkApprovalStatus, 30000)
     return () => clearInterval(interval)
   }, [navigate, updateUser, user?.role, user?.status])
@@ -61,140 +42,44 @@ const PendingApprovalStatus = () => {
   }
 
   const role = String(user?.role || '').toUpperCase()
+  const isPharmacy = role === 'PET_STORE' || role === 'PARAPHARMACY'
+  const accountLabel = role === 'PARAPHARMACY' ? 'Parapharmacy' : role === 'PET_STORE' ? 'Pharmacy' : 'Veterinary professional'
   const updateDocsPath = role === 'VETERINARIAN' ? '/doctor-verification-upload' : '/pet-store-verification-upload'
-  const accountLabel = role === 'PARAPHARMACY' ? 'parapharmacy' : role === 'PET_STORE' ? 'pharmacy' : 'account'
 
   return (
-    <AuthLayout>
-      <div className="content login-page pt-0">
-        <div className="container-fluid">
-          <div className="account-content">
-            <div className="d-flex align-items-center justify-content-center">
-              <div className="login-right">
-                <div className="inner-right-login">
-                  <div className="login-header">
-                    <div className="logo-icon">
-                      <img src="/assets/img/pet-logo.jpg" alt="MyPetPlus logo" />
-                    </div>
-
-                    {checkingStatus ? (
-                      <div className="text-center py-5">
-                        <div className="spinner-border text-primary" role="status">
-                          <span className="visually-hidden">Loading...</span>
-                        </div>
-                        <p className="mt-3 text-muted">Checking your status...</p>
-                      </div>
-                    ) : (
-                      <div style={{ maxWidth: '500px', margin: '0 auto' }}>
-                        <div className="text-center mb-4">
-                          <div className="mb-3" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                            <div className="pending-icon-wrapper" style={{ width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8f9fa', borderRadius: '50%' }}>
-                              <i className="fe fe-clock" style={{ fontSize: '48px', color: '#ffc107' }}></i>
-                            </div>
-                          </div>
-                          <h3 className="mb-2">Pending Admin Approval</h3>
-                          <p className="text-muted">
-                            Your verification documents have been submitted successfully.
-                          </p>
-                        </div>
-
-                        <div className="card" style={{ background: '#f8f9fa', border: 'none', margin: '20px 0' }}>
-                          <div className="card-body">
-                            <div className="d-flex align-items-start mb-3">
-                              <div style={{ fontSize: '24px', marginRight: '15px', flexShrink: 0 }}>
-                                <i className="fe fe-check-circle text-success"></i>
-                              </div>
-                              <div>
-                                <h6 style={{ marginBottom: '5px', fontWeight: '600' }}>Documents Submitted</h6>
-                                <p className="text-muted small mb-0">Your verification documents are under review</p>
-                              </div>
-                            </div>
-
-                            <div className="d-flex align-items-start mb-3">
-                              <div style={{ fontSize: '24px', marginRight: '15px', flexShrink: 0 }}>
-                                <i className="fe fe-clock text-warning"></i>
-                              </div>
-                              <div>
-                                <h6 style={{ marginBottom: '5px', fontWeight: '600' }}>Review in Progress</h6>
-                                <p className="text-muted small mb-0">Our admin team is reviewing your documents</p>
-                              </div>
-                            </div>
-
-                            <div className="d-flex align-items-start">
-                              <div style={{ fontSize: '24px', marginRight: '15px', flexShrink: 0 }}>
-                                <i className="fe fe-mail text-info"></i>
-                              </div>
-                              <div>
-                                <h6 style={{ marginBottom: '5px', fontWeight: '600' }}>Notification</h6>
-                                <p className="text-muted small mb-0">You will receive an email once your account is approved</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="alert alert-info mt-4">
-                          <div className="d-flex">
-                            <div className="flex-shrink-0">
-                              <i className="fe fe-info"></i>
-                            </div>
-                            <div className="flex-grow-1 ms-3">
-                              <h6 className="alert-heading">What happens next?</h6>
-                              <p className="mb-0 small">
-                                Our admin team typically reviews verification documents within 24-48 hours. 
-                                Once approved, you'll be able to access your dashboard and start using your {accountLabel} account.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="mt-4" style={{ borderTop: '1px solid #e9ecef', paddingTop: '20px' }}>
-                          <div className="d-grid gap-2">
-                            <button
-                              type="button"
-                              className="btn btn-primary"
-                              onClick={() => window.location.reload()}
-                            >
-                              <i className="fe fe-refresh-cw me-2"></i>
-                              Check Status Again
-                            </button>
-                            <Link
-                              to={updateDocsPath}
-                              className="btn btn-outline-primary"
-                            >
-                              <i className="fe fe-edit me-2"></i>
-                              Update Documents
-                            </Link>
-                            <button
-                              type="button"
-                              className="btn btn-link text-muted"
-                              onClick={handleLogout}
-                            >
-                              Logout
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="support-info mt-4 text-center">
-                          <p className="text-muted small mb-0">
-                            Need help? <Link to="/contact-us">Contact Support</Link>
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="login-bottom-copyright">
-                  <span>© {new Date().getFullYear()} MyPetPlus. All rights reserved.</span>
-                </div>
-              </div>
+    <div className="auth-pharmacy-flow">
+      {isPharmacy && <div className="auth-pharmacy-flow__steps" aria-label="Registration progress">
+        <span className="is-complete"><i className="fa-solid fa-check"></i><b>Account</b></span>
+        <span className="is-complete"><i className="fa-solid fa-check"></i><b>Phone verification</b></span>
+        <span className="is-complete"><i className="fa-solid fa-check"></i><b>Documents</b></span>
+        <span className="is-active"><i className="fa-solid fa-circle-check"></i><b>Approval</b></span>
+      </div>}
+      <div className="auth-pharmacy-flow__panel">
+        {checkingStatus ? (
+          <div className="text-center py-5"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div><p className="mt-3 text-muted mb-0">Checking your application status…</p></div>
+        ) : (
+          <>
+            <div className="auth-pharmacy-flow__header">
+              <div className="logo-icon"><i className="fa-solid fa-clock" /></div>
+              <div><h3>Application under review</h3><p>Your {accountLabel} verification documents have been submitted successfully. We’ll move you to your dashboard as soon as your account is approved.</p></div>
             </div>
-          </div>
-        </div>
+            <div className="row g-3 mt-1">
+              {[
+                ['fa-file-circle-check', 'Documents submitted', 'Your documents are securely in the review queue.'],
+                ['fa-magnifying-glass', 'Review in progress', 'Our team is confirming your application details.'],
+                ['fa-bell', 'Automatic update', 'This page checks for approval automatically every 30 seconds.'],
+              ].map(([icon, title, description]) => <div className="col-md-4" key={title}><div className="border rounded-3 p-3 h-100"><i className={`fa-solid ${icon} text-primary mb-3`} style={{ fontSize: 22 }}></i><div className="fw-semibold mb-1">{title}</div><div className="small text-muted">{description}</div></div></div>)}
+            </div>
+            <div className="d-flex justify-content-end gap-2 flex-wrap mt-4 pt-3 border-top">
+              <Link to={updateDocsPath} className="btn btn-outline-primary"><i className="fa-solid fa-pen me-2"></i>Update documents</Link>
+              <button type="button" className="btn btn-primary-gradient" onClick={() => window.location.reload()}><i className="fa-solid fa-rotate me-2"></i>Check status now</button>
+            </div>
+          </>
+        )}
       </div>
-
-    </AuthLayout>
+      <div className="d-flex justify-content-center gap-3 mt-3 small"><Link to="/contact-us" className="text-muted">Contact support</Link><button type="button" className="btn btn-link text-muted p-0" onClick={handleLogout}>Log out</button></div>
+    </div>
   )
 }
 
 export default PendingApprovalStatus
-

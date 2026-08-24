@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import AuthLayout from '../../layouts/AuthLayout'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../utils/api'
@@ -17,34 +16,10 @@ const schema = yup.object({
 })
 
 const DOCS = [
-  {
-    key: 'petStoreLicense',
-    docType: 'PET_STORE_LICENSE',
-    label: 'Pet Store License',
-    accept: '.pdf,.jpg,.jpeg,.png',
-    required: true,
-  },
-  {
-    key: 'pharmacistDegree',
-    docType: 'PET_STORE_DEGREE',
-    label: 'Pharmacist Degree / Qualification',
-    accept: '.pdf,.jpg,.jpeg,.png',
-    required: true,
-  },
-  {
-    key: 'ownerId',
-    docType: 'PET_STORE_OWNER_ID',
-    label: 'Owner Photo ID',
-    accept: '.pdf,.jpg,.jpeg,.png',
-    required: true,
-  },
-  {
-    key: 'addressProof',
-    docType: 'PET_STORE_ADDRESS_PROOF',
-    label: 'Address Proof (utility bill / lease agreement)',
-    accept: '.pdf,.jpg,.jpeg,.png',
-    required: true,
-  },
+  { key: 'petStoreLicense', docType: 'PET_STORE_LICENSE', label: 'Business license', help: 'Pharmacy or Parapharmacy registration document', required: true },
+  { key: 'pharmacistDegree', docType: 'PET_STORE_DEGREE', label: 'Professional qualification', help: 'Pharmacist degree or relevant qualification', required: true },
+  { key: 'ownerId', docType: 'PET_STORE_OWNER_ID', label: 'Owner photo ID', help: 'Valid government-issued identification', required: true },
+  { key: 'addressProof', docType: 'PET_STORE_ADDRESS_PROOF', label: 'Address proof', help: 'Utility bill or lease agreement', required: true },
 ]
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024
@@ -53,51 +28,27 @@ const PetStoreVerificationUpload = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
   const [loading, setLoading] = useState(false)
-  const [filePreviews, setFilePreviews] = useState({})
   const [selectedFiles, setSelectedFiles] = useState({})
 
   useEffect(() => {
     const role = String(user?.role || '').toUpperCase()
-    if (role === 'PET_STORE' || role === 'PARAPHARMACY') {
-      if (user?.isPhoneVerified === false) {
-        navigate('/pharmacy-phone-verification')
-      }
+    if ((role === 'PET_STORE' || role === 'PARAPHARMACY') && user?.isPhoneVerified === false) {
+      navigate('/pharmacy-phone-verification')
     }
   }, [navigate, user?.isPhoneVerified, user?.role])
 
-  const {
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm({
-    resolver: yupResolver(schema),
-  })
+  const { handleSubmit, formState: { errors }, setValue } = useForm({ resolver: yupResolver(schema) })
 
   const handleFileChange = (fieldName, event) => {
     const file = event.target.files?.[0]
     if (!file) return
-
     if (file.size > MAX_FILE_SIZE) {
-      toast.error(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed file size is 10MB.`)
+      toast.error(`"${file.name}" is too large. The maximum file size is 10 MB.`)
       event.target.value = ''
       return
     }
-
-    setSelectedFiles((prev) => ({ ...prev, [fieldName]: file }))
+    setSelectedFiles((previous) => ({ ...previous, [fieldName]: file }))
     setValue(fieldName, file, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
-
-    const reader = new FileReader()
-    reader.onloadend = () => {
-      setFilePreviews((prev) => ({
-        ...prev,
-        [fieldName]: {
-          name: file.name,
-          url: reader.result,
-          type: file.type,
-        },
-      }))
-    }
-    reader.readAsDataURL(file)
   }
 
   const uploadDoc = async (file, docType) => {
@@ -110,21 +61,13 @@ const PetStoreVerificationUpload = () => {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      let uploadedCount = 0
       for (const doc of DOCS) {
         const file = selectedFiles[doc.key] || data?.[doc.key]
-        if (file && (file instanceof File || file instanceof Blob || typeof file?.slice === 'function')) {
-          await uploadDoc(file, doc.docType)
-          uploadedCount++
+        if (!file || !(file instanceof File || file instanceof Blob || typeof file?.slice === 'function')) {
+          throw new Error(`Please select ${doc.label.toLowerCase()}`)
         }
+        await uploadDoc(file, doc.docType)
       }
-
-      if (uploadedCount === 0) {
-        toast.error('Please select at least one document to upload.')
-        setLoading(false)
-        return
-      }
-
       toast.success('Verification documents uploaded successfully!')
       navigate('/pending-approval')
     } catch (error) {
@@ -135,80 +78,45 @@ const PetStoreVerificationUpload = () => {
   }
 
   return (
-    <AuthLayout>
-      <div className="content login-page pt-0">
-        <div className="container-fluid">
-          <div className="account-content">
-            <div className="d-flex align-items-center justify-content-center">
-              <div className="login-right">
-                <div className="inner-right-login">
-                  <div className="login-header">
-                    <div className="logo-icon">
-                      <img src="/assets/img/pet-logo.jpg" alt="MyPetPlus logo" />
-                    </div>
-
-                    <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
-                      <h3 className="my-4">Pharmacy / Parapharmacy Verification</h3>
-                      <p className="text-muted mb-4">
-                        Please upload the required verification documents. Your account will remain pending until admin approval.
-                      </p>
-
-                      <div className="verify-box mb-4">
-                        <ul className="verify-list">
-                          <li className="verify-item">Pet Store License</li>
-                          <li className="verify-item">Pharmacist Degree / Qualification</li>
-                          <li className="verify-item">Owner Photo ID</li>
-                          <li className="verify-item">Address Proof</li>
-                        </ul>
-                      </div>
-
-                      {DOCS.map((doc) => (
-                        <div key={doc.key} className="mb-3">
-                          <label className="mb-2">
-                            {doc.label} {doc.required ? <span className="text-danger">*</span> : null}
-                          </label>
-                          <div className="call-option file-option">
-                            <input
-                              type="file"
-                              id={doc.key}
-                              className="option-radio"
-                              accept={doc.accept}
-                              onChange={(e) => handleFileChange(doc.key, e)}
-                            />
-                            <label htmlFor={doc.key} className="call-lable verify-lable verify-file">
-                              <img src="/assets/img/icons/file.png" alt="file-icon" />
-                              {filePreviews?.[doc.key]?.name ? filePreviews[doc.key].name : `Upload ${doc.label}`}
-                            </label>
-                          </div>
-                          {errors?.[doc.key] && (
-                            <div className="text-danger small mt-1">{errors[doc.key]?.message}</div>
-                          )}
-                        </div>
-                      ))}
-
-                      <div className="mt-5">
-                        <button type="submit" className="btn btn-primary w-100 btn-lg login-btn" disabled={loading}>
-                          {loading ? 'Uploading...' : 'Submit for Verification'}
-                        </button>
-                      </div>
-
-                      <div className="text-center mt-3">
-                        <Link to="/pharmacy-register" className="text-muted">
-                          ← Back to Registration
-                        </Link>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-                <div className="login-bottom-copyright">
-                  <span>© {new Date().getFullYear()} MyPetPlus. All rights reserved.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="auth-pharmacy-flow auth-pharmacy-flow--documents">
+      <div className="auth-pharmacy-flow__steps" aria-label="Registration progress">
+        <span className="is-complete"><i className="fa-solid fa-check"></i><b>Account</b></span>
+        <span className="is-complete"><i className="fa-solid fa-check"></i><b>Phone verification</b></span>
+        <span className="is-active"><i className="fa-solid fa-file-shield"></i><b>Documents</b></span>
+        <span><i className="fa-solid fa-circle-check"></i><b>Approval</b></span>
       </div>
-    </AuthLayout>
+      <div className="auth-pharmacy-flow__panel">
+        <div className="auth-pharmacy-flow__header">
+          <div className="logo-icon"><i className="fa-solid fa-file-shield" /></div>
+          <div><h3>Verify your business</h3><p>Upload the required documents. They are reviewed by the MyPetPlus team before your account can be approved.</p></div>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
+          <div className="auth-document-grid mt-3">
+            {DOCS.map((doc) => {
+              const file = selectedFiles[doc.key]
+              return (
+                <div className={`auth-document-card ${file ? 'is-selected' : ''}`} key={doc.key}>
+                  <div className="auth-document-card__icon"><i className={`fa-solid ${file ? 'fa-circle-check' : 'fa-file-arrow-up'}`} /></div>
+                  <div className="flex-grow-1 min-width-0">
+                    <label htmlFor={doc.key} className="auth-document-card__title">{doc.label} {doc.required && <span className="text-danger">*</span>}</label>
+                    <div className="auth-document-card__help">{file?.name || doc.help}</div>
+                    {errors?.[doc.key] && <div className="text-danger small mt-1">{errors[doc.key]?.message}</div>}
+                  </div>
+                  <label htmlFor={doc.key} className="btn btn-sm btn-outline-primary mb-0">{file ? 'Replace' : 'Choose file'}</label>
+                  <input type="file" id={doc.key} className="d-none" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => handleFileChange(doc.key, event)} />
+                </div>
+              )
+            })}
+          </div>
+          <div className="auth-document-footer mt-3">
+            <div className="text-muted small"><i className="fa-solid fa-shield-halved me-2"></i>PDF, JPG, and PNG files up to 10 MB. Your documents are used only for account verification.</div>
+            <button type="submit" className="btn btn-primary-gradient" disabled={loading}>{loading ? 'Uploading documents…' : 'Submit for verification'} <i className="fa-solid fa-arrow-right ms-2" /></button>
+          </div>
+        </form>
+      </div>
+      <div className="text-center mt-3"><Link to="/pharmacy-phone-verification" className="text-muted">Back to phone verification</Link></div>
+    </div>
   )
 }
 

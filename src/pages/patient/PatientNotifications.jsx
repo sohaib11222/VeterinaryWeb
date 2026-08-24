@@ -57,6 +57,12 @@ const PatientNotifications = () => {
         return 'isax isax-wallet-2'
       case 'VACCINATION':
         return 'isax isax-document-text'
+      case 'PRESCRIPTION_APPROVED':
+        return 'isax isax-tick-circle'
+      case 'PRESCRIPTION_REJECTED':
+      case 'PRESCRIPTION_REQUEST':
+      case 'PRESCRIPTION':
+        return 'isax isax-document-text'
       default:
         return 'isax isax-notification'
     }
@@ -73,6 +79,13 @@ const PatientNotifications = () => {
         return 'color-yellow'
       case 'VACCINATION':
         return 'color-green'
+      case 'PRESCRIPTION_APPROVED':
+        return 'color-green'
+      case 'PRESCRIPTION_REJECTED':
+        return 'color-red'
+      case 'PRESCRIPTION_REQUEST':
+      case 'PRESCRIPTION':
+        return 'color-violet'
       default:
         return 'color-blue'
     }

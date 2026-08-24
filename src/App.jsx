@@ -11,6 +11,7 @@ import DashboardLayout from './layouts/DashboardLayout'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import GoogleTranslate from './components/common/GoogleTranslate'
 import LiveDataRefresh from './components/common/LiveDataRefresh'
+import PrescriptionApprovalNotifier from './components/pharmacy/PrescriptionApprovalNotifier'
 
 // Public Pages - Home
 import Index from './pages/Index'
@@ -144,6 +145,7 @@ import PharmacyAdminOrderDetails from './pages/pharmacy-admin/PharmacyAdminOrder
 import PharmacyAdminPayouts from './pages/pharmacy-admin/PharmacyAdminPayouts'
 import PharmacyAdminProfile from './pages/pharmacy-admin/PharmacyAdminProfile'
 import PharmacyAdminSubscription from './pages/pharmacy-admin/PharmacyAdminSubscription'
+import PharmacyAdminPrescriptionRequests from './pages/pharmacy-admin/PharmacyAdminPrescriptionRequests'
 
 // Search & Booking Pages
 import Search from './pages/search/Search'
@@ -223,6 +225,14 @@ function App() {
                   element={
                     <ProtectedRoute role="VETERINARIAN" allowPending={true}>
                       <AuthLayout><DoctorVerificationUpload /></AuthLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/doctor-phone-verification"
+                  element={
+                    <ProtectedRoute role="VETERINARIAN" allowPending={true}>
+                      <AuthLayout><PharmacyPhoneVerification /></AuthLayout>
                     </ProtectedRoute>
                   }
                 />
@@ -909,6 +919,15 @@ function App() {
             />
 
             <Route
+              path="/pharmacy-admin/prescription-requests"
+              element={
+                <ProtectedRoute role="PET_STORE">
+                  <DashboardLayout><PharmacyAdminPrescriptionRequests /></DashboardLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
               path="/pharmacy-admin/orders/:orderId"
               element={
                 <ProtectedRoute role={['PET_STORE', 'PARAPHARMACY', 'ADMIN']}>
@@ -984,6 +1003,7 @@ function App() {
             <Route path="/error-500" element={<Error500 />} />
             <Route path="*" element={<Error404 />} />
             </Routes>
+            <PrescriptionApprovalNotifier />
             <GoogleTranslate />
             <ToastContainer position="top-right" autoClose={3000} />
           </BrowserRouter>

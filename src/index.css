@@ -501,3 +501,159 @@ body.home-hero-header-transparent .home-hero-v2 {
   line-height: 36px !important;
 }
 
+/* Pharmacy: one-time prescription approval message */
+.prescription-approval-notifier {
+  position: fixed;
+  inset: 0;
+  z-index: 13000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(5, 24, 36, 0.52);
+  backdrop-filter: blur(5px);
+}
+
+.prescription-approval-notifier__card {
+  position: relative;
+  width: min(440px, 100%);
+  overflow: hidden;
+  padding: 36px 32px 32px;
+  border: 1px solid rgba(33, 163, 111, 0.25);
+  border-radius: 24px;
+  background: linear-gradient(145deg, #ffffff 0%, #f0fff8 100%);
+  box-shadow: 0 28px 80px rgba(5, 24, 36, 0.3);
+  text-align: center;
+}
+
+.prescription-approval-notifier__icon {
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #159447;
+  font-size: 33px;
+  box-shadow: 0 0 0 10px rgba(34, 197, 94, 0.1);
+}
+
+.prescription-approval-notifier__eyebrow {
+  display: block;
+  color: #15803d;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.prescription-approval-notifier__card h3 {
+  margin: 10px 0 10px;
+  color: #123047;
+  font-size: 24px;
+  font-weight: 750;
+}
+
+.prescription-approval-notifier__card p {
+  margin: 0 auto 24px;
+  color: #587082;
+  line-height: 1.6;
+}
+
+.prescription-approval-notifier__button {
+  min-height: 46px;
+  padding: 10px 22px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #078a6d, #10b981);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.24);
+}
+
+.prescription-approval-notifier__button:hover,
+.prescription-approval-notifier__button:focus-visible {
+  background: linear-gradient(135deg, #05755d, #0c9e6a);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.prescription-approval-notifier__close {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #6c7a86;
+  font-size: 18px;
+}
+
+.prescription-approval-notifier__close:hover,
+.prescription-approval-notifier__close:focus-visible {
+  background: #e6f7ef;
+  color: #123047;
+}
+
+/* Doctor availability: consistent, touch-friendly Add Time Slot control */
+.slot-header .veterinary-action-btn.add-slot {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto !important;
+  min-width: 142px;
+  min-height: 42px;
+  padding: 9px 15px !important;
+  border: 1px solid #078a6d !important;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #078a6d, #12a786) !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1;
+  text-decoration: none !important;
+  box-shadow: 0 8px 16px rgba(7, 138, 109, 0.18);
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.slot-header .veterinary-action-btn.add-slot i {
+  margin: 0 !important;
+  font-size: 13px;
+}
+
+.slot-header .veterinary-action-btn.add-slot:hover,
+.slot-header .veterinary-action-btn.add-slot:focus-visible {
+  background: linear-gradient(135deg, #05755d, #078a6d) !important;
+  color: #fff !important;
+  box-shadow: 0 11px 22px rgba(7, 138, 109, 0.26);
+  transform: translateY(-1px);
+}
+
+.slot-header .veterinary-action-btn.add-slot:active {
+  box-shadow: 0 4px 10px rgba(7, 138, 109, 0.2);
+  transform: translateY(0);
+}
+
+.slot-header .veterinary-action-btn.add-slot:focus-visible {
+  outline: 3px solid rgba(18, 167, 134, 0.28);
+  outline-offset: 3px;
+}
+
+@media (max-width: 575.98px) {
+  .slot-box .slot-header {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .slot-header .veterinary-action-btn.add-slot {
+    min-width: 128px;
+    min-height: 40px;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+}
+

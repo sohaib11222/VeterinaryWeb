@@ -7,17 +7,17 @@ import { getImageUrl } from '../../utils/apiConfig'
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart()
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = (cartItemId, newQuantity) => {
     if (newQuantity < 1) {
-      removeFromCart(productId)
+      removeFromCart(cartItemId)
       toast.info('Item removed from cart')
     } else {
-      updateQuantity(productId, newQuantity)
+      updateQuantity(cartItemId, newQuantity)
     }
   }
 
-  const handleRemoveItem = (productId, productName) => {
-    removeFromCart(productId)
+  const handleRemoveItem = (cartItemId, productName) => {
+    removeFromCart(cartItemId)
     toast.info(`${productName} removed from cart`)
   }
 
@@ -54,8 +54,10 @@ const Cart = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {cartItems.map((item) => (
-                          <tr key={item._id}>
+                        {cartItems.map((item) => {
+                          const cartItemId = item.cartItemId || item._id
+                          return (
+                          <tr key={cartItemId}>
                             <td>
                               <h2 className="table-avatar">
                                 <Link to={`/product-description?id=${item._id}`} className="avatar avatar-sm me-2">
@@ -70,6 +72,7 @@ const Cart = () => {
                                 </Link>
                               </h2>
                               <Link to={`/product-description?id=${item._id}`}>{item.name}</Link>
+                              {item.variantName && <div className="text-muted small">{item.variantName}</div>}
                             </td>
                             <td>{item.sku || 'N/A'}</td>
                             <td>€{Number(item.price || 0).toFixed(2)}</td>
@@ -79,7 +82,7 @@ const Cart = () => {
                                   <button
                                     type="button"
                                     className="quantity-left-minus btn btn-danger btn-number"
-                                    onClick={() => handleQuantityChange(item._id, (item.quantity || 1) - 1)}
+                                    onClick={() => handleQuantityChange(cartItemId, (item.quantity || 1) - 1)}
                                   >
                                     <span><i className="fas fa-minus"></i></span>
                                   </button>
@@ -94,8 +97,8 @@ const Cart = () => {
                                   <button
                                     type="button"
                                     className="quantity-right-plus btn btn-success btn-number"
-                                    onClick={() => handleQuantityChange(item._id, (item.quantity || 1) + 1)}
-                                    disabled={item.stock && (item.quantity || 1) >= item.stock}
+                                    onClick={() => handleQuantityChange(cartItemId, (item.quantity || 1) + 1)}
+                                    disabled={Number(item.stock ?? 0) <= (item.quantity || 1)}
                                   >
                                     <span><i className="fas fa-plus"></i></span>
                                   </button>
@@ -110,7 +113,7 @@ const Cart = () => {
                                   className="btn btn-sm bg-danger-light"
                                   onClick={(e) => {
                                     e.preventDefault()
-                                    handleRemoveItem(item._id, item.name)
+                                    handleRemoveItem(cartItemId, item.name)
                                   }}
                                 >
                                   <i className="fas fa-times"></i>
@@ -118,7 +121,8 @@ const Cart = () => {
                               </div>
                             </td>
                           </tr>
-                        ))}
+                          )
+                        })}
                       </tbody>
                     </table>
                   </div>

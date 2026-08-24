@@ -214,6 +214,15 @@ const ProductAll = () => {
                                   {originalPrice !== null && <span className="price-strike">€{Number(originalPrice || 0).toFixed(2)}</span>}
                                 </div>
                                 <div className="col-lg-6 text-end">
+                                  {product?.requiresPrescription ? (
+                                    <Link
+                                      to={`/product-description?id=${productId}`}
+                                      className="cart-icon"
+                                      title="Prescription required — view product"
+                                    >
+                                      <i className="fas fa-file-prescription"></i>
+                                    </Link>
+                                  ) : (
                                   <a
                                     href="#"
                                     className="cart-icon"
@@ -222,6 +231,7 @@ const ProductAll = () => {
                                   >
                                     <i className="fas fa-shopping-cart"></i>
                                   </a>
+                                  )}
                                 </div>
                               </div>
                             </div>

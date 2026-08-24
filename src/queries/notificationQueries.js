@@ -23,6 +23,7 @@ export const useNotifications = (params = {}, queryOptions = {}) =>
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: 30_000,
+    refetchInterval: 15_000,
     ...queryOptions,
   })
 
@@ -33,6 +34,7 @@ export const useUnreadNotificationsCount = (queryOptions = {}) =>
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     staleTime: 60_000,
+    refetchInterval: 15_000,
     ...queryOptions,
   })
 

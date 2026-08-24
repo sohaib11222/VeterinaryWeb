@@ -147,6 +147,15 @@ export const API_ROUTES = {
     DELETE: (id) => `/products/${id}`,
   },
 
+  PRODUCT_PRESCRIPTIONS: {
+    BASE: '/product-prescription-requests',
+    MINE: '/product-prescription-requests/mine',
+    ELIGIBILITY: (productId, variantId = null) => `/product-prescription-requests/product/${productId}/eligibility${variantId ? `?variantId=${encodeURIComponent(variantId)}` : ''}`,
+    PHARMACY: '/product-prescription-requests/pharmacy',
+    PHARMACY_PENDING_COUNT: '/product-prescription-requests/pharmacy/pending-count',
+    REVIEW: (id) => `/product-prescription-requests/${id}/review`,
+  },
+
   ORDERS: {
     BASE: '/orders',
     LIST: '/orders',
@@ -163,6 +172,7 @@ export const API_ROUTES = {
     LIST: '/pet-stores',
     GET: (id) => `/pet-stores/${id}`,
     ME: '/pet-stores/me',
+    SETUP_STATUS: '/pet-stores/setup-status',
     MY_SUBSCRIPTION: '/pet-stores/my-subscription',
     BUY_SUBSCRIPTION: '/pet-stores/buy-subscription',
     CREATE: '/pet-stores',
@@ -326,6 +336,7 @@ export const API_ROUTES = {
     PET: '/upload/pet',
     BLOG: '/upload/blog',
     PRODUCT: '/upload/product',
+    PRODUCT_PRESCRIPTION: '/upload/product-prescription',
     PET_STORE: '/upload/pet-store',
     MEDICAL_RECORDS: '/upload/medical-records',
     CHAT: '/upload/chat',

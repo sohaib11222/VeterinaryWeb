@@ -4,17 +4,22 @@ import { StreamVideoClient } from '@stream-io/video-react-sdk'
 import { useAuth } from '../contexts/AuthContext'
 import * as videoApi from '../api/video'
 
-const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY
+const FALLBACK_STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY
 const MEDIA_PERMISSION_TIMEOUT_MS = 12_000
+const STREAM_PREPARE_TIMEOUT_MS = 15_000
 const STREAM_JOIN_TIMEOUT_MS = 20_000
+const STREAM_JOIN_RETRY_DELAY_MS = 750
+const STREAM_JOIN_ATTEMPTS = 4
 
 const responseData = (response) => response?.data?.data ?? response?.data ?? response
+const userIdFrom = (value) => String(value?._id || value?.id || value || '').trim()
+const delay = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds))
 
 const within = (promise, timeoutMs, message) => new Promise((resolve, reject) => {
   const timer = window.setTimeout(() => reject(new Error(message)), timeoutMs)
   Promise.resolve(promise).then(
     (value) => { window.clearTimeout(timer); resolve(value) },
-    (error) => { window.clearTimeout(timer); reject(error) }
+    (error) => { window.clearTimeout(timer); reject(error) },
   )
 })
 
@@ -26,6 +31,9 @@ export const useVideoCall = (appointmentId) => {
   const [error, setError] = useState(null)
   const clientRef = useRef(null)
   const callRef = useRef(null)
+  const pendingClientRef = useRef(null)
+  const pendingCallRef = useRef(null)
+  const pendingCallIdRef = useRef(null)
 
   const requestMediaPermissions = useCallback(async () => {
     if (!navigator.mediaDevices?.getUserMedia) {
@@ -46,47 +54,142 @@ export const useVideoCall = (appointmentId) => {
     }
   }, [])
 
-  const createStreamCall = useCallback(async (payload) => {
-    if (!STREAM_API_KEY) throw new Error('Missing VITE_STREAM_API_KEY in the frontend environment')
-
+  const getConnectionDetails = useCallback((payload) => {
+    const session = payload?.session || payload || {}
+    const streamApiKey = payload?.streamApiKey || FALLBACK_STREAM_API_KEY
     const streamToken = payload?.streamToken
-    const streamCallId = payload?.streamCallId || payload?.session?.sessionId
-    const userId = user?._id || user?.id
-    if (!streamToken || !streamCallId || !userId) {
+    const streamCallId = payload?.streamCallId || session?.sessionId || session?.callId
+    const currentUserId = userIdFrom(user?._id || user?.id)
+    const memberIds = [...new Set((payload?.streamMembers || [session?.veterinarianId, session?.petOwnerId])
+      .map(userIdFrom)
+      .filter(Boolean))]
+
+    if (!streamApiKey || !streamToken || !streamCallId || !currentUserId) {
       throw new Error('The video-call connection details are incomplete')
     }
 
+    return { streamApiKey, streamToken, streamCallId, currentUserId, memberIds }
+  }, [user])
+
+  const createStreamResources = useCallback((payload) => {
+    const details = getConnectionDetails(payload)
     const streamClient = new StreamVideoClient({
-      apiKey: STREAM_API_KEY,
-      user: { id: userId, name: user?.fullName || user?.name || user?.email || 'User' },
-      token: streamToken,
+      apiKey: details.streamApiKey,
+      user: {
+        id: details.currentUserId,
+        name: user?.fullName || user?.name || user?.email || 'User',
+      },
+      token: details.streamToken,
     })
-    const streamCall = streamClient.call('default', streamCallId)
+    return {
+      ...details,
+      streamClient,
+      streamCall: streamClient.call('default', details.streamCallId),
+    }
+  }, [getConnectionDetails, user])
+
+  const clearPendingResources = useCallback(async () => {
+    const pendingClient = pendingClientRef.current
+    pendingClientRef.current = null
+    pendingCallRef.current = null
+    pendingCallIdRef.current = null
+    await pendingClient?.disconnectUser().catch(() => {})
+  }, [])
+
+  const prepareOutgoingCall = useCallback(async (payload) => {
+    const details = getConnectionDetails(payload)
+    if (pendingClientRef.current && pendingCallIdRef.current === details.streamCallId) {
+      return { streamClient: pendingClientRef.current, streamCall: pendingCallRef.current }
+    }
+
+    await clearPendingResources()
+    const resources = createStreamResources(payload)
+    try {
+      // This is deliberately not a join. It creates exactly one private call
+      // and declares both appointment users as members while the receiver is
+      // still seeing the application's ringing screen.
+      const data = resources.memberIds.length > 0
+        ? { data: { members: resources.memberIds.map((id) => ({ user_id: id })) } }
+        : undefined
+      await within(
+        resources.streamCall.getOrCreate(data),
+        STREAM_PREPARE_TIMEOUT_MS,
+        'The video service did not prepare the shared call in time. Please try again.',
+      )
+      pendingClientRef.current = resources.streamClient
+      pendingCallRef.current = resources.streamCall
+      pendingCallIdRef.current = resources.streamCallId
+      return resources
+    } catch (err) {
+      await resources.streamClient.disconnectUser().catch(() => {})
+      throw err
+    }
+  }, [clearPendingResources, createStreamResources, getConnectionDetails])
+
+  const joinStreamCall = useCallback(async (payload) => {
+    const details = getConnectionDetails(payload)
+    let usingPreparedOutgoingCall = pendingClientRef.current && pendingCallIdRef.current === details.streamCallId
+    let resources = usingPreparedOutgoingCall
+      ? { streamClient: pendingClientRef.current, streamCall: pendingCallRef.current }
+      : createStreamResources(payload)
 
     try {
       await within(
         requestMediaPermissions(),
         MEDIA_PERMISSION_TIMEOUT_MS,
-        'Camera and microphone access timed out. Check the browser permission prompt and try again.'
+        'Camera and microphone access timed out. Check the browser permission prompt and try again.',
       )
-      await within(
-        streamCall.join({ create: true }),
-        STREAM_JOIN_TIMEOUT_MS,
-        'The video service did not connect in time. Please check your connection and call again.'
-      )
-      await Promise.allSettled([streamCall.camera.enable(), streamCall.microphone.enable()])
-      // Keep the live SDK objects in refs before updating React state. The
-      // cleanup must only run on unmount/end, not between setClient/setCall.
-      clientRef.current = streamClient
-      callRef.current = streamCall
-      setClient(streamClient)
-      setCall(streamCall)
-      return { streamClient, streamCall }
+
+      let lastJoinError = null
+      for (let attempt = 0; attempt < STREAM_JOIN_ATTEMPTS; attempt += 1) {
+        try {
+          await within(
+            // The caller has already created the call with both members. The
+            // receiver joins that same call without being able to replace it.
+            resources.streamCall.join({ create: false }),
+            STREAM_JOIN_TIMEOUT_MS,
+            'The video service did not connect in time. Please check your connection and call again.',
+          )
+          lastJoinError = null
+          break
+        } catch (joinError) {
+          lastJoinError = joinError
+          if (usingPreparedOutgoingCall) {
+            await clearPendingResources()
+            usingPreparedOutgoingCall = false
+          } else {
+            await resources.streamClient.disconnectUser().catch(() => {})
+          }
+
+          if (attempt < STREAM_JOIN_ATTEMPTS - 1) {
+            await delay(STREAM_JOIN_RETRY_DELAY_MS)
+            resources = createStreamResources(payload)
+          }
+        }
+      }
+      if (lastJoinError) throw lastJoinError
+
+      await Promise.allSettled([resources.streamCall.camera.enable(), resources.streamCall.microphone.enable()])
+
+      if (usingPreparedOutgoingCall) {
+        pendingClientRef.current = null
+        pendingCallRef.current = null
+        pendingCallIdRef.current = null
+      }
+      clientRef.current = resources.streamClient
+      callRef.current = resources.streamCall
+      setClient(resources.streamClient)
+      setCall(resources.streamCall)
+      return resources
     } catch (err) {
-      await streamClient.disconnectUser().catch(() => {})
+      if (usingPreparedOutgoingCall) {
+        await clearPendingResources()
+      } else {
+        await resources.streamClient.disconnectUser().catch(() => {})
+      }
       throw err
     }
-  }, [requestMediaPermissions, user])
+  }, [clearPendingResources, createStreamResources, getConnectionDetails, requestMediaPermissions])
 
   const startCall = useCallback(async ({ restartActive = false } = {}) => {
     if (!appointmentId || !user) return null
@@ -103,27 +206,27 @@ export const useVideoCall = (appointmentId) => {
     }
   }, [appointmentId, user])
 
-  const getSession = useCallback(async () => {
+  const getSession = useCallback(async ({ silent = false } = {}) => {
     if (!appointmentId || !user) return null
     try {
       return responseData(await videoApi.getVideoSessionByAppointment(appointmentId))
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || 'Failed to load video call'
-      setError(message)
+      if (!silent) setError(message)
       throw err
     }
   }, [appointmentId, user])
 
-  const joinActiveCall = useCallback(async (knownSession = null) => {
+  const joinActiveCall = useCallback(async (knownPayload = null) => {
     setLoading(true)
     setError(null)
     try {
-      const payload = await getSession()
-      const activeSession = payload?.session || knownSession
+      const payload = knownPayload?.streamToken ? knownPayload : await getSession()
+      const activeSession = payload?.session || knownPayload?.session || knownPayload
       if (activeSession?.status !== 'ACTIVE') {
         throw new Error('The other participant has not accepted the call yet')
       }
-      return await createStreamCall({ ...payload, session: activeSession })
+      return await joinStreamCall({ ...payload, session: activeSession })
     } catch (err) {
       const message = err?.response?.data?.message || err?.message || 'Failed to join video call'
       setError(message)
@@ -131,7 +234,7 @@ export const useVideoCall = (appointmentId) => {
     } finally {
       setLoading(false)
     }
-  }, [createStreamCall, getSession])
+  }, [getSession, joinStreamCall])
 
   const endCall = useCallback(async () => {
     const currentCall = callRef.current
@@ -142,16 +245,22 @@ export const useVideoCall = (appointmentId) => {
     setClient(null)
     await currentCall?.leave().catch(() => {})
     await currentClient?.disconnectUser().catch(() => {})
-  }, [])
+    await clearPendingResources()
+  }, [clearPendingResources])
 
   useEffect(() => () => {
     const activeCall = callRef.current
     const activeClient = clientRef.current
+    const pendingClient = pendingClientRef.current
     callRef.current = null
     clientRef.current = null
+    pendingCallRef.current = null
+    pendingClientRef.current = null
+    pendingCallIdRef.current = null
     activeCall?.leave().catch(() => {})
     activeClient?.disconnectUser().catch(() => {})
+    pendingClient?.disconnectUser().catch(() => {})
   }, [])
 
-  return { client, call, loading, error, startCall, getSession, joinActiveCall, endCall }
+  return { client, call, loading, error, startCall, getSession, prepareOutgoingCall, joinActiveCall, endCall }
 }

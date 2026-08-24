@@ -64,6 +64,7 @@ const ProductCheckout = () => {
 
     const orderItems = cartItems.map((item) => ({
       productId: item._id,
+      ...(item.variantId ? { variantId: item.variantId } : {}),
       quantity: item.quantity,
     }))
 
@@ -251,9 +252,10 @@ const ProductCheckout = () => {
                       </tbody>
                       <tbody>
                         {cartItems.map((item) => (
-                          <tr key={item._id}>
+                          <tr key={item.cartItemId || item._id}>
                             <td>
                               {item.name} <span className="text-muted">x{item.quantity}</span>
+                              {item.variantName && <div className="text-muted small">{item.variantName}</div>}
                             </td>
                             <td className="text-end">€{(Number(item.price || 0) * Number(item.quantity || 0)).toFixed(2)}</td>
                           </tr>

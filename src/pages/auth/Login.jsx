@@ -31,7 +31,9 @@ const Login = () => {
       const status = user?.status
 
       if (role === 'VETERINARIAN') {
-        if (status === 'PENDING') {
+        if (user?.isPhoneVerified === false) {
+          navigate('/doctor-phone-verification')
+        } else if (status === 'PENDING') {
           navigate('/pending-approval')
         } else if (status === 'APPROVED') {
           // On first login after approval/registration, prompt onboarding steps (profile -> timings -> subscription)

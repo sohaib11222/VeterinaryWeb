@@ -13,6 +13,7 @@ export const useCreatePetStore = () => {
     mutationFn: (data) => api.post(API_ROUTES.PET_STORES.CREATE, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pet-stores'] })
+      queryClient.invalidateQueries({ queryKey: ['pet-store', 'setup-status'] })
     },
   })
 }
@@ -24,6 +25,7 @@ export const useBuyPetStoreSubscription = () => {
     mutationFn: (data) => api.post(API_ROUTES.PET_STORES.BUY_SUBSCRIPTION, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pet-store', 'subscription', 'me'] })
+      queryClient.invalidateQueries({ queryKey: ['pet-store', 'setup-status'] })
       queryClient.invalidateQueries({ queryKey: ['products', 'mine'], exact: false })
     },
   })
@@ -38,6 +40,7 @@ export const useUpdatePetStore = () => {
     onSuccess: (_, variables) => {
       const id = variables?.petStoreId
       queryClient.invalidateQueries({ queryKey: ['pet-stores'] })
+      queryClient.invalidateQueries({ queryKey: ['pet-store', 'setup-status'] })
       if (id) {
         queryClient.invalidateQueries({ queryKey: ['pet-store', id] })
       }

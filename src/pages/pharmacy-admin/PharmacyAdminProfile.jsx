@@ -120,6 +120,18 @@ const PharmacyAdminProfile = () => {
       toast.error('Store name is required')
       return
     }
+    const requiredProfileFields = [
+      ['Phone', form.phone],
+      ['Address line 1', form.address.line1],
+      ['City', form.address.city],
+      ['Country', form.address.country],
+      ['ZIP / postal code', form.address.zip],
+    ]
+    const missingField = requiredProfileFields.find(([, value]) => !String(value || '').trim())
+    if (missingField) {
+      toast.error(`${missingField[0]} is required to complete your profile`)
+      return
+    }
 
     const payload = {
       name,
@@ -161,6 +173,7 @@ const PharmacyAdminProfile = () => {
     <div>
       <div className="page-header">
         <h3 className="page-title">{title}</h3>
+        <div className="text-muted">Complete the required contact and address fields to publish your profile.</div>
       </div>
 
       <div className="card">
@@ -177,13 +190,13 @@ const PharmacyAdminProfile = () => {
             <form onSubmit={onSubmit}>
               <div className="row">
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Store Name</label>
-                  <input className="form-control" name="name" value={form.name} onChange={handleChange} />
+                  <label className="form-label">Store Name <span className="text-danger">*</span></label>
+                  <input className="form-control" name="name" value={form.name} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Phone</label>
-                  <input className="form-control" name="phone" value={form.phone} onChange={handleChange} />
+                  <label className="form-label">Phone <span className="text-danger">*</span></label>
+                  <input className="form-control" name="phone" value={form.phone} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-6 mb-3">
@@ -213,8 +226,8 @@ const PharmacyAdminProfile = () => {
                 </div>
 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Address Line 1</label>
-                  <input className="form-control" name="address.line1" value={form.address.line1} onChange={handleChange} />
+                  <label className="form-label">Address Line 1 <span className="text-danger">*</span></label>
+                  <input className="form-control" name="address.line1" value={form.address.line1} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-6 mb-3">
@@ -223,8 +236,8 @@ const PharmacyAdminProfile = () => {
                 </div>
 
                 <div className="col-md-4 mb-3">
-                  <label className="form-label">City</label>
-                  <input className="form-control" name="address.city" value={form.address.city} onChange={handleChange} />
+                  <label className="form-label">City <span className="text-danger">*</span></label>
+                  <input className="form-control" name="address.city" value={form.address.city} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-4 mb-3">
@@ -233,8 +246,13 @@ const PharmacyAdminProfile = () => {
                 </div>
 
                 <div className="col-md-4 mb-3">
-                  <label className="form-label">Zip</label>
-                  <input className="form-control" name="address.zip" value={form.address.zip} onChange={handleChange} />
+                  <label className="form-label">ZIP / Postal Code <span className="text-danger">*</span></label>
+                  <input className="form-control" name="address.zip" value={form.address.zip} onChange={handleChange} required />
+                </div>
+
+                <div className="col-md-4 mb-3">
+                  <label className="form-label">Country <span className="text-danger">*</span></label>
+                  <input className="form-control" name="address.country" value={form.address.country} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-6 mb-3">

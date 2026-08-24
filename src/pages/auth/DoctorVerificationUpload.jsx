@@ -1,15 +1,14 @@
-import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
-import AuthLayout from '../../layouts/AuthLayout'
 import { toast } from 'react-toastify'
+
+import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 
-// Backend only needs veterinarian documents as files; no extra metadata is persisted,
-// so we validate strictly the required files that will be uploaded.
 const schema = yup.object({
   registrationCertificate: yup.mixed().required('Registration certificate is required'),
   goodStandingCertificate: yup.mixed().required('Certificate of good standing is required'),
@@ -18,83 +17,68 @@ const schema = yup.object({
   digitalSignature: yup.mixed().notRequired(),
 })
 
+const DOCUMENTS = [
+  { key: 'registrationCertificate', type: 'REGISTRATION_CERTIFICATE', label: 'Veterinary registration certificate', help: 'Current registration with the Veterinary Medical Council', accept: '.pdf,.jpg,.jpeg,.png', required: true },
+  { key: 'goodStandingCertificate', type: 'GOOD_STANDING_CERTIFICATE', label: 'Certificate of good standing', help: 'Issued within the last three months', accept: '.pdf,.jpg,.jpeg,.png', required: true },
+  { key: 'cv', type: 'CURRICULUM_VITAE', label: 'Curriculum Vitae', help: 'Your current professional CV', accept: '.pdf,.doc,.docx', required: true },
+  { key: 'specialistRegistration', type: 'SPECIALIST_REGISTRATION', label: 'Specialist registration', help: 'Optional — include this if you hold a specialist registration', accept: '.pdf,.jpg,.jpeg,.png' },
+  { key: 'digitalSignature', type: 'DIGITAL_SIGNATURE', label: 'Digital signature record', help: 'Optional — signature copy and registration number', accept: '.pdf,.jpg,.jpeg,.png' },
+]
+
 const MAX_FILE_SIZE = 10 * 1024 * 1024
 
 const DoctorVerificationUpload = () => {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [loading, setLoading] = useState(false)
-  const [filePreviews, setFilePreviews] = useState({})
   const [selectedFiles, setSelectedFiles] = useState({})
+  const { handleSubmit, formState: { errors }, setValue } = useForm({ resolver: yupResolver(schema) })
 
-  const { handleSubmit, formState: { errors }, setValue } = useForm({
-    resolver: yupResolver(schema)
-  })
-
-  const handleFileChange = (fieldName, event) => {
-    const file = event.target.files?.[0]
-    if (file) {
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error(`"${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed file size is 10MB.`)
-        event.target.value = ''
-        return
-      }
-
-      setSelectedFiles((prev) => ({ ...prev, [fieldName]: file }))
-      setValue(fieldName, file, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
-
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setFilePreviews((prev) => ({
-          ...prev,
-          [fieldName]: {
-            name: file.name,
-            url: reader.result,
-            type: file.type,
-          },
-        }))
-      }
-      reader.readAsDataURL(file)
+  useEffect(() => {
+    if (!user) {
+      navigate('/login', { replace: true })
+      return
     }
+    if (String(user.role || '').toUpperCase() !== 'VETERINARIAN') {
+      navigate('/', { replace: true })
+      return
+    }
+    if (!user.isPhoneVerified) navigate('/doctor-phone-verification', { replace: true })
+  }, [navigate, user])
+
+  const handleFileChange = (key, event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`"${file.name}" is too large. The maximum file size is 10 MB.`)
+      event.target.value = ''
+      return
+    }
+
+    setSelectedFiles((previous) => ({ ...previous, [key]: file }))
+    setValue(key, file, { shouldValidate: true, shouldDirty: true, shouldTouch: true })
   }
 
   const onSubmit = async (data) => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      toast.error('Session expired or not registered. Please register first.')
-      navigate('/doctor-register')
+    if (!user?.isPhoneVerified) {
+      toast.error('Verify your phone number before uploading verification documents.')
+      navigate('/doctor-phone-verification')
       return
     }
 
     setLoading(true)
     try {
       const formData = new FormData()
-      let filesCount = 0
-
-      const fields = [
-        { key: 'registrationCertificate', type: 'REGISTRATION_CERTIFICATE' },
-        { key: 'goodStandingCertificate', type: 'GOOD_STANDING_CERTIFICATE' },
-        { key: 'cv', type: 'CURRICULUM_VITAE' },
-        { key: 'specialistRegistration', type: 'SPECIALIST_REGISTRATION' },
-        { key: 'digitalSignature', type: 'DIGITAL_SIGNATURE' },
-      ]
-
-      fields.forEach(({ key, type }) => {
-        const file = selectedFiles[key] || data?.[key]
-        if (file && (file instanceof File || file instanceof Blob || typeof file?.slice === 'function')) {
-          formData.append('veterinarianDocs', file, file.name || 'document.pdf')
-          formData.append('documentType', type)
-          filesCount++
+      for (const document of DOCUMENTS) {
+        const file = selectedFiles[document.key] || data?.[document.key]
+        if (document.required && !file) throw new Error(`Please select ${document.label.toLowerCase()}`)
+        if (file) {
+          formData.append('veterinarianDocs', file, file.name)
+          formData.append('documentType', document.type)
         }
-      })
-
-      if (filesCount === 0) {
-        toast.error('Please select at least one document to upload.')
-        setLoading(false)
-        return
       }
 
       await api.upload(API_ROUTES.UPLOAD.VETERINARIAN_DOCS, formData)
-
       toast.success('Verification documents uploaded successfully!')
       navigate('/pending-approval')
     } catch (error) {
@@ -105,177 +89,56 @@ const DoctorVerificationUpload = () => {
   }
 
   return (
-    <AuthLayout>
-      <div className="content login-page pt-0">
-        <div className="container-fluid">
-          <div className="account-content">
-            <div className="d-flex align-items-center justify-content-center">
-              <div className="login-right">
-                <div className="inner-right-login">
-                  <div className="login-header">
-                    <div className="logo-icon">
-                      <img src="/assets/img/pet-logo.jpg" alt="MyPetPlus logo" />
-                    </div>
-                    <div className="step-list">
-                      <ul>
-                       
-                        <li>
-                          <a href="#" className="active-done">3</a>
-                        </li>
-                        <li>
-                          <a href="#" className="active">2</a>
-                        </li>
-                      </ul>
-                    </div>
-                    <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
-                      <h3 className="my-4">Doctor Verification</h3>
-                      <p className="text-muted mb-4">Please provide the details below and attach copies for your verification documents.</p>
+    <div className="auth-pharmacy-flow auth-pharmacy-flow--documents">
+      <div className="auth-pharmacy-flow__steps" aria-label="Registration progress">
+        <span className="is-complete"><i className="fa-solid fa-check" /><b>Account</b></span>
+        <span className="is-complete"><i className="fa-solid fa-check" /><b>Phone verification</b></span>
+        <span className="is-active"><i className="fa-solid fa-file-shield" /><b>Documents</b></span>
+        <span><i className="fa-solid fa-circle-check" /><b>Approval</b></span>
+      </div>
 
-                      {/* Required Documents List */}
-                      <div className="verify-box mb-4">
-                        <ul className="verify-list">
-                          <li className="verify-item">Certificate of Registration with the Medical Council</li>
-                          <li className="verify-item">Certificate of Good Standing (valid for 3 months from date of issue)</li>
-                          <li className="verify-item">Curriculum Vitae</li>
-                          <li className="verify-item">Specialist Registration Certificate (if applicable)</li>
-                          <li className="verify-item">Digital signature: copy of the signature and registration number (if applicable)</li>
-                        </ul>
-                      </div>
-
-                      {/* Registration Certificate */}
-                      <div className="mb-3">
-                        <label className="mb-2">
-                          Certificate of Registration <span className="text-danger">*</span>
-                        </label>
-                        <div className="call-option file-option">
-                          <input
-                            type="file"
-                            id="registrationCertificate"
-                            className="option-radio"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('registrationCertificate', e)}
-                          />
-                          <label htmlFor="registrationCertificate" className="call-lable verify-lable verify-file">
-                            <img src="/assets/img/icons/file.png" alt="file-icon" />
-                            {filePreviews.registrationCertificate ? filePreviews.registrationCertificate.name : 'Upload Registration Certificate'}
-                          </label>
-                        </div>
-                        {errors.registrationCertificate && (
-                          <div className="text-danger small mt-1">{errors.registrationCertificate.message}</div>
-                        )}
-                      </div>
-
-                      {/* Good Standing Certificate */}
-                      <div className="mb-3">
-                        <label className="mb-2">
-                          Certificate of Good Standing <span className="text-danger">*</span>
-                        </label>
-                        <div className="call-option file-option">
-                          <input
-                            type="file"
-                            id="goodStandingCertificate"
-                            className="option-radio"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('goodStandingCertificate', e)}
-                          />
-                          <label htmlFor="goodStandingCertificate" className="call-lable verify-lable verify-file">
-                            <img src="/assets/img/icons/file.png" alt="file-icon" />
-                            {filePreviews.goodStandingCertificate ? filePreviews.goodStandingCertificate.name : 'Upload Good Standing Certificate'}
-                          </label>
-                        </div>
-                        {errors.goodStandingCertificate && (
-                          <div className="text-danger small mt-1">{errors.goodStandingCertificate.message}</div>
-                        )}
-                      </div>
-
-                      {/* Curriculum Vitae */}
-                      <div className="mb-3">
-                        <label className="mb-2">
-                          Curriculum Vitae (CV) <span className="text-danger">*</span>
-                        </label>
-                        <div className="call-option file-option">
-                          <input
-                            type="file"
-                            id="cv"
-                            className="option-radio"
-                            accept=".pdf,.doc,.docx"
-                            onChange={(e) => handleFileChange('cv', e)}
-                          />
-                          <label htmlFor="cv" className="call-lable verify-lable verify-file">
-                            <img src="/assets/img/icons/file.png" alt="file-icon" />
-                            {filePreviews.cv ? filePreviews.cv.name : 'Upload Curriculum Vitae'}
-                          </label>
-                        </div>
-                        {errors.cv && (
-                          <div className="text-danger small mt-1">{errors.cv.message}</div>
-                        )}
-                      </div>
-
-                      {/* Specialist Registration Certificate (Optional) */}
-                      <div className="mb-3">
-                        <label className="mb-2">Specialist Registration Certificate (Optional)</label>
-                        <div className="call-option file-option">
-                          <input
-                            type="file"
-                            id="specialistRegistration"
-                            className="option-radio"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('specialistRegistration', e)}
-                          />
-                          <label htmlFor="specialistRegistration" className="call-lable verify-lable verify-file">
-                            <img src="/assets/img/icons/file.png" alt="file-icon" />
-                            {filePreviews.specialistRegistration ? filePreviews.specialistRegistration.name : 'Upload Specialist Registration'}
-                          </label>
-                        </div>
-                      </div>
-
-                      {/* Digital Signature (Optional) */}
-                      <div className="mb-3">
-                        <label className="mb-2">Digital Signature (Optional)</label>
-                        <div className="call-option file-option">
-                          <input
-                            type="file"
-                            id="digitalSignature"
-                            className="option-radio"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={(e) => handleFileChange('digitalSignature', e)}
-                          />
-                          <label htmlFor="digitalSignature" className="call-lable verify-lable verify-file">
-                            <img src="/assets/img/icons/file.png" alt="file-icon" />
-                            {filePreviews.digitalSignature ? filePreviews.digitalSignature.name : 'Upload Digital Signature'}
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="mt-5">
-                        <button
-                          type="submit"
-                          className="btn btn-primary w-100 btn-lg login-btn"
-                          disabled={loading}
-                        >
-                          {loading ? 'Uploading...' : 'Submit for Verification'}
-                        </button>
-                      </div>
-
-                      <div className="text-center mt-3">
-                        <Link to="/doctor-register-step3" className="text-muted">
-                          ← Back to Previous Step
-                        </Link>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-                <div className="login-bottom-copyright">
-                  <span>© {new Date().getFullYear()} MyPetPlus. All rights reserved.</span>
-                </div>
-              </div>
-            </div>
+      <div className="auth-pharmacy-flow__panel">
+        <div className="auth-pharmacy-flow__header">
+          <div className="logo-icon"><i className="fa-solid fa-file-shield" /></div>
+          <div>
+            <h3>Verify your veterinary credentials</h3>
+            <p>Upload the required professional documents. The MyPetPlus team reviews them before approving your veterinary account.</p>
           </div>
         </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
+          <div className="auth-document-grid mt-3">
+            {DOCUMENTS.map((document) => {
+              const file = selectedFiles[document.key]
+              return (
+                <div className={`auth-document-card ${file ? 'is-selected' : ''}`} key={document.key}>
+                  <div className="auth-document-card__icon"><i className={`fa-solid ${file ? 'fa-circle-check' : 'fa-file-arrow-up'}`} /></div>
+                  <div className="flex-grow-1 min-width-0">
+                    <label htmlFor={document.key} className="auth-document-card__title">
+                      {document.label} {document.required && <span className="text-danger">*</span>}
+                    </label>
+                    <div className="auth-document-card__help">{file?.name || document.help}</div>
+                    {errors?.[document.key] && <div className="text-danger small mt-1">{errors[document.key]?.message}</div>}
+                  </div>
+                  <label htmlFor={document.key} className="btn btn-sm btn-outline-primary mb-0">{file ? 'Replace' : 'Choose file'}</label>
+                  <input type="file" id={document.key} className="d-none" accept={document.accept} onChange={(event) => handleFileChange(document.key, event)} />
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="auth-document-footer mt-3">
+            <div className="text-muted small"><i className="fa-solid fa-shield-halved me-2" />PDF, JPG, PNG, DOC, and DOCX files up to 10 MB. Your documents are used only for account verification.</div>
+            <button type="submit" className="btn btn-primary-gradient" disabled={loading}>
+              {loading ? 'Uploading documents…' : 'Submit for verification'} <i className="fa-solid fa-arrow-right ms-2" />
+            </button>
+          </div>
+        </form>
       </div>
-    </AuthLayout>
+
+      <div className="text-center mt-3"><Link to="/doctor-phone-verification" className="text-muted">Back to phone verification</Link></div>
+    </div>
   )
 }
 
 export default DoctorVerificationUpload
-

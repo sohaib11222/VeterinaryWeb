@@ -7,6 +7,7 @@ import { useSpecializations } from '../../queries/specializationQueries'
 import { useFavorites } from '../../queries/favoriteQueries'
 import { useAddFavorite, useRemoveFavorite } from '../../mutations/favoriteMutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { toSpecializationOption } from '../../utils/specialization'
 import Breadcrumb from '../../components/common/Breadcrumb'
 
 const Search = () => {
@@ -59,15 +60,10 @@ const Search = () => {
   }, [specsData])
 
   const specializationOptions = useMemo(() => {
+    const seen = new Set()
     return specializationsList
-      .map((spec) => {
-        const derivedCodeFromName = spec?.name?.toUpperCase()?.replace(/\s+/g, '_')
-        const derivedCodeFromSlug = spec?.slug?.toUpperCase()?.replace(/-/g, '_')
-        const code = spec?.type || derivedCodeFromSlug || derivedCodeFromName
-        if (!code) return null
-        return { code, name: spec?.name || code }
-      })
-      .filter(Boolean)
+      .map(toSpecializationOption)
+      .filter((option) => option && !seen.has(option.code) && seen.add(option.code))
   }, [specializationsList])
 
   const specializationNameByCode = useMemo(() => {

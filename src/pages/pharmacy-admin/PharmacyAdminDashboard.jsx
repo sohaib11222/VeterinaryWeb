@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useOrders } from '../../queries/orderQueries'
 import { useUpdateOrderStatus } from '../../mutations/orderMutations'
-import { useMyPetStoreSubscription } from '../../queries/petStoreQueries'
+import { useMyPetStoreSubscription, usePetStoreSetupStatus } from '../../queries/petStoreQueries'
+import { usePharmacyPendingPrescriptionCount } from '../../queries/productPrescriptionRequestQueries'
+import PharmacySetupModal from '../../components/common/PharmacySetupModal'
 import { toast } from 'react-toastify'
 
 const STATUS_PIPELINE = [
@@ -54,12 +56,18 @@ const PharmacyAdminDashboard = () => {
   )
 
   const mySubQuery = useMyPetStoreSubscription({ enabled: role === 'PET_STORE' })
+  const setupQuery = usePetStoreSetupStatus({ enabled: role === 'PET_STORE' || role === 'PARAPHARMACY' })
+  const pendingPrescriptionQuery = usePharmacyPendingPrescriptionCount({ enabled: role === 'PET_STORE' })
   const mySub = useMemo(() => {
     const payload = mySubQuery.data?.data ?? mySubQuery.data
     return payload?.data ?? payload
   }, [mySubQuery.data])
 
   const hasActiveSubscription = role !== 'PET_STORE' ? true : !!mySub?.hasActiveSubscription
+  const setupPayload = setupQuery.data?.data ?? setupQuery.data
+  const setup = setupPayload?.data ?? setupPayload
+  const pendingPrescriptionPayload = pendingPrescriptionQuery.data?.data ?? pendingPrescriptionQuery.data
+  const pendingPrescriptionCount = pendingPrescriptionPayload?.data?.pendingCount ?? pendingPrescriptionPayload?.pendingCount ?? 0
 
   const setOrderStatus = async (orderId, status) => {
     try {
@@ -250,6 +258,10 @@ const PharmacyAdminDashboard = () => {
                         <i className="fa-solid fa-box me-2"></i>
                         Manage Products
                       </Link>
+                      {role === 'PET_STORE' && <Link to="/pharmacy-admin/prescription-requests" className="btn btn-outline-primary btn-md rounded-pill">
+                        <i className="fa-solid fa-file-prescription me-2"></i>
+                        Prescription Requests {pendingPrescriptionCount > 0 ? `(${pendingPrescriptionCount})` : ''}
+                      </Link>}
                       <Link to="/pharmacy-admin/payouts" className="btn btn-outline-primary btn-md rounded-pill">
                         <i className="fa-solid fa-money-bill-1 me-2"></i>
                         Payouts
@@ -273,6 +285,7 @@ const PharmacyAdminDashboard = () => {
           </div>
         </div>
       </div>
+      <PharmacySetupModal setup={setup} role={role} />
     </div>
   )
 }

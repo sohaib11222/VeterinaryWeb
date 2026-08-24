@@ -1,11 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { StreamCall, StreamTheme, StreamVideo } from '@stream-io/video-react-sdk'
 
 import * as videoApi from '../../api/video'
 import { useVideoCall } from '../../hooks/useVideoCall'
 import WhatsAppVideoCall from './WhatsAppVideoCall'
+
+const ACCEPTANCE_POLL_INTERVAL_MS = 1_000
+const MAX_CONSECUTIVE_SESSION_ERRORS = 3
+
+const delay = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds))
 
 // The deployed API has historically returned both { data: { session } } and
 // a flatter { sessionId, streamCallId } response.  Keep the call state usable
@@ -29,11 +34,15 @@ const sessionFromPayload = (payload, fallbackStatus) => {
 
 const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallback }) => {
   const navigate = useNavigate()
+  const location = useLocation()
   const [searchParams] = useSearchParams()
   const appointmentId = searchParams.get('appointmentId')
   const mode = searchParams.get('mode') === 'answer' ? 'answer' : 'caller'
-  const { client, call, loading, error, startCall, getSession, joinActiveCall, endCall } = useVideoCall(appointmentId)
+  const { client, call, loading, error, startCall, getSession, prepareOutgoingCall, joinActiveCall, endCall } = useVideoCall(appointmentId)
   const [session, setSession] = useState(null)
+  const acceptedSessionPayloadRef = useRef(
+    mode === 'answer' ? location.state?.videoCall || null : null
+  )
   const [setupError, setSetupError] = useState(null)
   const startRef = useRef(false)
   const joinRef = useRef(false)
@@ -48,30 +57,88 @@ const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallb
     startRef.current = true
     let cancelled = false
 
+    const applySessionPayload = (payload, fallbackStatus = null) => {
+      const nextSession = sessionFromPayload(payload, fallbackStatus)
+      if (!nextSession) {
+        throw new Error('The video service did not return a call session. Please try again.')
+      }
+
+      sessionRef.current = nextSession
+      acceptedSessionPayloadRef.current = payload
+      if (!cancelled) setSession(nextSession)
+      return nextSession
+    }
+
+    const joinAcceptedCall = async (payload) => {
+      if (joinRef.current || cancelled) return
+      joinRef.current = true
+      try {
+        await joinActiveCall(payload)
+      } catch (joinError) {
+        joinRef.current = false
+        throw joinError
+      }
+    }
+
+    const waitForAcceptanceAndJoin = async (initialPayload) => {
+      let payload = initialPayload
+      let currentSession = applySessionPayload(payload, 'RINGING')
+      let consecutiveErrors = 0
+
+      while (!cancelled) {
+        if (currentSession.status === 'ACTIVE') {
+          await joinAcceptedCall(payload)
+          return
+        }
+        if (['DECLINED', 'MISSED', 'ENDED'].includes(currentSession.status)) return
+
+        await delay(ACCEPTANCE_POLL_INTERVAL_MS)
+        if (cancelled) return
+
+        try {
+          // Keep this polling request silent. A transient request failure must
+          // not eject the caller from a ringing call that the other participant
+          // may have just accepted.
+          payload = await getSession({ silent: true })
+          currentSession = applySessionPayload(payload, currentSession.status)
+          consecutiveErrors = 0
+        } catch (pollError) {
+          consecutiveErrors += 1
+          if (consecutiveErrors >= MAX_CONSECUTIVE_SESSION_ERRORS) throw pollError
+        }
+      }
+    }
+
     const prepare = async () => {
       try {
-        let payload = mode === 'caller' ? await startCall() : await getSession()
+        let payload = mode === 'caller'
+          ? await startCall()
+          : acceptedSessionPayloadRef.current || await getSession()
         // If a previous browser session disappeared without completing its
         // final request, start a fresh ringing attempt instead of leaving the
         // user on an "already active" error screen.
         if (mode === 'caller' && payload?.session?.status === 'ACTIVE') {
           payload = await startCall({ restartActive: true })
         }
-        if (!cancelled) {
-          const nextSession = sessionFromPayload(payload, mode === 'caller' ? 'RINGING' : null)
-          if (!nextSession) throw new Error('The video service did not return a call session. Please try again.')
-          setSession(nextSession)
+        const nextSession = applySessionPayload(payload, mode === 'caller' ? 'RINGING' : null)
+
+        // The receiver gets the ACTIVE response from /video/accept and joins
+        // immediately. The caller instead waits for that exact server-side
+        // transition and then joins from the same payload, avoiding the old
+        // render/poll race that left the caller on "Connecting securely".
+        if (mode === 'caller') {
+          await prepareOutgoingCall(payload)
+          await waitForAcceptanceAndJoin(payload)
+        } else if (nextSession.status === 'ACTIVE') {
+          await joinAcceptedCall(payload)
         }
       } catch (err) {
         const message = err?.response?.data?.message || err?.message || 'Unable to prepare the video call'
         if (mode === 'caller' && /already active/i.test(message)) {
           try {
             const payload = await startCall({ restartActive: true })
-            if (!cancelled) {
-              const nextSession = sessionFromPayload(payload, 'RINGING')
-              if (!nextSession) throw new Error('The video service did not return a call session. Please try again.')
-              setSession(nextSession)
-            }
+            await prepareOutgoingCall(payload)
+            await waitForAcceptanceAndJoin(payload)
             return
           } catch (retryError) {
             if (!cancelled) setSetupError(retryError?.response?.data?.message || retryError?.message || 'Unable to restart the video call')
@@ -83,34 +150,12 @@ const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallb
     }
     prepare()
     return () => { cancelled = true }
-  }, [appointmentId, getSession, mode, startCall])
-
-  useEffect(() => {
-    if (!appointmentId || !['RINGING', 'ACTIVE'].includes(session?.status)) return undefined
-    const timer = window.setInterval(async () => {
-      try {
-        const payload = await getSession()
-        setSession((currentSession) => sessionFromPayload(payload, currentSession?.status) || currentSession)
-      } catch (err) {
-        setSetupError(err?.response?.data?.message || err?.message || 'Unable to update the video call')
-      }
-    }, 2000)
-    return () => window.clearInterval(timer)
-  }, [appointmentId, getSession, session?.status])
+  }, [appointmentId, getSession, joinActiveCall, mode, prepareOutgoingCall, startCall])
 
   useEffect(() => {
     if (!['DECLINED', 'MISSED', 'ENDED'].includes(session?.status)) return
     endCall()
   }, [endCall, session?.status])
-
-  useEffect(() => {
-    if (session?.status !== 'ACTIVE' || joinRef.current || call) return
-    joinRef.current = true
-    joinActiveCall(session).catch((err) => {
-      joinRef.current = false
-      setSetupError(err?.response?.data?.message || err?.message || 'Unable to connect the video call')
-    })
-  }, [call, joinActiveCall, session?.status])
 
   useEffect(() => () => {
     const activeSession = sessionRef.current

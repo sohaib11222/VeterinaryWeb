@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import AuthLayout from '../../layouts/AuthLayout'
 import { useAuth } from '../../contexts/AuthContext'
 import { toast } from 'react-toastify'
 import { api } from '../../utils/api'
@@ -16,6 +15,10 @@ const PharmacyPhoneVerification = () => {
   const [verifying, setVerifying] = useState(false)
 
   const phoneTrimmed = useMemo(() => String(phone || '').trim(), [phone])
+  const role = String(user?.role || '').toUpperCase()
+  const isVeterinarian = role === 'VETERINARIAN'
+  const nextPath = isVeterinarian ? '/doctor-verification-upload' : '/pet-store-verification-upload'
+  const accountLabel = isVeterinarian ? 'Veterinarian' : 'Pharmacy or Parapharmacy'
 
   useEffect(() => {
     if (!user) {
@@ -23,16 +26,15 @@ const PharmacyPhoneVerification = () => {
       return
     }
 
-    const role = String(user?.role || '').toUpperCase()
-    if (role !== 'PET_STORE' && role !== 'PARAPHARMACY') {
+    if (!['VETERINARIAN', 'PET_STORE', 'PARAPHARMACY'].includes(role)) {
       navigate('/')
       return
     }
 
     if (user?.isPhoneVerified) {
-      navigate('/pet-store-verification-upload')
+      navigate(nextPath)
     }
-  }, [user, navigate])
+  }, [user, navigate, nextPath, role])
 
   const handleResend = async () => {
     if (!user) return
@@ -71,7 +73,7 @@ const PharmacyPhoneVerification = () => {
       }
 
       toast.success('Phone verified successfully')
-      navigate('/pet-store-verification-upload')
+      navigate(nextPath)
     } catch (error) {
       toast.error(error?.data?.message || error?.message || 'Invalid verification code')
     } finally {
@@ -80,81 +82,38 @@ const PharmacyPhoneVerification = () => {
   }
 
   return (
-    <AuthLayout>
-      <div className="content login-page pt-0">
-        <div className="container-fluid">
-          <div className="account-content">
-            <div className="d-flex align-items-center justify-content-center">
-              <div className="login-right">
-                <div className="inner-right-login">
-                  <div className="login-header">
-                    <div className="logo-icon">
-                      <img
-                        src="/assets/img/pet-logo.jpg"
-                        alt="MyPetPlus logo"
-                        style={{ maxHeight: '60px', height: 'auto', width: 'auto' }}
-                      />
-                    </div>
-
-                    <form onSubmit={handleVerify}>
-                      <h3 className="my-4">Verify Phone Number</h3>
-                      <p className="text-muted mb-4">
-                        Enter the code we sent to your phone number to continue.
-                      </p>
-
-                      <div className="mb-3">
-                        <label className="form-label">Phone (E.164 format)</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="+1234567890"
-                        />
-                        <small className="text-muted d-block mt-1">Example: +393331234567</small>
-                      </div>
-
-                      <div className="mb-3">
-                        <label className="form-label">Verification Code</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={code}
-                          onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                          placeholder="Enter code"
-                          maxLength={10}
-                        />
-                      </div>
-
-                      <div className="mb-3">
-                        <button className="btn btn-primary-gradient w-100" type="submit" disabled={verifying}>
-                          {verifying ? 'Verifying...' : 'Verify & Continue'}
-                        </button>
-                      </div>
-
-                      <div className="text-center">
-                        <button type="button" className="btn btn-link" onClick={handleResend} disabled={sending}>
-                          {sending ? 'Sending...' : 'Resend code'}
-                        </button>
-                      </div>
-
-                      <div className="text-center mt-3">
-                        <Link to="/login" className="text-muted">
-                          Back to Login
-                        </Link>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-                <div className="login-bottom-copyright">
-                  <span>© {new Date().getFullYear()} MyPetPlus. All rights reserved.</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <div className="auth-pharmacy-flow">
+      <div className="auth-pharmacy-flow__steps" aria-label="Registration progress">
+        <span className="is-complete"><i className="fa-solid fa-check"></i><b>Account</b></span>
+        <span className="is-active"><i className="fa-solid fa-mobile-screen-button"></i><b>Phone verification</b></span>
+        <span><i className="fa-solid fa-file-shield"></i><b>Documents</b></span>
+        <span><i className="fa-solid fa-circle-check"></i><b>Approval</b></span>
       </div>
-    </AuthLayout>
+      <div className="auth-pharmacy-flow__panel">
+        <div className="auth-pharmacy-flow__header">
+          <div className="logo-icon"><i className="fa-solid fa-mobile-screen-button" /></div>
+          <div><h3>Verify your phone number</h3><p>Enter the verification code sent to your phone to continue with your {accountLabel} application.</p></div>
+        </div>
+        <form onSubmit={handleVerify} className="row g-3 mt-1">
+          <div className="col-md-7">
+            <label className="form-label">Phone number (E.164 format)</label>
+            <input type="text" className="form-control" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+393331234567" autoComplete="tel" />
+            <small className="text-muted d-block mt-1">Use your country code, for example +39 for Italy.</small>
+          </div>
+          <div className="col-md-5">
+            <label className="form-label">Verification code</label>
+            <input type="text" className="form-control" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} placeholder="Enter code" maxLength={10} inputMode="numeric" autoComplete="one-time-code" />
+          </div>
+          <div className="col-md-7 d-flex align-items-center">
+            <button type="button" className="btn btn-link px-0" onClick={handleResend} disabled={sending}>{sending ? 'Sending a new code…' : 'Didn’t receive a code? Resend'}</button>
+          </div>
+          <div className="col-md-5 d-grid">
+            <button className="btn btn-primary-gradient" type="submit" disabled={verifying}>{verifying ? 'Verifying…' : 'Verify & continue'} <i className="fa-solid fa-arrow-right ms-2" /></button>
+          </div>
+        </form>
+      </div>
+      <div className="text-center mt-3"><Link to="/login" className="text-muted">Back to login</Link></div>
+    </div>
   )
 }
 

@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMyPetStore } from '../../queries/petStoreQueries'
+import { usePharmacyPendingPrescriptionCount } from '../../queries/productPrescriptionRequestQueries'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const Sidebar = ({ userType = 'patient' }) => {
@@ -12,10 +13,13 @@ const Sidebar = ({ userType = 'patient' }) => {
   const role = String(user?.role || '').toUpperCase()
   const storeEnabled = userType === 'pharmacy_admin' && (role === 'PET_STORE' || role === 'PARAPHARMACY')
   const myPetStoreQuery = useMyPetStore({ enabled: storeEnabled })
+  const pendingPrescriptionQuery = usePharmacyPendingPrescriptionCount({ enabled: userType === 'pharmacy_admin' && role === 'PET_STORE' })
   const petStore = useMemo(() => {
     const payload = myPetStoreQuery.data?.data ?? myPetStoreQuery.data
     return payload?.data ?? payload
   }, [myPetStoreQuery.data])
+  const pendingPrescriptionPayload = pendingPrescriptionQuery.data?.data ?? pendingPrescriptionQuery.data
+  const pendingPrescriptionCount = pendingPrescriptionPayload?.data?.pendingCount ?? pendingPrescriptionPayload?.pendingCount ?? 0
 
   if (userType === 'doctor') {
     return (
@@ -257,6 +261,14 @@ const Sidebar = ({ userType = 'patient' }) => {
                   <div className="menu-indicator"></div>
                 </Link>
               </li>
+              {role === 'PET_STORE' && <li className={isActive('/pharmacy-admin/prescription-requests') ? 'active' : ''}>
+                <Link to="/pharmacy-admin/prescription-requests">
+                  <i className="fa-solid fa-file-prescription"></i>
+                  <span>Prescriptions</span>
+                  {pendingPrescriptionCount > 0 && <small className="unread-msg veterinary-badge">{pendingPrescriptionCount}</small>}
+                  <div className="menu-indicator"></div>
+                </Link>
+              </li>}
               <li className={isActive('/pharmacy-admin/payouts') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/payouts">
                   <i className="fa-solid fa-money-bill-1"></i>
@@ -264,13 +276,13 @@ const Sidebar = ({ userType = 'patient' }) => {
                   <div className="menu-indicator"></div>
                 </Link>
               </li>
-              <li className={isActive('/pharmacy-admin/subscription') ? 'active' : ''}>
+              {role === 'PET_STORE' && <li className={isActive('/pharmacy-admin/subscription') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/subscription">
                   <i className="fa-solid fa-crown"></i>
                   <span>Subscription</span>
                   <div className="menu-indicator"></div>
                 </Link>
-              </li>
+              </li>}
               <li className={isActive('/pharmacy-admin/profile') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/profile">
                   <i className="fa-solid fa-user-pen"></i>
@@ -289,4 +301,3 @@ const Sidebar = ({ userType = 'patient' }) => {
 }
 
 export default Sidebar
-

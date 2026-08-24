@@ -27,6 +27,14 @@ export const useMyPetStore = (options = {}) =>
     ...options,
   })
 
+export const usePetStoreSetupStatus = (options = {}) =>
+  useQuery({
+    queryKey: ['pet-store', 'setup-status'],
+    queryFn: () => api.get(API_ROUTES.PET_STORES.SETUP_STATUS),
+    refetchInterval: 30_000,
+    ...options,
+  })
+
 export const useMyPetStoreSubscription = (options = {}) =>
   useQuery({
     queryKey: ['pet-store', 'subscription', 'me'],

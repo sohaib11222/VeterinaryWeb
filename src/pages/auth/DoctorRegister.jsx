@@ -15,7 +15,10 @@ const schema = yup.object({
     .min(2, 'Full name must be at least 2 characters')
     .required('Full name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
-  phone: yup.string().required('Phone is required'),
+  phone: yup
+    .string()
+    .matches(/^\+\d{7,15}$/, 'Use international format, for example +393331234567')
+    .required('Phone is required'),
   password: yup
     .string()
     .min(6, 'Password must be at least 6 characters')
@@ -46,7 +49,7 @@ const DoctorRegister = () => {
       }
 
       const response = await registerUser(payload, 'doctor')
-      toast.success('Registration successful! Please upload verification documents.')
+      toast.success('Registration successful! Verify your phone number to continue.')
 
       // Trigger first-time onboarding prompts after approval/login
       try {
@@ -57,7 +60,7 @@ const DoctorRegister = () => {
 
       const status = response?.user?.status
       if (status === 'PENDING') {
-        navigate('/doctor-verification-upload')
+        navigate('/doctor-phone-verification')
       } else {
         navigate('/doctor/dashboard')
       }
@@ -141,7 +144,7 @@ const DoctorRegister = () => {
                         <input
                           type="tel"
                           className={`form-control veterinary-form-control ${errors.phone ? 'is-invalid' : ''}`}
-                          placeholder="Enter your phone number"
+                          placeholder="+393331234567"
                           {...register('phone')}
                         />
                         {errors.phone && <div className="invalid-feedback veterinary-error-feedback">{errors.phone.message}</div>}
