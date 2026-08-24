@@ -8,11 +8,24 @@ import { useConversations, useMessages, useUnreadChatCount } from '../../queries
 import { useGetOrCreateConversation, useMarkConversationRead, useSendMessage, useUploadChatFile } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
-const AdminDoctorChat = () => {
+const AdminDoctorChat = ({ mode = 'doctor' }) => {
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const currentUserId = user?.id || user?._id
+  const isBusinessChat = mode === 'business'
+  const businessRole = String(user?.role || '').toUpperCase()
+  const conversationType = isBusinessChat
+    ? businessRole === 'PARAPHARMACY'
+      ? 'ADMIN_PARAPHARMACY'
+      : 'ADMIN_PET_STORE'
+    : 'ADMIN_VETERINARIAN'
+  const participantKey = isBusinessChat ? 'businessId' : 'veterinarianId'
+  const accountLabel = isBusinessChat
+    ? businessRole === 'PARAPHARMACY'
+      ? 'Parapharmacy'
+      : 'Pharmacy'
+    : 'Doctor'
   const currentUserImage = getImageUrl(user?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
 
   const messagesEndRef = useRef(null)
@@ -36,14 +49,14 @@ const AdminDoctorChat = () => {
   } = useConversations(
     { limit: 50 },
     {
-      refetchInterval: false,
-      refetchIntervalInBackground: false,
+      refetchInterval: 5000,
+      refetchIntervalInBackground: true,
     }
   )
 
   useUnreadChatCount({
-    refetchInterval: false,
-    refetchIntervalInBackground: false,
+    refetchInterval: 10000,
+    refetchIntervalInBackground: true,
   })
 
   const conversations = useMemo(() => {
@@ -53,8 +66,8 @@ const AdminDoctorChat = () => {
   }, [conversationsResponse])
 
   const adminConversations = useMemo(
-    () => conversations.filter((c) => c?.conversationType === 'ADMIN_VETERINARIAN'),
-    [conversations]
+    () => conversations.filter((c) => c?.conversationType === conversationType),
+    [conversationType, conversations]
   )
 
   const selectedConversation = useMemo(
@@ -71,7 +84,7 @@ const AdminDoctorChat = () => {
     { limit: 100 },
     {
       refetchInterval: selectedConversationId ? 2000 : false,
-      refetchIntervalInBackground: false,
+      refetchIntervalInBackground: true,
     }
   )
 
@@ -165,7 +178,7 @@ const AdminDoctorChat = () => {
       return
     }
     try {
-      const res = await getOrCreateConversation.mutateAsync({ veterinarianId: currentUserId })
+      const res = await getOrCreateConversation.mutateAsync({ [participantKey]: currentUserId })
       const payload = res?.data ?? res
       const conv = payload?.data ?? payload
       const convId = conv?._id
@@ -189,7 +202,7 @@ const AdminDoctorChat = () => {
     try {
       await sendMessage.mutateAsync({
         conversationId: selectedConversationId || undefined,
-        veterinarianId: currentUserId,
+        [participantKey]: currentUserId,
         message: text,
         type: 'TEXT',
       })
@@ -246,7 +259,7 @@ const AdminDoctorChat = () => {
       const messageText = newMessage.trim()
       await sendMessage.mutateAsync({
         conversationId: selectedConversationId || undefined,
-        veterinarianId: currentUserId,
+        [participantKey]: currentUserId,
         type: 'FILE',
         attachments: uploaded,
         ...(messageText ? { message: messageText } : {}),
@@ -586,7 +599,7 @@ const AdminDoctorChat = () => {
                     <div className="text-center py-3 text-muted">Loading...</div>
                   ) : adminConversations.length === 0 ? (
                     <div className="text-center py-3">
-                      <p className="text-muted mb-3">No admin conversations yet</p>
+                      <p className="text-muted mb-3">No admin conversations for this {accountLabel.toLowerCase()} yet</p>
                       <button className="btn btn-primary" type="button" onClick={handleStartConversation}>
                         Start Chat
                       </button>

@@ -283,6 +283,13 @@ const Sidebar = ({ userType = 'patient' }) => {
                   <div className="menu-indicator"></div>
                 </Link>
               </li>}
+              <li className={isActive('/pharmacy-admin/admin-chat') ? 'active' : ''}>
+                <Link to="/pharmacy-admin/admin-chat">
+                  <i className="fa-solid fa-headset"></i>
+                  <span>Admin Messages</span>
+                  <div className="menu-indicator"></div>
+                </Link>
+              </li>
               <li className={isActive('/pharmacy-admin/profile') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/profile">
                   <i className="fa-solid fa-user-pen"></i>

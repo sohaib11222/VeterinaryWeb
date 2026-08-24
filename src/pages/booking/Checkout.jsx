@@ -26,6 +26,7 @@ const Checkout = () => {
     bookingType: searchParams.get('bookingType') || 'VISIT',
     reason: searchParams.get('reason'),
     petSymptoms: searchParams.get('petSymptoms'),
+    timezone: searchParams.get('timezone') || 'Europe/Rome',
     timezoneOffset: parseInt(searchParams.get('timezoneOffset') || '0', 10),
   }), [searchParams])
 
@@ -87,6 +88,7 @@ const Checkout = () => {
         bookingType: bookingDetails.bookingType,
         reason: bookingDetails.reason,
         petSymptoms: bookingDetails.petSymptoms || undefined,
+        timezone: bookingDetails.timezone,
         timezoneOffset: bookingDetails.timezoneOffset,
       }
 

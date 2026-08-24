@@ -106,6 +106,7 @@ const Booking = () => {
     }
 
     const tzOffset = -new Date().getTimezoneOffset()
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Rome'
 
     // Navigate to checkout with booking details
     const checkoutParams = new URLSearchParams({
@@ -117,6 +118,7 @@ const Booking = () => {
       bookingType,
       reason: reason.trim(),
       ...(petSymptoms.trim() && { petSymptoms: petSymptoms.trim() }),
+      timezone,
       timezoneOffset: tzOffset.toString(),
     })
 

@@ -146,6 +146,7 @@ import PharmacyAdminPayouts from './pages/pharmacy-admin/PharmacyAdminPayouts'
 import PharmacyAdminProfile from './pages/pharmacy-admin/PharmacyAdminProfile'
 import PharmacyAdminSubscription from './pages/pharmacy-admin/PharmacyAdminSubscription'
 import PharmacyAdminPrescriptionRequests from './pages/pharmacy-admin/PharmacyAdminPrescriptionRequests'
+import PharmacyAdminChat from './pages/pharmacy-admin/PharmacyAdminChat'
 
 // Search & Booking Pages
 import Search from './pages/search/Search'
@@ -950,6 +951,15 @@ function App() {
               element={
                 <ProtectedRoute role={['PET_STORE', 'PARAPHARMACY', 'ADMIN']}>
                   <DashboardLayout><PharmacyAdminSubscription /></DashboardLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/pharmacy-admin/admin-chat"
+              element={
+                <ProtectedRoute role={['PET_STORE', 'PARAPHARMACY']} requireApproved={true}>
+                  <DashboardLayout><PharmacyAdminChat /></DashboardLayout>
                 </ProtectedRoute>
               }
             />

@@ -46,7 +46,7 @@ const DashboardLayout = ({ children, breadcrumb }) => {
                         location.pathname === '/patient/prescription'
   const isAdminRoute = location.pathname.startsWith('/admin')
   const isPharmacyAdminRoute = location.pathname.startsWith('/pharmacy-admin')
-  const isChatRoute = location.pathname === '/chat' || location.pathname === '/chat-doctor' || location.pathname === '/doctor/admin-chat'
+  const isChatRoute = location.pathname === '/chat' || location.pathname === '/chat-doctor' || location.pathname === '/doctor/admin-chat' || location.pathname === '/pharmacy-admin/admin-chat'
 
   return (
     <div className="main-wrapper">
