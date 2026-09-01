@@ -17,6 +17,7 @@ const Chat = () => {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedConversationId, setSelectedConversationId] = useState(conversationIdFromUrl || '')
+  const [isMobileConversationOpen, setIsMobileConversationOpen] = useState(false)
   const [newMessage, setNewMessage] = useState('')
 
   const currentUserId = user?.id || user?._id
@@ -128,6 +129,7 @@ const Chat = () => {
     const id = c?._id
     if (!id) return
     setSelectedConversationId(id)
+    setIsMobileConversationOpen(true)
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
       next.set('conversationId', String(id))
@@ -845,7 +847,7 @@ const Chat = () => {
       <div className="page-wrapper chat-page-wrapper patient-chat-wrapper">
         <div className="container">
           <div className="content doctor-content">
-            <div className="patient-chat-container">
+            <div className={`patient-chat-container${isMobileConversationOpen ? ' mobile-chat-detail-open' : ''}`}>
               {/* Left Sidebar - Chat List */}
               <div className="chat-list-sidebar">
                 <div className="chat-list-header">
@@ -1008,6 +1010,14 @@ const Chat = () => {
                 {selectedConversation ? (
                   <>
                     <div className="chat-details-header">
+                      <button
+                        type="button"
+                        className="chat-mobile-back-button"
+                        onClick={() => setIsMobileConversationOpen(false)}
+                        aria-label="Back to chats"
+                      >
+                        <i className="fa-solid fa-arrow-left"></i>
+                      </button>
                       <div className="chat-details-user">
                         <div className="chat-details-avatar">
                           <img

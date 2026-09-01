@@ -74,9 +74,9 @@ const PharmacyDetails = () => {
   return (
     <>
       <Breadcrumb title="Pharmacy" li1="Pharmacy Details" li2={store?.name || 'Pharmacy'} />
-      <div className="content">
+      <div className="content pharmacy-details-mobile">
         <div className="container">
-          <div className="card">
+          <div className="card pharmacy-details-hero-card">
             <div className="card-body">
               <div className="doctor-widget">
                 <div className="doc-info-left">
@@ -127,7 +127,7 @@ const PharmacyDetails = () => {
           <div className="card">
             <div className="card-body pt-0">
               <nav className="user-tabs mb-4">
-                <ul className="nav nav-tabs nav-tabs-bottom nav-justified">
+                <ul className="nav nav-tabs nav-tabs-bottom nav-justified pharmacy-details-tabs">
                   <li className="nav-item">
                     <a className="nav-link active" href="#pharmacy_overview" data-bs-toggle="tab">Overview</a>
                   </li>
@@ -142,7 +142,7 @@ const PharmacyDetails = () => {
 
               <div className="tab-content pt-0">
                 <div role="tabpanel" id="pharmacy_overview" className="tab-pane fade show active">
-                  <div className="row">
+                  <div className="row pharmacy-details-products-grid">
                     <div className="col-md-9">
                       <div className="widget about-widget">
                         <h4 className="widget-title">About Pharmacy</h4>
@@ -178,7 +178,7 @@ const PharmacyDetails = () => {
                         const img = getImageUrl(p?.images?.[0]) || '/assets/img/products/product.jpg'
                         const price = typeof p?.discountPrice === 'number' && p.discountPrice > 0 ? p.discountPrice : p?.price
                         return (
-                          <div key={p?._id} className="col-md-6 col-lg-4 mb-3">
+                          <div key={p?._id} className="col-6 col-lg-4 mb-3">
                             <div className="card">
                               <div className="card-body">
                                 <Link to={`/product-description?id=${p?._id}`} className="text-decoration-none">

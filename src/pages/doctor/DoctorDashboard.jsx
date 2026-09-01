@@ -282,7 +282,7 @@ const DoctorDashboard = () => {
   }, [])
 
   return (
-    <div className="content veterinary-dashboard">
+    <div className="content veterinary-dashboard doctor-dashboard-mobile">
       <ProfileIncompleteModal
         show={showProfileModal}
         onClose={() => {

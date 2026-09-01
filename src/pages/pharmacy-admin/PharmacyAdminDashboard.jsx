@@ -79,11 +79,11 @@ const PharmacyAdminDashboard = () => {
   }
 
   return (
-    <div className="content veterinary-dashboard">
+    <div className="content veterinary-dashboard pharmacy-admin-dashboard-mobile">
       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-12 col-xl-12">
-            <div className="row mb-4">
+            <div className="row mb-4 pharmacy-dashboard-status-grid">
               <div className="col-12">
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
@@ -183,7 +183,7 @@ const PharmacyAdminDashboard = () => {
                       <div className="alert alert-info mb-0">No orders yet.</div>
                     ) : (
                       <div className="table-responsive">
-                        <table className="table dashboard-table appoint-table veterinary-table mb-0">
+                        <table className="table dashboard-table appoint-table veterinary-table mb-0 pharmacy-dashboard-orders-table">
                           <thead>
                             <tr>
                               <th>Order</th>
@@ -205,12 +205,12 @@ const PharmacyAdminDashboard = () => {
 
                               return (
                                 <tr key={id}>
-                                  <td>{orderNo}</td>
-                                  <td>{customer}</td>
-                                  <td>{typeof total === 'number' ? total.toFixed(2) : total}</td>
-                                  <td>{paymentStatus}</td>
-                                  <td>{status}</td>
-                                  <td>
+                                  <td data-label="Order">{orderNo}</td>
+                                  <td data-label="Customer">{customer}</td>
+                                  <td data-label="Total">{typeof total === 'number' ? total.toFixed(2) : total}</td>
+                                  <td data-label="Payment">{paymentStatus}</td>
+                                  <td data-label="Status">{status}</td>
+                                  <td data-label="Update">
                                     <select
                                       className="form-select form-select-sm"
                                       value={status}

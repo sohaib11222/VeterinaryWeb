@@ -219,12 +219,12 @@ const ProductDescription = () => {
   return (
     <>
       <Breadcrumb title="Pharmacy" li1="Product Description" li2={product?.name || 'Product'} />
-      <div className="content">
+      <div className="content pharmacy-product-detail-mobile">
         <div className="container">
           <div className="row">
             <div className="col-md-7 col-lg-9 col-xl-9">
               <div className="card">
-                <div className="card-body product-description">
+                <div className="card-body product-description pharmacy-product-summary">
                   <div className="doctor-widget">
                     <div className="doc-info-left">
                       <div className="doctor-img1">
@@ -250,7 +250,7 @@ const ProductDescription = () => {
                   <h3 className="mb-3">Product Details</h3>
                   <div className="widget about-widget mb-4">
                     <h4 className="widget-title">Selected variant</h4>
-                    <div className="row">
+                    <div className="row product-detail-facts">
                       <DetailRow label="Variant" value={variantLabel(selectedVariant)} />
                       <DetailRow label="Strength" value={selectedVariant?.strengthValue ? `${selectedVariant.strengthValue} ${selectedVariant.strengthUnit || ''}`.trim() : null} />
                       <DetailRow label={isMedicine ? 'Dosage form' : 'Product format'} value={selectedVariant?.dosageForm} />
@@ -264,7 +264,7 @@ const ProductDescription = () => {
                     <div className="widget about-widget mb-4">
                       <h4 className="widget-title">Available variants</h4>
                       <div className="table-responsive">
-                        <table className="table table-sm align-middle mb-0">
+                        <table className="table table-sm align-middle mb-0 product-variant-mobile-table">
                           <thead><tr><th>Variant</th><th>Strength / format</th><th>Pack</th><th>Price</th><th>Status</th><th className="text-end">Select</th></tr></thead>
                           <tbody>
                             {allVariants.map((variant, index) => {
@@ -287,12 +287,12 @@ const ProductDescription = () => {
                                 }}
                                 style={{ cursor: 'pointer' }}
                               >
-                                <td>{variantLabel(variant, `Variant ${index + 1}`)}{variant.isDefault && <span className="badge bg-secondary ms-2">Default</span>}</td>
-                                <td>{[variant.strengthValue ? `${variant.strengthValue} ${variant.strengthUnit || ''}`.trim() : '', variant.dosageForm].filter(Boolean).join(' · ') || '—'}</td>
-                                <td>{variantPack || variant.packageDescription || '—'}</td>
-                                <td>€{Number(variantPrice || 0).toFixed(2)}</td>
-                                <td>{variant.isActive === false ? 'Unavailable' : variant.stock > 0 ? `${variant.stock} in stock` : 'Out of stock'}</td>
-                                <td className="text-end"><button type="button" className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-outline-primary'}`} onClick={(event) => { event.stopPropagation(); selectVariant(variant) }}>{isSelected ? 'Selected' : 'Choose'}</button></td>
+                                <td data-label="Variant">{variantLabel(variant, `Variant ${index + 1}`)}{variant.isDefault && <span className="badge bg-secondary ms-2">Default</span>}</td>
+                                <td data-label="Strength / format">{[variant.strengthValue ? `${variant.strengthValue} ${variant.strengthUnit || ''}`.trim() : '', variant.dosageForm].filter(Boolean).join(' · ') || '—'}</td>
+                                <td data-label="Pack">{variantPack || variant.packageDescription || '—'}</td>
+                                <td data-label="Price">€{Number(variantPrice || 0).toFixed(2)}</td>
+                                <td data-label="Availability">{variant.isActive === false ? 'Unavailable' : variant.stock > 0 ? `${variant.stock} in stock` : 'Out of stock'}</td>
+                                <td data-label="Select" className="text-end"><button type="button" className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-outline-primary'}`} onClick={(event) => { event.stopPropagation(); selectVariant(variant) }}>{isSelected ? 'Selected' : 'Choose'}</button></td>
                               </tr>
                             })}
                           </tbody>
@@ -304,7 +304,7 @@ const ProductDescription = () => {
                   {isMedicine ? (
                     <div className="widget about-widget mb-4">
                       <h4 className="widget-title">Medicine information</h4>
-                      <div className="row">
+                      <div className="row product-detail-facts">
                         <DetailRow label="Active ingredient(s)" value={medicineDetails.activeIngredients} />
                         <DetailRow label="Administration route" value={medicineDetails.administrationRoute} />
                         <DetailRow label="Target species" value={medicineDetails.targetSpecies?.length ? medicineDetails.targetSpecies : product.petType} />
@@ -321,7 +321,7 @@ const ProductDescription = () => {
                   ) : (
                     <div className="widget about-widget mb-4">
                       <h4 className="widget-title">Parapharmacy product information</h4>
-                      <div className="row">
+                      <div className="row product-detail-facts">
                         <DetailRow label="Product class" value={parapharmacyDetails.productClass} />
                         <DetailRow label="Life stage" value={parapharmacyDetails.lifeStage} />
                         <DetailRow label="Target species" value={parapharmacyDetails.targetSpecies?.length ? parapharmacyDetails.targetSpecies : product.petType} />
@@ -341,7 +341,7 @@ const ProductDescription = () => {
             </div>
 
             <div className="col-md-5 col-lg-3 col-xl-3 theiaStickySidebar">
-              <div className="card search-filter"><div className="card-body">
+              <div className="card search-filter pharmacy-product-purchase-card"><div className="card-body">
                 {allVariants.length > 1 && (
                   <div className="mb-3">
                     <label className="form-label">Choose a variant</label>

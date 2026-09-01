@@ -690,3 +690,1535 @@ body.home-hero-header-transparent .home-hero-v2 {
   }
 }
 
+/* Mobile chat: use a one-panel, WhatsApp-style conversation flow. */
+.chat-mobile-back-button {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  .doctor-chat-wrapper,
+  .patient-chat-wrapper,
+  .admin-doctor-chat-wrapper {
+    min-height: 0;
+  }
+
+  .doctor-chat-wrapper .container,
+  .patient-chat-wrapper .container,
+  .admin-doctor-chat-wrapper .container {
+    width: 100%;
+    max-width: none;
+    padding: 0 !important;
+  }
+
+  .doctor-chat-wrapper .content,
+  .patient-chat-wrapper .content,
+  .admin-doctor-chat-wrapper .content {
+    padding: 0 !important;
+  }
+
+  .doctor-chat-container,
+  .patient-chat-container,
+  .admin-doctor-chat-container {
+    display: block !important;
+    height: calc(100dvh - 76px) !important;
+    max-height: none !important;
+    min-height: 470px;
+    overflow: hidden;
+  }
+
+  .doctor-chat-container .chat-list-sidebar,
+  .patient-chat-container .chat-list-sidebar,
+  .admin-doctor-chat-container .chat-list-sidebar,
+  .doctor-chat-container .chat-details-area,
+  .patient-chat-container .chat-details-area,
+  .admin-doctor-chat-container .chat-details-area {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
+    min-height: 0;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .doctor-chat-container .chat-list-sidebar,
+  .patient-chat-container .chat-list-sidebar,
+  .admin-doctor-chat-container .chat-list-sidebar {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .doctor-chat-container .chat-details-area,
+  .patient-chat-container .chat-details-area,
+  .admin-doctor-chat-container .chat-details-area {
+    display: none !important;
+  }
+
+  .doctor-chat-container.mobile-chat-detail-open .chat-list-sidebar,
+  .patient-chat-container.mobile-chat-detail-open .chat-list-sidebar,
+  .admin-doctor-chat-container.mobile-chat-detail-open .chat-list-sidebar {
+    display: none !important;
+  }
+
+  .doctor-chat-container.mobile-chat-detail-open .chat-details-area,
+  .patient-chat-container.mobile-chat-detail-open .chat-details-area,
+  .admin-doctor-chat-container.mobile-chat-detail-open .chat-details-area {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .chat-details-header {
+    gap: 10px;
+    padding: 12px 14px !important;
+  }
+
+  .chat-details-header .chat-details-user {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .chat-details-header .chat-details-user-info h5 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chat-mobile-back-button {
+    display: inline-grid !important;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: #edf7f4;
+    color: #078a6d;
+    font-size: 16px;
+  }
+
+  .chat-details-area .chat-messages-area {
+    min-height: 0;
+  }
+
+  .chat-details-area .chat-input-area {
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .chat-input-area .chat-input-actions {
+    flex-wrap: nowrap;
+  }
+
+  .chat-input-area .chat-input-field {
+    min-width: 0;
+  }
+}
+
+/* Pharmacy and Parapharmacy: compact dashboard and management screens for phones. */
+@media (max-width: 767.98px) {
+  .pharmacy-admin-dashboard-mobile .container-fluid {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .pharmacy-admin-dashboard-mobile .dashboard-title {
+    font-size: clamp(22px, 6vw, 28px);
+    line-height: 1.25;
+  }
+
+  .pharmacy-admin-dashboard-mobile .dashboard-subtitle {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .pharmacy-admin-dashboard-mobile .pharmacy-dashboard-status-grid > [class*='col-'] {
+    width: 50%;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin-bottom: 12px !important;
+  }
+
+  .pharmacy-admin-dashboard-mobile .pharmacy-dashboard-status-grid {
+    margin-left: -6px;
+    margin-right: -6px;
+  }
+
+  .pharmacy-admin-dashboard-mobile .dashboard-widget-box {
+    min-height: 116px;
+    padding: 14px 12px;
+  }
+
+  .pharmacy-admin-dashboard-mobile .dashboard-widget-box h6 {
+    min-height: 34px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .pharmacy-admin-dashboard-mobile .dashboard-widget-box h4 {
+    margin: 4px 0;
+    font-size: 23px;
+  }
+
+  .pharmacy-admin-dashboard-mobile .dashboard-widget-icon {
+    display: none;
+  }
+
+  .pharmacy-admin-dashboard-mobile .dashboard-card-head {
+    align-items: center;
+    gap: 10px;
+  }
+
+  .pharmacy-admin-dashboard-mobile .dashboard-card-head h5 {
+    font-size: 16px;
+  }
+
+  .pharmacy-admin-dashboard-mobile .table-responsive,
+  .pharmacy-admin-orders-mobile .table-responsive,
+  .pharmacy-admin-products-mobile .table-responsive {
+    overflow: visible;
+  }
+
+  .pharmacy-dashboard-orders-table,
+  .pharmacy-dashboard-orders-table tbody,
+  .pharmacy-dashboard-orders-table tr,
+  .pharmacy-dashboard-orders-table td,
+  .pharmacy-admin-orders-table,
+  .pharmacy-admin-orders-table tbody,
+  .pharmacy-admin-orders-table tr,
+  .pharmacy-admin-orders-table td,
+  .pharmacy-admin-products-table,
+  .pharmacy-admin-products-table tbody,
+  .pharmacy-admin-products-table tr,
+  .pharmacy-admin-products-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .pharmacy-dashboard-orders-table thead,
+  .pharmacy-admin-orders-table thead,
+  .pharmacy-admin-products-table thead {
+    display: none;
+  }
+
+  .pharmacy-dashboard-orders-table tbody tr,
+  .pharmacy-admin-orders-table tbody tr,
+  .pharmacy-admin-products-table tbody tr {
+    margin: 0 0 12px;
+    padding: 6px 13px;
+    border: 1px solid #deebeb;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(17, 70, 76, .06);
+  }
+
+  .pharmacy-dashboard-orders-table tbody td,
+  .pharmacy-admin-orders-table tbody td,
+  .pharmacy-admin-products-table tbody td {
+    display: grid;
+    grid-template-columns: minmax(88px, 37%) minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    min-height: 43px;
+    padding: 9px 0;
+    border: 0;
+    border-bottom: 1px solid #eef3f3;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .pharmacy-dashboard-orders-table tbody td::before,
+  .pharmacy-admin-orders-table tbody td::before,
+  .pharmacy-admin-products-table tbody td::before {
+    content: attr(data-label);
+    color: #627580;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .pharmacy-dashboard-orders-table tbody td:last-child,
+  .pharmacy-admin-orders-table tbody td:last-child,
+  .pharmacy-admin-products-table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .pharmacy-dashboard-orders-table .form-select,
+  .pharmacy-admin-orders-table .form-select {
+    min-height: 40px;
+  }
+
+  .pharmacy-admin-orders-mobile .page-header,
+  .pharmacy-admin-products-mobile .page-header {
+    margin-bottom: 16px;
+  }
+
+  .pharmacy-admin-orders-mobile .page-title,
+  .pharmacy-admin-products-mobile .page-title {
+    font-size: 24px;
+  }
+
+  .pharmacy-admin-orders-mobile .card-body,
+  .pharmacy-admin-products-mobile .card-body {
+    padding: 15px 13px;
+  }
+
+  .pharmacy-admin-orders-mobile .pharmacy-order-filters > [class*='col-'] {
+    margin-bottom: 10px !important;
+  }
+
+  .pharmacy-admin-orders-mobile .pharmacy-order-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .pharmacy-admin-orders-mobile .pharmacy-order-actions .form-select {
+    grid-column: 1 / -1;
+  }
+
+  .pharmacy-admin-products-mobile .page-header .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .pharmacy-admin-products-mobile .card-body > .d-flex > div[style*='min-width'] {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .pharmacy-admin-products-mobile .pharmacy-product-actions {
+    justify-content: flex-end;
+  }
+
+  .pharmacy-order-modal .modal-dialog,
+  .pharmacy-product-editor-modal .modal-dialog {
+    width: calc(100% - 24px);
+    max-width: none;
+    margin: 12px auto;
+  }
+
+  .pharmacy-product-editor-modal .modal-dialog {
+    height: calc(100% - 24px);
+  }
+
+  .pharmacy-product-editor-modal .modal-content {
+    max-height: 100%;
+  }
+
+  .pharmacy-order-modal .modal-footer,
+  .pharmacy-product-editor-modal .modal-body > form > .d-flex.justify-content-end {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 8px !important;
+  }
+
+  .pharmacy-order-modal .modal-footer .btn,
+  .pharmacy-product-editor-modal .modal-body > form > .d-flex.justify-content-end .btn {
+    width: 100%;
+    min-height: 44px;
+    margin: 0 !important;
+  }
+}
+
+/* Public pharmacy, parapharmacy, search, product, and product-detail pages. */
+@media (max-width: 767.98px) {
+  .pharmacy-products-mobile .container,
+  .pharmacy-search-mobile .container,
+  .pharmacy-details-mobile .container,
+  .pharmacy-product-detail-mobile .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .pharmacy-products-mobile .search-filter,
+  .pharmacy-search-mobile .search-filter {
+    margin-bottom: 18px;
+  }
+
+  .pharmacy-products-mobile .search-filter .card-body,
+  .pharmacy-search-mobile .search-filter .card-body {
+    padding: 15px;
+  }
+
+  .pharmacy-products-mobile .pharmacy-title {
+    margin-bottom: 6px;
+    font-size: 23px;
+  }
+
+  .pharmacy-products-mobile .pharmacy-products-grid {
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+
+  .pharmacy-products-mobile .pharmacy-product-tile {
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-bottom: 10px !important;
+  }
+
+  .pharmacy-products-mobile .profile-widget {
+    min-width: 0;
+    border-radius: 13px;
+    overflow: hidden;
+  }
+
+  .pharmacy-products-mobile .pharmacy-product-tile .doc-img {
+    height: 142px !important;
+  }
+
+  .pharmacy-products-mobile .pharmacy-product-tile .fav-btn {
+    top: 8px;
+    right: 8px;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+  }
+
+  .pharmacy-products-mobile .pharmacy-product-tile .pro-content {
+    min-width: 0;
+    padding: 12px 10px;
+  }
+
+  .pharmacy-products-mobile .pharmacy-product-tile .pro-content .title {
+    display: -webkit-box;
+    overflow: hidden;
+    min-height: 39px;
+    margin-bottom: 8px;
+    padding-bottom: 0 !important;
+    font-size: 14px;
+    line-height: 1.38;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .pharmacy-products-mobile .pharmacy-product-tile .price,
+  .pharmacy-products-mobile .pharmacy-product-tile .price-strike {
+    display: block;
+    font-size: 13px;
+    line-height: 1.25;
+  }
+
+  .pharmacy-products-mobile .pharmacy-product-tile .row.align-items-center > [class*='col-'] {
+    width: 100%;
+    text-align: left !important;
+  }
+
+  .pharmacy-products-mobile .pharmacy-product-tile .cart-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-top: 7px;
+  }
+
+  .pharmacy-products-mobile .pagination,
+  .pharmacy-search-mobile .pagination {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .pharmacy-search-mobile .btn-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .pharmacy-search-mobile .btn-group .btn {
+    min-height: 44px;
+    padding: 8px;
+    white-space: normal;
+  }
+
+  .pharmacy-search-mobile .theiaStickySidebar,
+  .pharmacy-product-detail-mobile .theiaStickySidebar {
+    position: static !important;
+    top: auto !important;
+    height: auto !important;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .card-body {
+    padding: 14px;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .doctor-widget,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .doctor-widget {
+    display: block;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .doc-info-left,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .doc-info-left {
+    display: flex;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .doctor-img1,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .doctor-img1 {
+    width: 76px !important;
+    height: 76px !important;
+    margin-right: 12px;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .doctor-img1 img,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .doctor-img1 img {
+    width: 76px !important;
+    height: 76px !important;
+    max-width: 76px !important;
+    max-height: 76px !important;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .doc-info-cont,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .doc-info-cont {
+    min-width: 0;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .doc-name,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .doc-name {
+    font-size: 17px;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .doc-location,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .doc-location {
+    overflow-wrap: anywhere;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .doc-info-right,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .doc-info-right {
+    width: 100%;
+    margin-top: 14px;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .clinic-booking,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .clinic-booking {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .pharmacy-search-mobile .pharmacy-search-result-card .clinic-booking a,
+  .pharmacy-details-mobile .pharmacy-details-hero-card .clinic-booking a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    margin: 0;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .pharmacy-details-mobile .pharmacy-details-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 10px 0 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .pharmacy-details-mobile .pharmacy-details-tabs .nav-item {
+    flex: 0 0 auto;
+  }
+
+  .pharmacy-details-mobile .pharmacy-details-tabs .nav-link {
+    min-height: 42px;
+    padding: 9px 14px;
+    white-space: nowrap;
+  }
+
+  .pharmacy-details-mobile .pharmacy-details-products-grid {
+    margin-left: -5px;
+    margin-right: -5px;
+  }
+
+  .pharmacy-details-mobile .pharmacy-details-products-grid > [class*='col-'] {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .pharmacy-details-mobile .pharmacy-details-products-grid .card-body {
+    padding: 11px;
+  }
+
+  .pharmacy-details-mobile .pharmacy-details-products-grid .card-body .d-flex {
+    align-items: flex-start !important;
+    flex-direction: column;
+  }
+
+  .pharmacy-details-mobile .pharmacy-details-products-grid img {
+    width: 100% !important;
+    height: 96px !important;
+  }
+
+  .pharmacy-details-mobile .pharmacy-details-products-grid .fw-semibold {
+    display: -webkit-box;
+    overflow: hidden;
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.35;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .pharmacy-product-detail-mobile .card-body {
+    padding: 15px 13px;
+  }
+
+  .pharmacy-product-detail-mobile .pharmacy-product-summary .doctor-widget,
+  .pharmacy-product-detail-mobile .pharmacy-product-summary .doc-info-left {
+    display: block;
+  }
+
+  .pharmacy-product-detail-mobile .pharmacy-product-summary .doctor-img1,
+  .pharmacy-product-detail-mobile .pharmacy-product-summary .doctor-img1 img {
+    width: 100%;
+    max-width: none;
+    height: 205px;
+    margin: 0 0 14px;
+    border-radius: 13px;
+    object-fit: cover;
+  }
+
+  .pharmacy-product-detail-mobile .pharmacy-product-summary .doc-name {
+    font-size: 22px;
+    line-height: 1.25;
+  }
+
+  .pharmacy-product-detail-mobile .product-detail-facts > [class*='col-'] {
+    margin-bottom: 12px !important;
+  }
+
+  .pharmacy-product-detail-mobile .product-variant-mobile-table,
+  .pharmacy-product-detail-mobile .product-variant-mobile-table tbody,
+  .pharmacy-product-detail-mobile .product-variant-mobile-table tr,
+  .pharmacy-product-detail-mobile .product-variant-mobile-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .pharmacy-product-detail-mobile .product-variant-mobile-table thead {
+    display: none;
+  }
+
+  .pharmacy-product-detail-mobile .product-variant-mobile-table tbody tr {
+    margin: 0 0 12px;
+    padding: 6px 13px;
+    border: 1px solid #deebeb;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(17, 70, 76, .06);
+  }
+
+  .pharmacy-product-detail-mobile .product-variant-mobile-table tbody td {
+    display: grid;
+    grid-template-columns: minmax(105px, 42%) minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 9px 0;
+    border: 0;
+    border-bottom: 1px solid #eef3f3;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .pharmacy-product-detail-mobile .product-variant-mobile-table tbody td::before {
+    content: attr(data-label);
+    color: #627580;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .pharmacy-product-detail-mobile .product-variant-mobile-table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .pharmacy-product-detail-mobile .product-variant-mobile-table .btn {
+    justify-self: end;
+    min-width: 82px;
+  }
+
+  .pharmacy-product-detail-mobile .pharmacy-product-purchase-card {
+    margin-top: 18px;
+  }
+
+  .pharmacy-product-detail-mobile .pharmacy-product-purchase-card .list-group-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .pharmacy-product-detail-mobile .pharmacy-product-purchase-card .list-group-item .float-end {
+    float: none !important;
+    max-width: 62% !important;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Patient invoice screens deliberately use the same compact card rhythm as the doctor invoice flow. */
+.patient-invoice-hero {
+  background: linear-gradient(135deg, #075e54, #118b80);
+  color: #fff;
+}
+
+@media (max-width: 767.98px) {
+  .patient-invoices-mobile,
+  .patient-invoice-view-mobile {
+    min-width: 0;
+  }
+
+  .patient-invoices-mobile .veterinary-dashboard-header,
+  .patient-invoices-mobile .dashboard-title,
+  .patient-invoice-toolbar {
+    min-width: 0;
+  }
+
+  .patient-invoices-mobile .dashboard-title {
+    font-size: clamp(22px, 6vw, 28px);
+  }
+
+  .patient-invoices-mobile .dashboard-subtitle {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .patient-invoices-mobile .dashboard-card-body {
+    padding: 14px;
+  }
+
+  .patient-invoices-mobile .dashboard-card-body.p-0 {
+    padding: 0 !important;
+  }
+
+  .patient-invoices-mobile .form-select,
+  .patient-invoices-mobile .form-control,
+  .patient-invoices-mobile .btn {
+    min-height: 44px;
+  }
+
+  .patient-invoices-mobile article .row > [class*='col-'] {
+    min-width: 0;
+  }
+
+  .patient-invoice-actions {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    width: 100%;
+  }
+
+  .patient-invoice-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .patient-invoice-pagination {
+    flex-wrap: wrap;
+  }
+
+  .patient-invoice-pagination .btn {
+    min-height: 42px;
+  }
+
+  .patient-invoice-toolbar {
+    display: grid !important;
+    grid-template-columns: 1fr;
+  }
+
+  .patient-invoice-toolbar .btn {
+    width: 100%;
+    min-height: 45px;
+  }
+
+  .patient-invoice-hero .display-6 {
+    font-size: 2rem;
+  }
+
+  .patient-invoice-view-mobile .card {
+    border-radius: 16px;
+  }
+}
+
+/* Health-report tabs and wide tables become card-like records on small screens. */
+@media (max-width: 767.98px) {
+  .patient-medical-reports-mobile .container-fluid,
+  .patient-reports-mobile .container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .patient-medical-reports-mobile .appointment-tabs,
+  .patient-medical-reports-mobile .dashboard-card,
+  .patient-reports-mobile .card {
+    min-width: 0;
+  }
+
+  .patient-medical-reports-mobile .patient-medical-tabs {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .patient-medical-reports-mobile .patient-medical-tabs li {
+    flex: 0 0 auto;
+  }
+
+  .patient-medical-reports-mobile .patient-medical-tabs .veterinary-tab {
+    min-height: 42px;
+    padding: 10px 13px;
+    white-space: nowrap;
+  }
+
+  .patient-medical-reports-mobile .patient-medical-controls {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    width: 100%;
+    gap: 10px !important;
+  }
+
+  .patient-medical-reports-mobile .patient-medical-controls .input-block,
+  .patient-medical-reports-mobile .patient-medical-controls .form-control,
+  .patient-medical-reports-mobile .patient-medical-controls .form-select,
+  .patient-medical-reports-mobile .patient-medical-controls .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .patient-medical-reports-mobile .table-responsive,
+  .patient-reports-mobile .table-responsive {
+    overflow: visible;
+  }
+
+  .patient-medical-reports-mobile .medical-upcoming-table,
+  .patient-medical-reports-mobile .medical-vaccination-table,
+  .patient-medical-reports-mobile .medical-prescription-table,
+  .patient-medical-reports-mobile .medical-records-table,
+  .patient-reports-mobile .patient-reports-mobile-table,
+  .patient-medical-reports-mobile .medical-upcoming-table tbody,
+  .patient-medical-reports-mobile .medical-vaccination-table tbody,
+  .patient-medical-reports-mobile .medical-prescription-table tbody,
+  .patient-medical-reports-mobile .medical-records-table tbody,
+  .patient-reports-mobile .patient-reports-mobile-table tbody,
+  .patient-medical-reports-mobile .medical-upcoming-table tr,
+  .patient-medical-reports-mobile .medical-vaccination-table tr,
+  .patient-medical-reports-mobile .medical-prescription-table tr,
+  .patient-medical-reports-mobile .medical-records-table tr,
+  .patient-reports-mobile .patient-reports-mobile-table tr,
+  .patient-medical-reports-mobile .medical-upcoming-table td,
+  .patient-medical-reports-mobile .medical-vaccination-table td,
+  .patient-medical-reports-mobile .medical-prescription-table td,
+  .patient-medical-reports-mobile .medical-records-table td,
+  .patient-reports-mobile .patient-reports-mobile-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .patient-medical-reports-mobile .medical-upcoming-table thead,
+  .patient-medical-reports-mobile .medical-vaccination-table thead,
+  .patient-medical-reports-mobile .medical-prescription-table thead,
+  .patient-medical-reports-mobile .medical-records-table thead,
+  .patient-reports-mobile .patient-reports-mobile-table thead {
+    display: none;
+  }
+
+  .patient-medical-reports-mobile .medical-upcoming-table tbody tr,
+  .patient-medical-reports-mobile .medical-vaccination-table tbody tr,
+  .patient-medical-reports-mobile .medical-prescription-table tbody tr,
+  .patient-medical-reports-mobile .medical-records-table tbody tr,
+  .patient-reports-mobile .patient-reports-mobile-table tbody tr {
+    margin: 0 0 12px;
+    padding: 6px 13px;
+    border: 1px solid #deebeb;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(17, 70, 76, 0.06);
+  }
+
+  .patient-medical-reports-mobile .medical-upcoming-table tbody td,
+  .patient-medical-reports-mobile .medical-vaccination-table tbody td,
+  .patient-medical-reports-mobile .medical-prescription-table tbody td,
+  .patient-medical-reports-mobile .medical-records-table tbody td,
+  .patient-reports-mobile .patient-reports-mobile-table tbody td {
+    display: grid;
+    grid-template-columns: minmax(95px, 39%) minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    min-height: 43px;
+    padding: 9px 0;
+    border: 0;
+    border-bottom: 1px solid #eef3f3;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .patient-medical-reports-mobile .medical-upcoming-table tbody td::before,
+  .patient-medical-reports-mobile .medical-vaccination-table tbody td::before,
+  .patient-medical-reports-mobile .medical-prescription-table tbody td::before,
+  .patient-medical-reports-mobile .medical-records-table tbody td::before,
+  .patient-reports-mobile .patient-reports-mobile-table tbody td::before {
+    content: attr(data-label);
+    color: #627580;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .patient-medical-reports-mobile .medical-upcoming-table tbody td:last-child,
+  .patient-medical-reports-mobile .medical-vaccination-table tbody td:last-child,
+  .patient-medical-reports-mobile .medical-prescription-table tbody td:last-child,
+  .patient-medical-reports-mobile .medical-records-table tbody td:last-child,
+  .patient-reports-mobile .patient-reports-mobile-table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .patient-medical-reports-mobile td[colspan] {
+    display: block !important;
+    padding: 26px 0 !important;
+    text-align: center !important;
+  }
+
+  .patient-medical-reports-mobile td[colspan]::before {
+    content: none !important;
+  }
+
+  .patient-medical-reports-mobile .veterinary-actions,
+  .patient-reports-mobile .d-flex.align-items-center {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .patient-medical-report-modal .modal-dialog {
+    width: calc(100% - 24px);
+    max-width: none;
+    margin: 12px auto;
+  }
+
+  .patient-medical-report-modal .modal-body,
+  .patient-medical-report-modal .modal-header,
+  .patient-medical-report-modal .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .patient-medical-report-modal .modal-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .patient-medical-report-modal .modal-footer .btn {
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+  }
+}
+
+/* Doctor Clinic Hours: keep all scheduling controls usable on narrow screens. */
+@media (max-width: 767.98px) {
+  .veterinary-dashboard .container-fluid {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .veterinary-dashboard-header {
+    padding: 18px 16px !important;
+  }
+
+  .veterinary-dashboard-header .dashboard-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    font-size: clamp(22px, 7vw, 28px);
+    line-height: 1.2;
+  }
+
+  .veterinary-dashboard-header .dashboard-title i {
+    margin: 3px 0 0 !important;
+  }
+
+  .veterinary-dashboard-header .dashboard-subtitle {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .appointment-tabs .available-nav,
+  .available-tab .veterinary-day-nav {
+    display: flex !important;
+    flex-wrap: nowrap;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .appointment-tabs .available-nav .nav-item,
+  .available-tab .veterinary-day-nav li {
+    flex: 0 0 auto;
+  }
+
+  .appointment-tabs .available-nav .nav-link,
+  .available-tab .veterinary-day-nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    white-space: nowrap;
+  }
+
+  .veterinary-card .dashboard-card-body,
+  .veterinary-card .card-body {
+    padding: 16px 14px !important;
+  }
+
+  .veterinary-card-header h3 {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .veterinary-slot-box .slot-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px;
+  }
+
+  .veterinary-slot-box .slot-header h5,
+  .veterinary-slot-box .slot-header ul,
+  .veterinary-slot-box .slot-header li {
+    width: 100%;
+    margin: 0;
+  }
+
+  .veterinary-slot-box .slot-header ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  .veterinary-slot-box .slot-header .veterinary-action-btn.add-slot {
+    width: 100% !important;
+  }
+
+  .veterinary-time-slots li {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .veterinary-time-slots li .slot-type {
+    grid-column: 2;
+    width: fit-content;
+    margin: 0 !important;
+  }
+
+  .veterinary-time-slots li .btn {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin: 0 !important;
+    padding-left: 0;
+  }
+
+  .veterinary-form-wrap > .d-flex {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 12px !important;
+  }
+
+  .veterinary-form-wrap .veterinary-input,
+  .veterinary-form-wrap .veterinary-start-btn {
+    width: 100%;
+  }
+
+  .veterinary-form-wrap small {
+    display: block;
+  }
+
+  .veterinary-dashboard .modal-dialog {
+    width: auto;
+    max-width: none;
+    margin: 12px;
+  }
+
+  .veterinary-dashboard .modal-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .veterinary-dashboard .modal-footer .btn {
+    width: 100%;
+  }
+}
+
+/* Focused phone layouts for the Doctor and Pet Owner workspaces. */
+@media (max-width: 767.98px) {
+  .doctor-dashboard-mobile .dashboard-widget-box,
+  .patient-dashboard-mobile .dashboard-widget-box {
+    min-height: 118px;
+    padding: 17px !important;
+    border-radius: 16px;
+  }
+
+  .doctor-dashboard-mobile .dashboard-widget-box .dashboard-content-info h6,
+  .patient-dashboard-mobile .dashboard-widget-box .dashboard-content-info h6 {
+    margin-bottom: 4px;
+    font-size: 13px;
+  }
+
+  .doctor-dashboard-mobile .dashboard-widget-box .dashboard-content-info h4,
+  .patient-dashboard-mobile .dashboard-widget-box .dashboard-content-info h4 {
+    margin: 0 0 4px;
+    font-size: 26px;
+    line-height: 1.05;
+  }
+
+  .doctor-dashboard-mobile .dashboard-widget-box .dash-icon-box,
+  .patient-dashboard-mobile .dashboard-widget-box .dash-icon-box {
+    width: 52px;
+    height: 52px;
+    font-size: 23px;
+  }
+
+  .doctor-dashboard-mobile .dashboard-card-head,
+  .patient-dashboard-mobile .dashboard-card-head {
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px 16px;
+  }
+
+  .doctor-dashboard-mobile .dashboard-card-head h5,
+  .patient-dashboard-mobile .dashboard-card-head h5 {
+    font-size: 16px;
+    line-height: 1.35;
+  }
+
+  .doctor-dashboard-mobile .upcoming-patient-info {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .doctor-dashboard-mobile .upcoming-patient-info .date-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    text-align: left;
+  }
+
+  .doctor-dashboard-mobile .appointment-card-footer .btn-appointments {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .doctor-dashboard-mobile .appointment-card-footer .btn-appointments .btn {
+    width: 100%;
+    min-height: 42px;
+    margin: 0 !important;
+  }
+
+  .doctor-dashboard-mobile .quick-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .doctor-dashboard-mobile .quick-stats-grid .stat-item {
+    min-width: 0;
+    padding: 12px 8px;
+  }
+
+  .doctor-dashboard-mobile .quick-stats-grid .stat-number {
+    font-size: 21px;
+  }
+
+  .doctor-dashboard-mobile .quick-stats-grid .stat-label {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .doctor-dashboard-mobile .recent-patient-grid-boxes {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .doctor-dashboard-mobile .recent-patient-grid-boxes .recent-patient-grid {
+    min-width: 0;
+    margin: 0 !important;
+    padding: 12px 8px;
+    border: 1px solid #e5eef0;
+    border-radius: 14px;
+  }
+
+  .doctor-dashboard-mobile .product-licence-tab,
+  .patient-dashboard-mobile .patient-dash-tab .nav-tabs-bottom {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .doctor-dashboard-mobile .product-licence-tab .nav-item,
+  .patient-dashboard-mobile .patient-dash-tab .nav-item {
+    flex: 0 0 auto;
+  }
+
+  .doctor-dashboard-mobile .product-licence-tab .nav-link,
+  .patient-dashboard-mobile .patient-dash-tab .nav-link {
+    min-height: 40px;
+    padding: 9px 13px;
+    white-space: nowrap;
+  }
+
+  .patient-dashboard-mobile .book-appointment-head {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .patient-dashboard-mobile .book-appointment-head h3 {
+    max-width: calc(100% - 44px);
+    font-size: 19px;
+    line-height: 1.32;
+  }
+
+  .patient-dashboard-mobile .appointment-dash-card .doctor-fav-list {
+    align-items: flex-start;
+  }
+
+  .patient-dashboard-mobile .appointment-dash-card .date-time p {
+    margin-bottom: 8px;
+  }
+
+  .patient-dashboard-mobile .appointment-dash-card .card-btns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px !important;
+  }
+
+  .patient-dashboard-mobile .appointment-dash-card .card-btns .btn {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 8px;
+  }
+
+  .patient-dashboard-mobile .dashboard-card-body .col-12 > .d-flex.gap-2 {
+    display: grid !important;
+    grid-template-columns: 1fr;
+  }
+
+  .patient-dashboard-mobile .dashboard-card-body .col-12 > .d-flex.gap-2 .btn {
+    width: 100%;
+  }
+}
+
+/* Keep profile settings navigation compact, touch-friendly, and horizontally discoverable. */
+@media (max-width: 767.98px) {
+  .doctor-profile-settings-mobile .setting-tab,
+  .patient-profile-settings-mobile .veterinary-settings-tab {
+    overflow: hidden;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-nav-tabs,
+  .patient-profile-settings-mobile .veterinary-settings-tab .nav-tabs-bottom {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    flex-wrap: nowrap !important;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px 14px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-nav-tabs .nav-item,
+  .patient-profile-settings-mobile .veterinary-settings-tab .nav-item {
+    flex: 0 0 auto;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-nav-tabs .nav-link,
+  .patient-profile-settings-mobile .veterinary-settings-tab .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-nav-tabs .nav-link i,
+  .patient-profile-settings-mobile .veterinary-settings-tab .nav-link i {
+    margin-right: 7px !important;
+  }
+
+  .doctor-profile-settings-mobile .dashboard-card-body,
+  .patient-profile-settings-mobile .dashboard-card-body {
+    padding: 16px 14px;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-avatar-upload,
+  .patient-profile-settings-mobile .veterinary-avatar-upload {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-avatar-upload .upload-img,
+  .patient-profile-settings-mobile .veterinary-avatar-upload .upload-img {
+    width: 100%;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-avatar-upload .imgs-load,
+  .patient-profile-settings-mobile .veterinary-avatar-upload .imgs-load {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-avatar-upload .imgs-load input,
+  .patient-profile-settings-mobile .veterinary-avatar-upload .imgs-load .btn {
+    max-width: 100%;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-form-actions,
+  .patient-profile-settings-mobile .veterinary-form-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 9px;
+    text-align: stretch !important;
+  }
+
+  .doctor-profile-settings-mobile .veterinary-form-actions .btn,
+  .patient-profile-settings-mobile .veterinary-form-actions .btn {
+    width: 100%;
+    min-height: 44px;
+    margin: 0 !important;
+  }
+}
+
+/* Convert the dense health-record tables into readable cards on phones. */
+@media (max-width: 767.98px) {
+  .doctor-vaccinations-mobile .dash-search-input,
+  .weight-records-mobile .input-block {
+    width: 100%;
+  }
+
+  .doctor-vaccinations-mobile .dash-search-input .form-control,
+  .weight-records-mobile .input-block .form-select {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .weight-records-mobile .veterinary-dashboard-header > .d-flex {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .weight-records-mobile .veterinary-dashboard-header > .d-flex .btn {
+    margin: 0 !important;
+  }
+
+  .doctor-vaccinations-mobile .table-responsive,
+  .weight-records-mobile .table-responsive {
+    overflow: visible;
+  }
+
+  .doctor-vaccinations-mobile .vaccination-mobile-table,
+  .doctor-vaccinations-mobile .vaccination-mobile-table tbody,
+  .doctor-vaccinations-mobile .vaccination-mobile-table tr,
+  .doctor-vaccinations-mobile .vaccination-mobile-table td,
+  .weight-records-mobile .weight-records-mobile-table,
+  .weight-records-mobile .weight-records-mobile-table tbody,
+  .weight-records-mobile .weight-records-mobile-table tr,
+  .weight-records-mobile .weight-records-mobile-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .doctor-vaccinations-mobile .vaccination-mobile-table thead,
+  .weight-records-mobile .weight-records-mobile-table thead {
+    display: none;
+  }
+
+  .doctor-vaccinations-mobile .vaccination-mobile-table tbody tr,
+  .weight-records-mobile .weight-records-mobile-table tbody tr {
+    margin: 0 0 12px;
+    padding: 6px 13px;
+    border: 1px solid #deebeb;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(17, 70, 76, 0.06);
+  }
+
+  .doctor-vaccinations-mobile .vaccination-mobile-table tbody td,
+  .weight-records-mobile .weight-records-mobile-table tbody td {
+    display: grid;
+    grid-template-columns: minmax(96px, 40%) minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    min-height: 43px;
+    padding: 9px 0;
+    border: 0;
+    border-bottom: 1px solid #eef3f3;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  .doctor-vaccinations-mobile .vaccination-mobile-table tbody td::before,
+  .weight-records-mobile .weight-records-mobile-table tbody td::before {
+    content: attr(data-label);
+    color: #627580;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  .doctor-vaccinations-mobile .vaccination-mobile-table tbody td:last-child,
+  .weight-records-mobile .weight-records-mobile-table tbody td:last-child {
+    border-bottom: 0;
+  }
+
+  .doctor-vaccinations-mobile .vaccination-mobile-table tbody td[colspan],
+  .weight-records-mobile .weight-records-mobile-table tbody td[colspan] {
+    display: block;
+    min-height: 0;
+    padding: 26px 0;
+    text-align: center;
+  }
+
+  .doctor-vaccinations-mobile .vaccination-mobile-table tbody td[colspan]::before,
+  .weight-records-mobile .weight-records-mobile-table tbody td[colspan]::before {
+    content: none;
+  }
+
+  .doctor-vaccinations-mobile .vaccination-mobile-table .veterinary-actions {
+    justify-content: flex-end;
+  }
+
+  .weight-records-mobile .veterinary-pagination ul,
+  .doctor-vaccinations-mobile .veterinary-pagination ul {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+  }
+}
+
+/* Patient orders: filters and order summaries should never compete for one row. */
+@media (max-width: 767.98px) {
+  .patient-order-history-mobile .container {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .patient-order-history-mobile .dashboard-header > .d-flex {
+    align-items: flex-start !important;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .patient-order-history-mobile .dashboard-header > .d-flex .btn {
+    margin: 0 !important;
+  }
+
+  .patient-order-history-mobile .order-history-filter-bar {
+    align-items: stretch !important;
+    gap: 13px;
+  }
+
+  .patient-order-history-mobile .order-filter-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .patient-order-history-mobile .order-filter-tabs .btn {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 8px 13px;
+    white-space: nowrap;
+  }
+
+  .patient-order-history-mobile .order-history-filter-bar > .btn {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .patient-order-history-mobile .order-item {
+    padding: 0 0 20px !important;
+  }
+
+  .patient-order-history-mobile .order-history-summary {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .patient-order-history-mobile .order-history-summary .text-end {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 7px 12px;
+    width: 100%;
+    text-align: left !important;
+  }
+
+  .patient-order-history-mobile .order-history-summary .text-end h5 {
+    grid-column: 1 / -1;
+    margin: 2px 0 0 !important;
+  }
+
+  .patient-order-history-mobile .order-items li {
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+
+  .patient-order-history-mobile .order-items li > div {
+    min-width: 0;
+  }
+
+  .patient-order-history-mobile .order-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .patient-order-history-mobile .order-actions .btn {
+    width: 100%;
+    min-height: 42px;
+    margin: 0 !important;
+  }
+}
+

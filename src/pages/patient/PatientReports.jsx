@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 const PatientReports = () => {
   return (
-    <div className="content doctor-content">
+    <div className="content doctor-content patient-reports-mobile">
       <div className="container">
         <div className="row">
           <div className="col-lg-4 col-xl-3 theiaStickySidebar">
@@ -43,7 +43,7 @@ const PatientReports = () => {
             <div className="card">
               <div className="card-body">
                 <div className="table-responsive">
-                  <table className="table table-hover table-center mb-0">
+                  <table className="table table-hover table-center mb-0 patient-reports-mobile-table">
                     <thead>
                       <tr>
                         <th>Report Name</th>
@@ -55,13 +55,13 @@ const PatientReports = () => {
                     </thead>
                     <tbody>
                       <tr>
-                        <td>
+                        <td data-label="Report">
                           <a href="javascript:void(0);">Blood Test Report</a>
                         </td>
-                        <td>15 Jan 2024</td>
-                        <td>Dr. John Doe</td>
-                        <td><span className="badge badge-success-bg">Lab Report</span></td>
-                        <td>
+                        <td data-label="Date">15 Jan 2024</td>
+                        <td data-label="Doctor">Dr. John Doe</td>
+                        <td data-label="Type"><span className="badge badge-success-bg">Lab Report</span></td>
+                        <td data-label="Actions">
                           <div className="d-flex align-items-center">
                             <a href="javascript:void(0);" className="btn btn-sm bg-info-light me-2">
                               <i className="isax isax-eye"></i> View
@@ -73,13 +73,13 @@ const PatientReports = () => {
                         </td>
                       </tr>
                       <tr>
-                        <td>
+                        <td data-label="Report">
                           <a href="javascript:void(0);">X-Ray Report</a>
                         </td>
-                        <td>10 Jan 2024</td>
-                        <td>Dr. Sarah Smith</td>
-                        <td><span className="badge badge-warning-bg">Imaging</span></td>
-                        <td>
+                        <td data-label="Date">10 Jan 2024</td>
+                        <td data-label="Doctor">Dr. Sarah Smith</td>
+                        <td data-label="Type"><span className="badge badge-warning-bg">Imaging</span></td>
+                        <td data-label="Actions">
                           <div className="d-flex align-items-center">
                             <a href="javascript:void(0);" className="btn btn-sm bg-info-light me-2">
                               <i className="isax isax-eye"></i> View
@@ -91,13 +91,13 @@ const PatientReports = () => {
                         </td>
                       </tr>
                       <tr>
-                        <td>
+                        <td data-label="Report">
                           <a href="javascript:void(0);">ECG Report</a>
                         </td>
-                        <td>05 Jan 2024</td>
-                        <td>Dr. Michael Brown</td>
-                        <td><span className="badge badge-success-bg">Lab Report</span></td>
-                        <td>
+                        <td data-label="Date">05 Jan 2024</td>
+                        <td data-label="Doctor">Dr. Michael Brown</td>
+                        <td data-label="Type"><span className="badge badge-success-bg">Lab Report</span></td>
+                        <td data-label="Actions">
                           <div className="d-flex align-items-center">
                             <a href="javascript:void(0);" className="btn btn-sm bg-info-light me-2">
                               <i className="isax isax-eye"></i> View

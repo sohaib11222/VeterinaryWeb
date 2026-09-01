@@ -264,7 +264,7 @@ const Header = () => {
                         <div className="btn log-register">
                           <Link to="/login" className="me-1">
                             <span><i className="feather-user"></i></span> Sign In
-                          </Link> / 
+                          </Link> /
                           <Link to="/register" className="ms-1">Sign Up</Link>
                         </div>
                       </li>
@@ -407,102 +407,109 @@ const Header = () => {
 
                 {/* Doctors Menu - only for veterinarians (or public when not logged in) */}
                 {showDoctorsNav && (
-                <li className={`has-submenu ${isActive('/doctor') || isActive('/appointments') ? 'active' : ''}`}>
-                  <a
-                    href="javascript:void(0);"
-                    onClick={toggleMobileSubmenu('doctors')}
-                    aria-expanded={openMobileSubmenu === 'doctors'}
-                  >
-                    Doctors <i className="fas fa-chevron-down"></i>
-                  </a>
-                  <ul
-                    className="submenu"
-                    style={{ display: openMobileSubmenu === 'doctors' ? 'block' : undefined }}
-                  >
-                    {role === ROLES.VETERINARIAN && (
-                      <>
-                        <li><Link to="/doctor/dashboard">Doctor Dashboard</Link></li>
-                        <li><Link to="/appointments">Appointments</Link></li>
-                        <li><Link to="/available-timings">Available Timing</Link></li>
-                        <li><Link to="/my-patients">Patients List</Link></li>
-                        <li><Link to="/chat-doctor">Chat</Link></li>
-                        <li><Link to="/invoices">Invoices</Link></li>
-                        <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
-                        <li><Link to="/reviews">Reviews</Link></li>
-                      </>
-                    )}
-                    {!user && (
-                      <>
-                        <li><Link to="/doctor/dashboard">Doctor Dashboard</Link></li>
-                        <li><Link to="/appointments">Appointments</Link></li>
-                        <li><Link to="/available-timings">Available Timing</Link></li>
-                        <li><Link to="/my-patients">Patients List</Link></li>
-                        <li><Link to="/chat-doctor">Chat</Link></li>
-                        <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
-                        <li><Link to="/reviews">Reviews</Link></li>
-                        <li><Link to="/doctor-register">Doctor Register</Link></li>
-                      </>
-                    )}
-                  </ul>
-                </li>
+                  <li className={`has-submenu ${isActive('/doctor') || isActive('/appointments') ? 'active' : ''}`}>
+                    <a
+                      href="javascript:void(0);"
+                      onClick={toggleMobileSubmenu('doctors')}
+                      aria-expanded={openMobileSubmenu === 'doctors'}
+                    >
+                      Doctors <i className="fas fa-chevron-down"></i>
+                    </a>
+                    <ul
+                      className="submenu"
+                      style={{ display: openMobileSubmenu === 'doctors' ? 'block' : undefined }}
+                    >
+                      {role === ROLES.VETERINARIAN && (
+                        <>
+                          <li><Link to="/doctor/dashboard">Doctor Dashboard</Link></li>
+                          <li><Link to="/appointments">Appointments</Link></li>
+                          <li><Link to="/available-timings">Available Timing</Link></li>
+                          <li><Link to="/my-patients">Patients List</Link></li>
+                          <li><Link to="/chat-doctor">Chat</Link></li>
+                          <li><Link to="/invoices">Invoices</Link></li>
+                          <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
+                          <li><Link to="/reviews">Reviews</Link></li>
+                        </>
+                      )}
+                      {!user && (
+                        <>
+                          <li><Link to="/doctor/dashboard">Doctor Dashboard</Link></li>
+                          <li><Link to="/appointments">Appointments</Link></li>
+                          <li><Link to="/available-timings">Available Timing</Link></li>
+                          <li><Link to="/my-patients">Patients List</Link></li>
+                          <li><Link to="/chat-doctor">Chat</Link></li>
+                          <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
+                          <li><Link to="/reviews">Reviews</Link></li>
+                          <li><Link to="/doctor-register">Doctor Register</Link></li>
+                        </>
+                      )}
+                    </ul>
+                  </li>
                 )}
 
                 {/* Patients Menu - only for pet owners (or public when not logged in) */}
                 {showPatientsNav && (
-                <li className={`has-submenu ${isActive('/patient') || isActive('/search') || isActive('/booking') ? 'active' : ''}`}>
-                  <a
-                    href="javascript:void(0);"
-                    onClick={toggleMobileSubmenu('patients')}
-                    aria-expanded={openMobileSubmenu === 'patients'}
-                  >
-                    Patients <i className="fas fa-chevron-down"></i>
-                  </a>
-                  <ul
-                    className="submenu"
-                    style={{ display: openMobileSubmenu === 'patients' ? 'block' : undefined }}
-                  >
-                    <li><Link to="/patient/dashboard">Patient Dashboard</Link></li>
-                  
-                    <li>
-                      <Link to="/search">Search Doctor</Link>
-                      {/* <ul className="submenu inner-submenu">
+                  <li className={`has-submenu ${isActive('/patient') || isActive('/search') || isActive('/booking') ? 'active' : ''}`}>
+                    <a
+                      href="javascript:void(0);"
+                      onClick={toggleMobileSubmenu('patients')}
+                      aria-expanded={openMobileSubmenu === 'patients'}
+                    >
+                      Patients <i className="fas fa-chevron-down"></i>
+                    </a>
+                    <ul
+                      className="submenu"
+                      style={{ display: openMobileSubmenu === 'patients' ? 'block' : undefined }}
+                    >
+                      <li><Link to="/patient/dashboard">Patient Dashboard</Link></li>
+
+                      <li>
+                        <Link to="/search">Search Doctor</Link>
+                        {/* <ul className="submenu inner-submenu">
                         <li><Link to="/search">Search Doctor 1</Link></li>
                         <li><Link to="/search-2">Search Doctor 2</Link></li>
                       </ul> */}
-                    </li>
-                  
-                   
-                    {/* <li><Link to="/checkout">Checkout</Link></li>
+                      </li>
+
+
+                      {/* <li><Link to="/checkout">Checkout</Link></li>
                     <li><Link to="/booking-success">Booking Success</Link></li> */}
-                    <li><Link to="/favourites">Favourites</Link></li>
-                    <li><Link to="/chat">Chat</Link></li>
-                    <li><Link to="/profile-settings">Profile Settings</Link></li>
-                    <li><Link to="/change-password">Change Password</Link></li>
-                  </ul>
-                </li>
+                      <li><Link to="/favourites">Favourites</Link></li>
+                      <li><Link to="/chat">Chat</Link></li>
+                      <li><Link to="/profile-settings">Profile Settings</Link></li>
+                      <li><Link to="/change-password">Change Password</Link></li>
+                    </ul>
+                  </li>
                 )}
 
                 {/* Pharmacy Menu - pet owners, pet store, admin (or public when not logged in) */}
                 {showPharmacyNav && (
-                <li className={`has-submenu ${isActive('/pharmacy') || isActive('/product') || isActive('/cart') ? 'active' : ''}`}>
-                  <a
-                    href="javascript:void(0);"
-                    onClick={toggleMobileSubmenu('pharmacy')}
-                    aria-expanded={openMobileSubmenu === 'pharmacy'}
-                  >
-                    Pharmacy <i className="fas fa-chevron-down"></i>
-                  </a>
-                  <ul
-                    className="submenu"
-                    style={{ display: openMobileSubmenu === 'pharmacy' ? 'block' : undefined }}
-                  >
-                   
-                    <li><Link to="/pharmacy-search">Pharmacies</Link></li>
-                    <li><Link to="/product-all">Products</Link></li>
-                    <li><Link to="/cart">Cart</Link></li>
-                  
-                  </ul>
-                </li>
+                  <li className={`has-submenu ${isActive('/pharmacy') || isActive('/product') || isActive('/cart') ? 'active' : ''}`}>
+                    <a
+                      href="javascript:void(0);"
+                      onClick={toggleMobileSubmenu('pharmacy')}
+                      aria-expanded={openMobileSubmenu === 'pharmacy'}
+                    >
+                      Pharmacy <i className="fas fa-chevron-down"></i>
+                    </a>
+                    <ul
+                      className="submenu"
+                      style={{ display: openMobileSubmenu === 'pharmacy' ? 'block' : undefined }}
+                    >
+
+                      <li><Link to="/pharmacy-search">Pharmacies</Link></li>
+                      <li><Link to="/product-all">Products</Link></li>
+                      <li><Link to="/cart">Cart</Link></li>
+                      {(role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && (
+                        <li>
+                          <Link to="/pharmacy-admin/dashboard">
+                            {role === ROLES.PARAPHARMACY ? 'Parapharmacy Dashboard' : 'Pharmacy Dashboard'}
+                          </Link>
+                        </li>
+                      )}
+
+                    </ul>
+                  </li>
                 )}
 
                 {/* About Us */}

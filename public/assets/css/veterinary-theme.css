@@ -3,34 +3,52 @@
 /* Veterinary Color Palette */
 :root {
   /* Primary Colors - Pet/Veterinary Theme */
-  --vet-primary: #4A90E2;        /* Friendly Blue */
-  --vet-primary-dark: #357ABD;     /* Darker Blue */
-  --vet-primary-light: #E8F4FD;    /* Light Blue */
-  
+  --vet-primary: #4A90E2;
+  /* Friendly Blue */
+  --vet-primary-dark: #357ABD;
+  /* Darker Blue */
+  --vet-primary-light: #E8F4FD;
+  /* Light Blue */
+
   /* Secondary Colors */
-  --vet-secondary: #50C878;        /* Pet Green */
-  --vet-secondary-dark: #3FA65F;   /* Darker Green */
-  --vet-secondary-light: #E8F5EE;  /* Light Green */
-  
+  --vet-secondary: #50C878;
+  /* Pet Green */
+  --vet-secondary-dark: #3FA65F;
+  /* Darker Green */
+  --vet-secondary-light: #E8F5EE;
+  /* Light Green */
+
   /* Accent Colors */
-  --vet-accent: #FF8C42;           /* Warm Orange */
-  --vet-accent-dark: #E67A22;      /* Darker Orange */
-  --vet-accent-light: #FFF4EC;     /* Light Orange */
-  
+  --vet-accent: #FF8C42;
+  /* Warm Orange */
+  --vet-accent-dark: #E67A22;
+  /* Darker Orange */
+  --vet-accent-light: #FFF4EC;
+  /* Light Orange */
+
   /* Neutral Colors */
-  --vet-purple: #8B7FD6;          /* Soft Purple */
-  --vet-pink: #FFB6C1;             /* Soft Pink */
-  --vet-teal: #20B2AA;             /* Teal */
-  
+  --vet-purple: #8B7FD6;
+  /* Soft Purple */
+  --vet-pink: #FFB6C1;
+  /* Soft Pink */
+  --vet-teal: #20B2AA;
+  /* Teal */
+
   /* Background Colors */
-  --vet-bg-primary: #F8FAFB;       /* Light Background */
-  --vet-bg-secondary: #FFFFFF;     /* White Background */
-  --vet-bg-tertiary: #F0F7FF;      /* Very Light Blue */
-  
+  --vet-bg-primary: #F8FAFB;
+  /* Light Background */
+  --vet-bg-secondary: #FFFFFF;
+  /* White Background */
+  --vet-bg-tertiary: #F0F7FF;
+  /* Very Light Blue */
+
   /* Text Colors */
-  --vet-text-primary: #2C3E50;     /* Dark Text */
-  --vet-text-secondary: #6C757D;   /* Secondary Text */
-  --vet-text-light: #8492A6;       /* Light Text */
+  --vet-text-primary: #2C3E50;
+  /* Dark Text */
+  --vet-text-secondary: #6C757D;
+  /* Secondary Text */
+  --vet-text-light: #8492A6;
+  /* Light Text */
 }
 
 /* Dashboard Theme Overrides */
@@ -243,15 +261,18 @@
 
 /* Veterinary Icons - Replace medical icons with pet-friendly ones */
 .dashboard-widget-box:nth-child(1) .dash-icon-box i::before {
-  content: "🐕"; /* Dog icon for patients */
+  content: "🐕";
+  /* Dog icon for patients */
 }
 
 .dashboard-widget-box:nth-child(2) .dash-icon-box i::before {
-  content: "📅"; /* Calendar for today's patients */
+  content: "📅";
+  /* Calendar for today's patients */
 }
 
 .dashboard-widget-box:nth-child(3) .dash-icon-box i::before {
-  content: "⏰"; /* Clock for appointments */
+  content: "⏰";
+  /* Clock for appointments */
 }
 
 /* Typography Updates */
@@ -431,13 +452,13 @@
   .dashboard-widget-box {
     margin-bottom: 1rem;
   }
-  
+
   .dashboard-widget-icon .dash-icon-box {
     width: 50px;
     height: 50px;
     font-size: 1.25rem;
   }
-  
+
   .dashboard-content-info h4 {
     font-size: 1.5rem;
   }
@@ -461,8 +482,7 @@
 }
 
 @media (max-width: 992px) {
-  .recent-patient-grid-boxes {
-  }
+  .recent-patient-grid-boxes {}
 }
 
 /* Animation and Transitions */
@@ -476,6 +496,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -546,7 +567,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
   border-radius: 20px;
 }
 
@@ -774,9 +795,11 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }
+
   100% {
     transform: scale(1);
   }
@@ -826,26 +849,26 @@
     padding: 1rem;
     margin: -1rem;
   }
-  
+
   .veterinary-tab {
     min-width: auto;
     padding: 0.75rem 1rem;
     border-radius: 8px;
     justify-content: flex-start;
   }
-  
+
   .veterinary-tab::before {
     display: none;
   }
-  
+
   .tab-text {
     font-size: 0.875rem;
   }
-  
+
   .veterinary-tab-badge {
     margin-left: auto;
   }
-  
+
   .filter-head {
     padding: 1rem;
     border-left: none;
@@ -859,13 +882,13 @@
     padding: 1rem 1rem 0;
     margin: -1rem -1rem 0;
   }
-  
+
   .veterinary-tab {
     min-width: 120px;
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
   }
-  
+
   .tab-text {
     font-size: 0.85rem;
   }
@@ -911,13 +934,20 @@
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
   animation: float 6s ease-in-out infinite;
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 .veterinary-profile-widget .booking-doc-img {
@@ -929,14 +959,14 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  border: 4px solid rgba(255,255,255,0.3);
+  border: 4px solid rgba(255, 255, 255, 0.3);
   object-fit: cover;
   transition: all 0.3s ease;
 }
 
 .veterinary-profile-widget .booking-doc-img:hover img {
   transform: scale(1.05);
-  border-color: rgba(255,255,255,0.5);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .profile-badge {
@@ -969,24 +999,24 @@
 }
 
 .veterinary-profile-widget .profile-det-info h3 a:hover {
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .veterinary-profile-widget .patient-details h5 {
-  color: rgba(255,255,255,0.9);
+  color: rgba(255, 255, 255, 0.9);
   font-size: 0.85rem;
   font-weight: 400;
   margin-bottom: 0.5rem;
 }
 
 .veterinary-role-badge {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.2);
   color: white;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 500;
-  border: 1px solid rgba(255,255,255,0.3);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .veterinary-role-badge i {
@@ -1174,24 +1204,24 @@
     z-index: 1000;
     transition: left 0.3s ease;
   }
-  
+
   .veterinary-sidebar.active {
     left: 0;
   }
-  
+
   .veterinary-profile-widget {
     padding: 1.5rem 1rem;
   }
-  
+
   .veterinary-profile-widget .booking-doc-img img {
     width: 60px;
     height: 60px;
   }
-  
+
   .veterinary-dashboard-menu .dashboard-menu ul li a {
     padding: 0.6rem 1rem;
   }
-  
+
   .veterinary-dashboard-menu .dashboard-menu ul li a span {
     font-size: 0.85rem;
   }
@@ -1201,16 +1231,16 @@
   .veterinary-sidebar {
     width: 220px;
   }
-  
+
   .veterinary-profile-widget {
     padding: 1.5rem 1rem;
   }
-  
+
   .veterinary-profile-widget .booking-doc-img img {
     width: 70px;
     height: 70px;
   }
-  
+
   .veterinary-dashboard-menu .dashboard-menu ul li a {
     padding: 0.7rem 1rem;
   }
@@ -1393,21 +1423,21 @@
     gap: 1rem;
     align-items: flex-start;
   }
-  
+
   .veterinary-appointment .patinet-information {
     min-width: 100%;
   }
-  
+
   .veterinary-appointment .appointment-action ul {
     flex-direction: row;
     gap: 0.5rem;
   }
-  
+
   .veterinary-tab {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }
-  
+
   .veterinary-badge {
     margin-left: 0.25rem;
   }
@@ -1417,7 +1447,7 @@
   .veterinary-appointment ul {
     gap: 1rem;
   }
-  
+
   .veterinary-appointment .patinet-information {
     min-width: 200px;
   }
@@ -1460,14 +1490,14 @@
   min-height: 76px;
 }
 
-.header .main-nav > li > a {
+.header .main-nav>li>a {
   color: var(--vet-text-primary);
   font-weight: 600;
   letter-spacing: 0.2px;
 }
 
-.header .main-nav > li > a:hover,
-.header .main-nav > li.active > a {
+.header .main-nav>li>a:hover,
+.header .main-nav>li.active>a {
   color: var(--vet-primary);
 }
 
@@ -1641,9 +1671,17 @@
 }
 
 @keyframes pulse-check {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .veterinary-reject-btn {
@@ -1698,9 +1736,17 @@
 }
 
 @keyframes pulse-reject {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Request Action Container */
@@ -2026,9 +2072,17 @@
 }
 
 @keyframes pulse-add {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .veterinary-slot-box .delete-slot {
@@ -2083,9 +2137,17 @@
 }
 
 @keyframes pulse-delete {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* Enhanced Time Slots */
@@ -2148,11 +2210,25 @@
 }
 
 @keyframes pulse-clock {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(5deg); }
-  50% { transform: rotate(0deg); }
-  75% { transform: rotate(-5deg); }
-  100% { transform: rotate(0deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(5deg);
+  }
+
+  50% {
+    transform: rotate(0deg);
+  }
+
+  75% {
+    transform: rotate(-5deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
 }
 
 .veterinary-slot-box .time-slots li .slot-type {
@@ -4085,27 +4161,27 @@
     text-align: center;
     padding: 1rem;
   }
-  
+
   .veterinary-education-accordions .education-title {
     font-size: 0.9rem;
   }
-  
+
   .veterinary-education-accordions .content-collapse {
     padding: 1rem;
   }
-  
+
   .veterinary-education-accordions .add-service-info {
     padding: 1rem;
   }
-  
+
   .veterinary-education-accordions .form-wrap {
     margin-bottom: 1rem;
   }
-  
+
   .veterinary-education-accordions .col-form-label {
     font-size: 0.85rem;
   }
-  
+
   .veterinary-education-accordions .veterinary-input {
     font-size: 0.85rem;
     padding: 0.6rem 0.8rem;
@@ -4116,15 +4192,15 @@
   .veterinary-education-accordions .veterinary-accordion-wrap {
     padding: 0.875rem 1.25rem;
   }
-  
+
   .veterinary-education-accordions .content-collapse {
     padding: 1.5rem;
   }
-  
+
   .veterinary-education-accordions .add-service-info {
     padding: 1.25rem;
   }
-  
+
   .veterinary-education-accordions .form-wrap {
     margin-bottom: 1.25rem;
   }
@@ -4285,9 +4361,17 @@
 }
 
 @keyframes pulse-green {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Veterinary Chat Items */
@@ -4529,9 +4613,17 @@
 }
 
 @keyframes audio-wave {
-  0% { width: 0%; }
-  50% { width: 100%; }
-  100% { width: 0%; }
+  0% {
+    width: 0%;
+  }
+
+  50% {
+    width: 100%;
+  }
+
+  100% {
+    width: 0%;
+  }
 }
 
 .veterinary-missed-call {
@@ -4745,16 +4837,16 @@
     flex-direction: column;
     height: auto;
   }
-  
+
   .veterinary-chat-sidebar {
     width: 100%;
     max-height: 400px;
   }
-  
+
   .veterinary-chat-details {
     display: none;
   }
-  
+
   .veterinary-chat-details.show {
     display: flex;
   }
@@ -4764,97 +4856,97 @@
   .veterinary-chat-container {
     gap: 1rem;
   }
-  
+
   .veterinary-chat-sidebar {
     width: 100%;
     max-height: 300px;
   }
-  
+
   .veterinary-chat-header {
     padding: 0.75rem 1rem;
   }
-  
+
   .veterinary-chat-header h4 {
     font-size: 1.1rem;
     margin-bottom: 0.5rem;
   }
-  
+
   .veterinary-chat-search .veterinary-input {
     padding: 0.5rem 0.75rem 0.5rem 2rem;
     font-size: 0.8rem;
   }
-  
+
   .veterinary-chat-content {
     padding: 0 0.5rem;
   }
-  
+
   .veterinary-online-section,
   .veterinary-pinned-section,
   .veterinary-recent-section {
     padding: 0.75rem 0;
   }
-  
+
   .veterinary-section-header h6 {
     font-size: 0.8rem;
     margin-bottom: 0.5rem;
   }
-  
+
   .veterinary-online-contacts {
     gap: 0.5rem;
   }
-  
+
   .veterinary-online-contact {
     width: 40px;
     height: 40px;
   }
-  
+
   .veterinary-chat-item {
     padding: 0.5rem;
     margin-bottom: 0.25rem;
   }
-  
+
   .veterinary-chat-avatar {
     width: 36px;
     height: 36px;
     margin-right: 0.5rem;
   }
-  
+
   .veterinary-chat-name {
     font-size: 0.85rem;
   }
-  
+
   .veterinary-chat-time {
     font-size: 0.7rem;
   }
-  
+
   .veterinary-chat-message {
     margin-bottom: 1rem;
   }
-  
+
   .veterinary-message-bubble {
     padding: 0.75rem 1rem;
     font-size: 0.8rem;
   }
-  
+
   .veterinary-chat-messages {
     padding: 1rem 1rem;
     padding-bottom: 1.5rem;
   }
-  
+
   .veterinary-chat-input-area {
     padding: 0.75rem 1rem;
   }
-  
+
   .veterinary-chat-actions button {
     width: 32px;
     height: 32px;
   }
-  
+
   .veterinary-chat-input {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
   }
-  
+
   .veterinary-send-button {
     width: 36px;
     height: 36px;
@@ -4865,97 +4957,97 @@
   .veterinary-chat-container {
     gap: 0.5rem;
   }
-  
+
   .veterinary-chat-sidebar {
     width: 100%;
     max-height: 250px;
   }
-  
+
   .veterinary-chat-header {
     padding: 0.5rem 0.75rem;
   }
-  
+
   .veterinary-chat-header h4 {
     font-size: 1rem;
     margin-bottom: 0.25rem;
   }
-  
+
   .veterinary-chat-search .veterinary-input {
     padding: 0.5rem 0.75rem 0.5rem 2rem;
     font-size: 0.8rem;
   }
-  
+
   .veterinary-chat-content {
     padding: 0 0.25rem;
   }
-  
+
   .veterinary-online-section,
   .veterinary-pinned-section,
   .veterinary-recent-section {
     padding: 0.5rem 0;
   }
-  
+
   .veterinary-section-header h6 {
     font-size: 0.75rem;
     margin-bottom: 0.25rem;
   }
-  
+
   .veterinary-online-contacts {
     gap: 0.25rem;
   }
-  
+
   .veterinary-online-contact {
     width: 35px;
     height: 35px;
   }
-  
+
   .veterinary-chat-item {
     padding: 0.5rem;
     margin-bottom: 0.25rem;
   }
-  
+
   .veterinary-chat-avatar {
     width: 32px;
     height: 32px;
     margin-right: 0.5rem;
   }
-  
+
   .veterinary-chat-name {
     font-size: 0.8rem;
   }
-  
+
   .veterinary-chat-time {
     font-size: 0.7rem;
   }
-  
+
   .veterinary-message {
     margin-bottom: 0.75rem;
   }
-  
+
   .veterinary-message-bubble {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
   }
-  
+
   .veterinary-chat-messages {
     padding: 0.75rem 0.75rem;
     padding-bottom: 1rem;
   }
-  
+
   .veterinary-chat-input-area {
     padding: 0.5rem 0.75rem;
   }
-  
+
   .veterinary-chat-actions button {
     width: 28px;
     height: 28px;
   }
-  
+
   .veterinary-chat-input {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
   }
-  
+
   .veterinary-send-button {
     width: 32px;
     height: 32px;

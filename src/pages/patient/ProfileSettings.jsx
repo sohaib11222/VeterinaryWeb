@@ -178,7 +178,7 @@ const ProfileSettings = () => {
   const profileImageUrl = getImageUrl(form.profileImage)
 
   return (
-    <div className="content veterinary-dashboard">
+    <div className="content veterinary-dashboard patient-profile-settings-mobile">
       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-3 col-xl-2 theiaStickySidebar">

@@ -151,7 +151,7 @@ const DoctorProfileSettings = () => {
   }
 
   return (
-    <div className="content veterinary-dashboard">
+    <div className="content veterinary-dashboard doctor-profile-settings-mobile">
       <div className="container-fluid">
         <div className="row">
           <div className="col-lg-3 col-xl-2 theiaStickySidebar">

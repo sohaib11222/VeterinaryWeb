@@ -88,7 +88,7 @@ const ProductAll = () => {
   return (
     <>
       <Breadcrumb title="Pharmacy" li1="Products" li2="All Products" />
-      <div className="content">
+      <div className="content pharmacy-products-mobile">
         <div className="container">
           <div className="row">
             <div className="col-md-5 col-lg-3 col-xl-3 theiaStickySidebar">
@@ -152,7 +152,7 @@ const ProductAll = () => {
               </div>
             </div>
 
-            <div className="col-md-7 col-lg-9 col-xl-9">
+            <div className="col-md-7 col-lg-9 col-xl-9 pharmacy-product-results">
               <div className="row align-items-center pb-3">
                 <div className="col-md-12">
                   <h3 className="title pharmacy-title">{sellerId ? 'Pharmacy Products' : 'All Products'}</h3>
@@ -177,7 +177,7 @@ const ProductAll = () => {
                 </div>
               ) : (
                 <>
-                  <div className="row">
+                  <div className="row pharmacy-products-grid">
                     {products.map((product) => {
                       const productId = product?._id || product?.id
                       const productPrice = typeof product?.discountPrice === 'number' && product.discountPrice > 0 ? product.discountPrice : product?.price
@@ -185,7 +185,7 @@ const ProductAll = () => {
                       const productImage = getImageUrl(product?.images?.[0]) || '/assets/img/products/product.jpg'
 
                       return (
-                        <div key={productId} className="col-sm-6 col-lg-3 product-custom mb-4">
+                        <div key={productId} className="col-6 col-lg-3 product-custom mb-4 pharmacy-product-tile">
                           <div className="profile-widget" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                             <div className="doc-img" style={{ height: '250px', overflow: 'hidden', position: 'relative' }}>
                               <Link to={`/product-description?id=${productId}`} tabIndex="-1" style={{ display: 'block', height: '100%' }}>

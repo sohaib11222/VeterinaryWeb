@@ -145,7 +145,7 @@ const PatientDashboard = () => {
   }, [])
 
   return (
-    <div className="content veterinary-dashboard">
+    <div className="content veterinary-dashboard patient-dashboard-mobile">
       <div className="container-fluid">
         <div className="row">
           {/* Sidebar is handled by DashboardLayout */}

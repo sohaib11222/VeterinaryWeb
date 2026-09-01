@@ -388,7 +388,7 @@ const PharmacyAdminProducts = () => {
   }
 
   return (
-    <div>
+    <div className="pharmacy-admin-products-mobile">
       <div className="page-header">
         <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
           <h3 className="page-title mb-0">My Products</h3>
@@ -462,7 +462,7 @@ const PharmacyAdminProducts = () => {
             <div className="alert alert-info mb-0">No products found.</div>
           ) : (
             <div className="table-responsive">
-              <table className="table table-hover mb-0">
+              <table className="table table-hover mb-0 pharmacy-admin-products-table">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -481,7 +481,7 @@ const PharmacyAdminProducts = () => {
                     const effectivePrice = hasDiscount ? p.discountPrice : p?.price
                     return (
                       <tr key={id}>
-                        <td>
+                        <td data-label="Product">
                           <div className="d-flex align-items-center" style={{ gap: 10 }}>
                             {imgSrc ? (
                               <img
@@ -504,7 +504,7 @@ const PharmacyAdminProducts = () => {
                             </div>
                           </div>
                         </td>
-                        <td>
+                        <td data-label="Price">
                           <div className="fw-semibold">
                             {typeof effectivePrice === 'number' ? effectivePrice.toFixed(2) : effectivePrice}
                           </div>
@@ -514,16 +514,16 @@ const PharmacyAdminProducts = () => {
                             </div>
                           )}
                         </td>
-                        <td>{p?.stock ?? 0}</td>
-                        <td>
+                        <td data-label="Stock">{p?.stock ?? 0}</td>
+                        <td data-label="Status">
                           {p?.isActive === false ? (
                             <span className="badge bg-secondary">Inactive</span>
                           ) : (
                             <span className="badge bg-success">Active</span>
                           )}
                         </td>
-                        <td>
-                          <div className="d-flex gap-2">
+                        <td data-label="Actions">
+                          <div className="d-flex gap-2 pharmacy-product-actions">
                             <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => startEdit(p)}>
                               Edit
                             </button>
@@ -551,7 +551,7 @@ const PharmacyAdminProducts = () => {
         <>
           <div className="modal-backdrop fade show" onClick={closeModal} style={{ zIndex: 1040 }}></div>
           <div
-            className="modal fade show"
+            className="modal fade show pharmacy-product-editor-modal"
             style={{ display: 'block', zIndex: 1050 }}
             tabIndex="-1"
             role="dialog"

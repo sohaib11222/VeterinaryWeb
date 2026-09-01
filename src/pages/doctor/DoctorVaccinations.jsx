@@ -139,7 +139,7 @@ const DoctorVaccinations = () => {
 
   return (
     <>
-      <div className="content veterinary-dashboard">
+      <div className="content veterinary-dashboard doctor-vaccinations-mobile">
         <div className="container-fluid">
           <div className="row mb-4">
             <div className="col-12">
@@ -181,7 +181,7 @@ const DoctorVaccinations = () => {
                   <div className="dashboard-card-body">
                     <h5 className="mb-2">Upcoming (Next 30 days)</h5>
                     <div className="table-responsive">
-                      <table className="table table-center mb-0 veterinary-table">
+                      <table className="table table-center mb-0 veterinary-table vaccination-mobile-table">
                         <thead>
                           <tr>
                             <th>Pet</th>
@@ -193,7 +193,7 @@ const DoctorVaccinations = () => {
                         <tbody>
                           {upcomingVaccinations.map((v) => (
                             <tr key={v._id || `${v.petId?._id}-${v.vaccinationType}-${v.nextDueDate}`}>
-                              <td>
+                              <td data-label="Pet">
                                 <span className="badge veterinary-badge">
                                   <img
                                     src={getImageUrl(v.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
@@ -203,9 +203,9 @@ const DoctorVaccinations = () => {
                                   {v.petId?.name || '—'}
                                 </span>
                               </td>
-                              <td>{v.vaccineId?.name || v.vaccinationType || '—'}</td>
-                              <td>{formatDate(v.nextDueDate)}</td>
-                              <td>{v.petOwnerId?.name || v.petOwnerId?.fullName || '—'}</td>
+                              <td data-label="Vaccine">{v.vaccineId?.name || v.vaccinationType || '—'}</td>
+                              <td data-label="Due">{formatDate(v.nextDueDate)}</td>
+                              <td data-label="Owner">{v.petOwnerId?.name || v.petOwnerId?.fullName || '—'}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -223,7 +223,7 @@ const DoctorVaccinations = () => {
                 <div className="dashboard-card-body">
                   <div className="custom-table veterinary-table">
                     <div className="table-responsive">
-                      <table className="table table-center mb-0 veterinary-table">
+                      <table className="table table-center mb-0 veterinary-table vaccination-mobile-table">
                         <thead>
                           <tr>
                             <th>ID</th>
@@ -248,12 +248,12 @@ const DoctorVaccinations = () => {
                           ) : (
                             filteredVaccinations.map((v) => (
                               <tr key={v._id}>
-                                <td>
+                                <td data-label="ID">
                                   <a className="link-primary" href="#" onClick={(e) => { e.preventDefault(); setViewVaccination(v) }}>
                                     #{String(v._id).slice(-6).toUpperCase()}
                                   </a>
                                 </td>
-                                <td>
+                                <td data-label="Pet">
                                   <span className="badge veterinary-badge">
                                     <img
                                       src={getImageUrl(v.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
@@ -263,18 +263,18 @@ const DoctorVaccinations = () => {
                                     {v.petId?.name || '—'}
                                   </span>
                                 </td>
-                                <td>{v.vaccineId?.name || v.vaccinationType || '—'}</td>
-                                <td>{formatDate(v.vaccinationDate)}</td>
-                                <td>{formatDate(v.nextDueDate)}</td>
-                                <td>{v.petOwnerId?.name || v.petOwnerId?.fullName || '—'}</td>
-                                <td>
+                                <td data-label="Vaccine">{v.vaccineId?.name || v.vaccinationType || '—'}</td>
+                                <td data-label="Date">{formatDate(v.vaccinationDate)}</td>
+                                <td data-label="Next due">{formatDate(v.nextDueDate)}</td>
+                                <td data-label="Owner">{v.petOwnerId?.name || v.petOwnerId?.fullName || '—'}</td>
+                                <td data-label="Certificate">
                                   {v.certificateUrl ? (
                                     <a href={getImageUrl(v.certificateUrl) || '#'} target="_blank" rel="noreferrer" className="link-primary">View</a>
                                   ) : (
                                     '—'
                                   )}
                                 </td>
-                                <td>
+                                <td data-label="Actions">
                                   <div className="action-item veterinary-actions">
                                     <a href="#" className="veterinary-action-btn" title="View" onClick={(e) => { e.preventDefault(); setViewVaccination(v) }}>
                                       <i className="fa-solid fa-eye"></i>

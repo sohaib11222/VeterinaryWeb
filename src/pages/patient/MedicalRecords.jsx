@@ -216,7 +216,7 @@ const MedicalRecords = () => {
 
   return (
     <>
-      <div className="content veterinary-dashboard">
+      <div className="content veterinary-dashboard patient-medical-reports-mobile">
         <div className="container-fluid">
           <div className="row">
             <div className="col-lg-3 col-xl-2 theiaStickySidebar">
@@ -244,7 +244,7 @@ const MedicalRecords = () => {
                     <div className="row align-items-center">
                       <div className="col-lg-6 mb-3 mb-lg-0">
                         <div className="appointment-tabs veterinary-tabs">
-                          <ul className="nav">
+                          <ul className="nav patient-medical-tabs">
                             <li>
                               <a href="#" className={`nav-link veterinary-tab ${activeTab === 'medical' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleTabChange('medical') }} data-bs-toggle="tab" data-bs-target="#medical">
                                 <i className="fa-solid fa-notes-medical me-2"></i>Medical Records
@@ -264,7 +264,7 @@ const MedicalRecords = () => {
                         </div>
                       </div>
                       <div className="col-lg-6">
-                        <div className="d-flex justify-content-lg-end align-items-center gap-2 flex-wrap">
+                        <div className="d-flex justify-content-lg-end align-items-center gap-2 flex-wrap patient-medical-controls">
                           <div className="input-block dash-search-input">
                             <input
                               type="text"
@@ -314,7 +314,7 @@ const MedicalRecords = () => {
                       <div className="mb-3">
                         <h5 className="mb-2">Upcoming (Next 30 days)</h5>
                         <div className="table-responsive">
-                          <table className="table table-center mb-0 veterinary-table">
+                          <table className="table table-center mb-0 veterinary-table medical-upcoming-table">
                             <thead>
                               <tr>
                                 <th>Pet</th>
@@ -326,7 +326,7 @@ const MedicalRecords = () => {
                             <tbody>
                               {upcomingVaccinations.map((v) => (
                                 <tr key={v._id || `${v.petId?._id}-${v.vaccinationType}-${v.nextDueDate}`}>
-                                  <td>
+                                  <td data-label="Pet">
                                     <span className="badge veterinary-badge">
                                       <img
                                         src={getImageUrl(v.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
@@ -336,9 +336,9 @@ const MedicalRecords = () => {
                                       {v.petId?.name || '—'}
                                     </span>
                                   </td>
-                                  <td>{v.vaccinationType || '—'}</td>
-                                  <td>{formatDate(v.nextDueDate)}</td>
-                                  <td>{v.veterinarianId?.name || '—'}</td>
+                                  <td data-label="Vaccine">{v.vaccinationType || '—'}</td>
+                                  <td data-label="Due">{formatDate(v.nextDueDate)}</td>
+                                  <td data-label="Veterinarian">{v.veterinarianId?.name || '—'}</td>
                                 </tr>
                               ))}
                             </tbody>
@@ -349,7 +349,7 @@ const MedicalRecords = () => {
 
                     <div className="custom-table veterinary-table">
                       <div className="table-responsive">
-                        <table className="table table-center mb-0 veterinary-table">
+                        <table className="table table-center mb-0 veterinary-table medical-vaccination-table">
                           <thead>
                             <tr>
                               <th>ID</th>
@@ -374,12 +374,12 @@ const MedicalRecords = () => {
                             ) : (
                               filteredVaccinations.map((v) => (
                                 <tr key={v._id}>
-                                  <td>
+                                  <td data-label="Record ID">
                                     <a className="link-primary" href="#" onClick={(e) => { e.preventDefault(); setViewVaccination(v) }}>
                                       #{String(v._id).slice(-6).toUpperCase()}
                                     </a>
                                   </td>
-                                  <td>
+                                  <td data-label="Pet">
                                     <span className="badge veterinary-badge">
                                       <img
                                         src={getImageUrl(v.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
@@ -389,18 +389,18 @@ const MedicalRecords = () => {
                                       {v.petId?.name || '—'}
                                     </span>
                                   </td>
-                                  <td>{v.vaccinationType || '—'}</td>
-                                  <td>{formatDate(v.vaccinationDate)}</td>
-                                  <td>{formatDate(v.nextDueDate)}</td>
-                                  <td>{v.veterinarianId?.name || '—'}</td>
-                                  <td>
+                                  <td data-label="Vaccine">{v.vaccinationType || '—'}</td>
+                                  <td data-label="Date">{formatDate(v.vaccinationDate)}</td>
+                                  <td data-label="Next due">{formatDate(v.nextDueDate)}</td>
+                                  <td data-label="Veterinarian">{v.veterinarianId?.name || '—'}</td>
+                                  <td data-label="Certificate">
                                     {v.certificateUrl ? (
                                       <a href={getImageUrl(v.certificateUrl) || '#'} target="_blank" rel="noreferrer" className="link-primary">View</a>
                                     ) : (
                                       '—'
                                     )}
                                   </td>
-                                  <td>
+                                  <td data-label="Actions">
                                     <div className="action-item veterinary-actions">
                                       <a href="#" className="veterinary-action-btn" title="View" onClick={(e) => { e.preventDefault(); setViewVaccination(v) }}>
                                         <i className="fa-solid fa-eye"></i>
@@ -446,7 +446,7 @@ const MedicalRecords = () => {
                   <div className="dashboard-card-body">
                     <div className="custom-table veterinary-table">
                       <div className="table-responsive">
-                        <table className="table table-center mb-0 veterinary-table">
+                        <table className="table table-center mb-0 veterinary-table medical-prescription-table">
                           <thead>
                             <tr>
                               <th>ID</th>
@@ -468,17 +468,17 @@ const MedicalRecords = () => {
                             ) : (
                               filteredPrescriptions.map((rx) => (
                                 <tr key={rx._id}>
-                                  <td>
+                                  <td data-label="Prescription ID">
                                     #{String(rx._id).slice(-6).toUpperCase()}
                                   </td>
-                                  <td>{formatDate(rx.issuedAt || rx.createdAt)}</td>
-                                  <td>
+                                  <td data-label="Issued">{formatDate(rx.issuedAt || rx.createdAt)}</td>
+                                  <td data-label="Pet">
                                     <span className="badge veterinary-badge">
                                       <i className="fa-solid fa-paw me-1"></i>{rx.petId?.name || '—'}
                                     </span>
                                   </td>
-                                  <td>{rx.veterinarianId?.fullName || rx.veterinarianId?.name || '—'}</td>
-                                  <td>
+                                  <td data-label="Veterinarian">{rx.veterinarianId?.fullName || rx.veterinarianId?.name || '—'}</td>
+                                  <td data-label="Actions">
                                     <div className="action-item veterinary-actions">
                                       <Link to={`/patient/prescription?appointmentId=${rx.appointmentId?._id || rx.appointmentId}`} className="veterinary-action-btn" title="View">
                                         <i className="fa-solid fa-eye"></i>
@@ -527,7 +527,7 @@ const MedicalRecords = () => {
                   <div className="dashboard-card-body">
                     <div className="custom-table veterinary-table">
                       <div className="table-responsive">
-                        <table className="table table-center mb-0 veterinary-table">
+                        <table className="table table-center mb-0 veterinary-table medical-records-table">
                           <thead>
                             <tr>
                               <th>ID</th>
@@ -551,21 +551,21 @@ const MedicalRecords = () => {
                             ) : (
                               filtered.map((record) => (
                                 <tr key={record._id}>
-                                  <td>
+                                  <td data-label="Record ID">
                                     <a className="link-primary" href="#" onClick={(e) => { e.preventDefault(); setViewRecord(record) }}>
                                       #{String(record._id).slice(-6).toUpperCase()}
                                     </a>
                                   </td>
-                                  <td>
+                                  <td data-label="Title">
                                     <a href="#" className="lab-icon veterinary-lab-icon" onClick={(e) => { e.preventDefault(); setViewRecord(record) }}>
                                       <i className="fa-solid fa-flask me-2"></i>{record.title}
                                     </a>
                                   </td>
-                                  <td>{record.recordType || 'GENERAL'}</td>
-                                  <td>{formatDate(record.uploadedDate)}</td>
-                                  <td>{record.petId?.name || '—'}</td>
-                                  <td><span className="veterinary-notes">{record.description || '—'}</span></td>
-                                  <td>
+                                  <td data-label="Type">{record.recordType || 'GENERAL'}</td>
+                                  <td data-label="Date">{formatDate(record.uploadedDate)}</td>
+                                  <td data-label="Pet">{record.petId?.name || '—'}</td>
+                                  <td data-label="Description"><span className="veterinary-notes">{record.description || '—'}</span></td>
+                                  <td data-label="Actions">
                                     <div className="action-item veterinary-actions">
                                       <a href="#" className="veterinary-action-btn" title="View" onClick={(e) => { e.preventDefault(); setViewRecord(record) }}>
                                         <i className="fa-solid fa-eye"></i>
@@ -660,7 +660,7 @@ const MedicalRecordModals = ({
       {showAddModal && (
         <>
           <div className="modal-backdrop fade show" style={{ zIndex: 1040 }} onClick={() => setShowAddModal(false)}></div>
-          <div className="modal fade show" style={{ display: 'block', zIndex: 1050 }}>
+          <div className="modal fade show patient-medical-report-modal" style={{ display: 'block', zIndex: 1050 }}>
             <div className="modal-dialog modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
               <div className="modal-content">
                 <div className="modal-header">
@@ -735,7 +735,7 @@ const MedicalRecordModals = ({
       {viewRecord && (
         <>
           <div className="modal-backdrop fade show" style={{ zIndex: 1040 }} onClick={() => setViewRecord(null)}></div>
-          <div className="modal fade show" style={{ display: 'block', zIndex: 1050 }}>
+          <div className="modal fade show patient-medical-report-modal" style={{ display: 'block', zIndex: 1050 }}>
             <div className="modal-dialog modal-dialog-centered modal-lg" onClick={(e) => e.stopPropagation()}>
               <div className="modal-content">
                 <div className="modal-header">
@@ -786,7 +786,7 @@ const VaccinationModals = ({
       {viewVaccination && (
         <>
           <div className="modal-backdrop fade show" style={{ zIndex: 1040 }} onClick={() => setViewVaccination(null)}></div>
-          <div className="modal fade show" style={{ display: 'block', zIndex: 1050 }}>
+          <div className="modal fade show patient-medical-report-modal" style={{ display: 'block', zIndex: 1050 }}>
             <div className="modal-dialog modal-dialog-centered modal-lg" onClick={(e) => e.stopPropagation()}>
               <div className="modal-content">
                 <div className="modal-header">

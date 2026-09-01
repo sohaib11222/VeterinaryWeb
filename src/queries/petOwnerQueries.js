@@ -25,3 +25,10 @@ export const usePetOwnerPayments = (params = {}) =>
     queryFn: () => api.get(API_ROUTES.PET_OWNER.PAYMENTS, { params }),
   })
 
+export const usePetOwnerInvoice = (transactionId) =>
+  useQuery({
+    queryKey: ['petOwner', 'invoice', transactionId],
+    queryFn: () => api.get(API_ROUTES.PET_OWNER.INVOICE(transactionId)),
+    enabled: Boolean(transactionId),
+  })
+

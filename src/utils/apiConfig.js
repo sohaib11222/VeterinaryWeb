@@ -74,6 +74,8 @@ export const API_ROUTES = {
     DASHBOARD: '/pet-owners/dashboard',
     APPOINTMENTS: '/pet-owners/appointments',
     PAYMENTS: '/pet-owners/payments',
+    INVOICE: (transactionId) => `/pet-owners/payments/${transactionId}`,
+    INVOICE_PDF: (transactionId) => `/pet-owners/payments/${transactionId}/pdf`,
   },
 
   // ==================== Veterinarians ====================

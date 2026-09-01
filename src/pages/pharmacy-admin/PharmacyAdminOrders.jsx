@@ -90,14 +90,14 @@ const PharmacyAdminOrders = () => {
   }
 
   return (
-    <div>
+    <div className="pharmacy-admin-orders-mobile">
       <div className="page-header">
         <h3 className="page-title">Orders</h3>
       </div>
 
       <div className="card">
         <div className="card-body">
-          <div className="row">
+          <div className="row pharmacy-order-filters">
             <div className="col-md-4 mb-3">
               <label className="form-label">Status</label>
               <select className="form-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
@@ -132,7 +132,7 @@ const PharmacyAdminOrders = () => {
             <div className="alert alert-info mb-0">No orders found.</div>
           ) : (
             <div className="table-responsive">
-              <table className="table table-hover mb-0">
+              <table className="table table-hover mb-0 pharmacy-admin-orders-table">
                 <thead>
                   <tr>
                     <th>Order</th>
@@ -162,14 +162,14 @@ const PharmacyAdminOrders = () => {
 
                     return (
                       <tr key={id}>
-                        <td>{orderNo}</td>
-                        <td>{customer}</td>
-                        <td>{typeof total === 'number' ? total.toFixed(2) : total}</td>
-                        <td>{shippingDisplay}</td>
-                        <td>{paymentStatus}</td>
-                        <td>{status}</td>
-                        <td>
-                          <div className="d-flex gap-2 align-items-center">
+                        <td data-label="Order">{orderNo}</td>
+                        <td data-label="Customer">{customer}</td>
+                        <td data-label="Total">{typeof total === 'number' ? total.toFixed(2) : total}</td>
+                        <td data-label="Shipping">{shippingDisplay}</td>
+                        <td data-label="Payment">{paymentStatus}</td>
+                        <td data-label="Status">{status}</td>
+                        <td data-label="Actions">
+                          <div className="d-flex gap-2 align-items-center pharmacy-order-actions">
                             <Link to={`/pharmacy-admin/orders/${id}`} className="btn btn-sm btn-outline-secondary">
                               View
                             </Link>
@@ -211,7 +211,7 @@ const PharmacyAdminOrders = () => {
 
       {showShippingModal && (
         <>
-          <div className="modal fade show" style={{ display: 'block' }} role="dialog" aria-modal="true">
+          <div className="modal fade show pharmacy-order-modal" style={{ display: 'block' }} role="dialog" aria-modal="true">
             <div className="modal-dialog" role="document">
               <div className="modal-content">
                 <div className="modal-header">

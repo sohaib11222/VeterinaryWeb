@@ -58,7 +58,7 @@ const OrderHistory = () => {
   }
 
   return (
-    <div className="content">
+    <div className="content patient-order-history-mobile">
       <div className="container">
         <div className="row">
           <div className="col-lg-4 col-xl-3 theiaStickySidebar">
@@ -77,7 +77,7 @@ const OrderHistory = () => {
             {/* Filter Tabs */}
             <div className="card mb-4">
               <div className="card-body">
-                <div className="d-flex align-items-center justify-content-between flex-wrap">
+                <div className="d-flex align-items-center justify-content-between flex-wrap order-history-filter-bar">
                   <div className="order-filter-tabs">
                     <button
                       className={`btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
@@ -143,7 +143,7 @@ const OrderHistory = () => {
 
                       return (
                       <div key={id} className="order-item mb-4 pb-4 border-bottom">
-                        <div className="d-flex justify-content-between align-items-start mb-3">
+                        <div className="d-flex justify-content-between align-items-start mb-3 order-history-summary">
                           <div>
                             <h5 className="mb-1">Order #{orderNo}</h5>
                             <p className="text-muted small mb-0">

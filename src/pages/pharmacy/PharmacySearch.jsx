@@ -89,7 +89,7 @@ const PharmacySearch = () => {
   return (
     <>
       <Breadcrumb title="Pharmacy" li1="Pharmacy Search" li2="Pharmacy Search" />
-      <div className="content">
+      <div className="content pharmacy-search-mobile">
         <div className="container">
           <div className="row">
             <div className="col-md-12 col-lg-4 col-xl-3 theiaStickySidebar">
@@ -209,7 +209,7 @@ const PharmacySearch = () => {
                     const ownerId = typeof owner === 'object' ? owner?._id : owner
 
                     return (
-                      <div key={id} className="card mb-3">
+                      <div key={id} className="card mb-3 pharmacy-search-result-card">
                         <div className="card-body">
                           <div className="doctor-widget">
                             <div className="doc-info-left">

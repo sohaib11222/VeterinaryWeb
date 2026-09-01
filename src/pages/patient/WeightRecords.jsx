@@ -57,7 +57,7 @@ const WeightRecords = () => {
   }
 
   return (
-    <div className="content veterinary-dashboard">
+    <div className="content veterinary-dashboard weight-records-mobile">
       <div className="container-fluid">
         <div className="row mb-4">
           <div className="col-12">
@@ -129,7 +129,7 @@ const WeightRecords = () => {
               <div className="dashboard-card-body">
                 <div className="custom-table veterinary-table">
                   <div className="table-responsive">
-                    <table className="table table-center mb-0 veterinary-table">
+                    <table className="table table-center mb-0 veterinary-table weight-records-mobile-table">
                       <thead>
                         <tr>
                           <th>ID</th>
@@ -153,8 +153,8 @@ const WeightRecords = () => {
                         ) : (
                           records.map((r) => (
                             <tr key={r._id}>
-                              <td>#{String(r._id).slice(-6).toUpperCase()}</td>
-                              <td>
+                              <td data-label="Record">#{String(r._id).slice(-6).toUpperCase()}</td>
+                              <td data-label="Pet">
                                 <span className="badge veterinary-badge">
                                   <img
                                     src={getImageUrl(r.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
@@ -164,11 +164,11 @@ const WeightRecords = () => {
                                   {r.petId?.name || '—'}
                                 </span>
                               </td>
-                              <td>{formatWeight(r.weight)}</td>
-                              <td>{formatDate(r.date)}</td>
-                              <td>{r.recordedBy?.name || '—'}</td>
-                              <td>{r.relatedAppointmentId ? String(r.relatedAppointmentId).slice(-6).toUpperCase() : '—'}</td>
-                              <td>{r.notes || '—'}</td>
+                              <td data-label="Weight">{formatWeight(r.weight)}</td>
+                              <td data-label="Date">{formatDate(r.date)}</td>
+                              <td data-label="Recorded by">{r.recordedBy?.name || '—'}</td>
+                              <td data-label="Appointment">{r.relatedAppointmentId ? String(r.relatedAppointmentId).slice(-6).toUpperCase() : '—'}</td>
+                              <td data-label="Notes">{r.notes || '—'}</td>
                             </tr>
                           ))
                         )}

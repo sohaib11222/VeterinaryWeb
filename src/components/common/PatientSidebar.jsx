@@ -121,7 +121,7 @@ const PatientSidebar = () => {
             </li>
             <li className={isActive('/patient/reschedule-requests') ? 'active' : ''}>
               <Link to="/patient/reschedule-requests">
-                <i className="fa-solid fa-calendar-pen"></i>
+                <i className="fa-solid fa-calendar-days"></i>
                 <span>Reschedule Requests</span>
                 {pendingReschedulePaymentCount > 0 && (
                   <small className="unread-msg veterinary-badge">{pendingReschedulePaymentCount}</small>

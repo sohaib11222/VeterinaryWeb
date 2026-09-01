@@ -34,6 +34,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
   const lastMarkedReadConversationRef = useRef(null)
 
   const [selectedConversationId, setSelectedConversationId] = useState('')
+  const [isMobileConversationOpen, setIsMobileConversationOpen] = useState(false)
   const [newMessage, setNewMessage] = useState('')
   const [uploadingFiles, setUploadingFiles] = useState(false)
 
@@ -584,7 +585,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
       <div className="page-wrapper chat-page-wrapper admin-doctor-chat-wrapper">
         <div className="container">
           <div className="content doctor-content">
-            <div className="admin-doctor-chat-container">
+            <div className={`admin-doctor-chat-container${isMobileConversationOpen ? ' mobile-chat-detail-open' : ''}`}>
               <div className="chat-list-sidebar">
                 <div className="chat-list-header">
                   <div className="d-flex align-items-center justify-content-between mb-3">
@@ -622,6 +623,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                           onClick={(e) => {
                             e.preventDefault()
                             setSelectedConversationId(c._id)
+                            setIsMobileConversationOpen(true)
                           }}
                         >
                           <div className="chat-item-avatar">
@@ -650,6 +652,14 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                 {selectedConversation ? (
                   <>
                     <div className="chat-details-header">
+                      <button
+                        type="button"
+                        className="chat-mobile-back-button"
+                        onClick={() => setIsMobileConversationOpen(false)}
+                        aria-label="Back to chats"
+                      >
+                        <i className="fa-solid fa-arrow-left"></i>
+                      </button>
                       <div className="chat-details-user">
                         <div className="chat-details-avatar">
                           <img
