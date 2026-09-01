@@ -85,6 +85,7 @@ export const API_ROUTES = {
     REVIEWS: '/veterinarians/reviews',
     INVOICES: '/veterinarians/invoices',
     INVOICE: (transactionId) => `/veterinarians/invoices/${transactionId}`,
+    INVOICE_PDF: (transactionId) => `/veterinarians/invoices/${transactionId}/pdf`,
     PUBLIC_PROFILE: (id) => `/veterinarians/${id}`,
   },
 
@@ -154,6 +155,17 @@ export const API_ROUTES = {
     PHARMACY: '/product-prescription-requests/pharmacy',
     PHARMACY_PENDING_COUNT: '/product-prescription-requests/pharmacy/pending-count',
     REVIEW: (id) => `/product-prescription-requests/${id}/review`,
+  },
+
+  SUPPORT_TICKETS: {
+    BASE: '/support-tickets',
+    LIST: '/support-tickets',
+    CREATE: '/support-tickets',
+    GET: (id) => `/support-tickets/${id}`,
+    REPLY: (id) => `/support-tickets/${id}/messages`,
+    REOPEN: (id) => `/support-tickets/${id}/reopen`,
+    UNREAD_COUNT: '/support-tickets/unread-count',
+    UPLOAD_ATTACHMENTS: '/support-tickets/attachments',
   },
 
   ORDERS: {

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { useCreatePetWithUpload } from '../../mutations'
@@ -22,6 +22,7 @@ const PET_GENDER = ['MALE', 'FEMALE', 'NEUTERED', 'SPAYED', 'UNKNOWN']
 
 const AddDependent = () => {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const fileInputRef = useRef(null)
 
   const [name, setName] = useState('')
@@ -61,7 +62,11 @@ const AddDependent = () => {
     try {
       await createPet.mutateAsync(payload)
       toast.success('Pet created')
-      navigate('/dependent')
+      const returnTo = searchParams.get('returnTo')
+      const safeReturnTo = returnTo && returnTo.startsWith('/') && !returnTo.startsWith('//')
+        ? returnTo
+        : '/dependent'
+      navigate(safeReturnTo)
     } catch (err) {
       toast.error(err?.message || 'Failed to create pet')
     }

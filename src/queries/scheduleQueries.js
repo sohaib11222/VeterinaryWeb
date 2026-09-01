@@ -56,10 +56,14 @@ export const useWeeklyAvailableSlotsForDate = ({ veterinarianId, date, enabled =
     enabled: !!veterinarianId && !!date && enabled,
   })
 
-export const useRescheduleRequests = (params = {}) =>
+export const useRescheduleRequests = (params = {}, queryOptions = {}) =>
   useQuery({
     queryKey: ['reschedule-requests', params],
     queryFn: () => api.get(API_ROUTES.RESCHEDULE_REQUEST.LIST, { params }),
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    ...queryOptions,
   })
 
 export const useEligibleRescheduleAppointments = () =>

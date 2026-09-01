@@ -22,7 +22,8 @@ const PharmacyAdminPayouts = () => {
   const requestWithdrawal = useRequestWithdrawal()
 
   const [amount, setAmount] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState('BANK_TRANSFER')
+  const paymentMethod = 'STRIPE'
+  const [stripeAccountId, setStripeAccountId] = useState('')
   const [paymentDetails, setPaymentDetails] = useState('')
 
   const balance = useMemo(() => {
@@ -42,8 +43,9 @@ const PharmacyAdminPayouts = () => {
       toast.error('Enter a valid amount')
       return
     }
-    if (!paymentDetails.trim()) {
-      toast.error('Payment details are required')
+    const normalizedStripeAccountId = stripeAccountId.trim()
+    if (!/^acct_[A-Za-z0-9]+$/.test(normalizedStripeAccountId)) {
+      toast.error('Enter a valid Stripe Connected Account ID (acct_...)')
       return
     }
 
@@ -51,10 +53,12 @@ const PharmacyAdminPayouts = () => {
       await requestWithdrawal.mutateAsync({
         amount: n,
         paymentMethod,
+        stripeAccountId: normalizedStripeAccountId,
         paymentDetails: paymentDetails.trim(),
       })
       toast.success('Withdrawal request submitted')
       setAmount('')
+      setStripeAccountId('')
       setPaymentDetails('')
     } catch (error) {
       toast.error(error?.message || 'Failed to request withdrawal')
@@ -91,9 +95,12 @@ const PharmacyAdminPayouts = () => {
       <div className="card">
         <div className="card-body">
           <h5 className="mb-3">Request Withdrawal</h5>
+          <p className="text-muted mb-3">
+            Payouts are sent to your Stripe Connect account. Your Stripe secret key is never requested or stored here.
+          </p>
           <form onSubmit={submit}>
             <div className="row">
-              <div className="col-md-4 mb-3">
+              <div className="col-lg-3 mb-3">
                 <label className="form-label">Amount</label>
                 <input
                   type="number"
@@ -103,23 +110,28 @@ const PharmacyAdminPayouts = () => {
                   onChange={(e) => setAmount(e.target.value)}
                 />
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-lg-3 mb-3">
                 <label className="form-label">Payment Method</label>
-                <select
-                  className="form-select"
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                >
-                  <option value="BANK_TRANSFER">Bank Transfer</option>
-                  <option value="PAYPAL">PayPal</option>
-                  <option value="STRIPE">Stripe</option>
-                </select>
+                <div className="form-control bg-light" aria-label="Payment method">Stripe</div>
               </div>
-              <div className="col-md-4 mb-3">
-                <label className="form-label">Payment Details</label>
+              <div className="col-lg-3 mb-3">
+                <label className="form-label" htmlFor="stripe-account-id">Stripe Connected Account ID</label>
                 <input
+                  id="stripe-account-id"
                   className="form-control"
-                  placeholder="IBAN / account no / PayPal email"
+                  placeholder="acct_..."
+                  value={stripeAccountId}
+                  onChange={(e) => setStripeAccountId(e.target.value)}
+                  autoCapitalize="none"
+                  spellCheck="false"
+                />
+              </div>
+              <div className="col-lg-3 mb-3">
+                <label className="form-label" htmlFor="stripe-payout-note">Payout note <span className="text-muted">(optional)</span></label>
+                <input
+                  id="stripe-payout-note"
+                  className="form-control"
+                  placeholder="Reference for the admin"
                   value={paymentDetails}
                   onChange={(e) => setPaymentDetails(e.target.value)}
                 />
@@ -156,6 +168,8 @@ const PharmacyAdminPayouts = () => {
                     <th>Amount</th>
                     <th>Status</th>
                     <th>Method</th>
+                    <th>Net Payout</th>
+                    <th>Stripe Transfer</th>
                     <th>Requested</th>
                   </tr>
                 </thead>
@@ -164,13 +178,15 @@ const PharmacyAdminPayouts = () => {
                     const id = r?._id || r?.id
                     const amt = r?.amount
                     const status = r?.status
-                    const method = r?.paymentMethod
+                    const method = r?.paymentMethod === 'STRIPE' ? 'Stripe' : r?.paymentMethod
                     const createdAt = r?.createdAt ? new Date(r.createdAt).toLocaleString() : '—'
                     return (
                       <tr key={id}>
                         <td>{typeof amt === 'number' ? amt.toFixed(2) : amt}</td>
                         <td>{status}</td>
                         <td>{method}</td>
+                        <td>{typeof r?.netAmount === 'number' ? r.netAmount.toFixed(2) : '—'}</td>
+                        <td>{r?.stripeTransferId || r?.stripePayoutFailure || '—'}</td>
                         <td>{createdAt}</td>
                       </tr>
                     )

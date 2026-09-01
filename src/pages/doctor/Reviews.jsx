@@ -4,227 +4,30 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useMyVeterinarianReviews, useVeterinarianProfile } from '../../queries'
 import { getImageUrl } from '../../utils/apiConfig'
 
+const formatDate = (value) => value ? new Date(value).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : '—'
+const Stars = ({ rating }) => <span className="text-warning" aria-label={`${rating} out of 5 stars`}>{Array.from({ length: 5 }).map((_, index) => <i key={index} className={`fa-${index < Math.round(Number(rating) || 0) ? 'solid' : 'regular'} fa-star me-1`} />)}</span>
+
 const Reviews = () => {
   const { user } = useAuth()
-
   const [page, setPage] = useState(1)
   const limit = 10
-
-  const { data: profileRes } = useVeterinarianProfile()
-  const profile = profileRes?.data ?? profileRes
-
-  const { data: reviewsRes, isLoading, error } = useMyVeterinarianReviews({ page, limit }, { enabled: Boolean(user) })
-  const payload = reviewsRes?.data ?? reviewsRes
+  const profileQuery = useVeterinarianProfile()
+  const reviewsQuery = useMyVeterinarianReviews({ page, limit }, { enabled: Boolean(user) })
+  const profile = profileQuery.data?.data ?? profileQuery.data
+  const payload = reviewsQuery.data?.data ?? reviewsQuery.data
   const reviews = payload?.reviews || []
-  const pagination = payload?.pagination || { page: 1, limit, total: 0, pages: 1 }
-
-  const overallRating = useMemo(() => {
-    const avg = profile?.ratingAvg
-    if (avg !== null && avg !== undefined) return Number(avg) || 0
-    if (reviews.length === 0) return 0
-    const sum = reviews.reduce((acc, r) => acc + (Number(r?.rating) || 0), 0)
-    return sum / reviews.length
+  const pagination = payload?.pagination || { page: 1, pages: 1, total: 0 }
+  const average = useMemo(() => {
+    if (profile?.ratingAvg !== null && profile?.ratingAvg !== undefined) return Number(profile.ratingAvg) || 0
+    return reviews.length ? reviews.reduce((sum, review) => sum + (Number(review?.rating) || 0), 0) / reviews.length : 0
   }, [profile?.ratingAvg, reviews])
+  const total = Number(profile?.ratingCount ?? pagination.total ?? reviews.length) || 0
 
-  const ratingCount = useMemo(() => {
-    const count = profile?.ratingCount
-    if (count !== null && count !== undefined) return Number(count) || 0
-    return pagination?.total || reviews.length || 0
-  }, [profile?.ratingCount, pagination?.total, reviews.length])
-
-  const renderStars = (rating) => {
-    const r = Math.max(0, Math.min(5, Number(rating) || 0))
-    const full = Math.floor(r)
-    const half = r % 1 !== 0
-    return Array.from({ length: 5 }).map((_, i) => {
-      if (i < full) return <i key={i} className="fa-solid fa-star filled"></i>
-      if (i === full && half) return <i key={i} className="fa-solid fa-star-half-stroke filled"></i>
-      return <i key={i} className="fa-solid fa-star"></i>
-    })
-  }
-
-  const formatDate = (dateString) => {
-    if (!dateString) return ''
-    const d = new Date(dateString)
-    if (Number.isNaN(d.getTime())) return ''
-    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
-  }
-
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= (pagination?.pages || 1)) {
-      setPage(newPage)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
-
-  return (
-    <div className="content veterinary-dashboard">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-lg-3 col-xl-2 theiaStickySidebar">
-            {/* Sidebar is handled by DashboardLayout */}
-          </div>
-          <div className="col-lg-12 col-xl-12">
-            {/* Veterinary Reviews Header */}
-            <div className="row mb-4">
-              <div className="col-12">
-                <div className="veterinary-dashboard-header">
-                  <h2 className="dashboard-title">
-                    <i className="fa-solid fa-star me-3"></i>
-                    Pet Owner Reviews
-                  </h2>
-                  <p className="dashboard-subtitle">Read feedback from happy pet owners about our veterinary services</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Reviews Content */}
-            <div className="row">
-              <div className="col-12">
-                <div className="dashboard-card veterinary-card">
-                  <div className="dashboard-card-body">
-                    {/* Review Listing */}
-                    <ul className="comments-list veterinary-reviews-list">
-                      {/* Overall Rating */}
-                      <li className="over-all-review veterinary-overall-review">
-                        <div className="review-content">
-                          <div className="review-rate">
-                            <h5>
-                              <i className="fa-solid fa-paw me-2"></i>
-                              Overall Rating
-                            </h5>
-                            <div className="star-rated veterinary-star-rated">
-                              <span>{overallRating.toFixed(1)}</span>
-                              {renderStars(overallRating)}
-                              <div className="rating-summary">
-                                <small className="text-muted">Based on {ratingCount} reviews</small>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="position-relative daterange-wraper">
-                            <div className="input-groupicon calender-input">
-                              <input type="text" className="form-control date-range bookingrange veterinary-input" placeholder="From Date - To Date" />
-                            </div>
-                            <i className="fa-solid fa-calendar-days"></i>
-                          </div>
-                        </div>
-                      </li>
-
-                      {isLoading ? (
-                        <li>
-                          <div className="text-center py-5">
-                            <div className="spinner-border" role="status">
-                              <span className="visually-hidden">Loading reviews...</span>
-                            </div>
-                          </div>
-                        </li>
-                      ) : error ? (
-                        <li>
-                          <div className="text-center py-5 text-danger">
-                            <p>Error loading reviews</p>
-                            <small>{error?.message || 'Failed to load reviews'}</small>
-                          </div>
-                        </li>
-                      ) : reviews.length === 0 ? (
-                        <li>
-                          <div className="text-center py-5 text-muted">
-                            <p>No reviews yet</p>
-                            <small>Reviews from pet owners will appear here</small>
-                          </div>
-                        </li>
-                      ) : (
-                        reviews.map((review) => {
-                          const owner = review?.petOwnerId || {}
-                          const pet = review?.petId || {}
-
-                          const ownerName = owner?.fullName || owner?.name || 'Anonymous'
-                          const ownerImage = getImageUrl(owner?.profileImage) || '/assets/img/doctors-dashboard/profile-01.jpg'
-                          const petText = pet?.name ? `${pet.name}${pet.species ? ` (${pet.species})` : ''}` : ''
-
-                          return (
-                            <li key={review._id}>
-                              <div className="comments veterinary-review-card">
-                                <div className="comment-head">
-                                  <div className="patinet-information">
-                                    <a href="javascript:void(0);">
-                                      <img
-                                        src={ownerImage}
-                                        alt="Pet Owner"
-                                        onError={(e) => {
-                                          e.currentTarget.onerror = null
-                                          e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
-                                        }}
-                                      />
-                                    </a>
-                                    <div className="patient-info">
-                                      <h6><a href="javascript:void(0);">{ownerName}</a></h6>
-                                      <span className="review-date">{formatDate(review?.createdAt)}</span>
-                                      {petText && (
-                                        <div className="pet-info">
-                                          <small className="text-muted">Pet: {petText}</small>
-                                        </div>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <div className="star-rated veterinary-star-rating">
-                                    {renderStars(review?.rating)}
-                                  </div>
-                                </div>
-                                <div className="review-info">
-                                  <p>{review?.reviewText || '—'}</p>
-                                </div>
-                              </div>
-                            </li>
-                          )
-                        })
-                      )}
-                    </ul>
-
-                    {/* Pagination */}
-                    {(pagination?.pages || 1) > 1 && (
-                      <div className="pagination dashboard-pagination veterinary-pagination">
-                        <ul>
-                          <li>
-                            <a
-                              href="#"
-                              className={`page-link veterinary-page-link ${page <= 1 ? 'disabled' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault()
-                                handlePageChange(page - 1)
-                              }}
-                            >
-                              <i className="fa-solid fa-chevron-left"></i>
-                            </a>
-                          </li>
-                          <li>
-                            <a href="#" className="page-link veterinary-page-link active" onClick={(e) => e.preventDefault()}>
-                              {page}
-                            </a>
-                          </li>
-                          <li>
-                            <a
-                              href="#"
-                              className={`page-link veterinary-page-link ${page >= (pagination?.pages || 1) ? 'disabled' : ''}`}
-                              onClick={(e) => {
-                                e.preventDefault()
-                                handlePageChange(page + 1)
-                              }}
-                            >
-                              <i className="fa-solid fa-chevron-right"></i>
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+  return <section className="veterinary-dashboard"><div className="veterinary-dashboard-header mb-4"><h2 className="dashboard-title"><i className="fa-solid fa-star me-3" />Pet owner reviews</h2><p className="dashboard-subtitle">Feedback from pet owners after their veterinary appointments.</p></div>
+    <div className="card border-0 shadow-sm mb-4 overflow-hidden"><div className="card-body p-4" style={{ background: 'linear-gradient(135deg, #effaf8, #fff)' }}><div className="row align-items-center g-4"><div className="col-md-auto"><div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style={{ width: 96, height: 96, background: '#087f75', fontSize: 30 }}>{average.toFixed(1)}</div></div><div className="col"><h3 className="h4 mb-2">Overall rating</h3><Stars rating={average} /><p className="text-muted mb-0 mt-2">Based on {total} {total === 1 ? 'review' : 'reviews'}</p></div><div className="col-md-auto text-md-end"><span className="badge text-bg-light border px-3 py-2"><i className="fa-solid fa-paw me-2 text-primary" />Veterinary feedback</span></div></div></div></div>
+    {reviewsQuery.isLoading ? <div className="text-center py-5"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading reviews</span></div></div> : reviewsQuery.isError ? <div className="alert alert-danger">{reviewsQuery.error?.message || 'Unable to load reviews.'}</div> : reviews.length === 0 ? <div className="card border-0 shadow-sm"><div className="card-body text-center py-5 text-muted"><i className="fa-regular fa-star fa-2x mb-3" /><p className="mb-0">No reviews yet. New feedback will appear here.</p></div></div> : <div className="row g-4">{reviews.map((review) => { const owner = review?.petOwnerId || {}; const pet = review?.petId || {}; const ownerImage = getImageUrl(owner?.profileImage) || '/assets/img/doctors-dashboard/profile-01.jpg'; return <div className="col-12" key={review._id}><article className="card border-0 shadow-sm"><div className="card-body p-4"><div className="d-flex flex-wrap justify-content-between gap-3 mb-3"><div className="d-flex align-items-center gap-3"><img src={ownerImage} alt="Pet owner" className="rounded-circle object-fit-cover" style={{ width: 52, height: 52 }} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg' }} /><div><h3 className="h6 mb-1">{owner?.name || owner?.fullName || 'Pet owner'}</h3><div className="text-muted small">{pet?.name ? `Pet: ${pet.name}${pet.species ? ` · ${pet.species}` : ''}` : 'Pet details unavailable'} · {formatDate(review?.createdAt)}</div></div></div><div className="text-md-end"><Stars rating={review?.rating} /><div className="small text-muted mt-1">{Number(review?.rating || 0).toFixed(1)} / 5</div></div></div><blockquote className="mb-0 ps-3 border-start border-4 border-info text-secondary">{review?.reviewText || 'No written feedback was provided.'}</blockquote></div></article></div> })}</div>}
+    {(pagination.pages || 1) > 1 && <nav className="d-flex justify-content-center align-items-center gap-3 mt-4" aria-label="Review pages"><button type="button" className="btn btn-outline-primary" disabled={page <= 1} onClick={() => setPage((current) => current - 1)}>Previous</button><span className="text-muted">Page {page} of {pagination.pages}</span><button type="button" className="btn btn-outline-primary" disabled={page >= pagination.pages} onClick={() => setPage((current) => current + 1)}>Next</button></nav>}
+  </section>
 }
 
 export default Reviews

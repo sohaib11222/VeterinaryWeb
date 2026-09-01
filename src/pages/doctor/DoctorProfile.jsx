@@ -8,6 +8,25 @@ import { useFavorites } from '../../queries/favoriteQueries'
 import { useAddFavorite, useRemoveFavorite } from '../../mutations/favoriteMutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
+const PUBLIC_SOCIAL_LINKS = [
+  { key: 'facebook', label: 'Facebook', icon: 'fa-facebook-f' },
+  { key: 'instagram', label: 'Instagram', icon: 'fa-instagram' },
+  { key: 'linkedin', label: 'LinkedIn', icon: 'fa-linkedin-in' },
+  { key: 'twitter', label: 'X / Twitter', icon: 'fa-x-twitter' },
+  { key: 'website', label: 'Website', icon: 'fa-globe', style: 'fa-solid' },
+]
+
+const toSafePublicUrl = (value) => {
+  const trimmed = String(value || '').trim()
+  if (!trimmed) return null
+  try {
+    const parsed = new URL(/^[a-z][a-z\d+.-]*:/i.test(trimmed) ? trimmed : `https://${trimmed}`)
+    return ['http:', 'https:'].includes(parsed.protocol) ? parsed.toString() : null
+  } catch {
+    return null
+  }
+}
+
 const DoctorProfile = () => {
   const { userId } = useParams()
   const [searchParams] = useSearchParams()
@@ -119,6 +138,11 @@ const DoctorProfile = () => {
       ? profile.specializations[0].name
       : profile?.specializations?.[0]) || 'Veterinary'
   const rating = Number(profile?.ratingAvg || 0)
+  const publicSocialLinks = useMemo(() => (
+    PUBLIC_SOCIAL_LINKS
+      .map((definition) => ({ ...definition, href: toSafePublicUrl(profile?.socialLinks?.[definition.key]) }))
+      .filter((definition) => Boolean(definition.href))
+  ), [profile?.socialLinks])
 
   const experienceYears = useMemo(() => {
     if (Number(profile?.experienceYears)) return Number(profile.experienceYears)
@@ -222,12 +246,20 @@ const DoctorProfile = () => {
                   <div style={{ flex: 1 }}>
                     <h6 className="mb-2" style={{ fontWeight: 600 }}>Social Media</h6>
                     <div className="d-flex" style={{ gap: '10px', flexWrap: 'wrap' }}>
-                      <a href="#" onClick={(e) => e.preventDefault()} aria-label="Facebook"><i className="fa-brands fa-facebook-f"></i></a>
-                      <a href="#" onClick={(e) => e.preventDefault()} aria-label="Instagram"><i className="fa-brands fa-instagram"></i></a>
-                      <a href="#" onClick={(e) => e.preventDefault()} aria-label="Twitter"><i className="fa-brands fa-x-twitter"></i></a>
-                      <a href="#" onClick={(e) => e.preventDefault()} aria-label="Telegram"><i className="fa-brands fa-telegram"></i></a>
-                      <a href="#" onClick={(e) => e.preventDefault()} aria-label="WhatsApp"><i className="fa-brands fa-whatsapp"></i></a>
-                      <a href="#" onClick={(e) => e.preventDefault()} aria-label="LinkedIn"><i className="fa-brands fa-linkedin-in"></i></a>
+                      {publicSocialLinks.length > 0 ? publicSocialLinks.map(({ key, label, icon, style, href }) => (
+                        <a
+                          key={key}
+                          href={href}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          aria-label={`${doctorName} on ${label}`}
+                          title={label}
+                        >
+                          <i className={`${style || 'fa-brands'} ${icon}`}></i>
+                        </a>
+                      )) : (
+                        <span className="text-muted small">No social links added</span>
+                      )}
                     </div>
                   </div>
 

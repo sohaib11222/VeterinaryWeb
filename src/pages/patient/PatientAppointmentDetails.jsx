@@ -8,6 +8,7 @@ import { useCancelAppointment } from '../../mutations/appointmentMutations'
 import { useCreateReview } from '../../mutations'
 import { useMyAppointmentReview } from '../../queries'
 import { getImageUrl } from '../../utils/apiConfig'
+import RescheduleFeePayment from '../../components/appointments/RescheduleFeePayment'
 
 const PatientAppointmentDetails = () => {
   const [searchParams] = useSearchParams()
@@ -35,6 +36,12 @@ const PatientAppointmentDetails = () => {
   const timeStr = appointment?.appointmentTime || ''
   const status = String(appointment?.status || '').toUpperCase()
   const statusLabel = status || 'PENDING'
+  const consultationFee = useMemo(() => {
+    const rawValue = appointment?.consultationFee
+    if (rawValue === null || rawValue === undefined || rawValue === '') return null
+    const value = Number(rawValue)
+    return Number.isFinite(value) && value >= 0 ? value : null
+  }, [appointment?.consultationFee])
 
   const canCancel = ['PENDING', 'CONFIRMED'].includes(status)
 
@@ -197,7 +204,10 @@ const PatientAppointmentDetails = () => {
                               <span className={`badge veterinary-badge ${getStatusBadgeClass(status)}`}>{statusLabel}</span>
                             </div>
                             <div className="consult-fees veterinary-consult-fees">
-                              <h6><i className="fa-solid fa-euro-sign me-1"></i>Consultation Fees: €50</h6>
+                              <h6>
+                                <i className="fa-solid fa-euro-sign me-1"></i>
+                                Consultation Fee: {consultationFee === null ? '—' : `€${consultationFee.toFixed(2)}`}
+                              </h6>
                             </div>
                             <ul>
                               <li>
@@ -255,6 +265,19 @@ const PatientAppointmentDetails = () => {
                                 <Link to={`/video-call?appointmentId=${appointmentId}`} className="btn veterinary-btn-primary rounded-pill">
                                   <i className="fa-solid fa-video me-2"></i>Start Video Session
                                 </Link>
+                              </div>
+                            </li>
+                          )}
+
+                          {status === 'PENDING_PAYMENT' && (
+                            <li>
+                              <div className="start-btn">
+                                <RescheduleFeePayment
+                                  requestId={appointment?.rescheduleRequestId?._id || appointment?.rescheduleRequestId}
+                                  fee={appointment?.rescheduleFee}
+                                  className="btn veterinary-btn-primary rounded-pill"
+                                  onPaid={() => refetch()}
+                                />
                               </div>
                             </li>
                           )}

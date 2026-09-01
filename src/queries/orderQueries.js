@@ -7,10 +7,14 @@ import { useQuery } from '@tanstack/react-query'
 import { api } from '../utils/api'
 import { API_ROUTES } from '../utils/apiConfig'
 
-export const useOrders = (params = {}) =>
+export const useOrders = (params = {}, queryOptions = {}) =>
   useQuery({
     queryKey: ['orders', params],
     queryFn: () => api.get(API_ROUTES.ORDERS.LIST, { params }),
+    refetchInterval: 15000,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    ...queryOptions,
   })
 
 export const useOrder = (orderId) =>

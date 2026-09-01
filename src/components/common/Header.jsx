@@ -514,6 +514,20 @@ const Header = () => {
                 <li className={isActive('/contact-us') ? 'active' : ''}>
                   <Link to="/contact-us">Contact Us</Link>
                 </li>
+                {user && (
+                  <li className="mobile-menu-signout">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsMenuOpen(false)
+                        handleLogout()
+                      }}
+                    >
+                      <i className="isax isax-logout" aria-hidden="true"></i>
+                      Sign Out
+                    </button>
+                  </li>
+                )}
               </ul>
             </div>
 

@@ -501,6 +501,39 @@ body.home-hero-header-transparent .home-hero-v2 {
   line-height: 36px !important;
 }
 
+.main-menu-wrapper .main-nav > .mobile-menu-signout {
+  display: none !important;
+}
+
+@media (max-width: 991.98px) {
+  .main-menu-wrapper .main-nav > .mobile-menu-signout {
+    display: block !important;
+    margin: 16px 20px 8px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(18, 48, 71, 0.12);
+  }
+
+  .main-menu-wrapper .main-nav .mobile-menu-signout button {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    border: 0;
+    border-radius: 10px;
+    background: #123047;
+    color: #ffffff;
+    font: inherit;
+    font-weight: 700;
+  }
+
+  .main-menu-wrapper .main-nav .mobile-menu-signout button:hover,
+  .main-menu-wrapper .main-nav .mobile-menu-signout button:focus-visible {
+    background: #078a6d;
+  }
+}
+
 /* Pharmacy: one-time prescription approval message */
 .prescription-approval-notifier {
   position: fixed;

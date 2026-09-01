@@ -13,6 +13,7 @@ export const useUpdateVeterinarianProfile = () => {
     mutationFn: (data) => api.put(API_ROUTES.VETERINARIANS.UPDATE_PROFILE, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['veterinarian', 'profile'] })
+      queryClient.invalidateQueries({ queryKey: ['veterinarian', 'public'] })
       queryClient.invalidateQueries({ queryKey: ['veterinarian', 'dashboard'] })
     },
   })

@@ -3,7 +3,17 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useUnreadChatCount } from '../../queries/chatQueries'
 import { useUnreadNotificationsCount } from '../../queries/notificationQueries'
 import { useUserById } from '../../queries/userQueries'
+import { useAppointments } from '../../queries/appointmentQueries'
+import { useOrders } from '../../queries/orderQueries'
+import { useRescheduleRequests } from '../../queries/scheduleQueries'
+import { useSupportTicketUnreadCount } from '../../queries/supportTicketQueries'
 import { getImageUrl } from '../../utils/apiConfig'
+
+const getPaginatedCount = (response) => {
+  const outer = response?.data ?? response
+  const payload = outer?.data ?? outer
+  return Number(payload?.pagination?.total || 0)
+}
 
 const PatientSidebar = () => {
   const { user } = useAuth()
@@ -14,6 +24,34 @@ const PatientSidebar = () => {
   const unreadCount = unreadRes?.data?.unreadCount ?? 0
   const { data: unreadNotificationsRes } = useUnreadNotificationsCount({ enabled: Boolean(user) })
   const unreadNotifications = unreadNotificationsRes?.data?.unreadCount ?? 0
+  const { data: unreadSupportRes } = useSupportTicketUnreadCount({ enabled: Boolean(user) })
+  const unreadSupportCount = unreadSupportRes?.data?.unreadCount ?? 0
+  const { data: pendingAppointmentsRes } = useAppointments(
+    { status: 'PENDING', page: 1, limit: 1 },
+    { enabled: Boolean(user) }
+  )
+  const { data: pendingOrdersRes } = useOrders(
+    { status: 'PENDING', page: 1, limit: 1 },
+    { enabled: Boolean(user) }
+  )
+  const { data: rescheduleRequestsRes } = useRescheduleRequests(
+    { page: 1, limit: 100 },
+    { enabled: Boolean(user) }
+  )
+  const pendingAppointmentsCount = getPaginatedCount(pendingAppointmentsRes)
+  const pendingOrdersCount = getPaginatedCount(pendingOrdersRes)
+  const rescheduleRequestsPayload = rescheduleRequestsRes?.data?.data ?? rescheduleRequestsRes?.data ?? rescheduleRequestsRes
+  const rescheduleRequests = Array.isArray(rescheduleRequestsPayload)
+    ? rescheduleRequestsPayload
+    : Array.isArray(rescheduleRequestsPayload?.requests)
+      ? rescheduleRequestsPayload.requests
+      : []
+  const pendingReschedulePaymentCount = rescheduleRequests.filter((request) => {
+    const appointment = request?.newAppointmentId || {}
+    return String(request?.status || '').toUpperCase() === 'APPROVED'
+      && String(appointment?.paymentStatus || '').toUpperCase() !== 'PAID'
+      && Number(request?.rescheduleFee) > 0
+  }).length
   const location = useLocation()
   const isActive = (paths) => {
     if (Array.isArray(paths)) {
@@ -27,13 +65,6 @@ const PatientSidebar = () => {
     getImageUrl(latestUser?.profileImage) ||
     getImageUrl(user?.profileImage) ||
     '/assets/img/doctors-dashboard/profile-06.jpg'
-
-  // Console log image URLs for debugging
-  console.log('PatientSidebar - latestUser profileImage:', latestUser?.profileImage)
-  console.log('PatientSidebar - user profileImage:', user?.profileImage)
-  console.log('PatientSidebar - getImageUrl(latestUser?.profileImage):', getImageUrl(latestUser?.profileImage))
-  console.log('PatientSidebar - getImageUrl(user?.profileImage):', getImageUrl(user?.profileImage))
-  console.log('PatientSidebar - final profileImage:', profileImage)
 
   return (
     <div className="profile-sidebar veterinary-sidebar">
@@ -82,6 +113,19 @@ const PatientSidebar = () => {
               <Link to="/patient-appointments">
                 <i className="fa-solid fa-calendar-days"></i>
                 <span>Pet Appointments</span>
+                {pendingAppointmentsCount > 0 && (
+                  <small className="unread-msg veterinary-badge">{pendingAppointmentsCount}</small>
+                )}
+                <div className="menu-indicator"></div>
+              </Link>
+            </li>
+            <li className={isActive('/patient/reschedule-requests') ? 'active' : ''}>
+              <Link to="/patient/reschedule-requests">
+                <i className="fa-solid fa-calendar-pen"></i>
+                <span>Reschedule Requests</span>
+                {pendingReschedulePaymentCount > 0 && (
+                  <small className="unread-msg veterinary-badge">{pendingReschedulePaymentCount}</small>
+                )}
                 <div className="menu-indicator"></div>
               </Link>
             </li>
@@ -124,6 +168,9 @@ const PatientSidebar = () => {
               <Link to="/order-history">
                 <i className="fa-solid fa-shopping-bag"></i>
                 <span>Pet Supply Orders</span>
+                {pendingOrdersCount > 0 && (
+                  <small className="unread-msg veterinary-badge">{pendingOrdersCount}</small>
+                )}
                 <div className="menu-indicator"></div>
               </Link>
             </li>
@@ -144,6 +191,16 @@ const PatientSidebar = () => {
                 {unreadCount > 0 && (
                   <small className="unread-msg veterinary-badge">{unreadCount}</small>
                 )}
+              </Link>
+            </li>
+            <li className={isActive('/patient/support-tickets') ? 'active' : ''}>
+              <Link to="/patient/support-tickets">
+                <i className="fa-solid fa-headset"></i>
+                <span>Support Tickets</span>
+                {unreadSupportCount > 0 && (
+                  <small className="unread-msg veterinary-badge">{unreadSupportCount}</small>
+                )}
+                <div className="menu-indicator"></div>
               </Link>
             </li>
           

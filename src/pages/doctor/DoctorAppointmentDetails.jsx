@@ -57,6 +57,12 @@ const DoctorAppointmentDetails = () => {
   const timeStr = appointment?.appointmentTime || ''
   const status = String(appointment?.status || '').toUpperCase()
   const statusLabel = status || 'PENDING'
+  const consultationFee = useMemo(() => {
+    const rawValue = appointment?.consultationFee
+    if (rawValue === null || rawValue === undefined || rawValue === '') return null
+    const value = Number(rawValue)
+    return Number.isFinite(value) && value >= 0 ? value : null
+  }, [appointment?.consultationFee])
 
   const canAccept = status === 'PENDING'
   const canReject = status === 'PENDING'
@@ -254,7 +260,7 @@ const DoctorAppointmentDetails = () => {
                     <span className={`badge ${getStatusBadgeClass(status)}`}>{statusLabel}</span>
                   </div>
                   <div className="consult-fees">
-                    <h6>Consultation Fees: €50</h6>
+                    <h6>Consultation Fee: {consultationFee === null ? '—' : `€${consultationFee.toFixed(2)}`}</h6>
                   </div>
                   <ul>
                     <li>

@@ -12,6 +12,7 @@ import ProtectedRoute from './components/common/ProtectedRoute'
 import GoogleTranslate from './components/common/GoogleTranslate'
 import LiveDataRefresh from './components/common/LiveDataRefresh'
 import PrescriptionApprovalNotifier from './components/pharmacy/PrescriptionApprovalNotifier'
+import AppointmentReminderNotifier from './components/appointments/AppointmentReminderNotifier'
 
 // Public Pages - Home
 import Index from './pages/Index'
@@ -132,6 +133,9 @@ import ClinicMapView from './pages/patient/ClinicMapView'
 import OrderHistory from './pages/patient/OrderHistory'
 import OrderDetails from './pages/patient/OrderDetails'
 import DocumentsDownload from './pages/patient/DocumentsDownload'
+import SupportTickets from './pages/patient/SupportTickets'
+import CreateSupportTicket from './pages/patient/CreateSupportTicket'
+import SupportTicketDetail from './pages/patient/SupportTicketDetail'
 
 // Admin Pages
 import VaccineCatalog from './pages/admin/VaccineCatalog'
@@ -643,6 +647,30 @@ function App() {
                   }
                 />
                 <Route
+                  path="/patient/support-tickets"
+                  element={
+                    <ProtectedRoute role="PET_OWNER">
+                      <DashboardLayout breadcrumb={{ title: "Patient", li1: "Support", li2: "Support Tickets" }}><SupportTickets /></DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/patient/support-tickets/new"
+                  element={
+                    <ProtectedRoute role="PET_OWNER">
+                      <DashboardLayout breadcrumb={{ title: "Patient", li1: "Support", li2: "Create Ticket" }}><CreateSupportTicket /></DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/patient/support-tickets/:ticketId"
+                  element={
+                    <ProtectedRoute role="PET_OWNER">
+                      <DashboardLayout breadcrumb={{ title: "Patient", li1: "Support", li2: "Ticket Details" }}><SupportTicketDetail /></DashboardLayout>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/patient-appointments-grid"
                   element={
                     <ProtectedRoute role="PET_OWNER">
@@ -1014,6 +1042,7 @@ function App() {
             <Route path="*" element={<Error404 />} />
             </Routes>
             <PrescriptionApprovalNotifier />
+            <AppointmentReminderNotifier />
             <GoogleTranslate />
             <ToastContainer position="top-right" autoClose={3000} />
           </BrowserRouter>

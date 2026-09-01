@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useMyPetStore } from '../../queries/petStoreQueries'
 import { useCreatePetStore, useUpdatePetStore } from '../../mutations/petStoreMutations'
 import { api } from '../../utils/api'
-import { API_ROUTES } from '../../utils/apiConfig'
+import { API_ROUTES, getImageUrl } from '../../utils/apiConfig'
 
 const PharmacyAdminProfile = () => {
   const { user } = useAuth()
@@ -38,6 +38,11 @@ const PharmacyAdminProfile = () => {
     },
     isActive: true,
   })
+  const [logoPreview, setLogoPreview] = useState('')
+
+  useEffect(() => () => {
+    if (logoPreview.startsWith('blob:')) URL.revokeObjectURL(logoPreview)
+  }, [logoPreview])
 
   useEffect(() => {
     if (!petStore) return
@@ -103,12 +108,39 @@ const PharmacyAdminProfile = () => {
     const file = e.target.files?.[0]
     if (!file) return
 
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      toast.error('Choose a JPG, PNG, or WebP logo')
+      e.target.value = ''
+      return
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Logo image must be 5 MB or smaller')
+      e.target.value = ''
+      return
+    }
+
+    const localPreview = URL.createObjectURL(file)
+    setLogoPreview((previous) => {
+      if (previous.startsWith('blob:')) URL.revokeObjectURL(previous)
+      return localPreview
+    })
+
     try {
       const url = await uploadLogo(file)
       setForm((prev) => ({ ...prev, logo: url }))
+      setLogoPreview((previous) => {
+        if (previous.startsWith('blob:')) URL.revokeObjectURL(previous)
+        return ''
+      })
       toast.success('Logo uploaded')
     } catch (error) {
+      setLogoPreview((previous) => {
+        if (previous.startsWith('blob:')) URL.revokeObjectURL(previous)
+        return ''
+      })
       toast.error(error?.message || 'Logo upload failed')
+    } finally {
+      e.target.value = ''
     }
   }
 
@@ -202,9 +234,14 @@ const PharmacyAdminProfile = () => {
                 <div className="col-md-6 mb-3">
                   <label className="form-label">Logo</label>
                   <input className="form-control" type="file" accept="image/*" onChange={handleLogoFile} />
-                  {form.logo && (
-                    <div className="mt-2">
-                      <img src={form.logo} alt="logo" style={{ height: 60, objectFit: 'cover' }} />
+                  {(logoPreview || form.logo) && (
+                    <div className="mt-3 d-flex align-items-center gap-3 rounded border bg-light p-2">
+                      <img
+                        src={logoPreview || getImageUrl(form.logo)}
+                        alt="Selected business logo"
+                        style={{ width: 72, height: 72, borderRadius: 12, objectFit: 'cover', background: '#fff' }}
+                      />
+                      <div className="small text-muted"><strong className="d-block text-dark">Logo preview</strong>Your selected logo will appear on your public profile.</div>
                     </div>
                   )}
                 </div>

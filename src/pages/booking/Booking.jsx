@@ -216,7 +216,16 @@ const Booking = () => {
                         </select>
                         {!petsLoading && pets.length === 0 && (
                           <div className="form-text text-danger">
-                            You have no pets yet. Please add a pet first.
+                            You have no pets yet.{' '}
+                            <Link
+                              to={`/add-dependent?returnTo=${encodeURIComponent(
+                                searchParams.toString() ? `/booking?${searchParams.toString()}` : '/booking'
+                              )}`}
+                              className="fw-semibold"
+                            >
+                              Create a pet
+                            </Link>{' '}
+                            to continue with this booking.
                           </div>
                         )}
                       </div>

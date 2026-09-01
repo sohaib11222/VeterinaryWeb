@@ -44,11 +44,13 @@ const DoctorRescheduleRequests = () => {
       return
     }
 
+    const hasFixedFee = feeFixed !== ''
     const payload = {
       requestedDate: newDate,
       requestedTime: newTime,
-      rescheduleFeePercentage: Number(feePercentage) || 0,
-      ...(feeFixed ? { rescheduleFee: Number(feeFixed) } : {}),
+      ...(hasFixedFee
+        ? { rescheduleFee: Number(feeFixed) }
+        : { rescheduleFeePercentage: Number(feePercentage) || 0 }),
       ...(notes.trim() ? { veterinarianNotes: notes.trim() } : {}),
     }
 
@@ -200,6 +202,7 @@ const DoctorRescheduleRequests = () => {
                         />
                         <span className="input-group-text">%</span>
                       </div>
+                      <small className="form-text text-muted">Set 0% to confirm the reschedule with no additional payment.</small>
                     </div>
                     <div className="col-md-6 mb-3">
                       <label className="form-label">Or Fixed Fee (optional)</label>
@@ -208,7 +211,10 @@ const DoctorRescheduleRequests = () => {
                         step="0.01"
                         className="form-control"
                         value={feeFixed}
-                        onChange={(e) => setFeeFixed(e.target.value)}
+                        onChange={(e) => {
+                          setFeeFixed(e.target.value)
+                          if (e.target.value !== '') setFeePercentage('')
+                        }}
                         min={0}
                       />
                     </div>

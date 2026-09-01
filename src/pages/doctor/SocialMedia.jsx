@@ -40,12 +40,14 @@ const SocialMedia = () => {
     setSocialLinks((prev) => ({ ...prev, [key]: value }))
   }
 
-  const validateUrlOrEmpty = (value, label) => {
+  const normalizeUrlOrEmpty = (value, label) => {
     const trimmed = (value || '').trim()
     if (!trimmed) return ''
     try {
-      new URL(trimmed)
-      return trimmed
+      const candidate = /^[a-z][a-z\d+.-]*:/i.test(trimmed) ? trimmed : `https://${trimmed}`
+      const url = new URL(candidate)
+      if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Unsupported protocol')
+      return url.toString()
     } catch {
       toast.error(`Invalid ${label} URL`)
       return null
@@ -56,11 +58,11 @@ const SocialMedia = () => {
     e.preventDefault()
 
     const cleaned = {
-      facebook: validateUrlOrEmpty(socialLinks.facebook, 'Facebook'),
-      instagram: validateUrlOrEmpty(socialLinks.instagram, 'Instagram'),
-      linkedin: validateUrlOrEmpty(socialLinks.linkedin, 'LinkedIn'),
-      twitter: validateUrlOrEmpty(socialLinks.twitter, 'Twitter'),
-      website: validateUrlOrEmpty(socialLinks.website, 'Website'),
+      facebook: normalizeUrlOrEmpty(socialLinks.facebook, 'Facebook'),
+      instagram: normalizeUrlOrEmpty(socialLinks.instagram, 'Instagram'),
+      linkedin: normalizeUrlOrEmpty(socialLinks.linkedin, 'LinkedIn'),
+      twitter: normalizeUrlOrEmpty(socialLinks.twitter, 'X / Twitter'),
+      website: normalizeUrlOrEmpty(socialLinks.website, 'Website'),
     }
 
     if (Object.values(cleaned).some((v) => v === null)) {
@@ -117,7 +119,8 @@ const SocialMedia = () => {
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
-                        type="url"
+                        type="text"
+                        inputMode="url"
                         className="form-control veterinary-input"
                         placeholder="Add Facebook URL"
                         value={socialLinks.facebook}
@@ -136,7 +139,8 @@ const SocialMedia = () => {
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
-                        type="url"
+                        type="text"
+                        inputMode="url"
                         className="form-control veterinary-input"
                         placeholder="Add Instagram URL"
                         value={socialLinks.instagram}
@@ -155,7 +159,8 @@ const SocialMedia = () => {
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
-                        type="url"
+                        type="text"
+                        inputMode="url"
                         className="form-control veterinary-input"
                         placeholder="Add LinkedIn URL"
                         value={socialLinks.linkedin}
@@ -174,7 +179,8 @@ const SocialMedia = () => {
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
-                        type="url"
+                        type="text"
+                        inputMode="url"
                         className="form-control veterinary-input"
                         placeholder="Add Twitter URL"
                         value={socialLinks.twitter}
@@ -193,7 +199,8 @@ const SocialMedia = () => {
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
-                        type="url"
+                        type="text"
+                        inputMode="url"
                         className="form-control veterinary-input"
                         placeholder="Add Website URL"
                         value={socialLinks.website}

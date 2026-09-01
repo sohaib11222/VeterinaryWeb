@@ -8,6 +8,7 @@ import { useUnreadAnnouncementCount } from '../../queries/announcementQueries'
 import { useUnreadNotificationsCount } from '../../queries/notificationQueries'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useAppointments } from '../../queries/appointmentQueries'
+import { useRescheduleRequests } from '../../queries/scheduleQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
@@ -26,6 +27,16 @@ const DoctorSidebar = () => {
   const pendingParams = useMemo(() => ({ status: 'PENDING', page: 1, limit: 1 }), [])
   const { data: pendingRes } = useAppointments(pendingParams)
   const pendingCount = pendingRes?.data?.pagination?.total ?? pendingRes?.pagination?.total ?? 0
+  const { data: pendingRescheduleRes } = useRescheduleRequests(
+    { status: 'PENDING' },
+    { enabled: Boolean(user) }
+  )
+  const pendingRescheduleCount = useMemo(() => {
+    const outer = pendingRescheduleRes?.data ?? pendingRescheduleRes
+    const payload = outer?.data ?? outer
+    const requests = Array.isArray(payload) ? payload : payload?.requests
+    return Array.isArray(requests) ? requests.length : 0
+  }, [pendingRescheduleRes])
 
   const vetProfile = useMemo(() => vetProfileRes?.data?.data || vetProfileRes?.data || vetProfileRes || null, [vetProfileRes])
   const vetUser = vetProfile?.userId || null
@@ -199,6 +210,9 @@ const DoctorSidebar = () => {
               <Link to="/doctor/reschedule-requests">
                 <i className="fa-solid fa-calendar-days"></i>
                 <span>Reschedule Requests</span>
+                {pendingRescheduleCount > 0 && (
+                  <small className="unread-msg veterinary-badge">{pendingRescheduleCount}</small>
+                )}
                 <div className="menu-indicator"></div>
               </Link>
             </li>

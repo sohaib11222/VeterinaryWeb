@@ -3,8 +3,8 @@ import { API_ROUTES } from '../utils/apiConfig'
 
 const VIDEO_REQUEST_CONFIG = { timeout: 15_000 }
 
-export const startVideoSession = async (appointmentId, { restartActive = false } = {}) => {
-  return api.post(API_ROUTES.VIDEO.CREATE, { appointmentId, restartActive }, VIDEO_REQUEST_CONFIG)
+export const startVideoSession = async (appointmentId) => {
+  return api.post(API_ROUTES.VIDEO.CREATE, { appointmentId }, VIDEO_REQUEST_CONFIG)
 }
 
 export const endVideoSession = async (sessionId) => {

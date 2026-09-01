@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { toast } from 'react-toastify'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
+import InternationalPhoneInput, { isE164Phone } from '../../components/common/InternationalPhoneInput'
 
 const PharmacyPhoneVerification = () => {
   const navigate = useNavigate()
@@ -38,6 +39,10 @@ const PharmacyPhoneVerification = () => {
 
   const handleResend = async () => {
     if (!user) return
+    if (!isE164Phone(phoneTrimmed)) {
+      toast.error('Enter a valid international phone number')
+      return
+    }
     setSending(true)
     try {
       await api.post(API_ROUTES.AUTH.SEND_PHONE_OTP, phoneTrimmed ? { phone: phoneTrimmed } : {})
@@ -54,6 +59,10 @@ const PharmacyPhoneVerification = () => {
 
     if (!code.trim()) {
       toast.error('Please enter the verification code')
+      return
+    }
+    if (!isE164Phone(phoneTrimmed)) {
+      toast.error('Enter a valid international phone number')
       return
     }
 
@@ -96,9 +105,9 @@ const PharmacyPhoneVerification = () => {
         </div>
         <form onSubmit={handleVerify} className="row g-3 mt-1">
           <div className="col-md-7">
-            <label className="form-label">Phone number (E.164 format)</label>
-            <input type="text" className="form-control" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+393331234567" autoComplete="tel" />
-            <small className="text-muted d-block mt-1">Use your country code, for example +39 for Italy.</small>
+            <label className="form-label">Phone number</label>
+            <InternationalPhoneInput value={phone} onChange={setPhone} disabled={sending || verifying} />
+            <small className="text-muted d-block mt-1">We use the selected country code when sending your verification code.</small>
           </div>
           <div className="col-md-5">
             <label className="form-label">Verification code</label>

@@ -67,14 +67,14 @@ const ProductDescription = () => {
   }, [allVariants])
 
   useEffect(() => {
-    const preferred = purchasableVariants.find((variant) => (
+    const preferred = allVariants.find((variant) => (
       requestedVariantId && String(variant?._id || variant?.id || 'legacy-default') === requestedVariantId
-    )) || purchasableVariants.find((variant) => variant.isDefault) || purchasableVariants[0]
+    )) || allVariants.find((variant) => variant.isDefault && variant.isActive !== false) || purchasableVariants[0] || allVariants[0]
     setSelectedVariantId(String(preferred?._id || preferred?.id || 'legacy-default'))
     setQuantity(1)
-  }, [purchasableVariants, requestedVariantId])
+  }, [allVariants, purchasableVariants, requestedVariantId])
 
-  const selectedVariant = purchasableVariants.find((variant) => String(variant?._id || variant?.id || 'legacy-default') === selectedVariantId)
+  const selectedVariant = allVariants.find((variant) => String(variant?._id || variant?.id || 'legacy-default') === selectedVariantId)
     || purchasableVariants[0]
   const selectedStock = Number(selectedVariant?.stock ?? product?.stock ?? 0)
   const selectedPrice = typeof selectedVariant?.discountPrice === 'number' && selectedVariant.discountPrice > 0
@@ -117,6 +117,14 @@ const ProductDescription = () => {
       return
     }
     setQuantity(next)
+  }
+
+  const selectVariant = (variant) => {
+    const nextVariantId = String(variant?._id || variant?.id || 'legacy-default')
+    if (nextVariantId !== selectedVariantId) {
+      setSelectedVariantId(nextVariantId)
+      setQuantity(1)
+    }
   }
 
   const ensureAdd = (goCheckout) => {
@@ -257,17 +265,34 @@ const ProductDescription = () => {
                       <h4 className="widget-title">Available variants</h4>
                       <div className="table-responsive">
                         <table className="table table-sm align-middle mb-0">
-                          <thead><tr><th>Variant</th><th>Strength / format</th><th>Pack</th><th>Price</th><th>Status</th></tr></thead>
+                          <thead><tr><th>Variant</th><th>Strength / format</th><th>Pack</th><th>Price</th><th>Status</th><th className="text-end">Select</th></tr></thead>
                           <tbody>
                             {allVariants.map((variant, index) => {
                               const variantPrice = typeof variant.discountPrice === 'number' && variant.discountPrice > 0 ? variant.discountPrice : variant.price
                               const variantPack = [variant.packageType, variant.unitsPerPack ? `${variant.unitsPerPack} ${variant.unitLabel || 'units'}` : ''].filter(Boolean).join(' · ')
-                              return <tr key={variant._id || index} className={String(variant._id || variant.id || 'legacy-default') === selectedVariantId ? 'table-primary' : ''}>
+                              const variantId = String(variant._id || variant.id || 'legacy-default')
+                              const isSelected = variantId === selectedVariantId
+                              return <tr
+                                key={variant._id || index}
+                                className={isSelected ? 'table-primary' : ''}
+                                role="button"
+                                tabIndex={0}
+                                aria-pressed={isSelected}
+                                onClick={() => selectVariant(variant)}
+                                onKeyDown={(event) => {
+                                  if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault()
+                                    selectVariant(variant)
+                                  }
+                                }}
+                                style={{ cursor: 'pointer' }}
+                              >
                                 <td>{variantLabel(variant, `Variant ${index + 1}`)}{variant.isDefault && <span className="badge bg-secondary ms-2">Default</span>}</td>
                                 <td>{[variant.strengthValue ? `${variant.strengthValue} ${variant.strengthUnit || ''}`.trim() : '', variant.dosageForm].filter(Boolean).join(' · ') || '—'}</td>
                                 <td>{variantPack || variant.packageDescription || '—'}</td>
                                 <td>€{Number(variantPrice || 0).toFixed(2)}</td>
                                 <td>{variant.isActive === false ? 'Unavailable' : variant.stock > 0 ? `${variant.stock} in stock` : 'Out of stock'}</td>
+                                <td className="text-end"><button type="button" className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-outline-primary'}`} onClick={(event) => { event.stopPropagation(); selectVariant(variant) }}>{isSelected ? 'Selected' : 'Choose'}</button></td>
                               </tr>
                             })}
                           </tbody>
@@ -317,11 +342,11 @@ const ProductDescription = () => {
 
             <div className="col-md-5 col-lg-3 col-xl-3 theiaStickySidebar">
               <div className="card search-filter"><div className="card-body">
-                {purchasableVariants.length > 1 && (
+                {allVariants.length > 1 && (
                   <div className="mb-3">
                     <label className="form-label">Choose a variant</label>
-                    <select className="form-select" value={selectedVariantId} onChange={(e) => { setSelectedVariantId(e.target.value); setQuantity(1) }}>
-                      {purchasableVariants.map((variant, index) => <option key={variant._id || variant.id || index} value={String(variant._id || variant.id || 'legacy-default')}>{variantLabel(variant, `Variant ${index + 1}`)}</option>)}
+                    <select className="form-select" value={selectedVariantId} onChange={(e) => selectVariant(allVariants.find((variant) => String(variant?._id || variant?.id || 'legacy-default') === e.target.value))}>
+                      {allVariants.map((variant, index) => <option key={variant._id || variant.id || index} value={String(variant._id || variant.id || 'legacy-default')}>{variantLabel(variant, `Variant ${index + 1}`)}{variant.isActive === false ? ' — unavailable' : ''}</option>)}
                     </select>
                   </div>
                 )}

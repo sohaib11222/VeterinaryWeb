@@ -185,7 +185,7 @@ const ProductAll = () => {
                       const productImage = getImageUrl(product?.images?.[0]) || '/assets/img/products/product.jpg'
 
                       return (
-                        <div key={productId} className="col-md-12 col-lg-4 col-xl-4 product-custom mb-4">
+                        <div key={productId} className="col-sm-6 col-lg-3 product-custom mb-4">
                           <div className="profile-widget" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                             <div className="doc-img" style={{ height: '250px', overflow: 'hidden', position: 'relative' }}>
                               <Link to={`/product-description?id=${productId}`} tabIndex="-1" style={{ display: 'block', height: '100%' }}>

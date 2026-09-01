@@ -22,6 +22,7 @@ export const useConversations = (params = {}, queryOptions = {}) =>
     queryFn: () => api.get(API_ROUTES.CHAT.CONVERSATIONS, { params }),
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
+    refetchInterval: 15000,
     staleTime: 0,
     ...queryOptions,
   })

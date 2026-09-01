@@ -35,7 +35,7 @@ const RescheduleRequests = () => {
   const confirmPay = async () => {
     if (!selected?._id) return
     try {
-      await payFee.mutateAsync({ id: selected._id, paymentMethod: 'DUMMY' })
+      await payFee.mutateAsync({ id: selected._id, paymentMethod: 'STRIPE' })
       toast.success('Reschedule fee paid successfully. Appointment confirmed.')
       setShowPayModal(false)
       setSelected(null)

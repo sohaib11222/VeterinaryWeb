@@ -6,13 +6,14 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../contexts/AuthContext'
+import InternationalPhoneInput, { isE164Phone } from '../../components/common/InternationalPhoneInput'
 
 const pharmacyBannerImage = '/assets/img/pharmacyregister.jpg'
 
 const schema = yup.object({
   name: yup.string().min(2, 'Name must be at least 2 characters').max(50, 'Name must be less than 50 characters').required('Name is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
-  phone: yup.string().required('Phone is required'),
+  phone: yup.string().test('e164-phone', 'Enter a valid international phone number', isE164Phone).required('Phone is required'),
   password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
   password_confirmation: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Confirm password is required'),
 })
@@ -35,6 +36,8 @@ const PharmacyRegister = () => {
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -129,7 +132,13 @@ const PharmacyRegister = () => {
                       </div>
                       <div className="mb-3 auth-form-grid__full">
                         <label className="form-label"><i className="fa-solid fa-phone me-2" />Phone</label>
-                        <input className="form-control form-control-lg group_formcontrol form-control-phone" id="phone" type="text" {...register('phone')} />
+                        <input type="hidden" {...register('phone')} />
+                        <InternationalPhoneInput
+                          value={watch('phone') || ''}
+                          onChange={(phone) => setValue('phone', phone, { shouldDirty: true, shouldValidate: true })}
+                          invalid={Boolean(errors.phone)}
+                        />
+                        <small className="text-muted d-block mt-1">Choose your country; we save the complete international number for OTP verification.</small>
                         {errors.phone && <div className="text-danger small mt-1">{errors.phone.message}</div>}
                       </div>
                       <div className="mb-3">

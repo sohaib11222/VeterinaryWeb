@@ -1,15 +1,48 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Breadcrumb from '../../components/common/Breadcrumb'
 import { toast } from 'react-toastify'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCreateOrder } from '../../mutations/orderMutations'
+import { useUserById } from '../../queries/userQueries'
+
+const normalizeShippingAddress = (address = {}) => ({
+  line1: String(address?.line1 || '').trim(),
+  line2: String(address?.line2 || '').trim(),
+  city: String(address?.city || '').trim(),
+  state: String(address?.state || '').trim(),
+  country: String(address?.country || 'Italy').trim() || 'Italy',
+  zip: String(address?.zip || '').trim(),
+})
+
+const hasRequiredShippingAddress = (address) => Boolean(
+  address?.line1 && address?.city && address?.state && address?.zip && address?.country
+)
 
 const ProductCheckout = () => {
   const { cartItems, getCartTotal, clearCart } = useCart()
   const { user } = useAuth()
   const navigate = useNavigate()
+  const userId = user?.id || user?._id
+  const { data: userResponse } = useUserById(userId, { enabled: Boolean(userId) })
+  const profileUser = useMemo(() => {
+    const outer = userResponse?.data ?? userResponse
+    return outer?.data ?? outer ?? user
+  }, [userResponse, user])
+  const defaultShippingAddress = useMemo(
+    () => normalizeShippingAddress(profileUser?.address || user?.address),
+    [
+      profileUser?.address?.line1,
+      profileUser?.address?.line2,
+      profileUser?.address?.city,
+      profileUser?.address?.state,
+      profileUser?.address?.country,
+      profileUser?.address?.zip,
+      user?.address,
+    ]
+  )
+  const hasDefaultShippingAddress = hasRequiredShippingAddress(defaultShippingAddress)
 
   const [formData, setFormData] = useState({
     firstName: user?.fullName?.split(' ')[0] || '',
@@ -32,6 +65,25 @@ const ProductCheckout = () => {
   const total = subtotal
 
   const createOrderMutation = useCreateOrder()
+
+  useEffect(() => {
+    const fullName = profileUser?.fullName || profileUser?.name || user?.fullName || user?.name || ''
+    const [firstName = '', ...remainingName] = fullName.trim().split(/\s+/).filter(Boolean)
+
+    setFormData((prev) => ({
+      ...prev,
+      firstName: prev.firstName || firstName,
+      lastName: prev.lastName || remainingName.join(' '),
+      email: prev.email || profileUser?.email || user?.email || '',
+      phone: prev.phone || profileUser?.phone || user?.phone || '',
+      shippingLine1: prev.shippingLine1 || defaultShippingAddress.line1,
+      shippingLine2: prev.shippingLine2 || defaultShippingAddress.line2,
+      shippingCity: prev.shippingCity || defaultShippingAddress.city,
+      shippingState: prev.shippingState || defaultShippingAddress.state,
+      shippingZip: prev.shippingZip || defaultShippingAddress.zip,
+      shippingCountry: prev.shippingCountry || defaultShippingAddress.country,
+    }))
+  }, [defaultShippingAddress, profileUser?.email, profileUser?.fullName, profileUser?.name, profileUser?.phone, user?.email, user?.fullName, user?.name, user?.phone])
 
   useEffect(() => {
     if (cartItems.length === 0) {
@@ -68,27 +120,27 @@ const ProductCheckout = () => {
       quantity: item.quantity,
     }))
 
-    let shippingAddress = undefined
+    let shippingAddress
     if (formData.shipToDifferentAddress) {
-      const hasRequired =
-        formData.shippingLine1?.trim() &&
-        formData.shippingCity?.trim() &&
-        formData.shippingState?.trim() &&
-        formData.shippingZip?.trim()
+      shippingAddress = normalizeShippingAddress({
+        line1: formData.shippingLine1,
+        line2: formData.shippingLine2,
+        city: formData.shippingCity,
+        state: formData.shippingState,
+        country: formData.shippingCountry,
+        zip: formData.shippingZip,
+      })
 
-      if (!hasRequired) {
+      if (!hasRequiredShippingAddress(shippingAddress)) {
         toast.error('Please fill shipping address fields')
         return
       }
-
-      shippingAddress = {
-        line1: formData.shippingLine1.trim(),
-        line2: formData.shippingLine2?.trim() || undefined,
-        city: formData.shippingCity.trim(),
-        state: formData.shippingState.trim(),
-        country: formData.shippingCountry?.trim() || 'Italy',
-        zip: formData.shippingZip.trim(),
+    } else {
+      if (!hasDefaultShippingAddress) {
+        toast.error('Please save a complete address in your profile or select a different shipping address')
+        return
       }
+      shippingAddress = defaultShippingAddress
     }
 
     try {
@@ -169,6 +221,25 @@ const ProductCheckout = () => {
                           <label htmlFor="ship_different">Ship to a different address?</label>
                         </div>
                       </div>
+
+                      {!formData.shipToDifferentAddress && (
+                        <div className={`alert ${hasDefaultShippingAddress ? 'alert-light border' : 'alert-warning'} mt-3 mb-0`}>
+                          {hasDefaultShippingAddress ? (
+                            <>
+                              <strong>Saved delivery address</strong>
+                              <div className="mt-1">{defaultShippingAddress.line1}</div>
+                              {defaultShippingAddress.line2 && <div>{defaultShippingAddress.line2}</div>}
+                              <div>{defaultShippingAddress.city}, {defaultShippingAddress.state} {defaultShippingAddress.zip}</div>
+                              <div>{defaultShippingAddress.country}</div>
+                            </>
+                          ) : (
+                            <>
+                              <strong>No complete saved address found.</strong>{' '}
+                              <Link to="/profile-settings">Add your address in Profile Settings</Link> or choose a different shipping address.
+                            </>
+                          )}
+                        </div>
+                      )}
 
                       {formData.shipToDifferentAddress && (
                         <div className="row mt-3">

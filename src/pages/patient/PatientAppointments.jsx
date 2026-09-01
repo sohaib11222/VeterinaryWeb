@@ -3,419 +3,121 @@ import { useMemo, useState } from 'react'
 
 import { useAppointments } from '../../queries'
 import { useGetOrCreateConversation } from '../../mutations'
+import RescheduleFeePayment from '../../components/appointments/RescheduleFeePayment'
 import { getImageUrl } from '../../utils/apiConfig'
+
+const unwrapAppointments = (response) => {
+  const outer = response?.data ?? response
+  const payload = outer?.data ?? outer
+  return Array.isArray(payload) ? payload : Array.isArray(payload?.appointments) ? payload.appointments : []
+}
+
+const statusBadgeClass = (status) => {
+  if (status === 'CONFIRMED') return 'bg-success'
+  if (status === 'PENDING' || status === 'PENDING_PAYMENT') return 'bg-warning text-dark'
+  if (status === 'COMPLETED') return 'bg-primary'
+  return 'bg-secondary'
+}
 
 const PatientAppointments = () => {
   const navigate = useNavigate()
-  const { data: appointmentsResponse, isLoading } = useAppointments({ limit: 50 })
-  const getOrCreateConversation = useGetOrCreateConversation()
+  const [search, setSearch] = useState('')
+  const [activeTab, setActiveTab] = useState('all')
   const [chatAlert, setChatAlert] = useState('')
+  const appointmentsQuery = useAppointments({ limit: 50, search: search.trim() || undefined })
+  const getOrCreateConversation = useGetOrCreateConversation()
 
-  const appointments = useMemo(() => {
-    const payload = appointmentsResponse?.data?.data ?? appointmentsResponse?.data ?? appointmentsResponse
-    const list = payload?.appointments ?? payload
-    return Array.isArray(list) ? list : []
-  }, [appointmentsResponse])
-
-  const mapAppointmentCard = (a) => {
-    const vet = a.veterinarianId || {}
-    const pet = a.petId || {}
-    const dateStr = a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString() : ''
-    const timeStr = a.appointmentTime || ''
-    const appointmentId = a._id
-    const detailsUrl = appointmentId ? `/patient-appointment-details?id=${appointmentId}` : '/patient-appointment-details'
-
+  const appointments = useMemo(() => unwrapAppointments(appointmentsQuery.data), [appointmentsQuery.data])
+  const mappedAppointments = useMemo(() => appointments.map((appointment) => {
+    const vet = appointment?.veterinarianId || {}
+    const pet = appointment?.petId || {}
+    const status = String(appointment?.status || '').toUpperCase()
     return {
-      id: a.appointmentNumber || a._id,
-      appointmentId,
-      detailsUrl,
-      doctor: vet.name || vet.fullName || vet.email || 'Veterinarian',
-      doctorImg: getImageUrl(vet.profileImage) || '/assets/img/doctors/doctor-thumb-21.jpg',
-      date: `${dateStr} ${timeStr}`.trim(),
-      types: [a.reason || 'Consultation', a.bookingType === 'ONLINE' ? 'Video Call' : 'Clinic Visit'],
-      email: vet.email || '',
-      phone: vet.phone || '',
-      pet: pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : 'Pet',
-      _raw: a,
+      id: appointment?._id,
+      number: appointment?.appointmentNumber || appointment?._id,
+      detailsUrl: `/patient-appointment-details?id=${encodeURIComponent(String(appointment?._id || ''))}`,
+      vetName: vet?.name || vet?.fullName || vet?.email || 'Veterinarian',
+      vetImage: getImageUrl(vet?.profileImage) || '/assets/img/doctors/doctor-thumb-21.jpg',
+      petName: pet?.name || 'Pet',
+      petBreed: pet?.breed || '',
+      date: appointment?.appointmentDate ? new Date(appointment.appointmentDate).toLocaleDateString() : 'Date unavailable',
+      time: appointment?.appointmentTime || 'Time unavailable',
+      status,
+      type: appointment?.bookingType === 'ONLINE' ? 'Video consultation' : 'Clinic visit',
+      reason: appointment?.reason || 'Consultation',
+      raw: appointment,
     }
-  }
+  }), [appointments])
 
-  const upcomingAppointments = useMemo(() => {
-    const now = new Date()
-    return appointments
-      .filter((a) => {
-        const status = String(a.status || '').toUpperCase()
-        if (!['PENDING', 'CONFIRMED'].includes(status)) return false
-        const d = a.appointmentDate ? new Date(a.appointmentDate) : null
-        return !d || d >= new Date(now.setHours(0, 0, 0, 0))
-      })
-      .map(mapAppointmentCard)
-  }, [appointments])
+  const visibleAppointments = useMemo(() => {
+    const startOfToday = new Date()
+    startOfToday.setHours(0, 0, 0, 0)
+    if (activeTab === 'upcoming') return mappedAppointments.filter((item) => ['PENDING', 'CONFIRMED', 'PENDING_PAYMENT'].includes(item.status) && (!item.raw?.appointmentDate || new Date(item.raw.appointmentDate) >= startOfToday))
+    if (activeTab === 'completed') return mappedAppointments.filter((item) => item.status === 'COMPLETED')
+    if (activeTab === 'cancelled') return mappedAppointments.filter((item) => ['CANCELLED', 'REJECTED', 'NO_SHOW', 'RESCHEDULED'].includes(item.status))
+    return mappedAppointments
+  }, [activeTab, mappedAppointments])
 
-  const allAppointments = useMemo(
-    () => appointments.map(mapAppointmentCard),
-    [appointments]
-  )
+  const counts = useMemo(() => ({
+    all: mappedAppointments.length,
+    upcoming: mappedAppointments.filter((item) => ['PENDING', 'CONFIRMED', 'PENDING_PAYMENT'].includes(item.status)).length,
+    completed: mappedAppointments.filter((item) => item.status === 'COMPLETED').length,
+    cancelled: mappedAppointments.filter((item) => ['CANCELLED', 'REJECTED', 'NO_SHOW', 'RESCHEDULED'].includes(item.status)).length,
+  }), [mappedAppointments])
 
-  const cancelledAppointments = useMemo(
-    () => appointments
-      .filter((a) => ['CANCELLED', 'REJECTED', 'NO_SHOW'].includes(String(a.status || '').toUpperCase()))
-      .map(mapAppointmentCard),
-    [appointments]
-  )
-
-  const completedAppointments = useMemo(
-    () => appointments
-      .filter((a) => String(a.status || '').toUpperCase() === 'COMPLETED')
-      .map(mapAppointmentCard),
-    [appointments]
-  )
-
-  const renderAppointmentList = (list, emptyText) => {
-    if (isLoading) {
-      return (
-        <div className="text-center py-5">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      )
+  const openChat = async (appointment) => {
+    const raw = appointment?.raw
+    const appointmentId = appointment?.id
+    const veterinarianId = typeof raw?.veterinarianId === 'object' ? raw.veterinarianId?._id : raw?.veterinarianId
+    const petOwnerId = typeof raw?.petOwnerId === 'object' ? raw.petOwnerId?._id : raw?.petOwnerId
+    if (!appointmentId || !veterinarianId || !petOwnerId) {
+      setChatAlert('This appointment cannot be opened in chat yet.')
+      return
     }
 
-    if (!list || list.length === 0) {
-      return (
-        <div className="text-center py-5 text-muted">
-          <p className="mb-0">{emptyText}</p>
-        </div>
-      )
-    }
-
-    const handleOpenChat = async (apt) => {
-      const raw = apt?._raw
-      const appointmentId = apt?.appointmentId
-      const vetId = raw?.veterinarianId && (typeof raw.veterinarianId === 'object' ? raw.veterinarianId._id : raw.veterinarianId)
-      const ownerId = raw?.petOwnerId && (typeof raw.petOwnerId === 'object' ? raw.petOwnerId._id : raw.petOwnerId)
-      if (!appointmentId || !vetId || !ownerId) {
-        setChatAlert('Unable to open chat for this appointment')
-        return
-      }
-
+    try {
       setChatAlert('')
-      try {
-        const res = await getOrCreateConversation.mutateAsync({ veterinarianId: vetId, petOwnerId: ownerId, appointmentId })
-        const payload = res?.data ?? res
-        const conv = payload?.data ?? payload
-        const convId = conv?._id
-        if (!convId) {
-          setChatAlert('Unable to open chat for this appointment')
-          return
-        }
-        navigate(`/chat?conversationId=${encodeURIComponent(String(convId))}&appointmentId=${encodeURIComponent(String(appointmentId))}`)
-      } catch (err) {
-        const msg = err?.response?.data?.message || err?.message || 'Unable to open chat for this appointment'
-        setChatAlert(msg)
-      }
+      const response = await getOrCreateConversation.mutateAsync({ veterinarianId, petOwnerId, appointmentId })
+      const outer = response?.data ?? response
+      const conversation = outer?.data ?? outer
+      if (!conversation?._id) throw new Error('Unable to open the appointment chat')
+      navigate(`/chat?conversationId=${encodeURIComponent(String(conversation._id))}&appointmentId=${encodeURIComponent(String(appointmentId))}`)
+    } catch (error) {
+      setChatAlert(error?.data?.message || error?.message || 'Unable to open this appointment chat.')
     }
-
-    return list.map((apt, index) => (
-      <div key={apt.appointmentId || index} className="appointment-wrap veterinary-appointment">
-        <ul>
-          <li>
-            <div className="patinet-information">
-              <Link to={apt.detailsUrl}>
-                <img
-                  src={apt.doctorImg}
-                  alt="Veterinarian"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null
-                    e.currentTarget.src = '/assets/img/doctors/doctor-thumb-21.jpg'
-                  }}
-                />
-              </Link>
-              <div className="patient-info">
-                <p>{apt.id}</p>
-                <h6><Link to={apt.detailsUrl}>{apt.doctor}</Link></h6>
-                <small className="text-muted">Pet: {apt.pet}</small>
-              </div>
-            </div>
-          </li>
-          <li className="appointment-info">
-            <p><i className="fa-solid fa-clock"></i>{apt.date}</p>
-            <ul className="d-flex apponitment-types">
-              {apt.types.map((type, i) => (
-                <li key={i} className="badge veterinary-badge">{type}</li>
-              ))}
-            </ul>
-          </li>
-          <li className="mail-info-patient">
-            <ul>
-              <li><i className="fa-solid fa-envelope"></i>{apt.email}</li>
-              <li><i className="fa-solid fa-phone"></i>{apt.phone}</li>
-            </ul>
-          </li>
-          <li className="appointment-action">
-            <ul>
-              <li>
-                <Link to={apt.detailsUrl} className="veterinary-action-btn" title="View Details">
-                  <i className="fa-solid fa-eye"></i>
-                </Link>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  className="veterinary-action-btn border-0 bg-transparent"
-                  title="Chat"
-                  onClick={() => handleOpenChat(apt)}
-                  disabled={getOrCreateConversation.isPending}
-                >
-                  <i className="fa-solid fa-comments"></i>
-                </button>
-              </li>
-            </ul>
-          </li>
-          <li className="appointment-start">
-            {apt?._raw?.bookingType === 'ONLINE' && String(apt?._raw?.status || '').toUpperCase() === 'CONFIRMED' ? (
-              <Link
-                to={`/video-call?appointmentId=${apt.appointmentId}`}
-                className="start-link veterinary-start-btn"
-              >
-                Join Video Call
-              </Link>
-            ) : (
-              <Link to={apt.detailsUrl} className="start-link veterinary-start-btn">View</Link>
-            )}
-          </li>
-        </ul>
-      </div>
-    ))
   }
+
+  const tabItems = [['all', 'All'], ['upcoming', 'Upcoming'], ['completed', 'Completed'], ['cancelled', 'Closed']]
 
   return (
-    <div className="content veterinary-dashboard">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-lg-3 col-xl-2 theiaStickySidebar">
-            {/* PatientSidebar will be rendered by DashboardLayout */}
-          </div>
-          <div className="col-lg-12 col-xl-12">
-            {chatAlert ? (
-              <div className="alert alert-warning" role="alert">
-                {chatAlert}
-              </div>
-            ) : null}
-            {/* Veterinary Appointments Header */}
-            <div className="row mb-4">
-              <div className="col-12">
-                <div className="veterinary-dashboard-header">
-                  <h2 className="dashboard-title">
-                    <i className="fa-solid fa-calendar-check me-3"></i>
-                    Pet Appointments
-                  </h2>
-                  <p className="dashboard-subtitle">Manage your pets' veterinary appointments and schedules</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Appointments Controls */}
-            <div className="row mb-4">
-              <div className="col-12">
-                <div className="dashboard-card veterinary-card">
-                  <div className="dashboard-card-body">
-                    <div className="row align-items-center">
-                      <div className="col-lg-4 mb-3 mb-lg-0">
-                        <div className="input-block dash-search-input">
-                          <input type="text" className="form-control" placeholder="Search veterinarians or pets..." />
-                          <span className="search-icon"><i className="fa-solid fa-magnifying-glass"></i></span>
-                        </div>
-                      </div>
-                      <div className="col-lg-8">
-                        <div className="d-flex justify-content-lg-end align-items-center gap-2 flex-wrap">
-                          <div className="view-icons">
-                            <Link to="/patient-appointments" className="active veterinary-btn-icon">
-                              <i className="fa-solid fa-list"></i>
-                            </Link>
-                          </div>
-                          <div className="view-icons">
-                            <Link to="/patient-appointments-grid" className="veterinary-btn-icon">
-                              <i className="fa-solid fa-th"></i>
-                            </Link>
-                          </div>
-                          <div className="view-icons">
-                            <a href="#" className="veterinary-btn-icon">
-                              <i className="fa-solid fa-calendar-days"></i>
-                            </a>
-                          </div>
-                          <div className="form-sorts dropdown">
-                            <a href="javascript:void(0);" className="dropdown-toggle veterinary-dropdown-btn" id="table-filter">
-                              <i className="fa-solid fa-filter me-2"></i>Filter By
-                            </a>
-                            <div className="filter-dropdown-menu">
-                              <div className="filter-set-view">
-                                <div className="accordion" id="accordionExample">
-                                  <div className="filter-set-content">
-                                    <div className="filter-set-content-head">
-                                      <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        Veterinarian<i className="fa-solid fa-chevron-right"></i>
-                                      </a>
-                                    </div>
-                                    <div className="filter-set-contents accordion-collapse collapse show" id="collapseTwo" data-bs-parent="#accordionExample">
-                                      <ul>
-                                        <li>
-                                          <div className="input-block dash-search-input w-100">
-                                            <input type="text" className="form-control" placeholder="Search vets..." />
-                                            <span className="search-icon"><i className="fa-solid fa-magnifying-glass"></i></span>
-                                          </div>
-                                        </li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div className="filter-set-content">
-                                    <div className="filter-set-content-head">
-                                      <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        Appointment Type<i className="fa-solid fa-chevron-right"></i>
-                                      </a>
-                                    </div>
-                                    <div className="filter-set-contents accordion-collapse collapse show" id="collapseOne" data-bs-parent="#accordionExample">
-                                      <ul>
-                                        <li>
-                                          <div className="filter-checks">
-                                            <label className="checkboxs">
-                                              <input type="checkbox" defaultChecked />
-                                              <span className="checkmarks"></span>
-                                              <span className="check-title">All Types</span>
-                                            </label>
-                                          </div>
-                                        </li>
-                                        <li>
-                                          <div className="filter-checks">
-                                            <label className="checkboxs">
-                                              <input type="checkbox" />
-                                              <span className="checkmarks"></span>
-                                              <span className="check-title">Video Call</span>
-                                            </label>
-                                          </div>
-                                        </li>
-                                        <li>
-                                          <div className="filter-checks">
-                                            <label className="checkboxs">
-                                              <input type="checkbox" />
-                                              <span className="checkmarks"></span>
-                                              <span className="check-title">Clinic Visit</span>
-                                            </label>
-                                          </div>
-                                        </li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Appointment Tabs */}
-            <div className="row">
-              <div className="col-12">
-                <div className="dashboard-card veterinary-card">
-                  <div className="dashboard-card-body p-0">
-                    <div className="appointment-tab-head">
-                      <div className="appointment-tabs">
-                        <ul className="nav nav-pills inner-tab" id="pills-tab" role="tablist">
-                          <li className="nav-item" role="presentation">
-                            <button className="nav-link active veterinary-tab" id="pills-all-tab" data-bs-toggle="pill" data-bs-target="#pills-all" type="button" role="tab" aria-controls="pills-all" aria-selected="true">
-                              <i className="fa-solid fa-list me-2"></i>
-                              <span className="tab-text">All</span>
-                              <span className="veterinary-tab-badge">{allAppointments.length}</span>
-                            </button>
-                          </li>
-                          <li className="nav-item" role="presentation">
-                            <button className="nav-link veterinary-tab" id="pills-upcoming-tab" data-bs-toggle="pill" data-bs-target="#pills-upcoming" type="button" role="tab" aria-controls="pills-upcoming" aria-selected="false">
-                              <i className="fa-solid fa-clock me-2"></i>
-                              <span className="tab-text">Upcoming</span>
-                              <span className="veterinary-tab-badge">{upcomingAppointments.length}</span>
-                            </button>
-                          </li>
-                          <li className="nav-item" role="presentation">
-                            <button className="nav-link veterinary-tab" id="pills-cancel-tab" data-bs-toggle="pill" data-bs-target="#pills-cancel" type="button" role="tab" aria-controls="pills-cancel" aria-selected="true">
-                              <i className="fa-solid fa-times-circle me-2"></i>
-                              <span className="tab-text">Cancelled</span>
-                              <span className="veterinary-tab-badge">{cancelledAppointments.length}</span>
-                            </button>
-                          </li>
-                          <li className="nav-item" role="presentation">
-                            <button className="nav-link veterinary-tab" id="pills-complete-tab" data-bs-toggle="pill" data-bs-target="#pills-complete" type="button" role="tab" aria-controls="pills-complete" aria-selected="true">
-                              <i className="fa-solid fa-check-circle me-2"></i>
-                              <span className="tab-text">Completed</span>
-                              <span className="veterinary-tab-badge">{completedAppointments.length}</span>
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                      <div className="filter-head">
-                        <div className="position-relative daterange-wraper me-2">
-                          <div className="input-groupicon calender-input">
-                            <input type="text" className="form-control date-range bookingrange" placeholder="From Date - To Date" />
-                          </div>
-                          <i className="fa-solid fa-calendar-days"></i>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Appointment Content */}
-            <div className="row">
-              <div className="col-12">
-                <div className="tab-content appointment-tab-content">
-                  <div className="tab-pane fade show active" id="pills-all" role="tabpanel" aria-labelledby="pills-all-tab">
-                    <div className="dashboard-card veterinary-card">
-                      <div className="dashboard-card-body">
-                        {renderAppointmentList(allAppointments, 'No appointments found')}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="tab-pane fade" id="pills-upcoming" role="tabpanel" aria-labelledby="pills-upcoming-tab">
-                    <div className="dashboard-card veterinary-card">
-                      <div className="dashboard-card-body">
-                        {/* Appointment List */}
-                        {renderAppointmentList(upcomingAppointments, 'No upcoming appointments')}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="tab-pane fade" id="pills-cancel" role="tabpanel" aria-labelledby="pills-cancel-tab">
-                    <div className="dashboard-card veterinary-card">
-                      <div className="dashboard-card-body">
-                        {renderAppointmentList(cancelledAppointments, 'No cancelled appointments')}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="tab-pane fade" id="pills-complete" role="tabpanel" aria-labelledby="pills-complete-tab">
-                    <div className="dashboard-card veterinary-card">
-                      <div className="dashboard-card-body">
-                        {renderAppointmentList(completedAppointments, 'No completed appointments')}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <section className="veterinary-dashboard">
+      <div className="veterinary-dashboard-header mb-4">
+        <h2 className="dashboard-title"><i className="fa-solid fa-calendar-check me-3" />Pet appointments</h2>
+        <p className="dashboard-subtitle">Search, review, pay for, and join your pet’s appointments.</p>
       </div>
-    </div>
+
+      {chatAlert && <div className="alert alert-warning alert-dismissible fade show" role="alert">{chatAlert}<button type="button" className="btn-close" onClick={() => setChatAlert('')} aria-label="Close" /></div>}
+
+      <div className="dashboard-card veterinary-card mb-4"><div className="dashboard-card-body">
+        <label className="visually-hidden" htmlFor="patient-appointments-search">Search appointments</label>
+        <div className="input-group" style={{ maxWidth: 620 }}><span className="input-group-text bg-white"><i className="fa-solid fa-magnifying-glass text-muted" /></span><input id="patient-appointments-search" type="search" className="form-control" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by veterinarian, pet, appointment number, reason, or status" />{search && <button type="button" className="btn btn-outline-secondary" onClick={() => setSearch('')}>Clear</button>}</div>
+      </div></div>
+
+      <div className="d-flex flex-wrap gap-2 mb-4" role="tablist" aria-label="Appointment status">{tabItems.map(([key, label]) => <button key={key} type="button" className={`btn ${activeTab === key ? 'btn-primary' : 'btn-outline-primary'} rounded-pill`} onClick={() => setActiveTab(key)}>{label}<span className="ms-2 badge text-bg-light">{counts[key]}</span></button>)}</div>
+
+      <div className="dashboard-card veterinary-card"><div className="dashboard-card-body">
+        {appointmentsQuery.isLoading ? <div className="text-center py-5"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading appointments</span></div></div>
+          : appointmentsQuery.isError ? <div className="alert alert-danger mb-0">{appointmentsQuery.error?.message || 'Unable to load appointments.'}</div>
+          : visibleAppointments.length === 0 ? <div className="text-center text-muted py-5"><i className="fa-regular fa-calendar-xmark fa-2x mb-3" /><p className="mb-0">No appointments match this view.</p></div>
+          : visibleAppointments.map((appointment) => <article key={appointment.id} className="appointment-wrap veterinary-appointment mb-3"><ul>
+            <li><div className="patinet-information"><Link to={appointment.detailsUrl}><img src={appointment.vetImage} alt="Veterinarian" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/assets/img/doctors/doctor-thumb-21.jpg' }} /></Link><div className="patient-info"><p>{appointment.number}</p><h6><Link to={appointment.detailsUrl}>{appointment.vetName}</Link></h6><small className="text-muted">Pet: {appointment.petName}{appointment.petBreed ? ` · ${appointment.petBreed}` : ''}</small></div></div></li>
+            <li className="appointment-info"><p><i className="fa-solid fa-clock" />{appointment.date} · {appointment.time}</p><div className="d-flex flex-wrap gap-2"><span className="badge veterinary-badge">{appointment.type}</span><span className="badge veterinary-badge">{appointment.reason}</span><span className={`badge ${statusBadgeClass(appointment.status)}`}>{appointment.status.replace('_', ' ')}</span></div></li>
+            <li className="appointment-action"><ul><li><Link to={appointment.detailsUrl} className="veterinary-action-btn" title="View appointment"><i className="fa-solid fa-eye" /></Link></li><li><button type="button" className="veterinary-action-btn appointment-chat-action" title="Open chat" onClick={() => openChat(appointment)} disabled={getOrCreateConversation.isPending}><i className="fa-solid fa-comments" /></button></li></ul></li>
+            <li className="appointment-start d-flex flex-wrap gap-2">{appointment.status === 'PENDING_PAYMENT' ? <RescheduleFeePayment requestId={appointment.raw?.rescheduleRequestId?._id || appointment.raw?.rescheduleRequestId} fee={appointment.raw?.rescheduleFee} className="btn btn-primary btn-sm rounded-pill" onPaid={() => appointmentsQuery.refetch()} /> : appointment.raw?.bookingType === 'ONLINE' && appointment.status === 'CONFIRMED' ? <Link to={`/video-call?appointmentId=${encodeURIComponent(String(appointment.id))}`} className="start-link veterinary-start-btn">Join video call</Link> : <Link to={appointment.detailsUrl} className="start-link veterinary-start-btn">View appointment</Link>}</li>
+          </ul></article>)}
+      </div></div>
+    </section>
   )
 }
 
 export default PatientAppointments
-

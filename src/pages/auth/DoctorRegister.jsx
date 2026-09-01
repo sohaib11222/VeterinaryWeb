@@ -6,6 +6,7 @@ import * as yup from 'yup'
 import { useAuth } from '../../contexts/AuthContext'
 import { toast } from 'react-toastify'
 import AuthLayout from '../../layouts/AuthLayout'
+import InternationalPhoneInput, { isE164Phone } from '../../components/common/InternationalPhoneInput'
 
 const vetRegisterBannerImage = '/assets/img/pharmacyregister.jpg'
 
@@ -17,7 +18,7 @@ const schema = yup.object({
   email: yup.string().email('Invalid email').required('Email is required'),
   phone: yup
     .string()
-    .matches(/^\+\d{7,15}$/, 'Use international format, for example +393331234567')
+    .test('e164-phone', 'Enter a valid international phone number', isE164Phone)
     .required('Phone is required'),
   password: yup
     .string()
@@ -34,7 +35,7 @@ const DoctorRegister = () => {
   const { register: registerUser } = useAuth()
   const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
   })
 
@@ -141,12 +142,13 @@ const DoctorRegister = () => {
                         <label className="form-label veterinary-form-label">
                           <i className="fa-solid fa-phone me-2"></i>Phone Number
                         </label>
-                        <input
-                          type="tel"
-                          className={`form-control veterinary-form-control ${errors.phone ? 'is-invalid' : ''}`}
-                          placeholder="+393331234567"
-                          {...register('phone')}
+                        <input type="hidden" {...register('phone')} />
+                        <InternationalPhoneInput
+                          value={watch('phone') || ''}
+                          onChange={(phone) => setValue('phone', phone, { shouldDirty: true, shouldValidate: true })}
+                          invalid={Boolean(errors.phone)}
                         />
+                        <small className="text-muted d-block mt-1">Your selected country code is included automatically for verification.</small>
                         {errors.phone && <div className="invalid-feedback veterinary-error-feedback">{errors.phone.message}</div>}
                       </div>
                       <div className="mb-3 veterinary-form-group">

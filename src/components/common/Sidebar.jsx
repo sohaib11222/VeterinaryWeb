@@ -3,6 +3,9 @@ import { useMemo } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMyPetStore } from '../../queries/petStoreQueries'
 import { usePharmacyPendingPrescriptionCount } from '../../queries/productPrescriptionRequestQueries'
+import { useOrders } from '../../queries/orderQueries'
+import { useWithdrawalRequests } from '../../queries/balanceQueries'
+import { useUnreadChatCount } from '../../queries/chatQueries'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const Sidebar = ({ userType = 'patient' }) => {
@@ -14,12 +17,31 @@ const Sidebar = ({ userType = 'patient' }) => {
   const storeEnabled = userType === 'pharmacy_admin' && (role === 'PET_STORE' || role === 'PARAPHARMACY')
   const myPetStoreQuery = useMyPetStore({ enabled: storeEnabled })
   const pendingPrescriptionQuery = usePharmacyPendingPrescriptionCount({ enabled: userType === 'pharmacy_admin' && role === 'PET_STORE' })
+  const pendingOrdersQuery = useOrders(
+    { status: 'PENDING', page: 1, limit: 1 },
+    { enabled: storeEnabled }
+  )
+  const pendingPayoutsQuery = useWithdrawalRequests(
+    { status: 'PENDING', page: 1, limit: 1 },
+    { enabled: storeEnabled }
+  )
+  const unreadAdminMessagesQuery = useUnreadChatCount({ enabled: storeEnabled })
   const petStore = useMemo(() => {
     const payload = myPetStoreQuery.data?.data ?? myPetStoreQuery.data
     return payload?.data ?? payload
   }, [myPetStoreQuery.data])
   const pendingPrescriptionPayload = pendingPrescriptionQuery.data?.data ?? pendingPrescriptionQuery.data
   const pendingPrescriptionCount = pendingPrescriptionPayload?.data?.pendingCount ?? pendingPrescriptionPayload?.pendingCount ?? 0
+  const getPaginatedCount = (response) => {
+    const outer = response?.data ?? response
+    const payload = outer?.data ?? outer
+    return Number(payload?.pagination?.total || 0)
+  }
+  const pendingOrdersCount = getPaginatedCount(pendingOrdersQuery.data)
+  const pendingPayoutsCount = getPaginatedCount(pendingPayoutsQuery.data)
+  const unreadAdminMessages = unreadAdminMessagesQuery.data?.data?.unreadCount
+    ?? unreadAdminMessagesQuery.data?.unreadCount
+    ?? 0
 
   if (userType === 'doctor') {
     return (
@@ -251,6 +273,7 @@ const Sidebar = ({ userType = 'patient' }) => {
                 <Link to="/pharmacy-admin/orders">
                   <i className="fa-solid fa-shopping-bag"></i>
                   <span>Orders</span>
+                  {pendingOrdersCount > 0 && <small className="unread-msg veterinary-badge">{pendingOrdersCount}</small>}
                   <div className="menu-indicator"></div>
                 </Link>
               </li>
@@ -273,6 +296,7 @@ const Sidebar = ({ userType = 'patient' }) => {
                 <Link to="/pharmacy-admin/payouts">
                   <i className="fa-solid fa-money-bill-1"></i>
                   <span>Payouts</span>
+                  {pendingPayoutsCount > 0 && <small className="unread-msg veterinary-badge">{pendingPayoutsCount}</small>}
                   <div className="menu-indicator"></div>
                 </Link>
               </li>
@@ -287,6 +311,7 @@ const Sidebar = ({ userType = 'patient' }) => {
                 <Link to="/pharmacy-admin/admin-chat">
                   <i className="fa-solid fa-headset"></i>
                   <span>Admin Messages</span>
+                  {unreadAdminMessages > 0 && <small className="unread-msg veterinary-badge">{unreadAdminMessages}</small>}
                   <div className="menu-indicator"></div>
                 </Link>
               </li>
