@@ -1,8 +1,35 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useFooterOptions } from '../../queries/footerOptionQueries'
+
+const DEFAULT_FOOTER_OPTIONS = {
+  address: '3556 Beech Street, USA',
+  supportEmail: 'support@mypetplus.com',
+  phoneNumber: '+1 315 369 5943',
+  socialLinks: [],
+}
+
+const socialIconFor = (platform) => {
+  const value = String(platform || '').toLowerCase()
+  if (value.includes('facebook')) return 'fa-facebook'
+  if (value.includes('instagram')) return 'fa-instagram'
+  if (value === 'x' || value.includes('twitter')) return 'fa-x-twitter'
+  if (value.includes('linkedin')) return 'fa-linkedin'
+  if (value.includes('youtube')) return 'fa-youtube'
+  if (value.includes('tiktok')) return 'fa-tiktok'
+  return 'fa-link'
+}
 
 const Footer = () => {
   const location = useLocation()
   const path = location.pathname
+  const { data: footerResponse } = useFooterOptions()
+  const footerOptions = {
+    ...DEFAULT_FOOTER_OPTIONS,
+    ...(footerResponse?.data || footerResponse || {}),
+  }
+  const socialLinks = Array.isArray(footerOptions.socialLinks)
+    ? footerOptions.socialLinks.filter((link) => link?.isActive !== false && link?.url)
+    : []
 
   // Default footer for most pages
   const DefaultFooter = () => (
@@ -53,13 +80,13 @@ const Footer = () => {
                     <h2 className="footer-title">Contact Us</h2>
                     <div className="footer-contact-info">
                       <div className="footer-address">
-                        <p><i className="isax isax-location"></i> 3556 Beech Street, USA</p>
+                        <p><i className="isax isax-location"></i> {footerOptions.address}</p>
                       </div>
                       <div className="footer-address">
-                        <p><i className="feather-phone-call"></i> +1 315 369 5943</p>
+                        <p><i className="feather-phone-call"></i> {footerOptions.phoneNumber}</p>
                       </div>
                       <div className="footer-address mb-0">
-                        <p><i className="feather-mail"></i> support@mypetplus.com</p>
+                        <p><i className="feather-mail"></i> {footerOptions.supportEmail}</p>
                       </div>
                     </div>
                   </div>
@@ -78,10 +105,18 @@ const Footer = () => {
                 </div>
                 <div className="social-icon">
                   <ul>
-                    <li><a href="#"><i className="fa-brands fa-facebook"></i></a></li>
-                    <li><a href="#"><i className="fa-brands fa-instagram"></i></a></li>
-                    <li><a href="#"><i className="fa-brands fa-x-twitter"></i></a></li>
-                    <li><a href="#"><i className="fa-brands fa-linkedin"></i></a></li>
+                    {socialLinks.map((link, index) => (
+                      <li key={`${link.platform}-${index}`}>
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={link.platform}
+                        >
+                          <i className={`fa-brands ${socialIconFor(link.platform)}`}></i>
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>

@@ -50,6 +50,8 @@ export const API_ROUTES = {
     REGISTER: '/auth/register',
     LOGIN: '/auth/login',
     CHANGE_PASSWORD: '/auth/change-password',
+    REQUEST_CHANGE_PASSWORD_CODE: '/auth/change-password/request-code',
+    VERIFY_CHANGE_PASSWORD_CODE: '/auth/change-password/verify-code',
     REFRESH_TOKEN: '/auth/refresh-token',
     FORGOT_PASSWORD: '/auth/forgot-password',
     VERIFY_RESET_CODE: '/auth/verify-reset-code',
@@ -168,6 +170,16 @@ export const API_ROUTES = {
     REOPEN: (id) => `/support-tickets/${id}/reopen`,
     UNREAD_COUNT: '/support-tickets/unread-count',
     UPLOAD_ATTACHMENTS: '/support-tickets/attachments',
+  },
+
+  FOOTER_OPTIONS: {
+    GET: '/footer-options',
+    UPDATE: '/footer-options',
+  },
+
+  CONTACT_QUERIES: {
+    BASE: '/contact-queries',
+    CREATE: '/contact-queries',
   },
 
   ORDERS: {

@@ -124,7 +124,6 @@ import PatientRegister from './pages/patient/PatientRegister'
 import PatientBilling from './pages/patient/PatientBilling'
 import PatientNotifications from './pages/patient/PatientNotifications'
 import PatientReports from './pages/patient/PatientReports'
-import TwoFactorAuthentication from './pages/patient/TwoFactorAuthentication'
 import PatientInvoices from './pages/patient/PatientInvoices'
 import PatientInvoiceView from './pages/patient/PatientInvoiceView'
 import VideoCallRoom from './pages/patient/VideoCallRoom'
@@ -146,6 +145,7 @@ import PharmacyAdminDashboard from './pages/pharmacy-admin/PharmacyAdminDashboar
 import PharmacyAdminProducts from './pages/pharmacy-admin/PharmacyAdminProducts'
 import PharmacyAdminOrders from './pages/pharmacy-admin/PharmacyAdminOrders'
 import PharmacyAdminOrderDetails from './pages/pharmacy-admin/PharmacyAdminOrderDetails'
+import PharmacyAdminChangePassword from './pages/pharmacy-admin/PharmacyAdminChangePassword'
 import PharmacyAdminPayouts from './pages/pharmacy-admin/PharmacyAdminPayouts'
 import PharmacyAdminProfile from './pages/pharmacy-admin/PharmacyAdminProfile'
 import PharmacyAdminSubscription from './pages/pharmacy-admin/PharmacyAdminSubscription'
@@ -908,7 +908,6 @@ function App() {
                   }
                 />
                 <Route path="/patient-reports" element={<DashboardLayout breadcrumb={{ title: "Patient", li1: "Reports", li2: "Medical Reports" }}><PatientReports /></DashboardLayout>} />
-                <Route path="/two-factor-authentication" element={<DashboardLayout breadcrumb={{ title: "Patient", li1: "Settings", li2: "2 Factor Authentication" }}><TwoFactorAuthentication /></DashboardLayout>} />
 
             {/* Pharmacy Admin Routes - Protected (PET_STORE or ADMIN) */}
             <Route
@@ -934,6 +933,15 @@ function App() {
               element={
                 <ProtectedRoute role={['PET_STORE', 'PARAPHARMACY', 'ADMIN']}>
                   <DashboardLayout><PharmacyAdminProfile /></DashboardLayout>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/pharmacy-admin/change-password"
+              element={
+                <ProtectedRoute role={['PET_STORE', 'PARAPHARMACY']}>
+                  <DashboardLayout><PharmacyAdminChangePassword /></DashboardLayout>
                 </ProtectedRoute>
               }
             />

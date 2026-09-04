@@ -322,6 +322,13 @@ const Sidebar = ({ userType = 'patient' }) => {
                   <div className="menu-indicator"></div>
                 </Link>
               </li>
+              <li className={isActive('/pharmacy-admin/change-password') ? 'active' : ''}>
+                <Link to="/pharmacy-admin/change-password">
+                  <i className="fa-solid fa-key"></i>
+                  <span>Change Password</span>
+                  <div className="menu-indicator"></div>
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>

@@ -541,17 +541,6 @@ const Header = () => {
             {/* Right Side Navigation */}
             {!user ? (
               <ul className="nav header-navbar-rht">
-                <li className="searchbar">
-                  <a href="javascript:void(0);"><i className="feather-search"></i></a>
-                  <div className="togglesearch">
-                    <form action="/search">
-                      <div className="input-group">
-                        <input type="text" className="form-control" />
-                        <button type="submit" className="btn">Search</button>
-                      </div>
-                    </form>
-                  </div>
-                </li>
                 <li>
                   <Link to="/register" className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill">
                     <i className="isax isax-lock-1 me-1"></i>Sign Up
@@ -560,9 +549,6 @@ const Header = () => {
               </ul>
             ) : (
               <ul className="nav header-navbar-rht">
-                <li className="searchbar">
-                  <a href="javascript:void(0);"><i className="feather-search"></i></a>
-                </li>
                 {role === ROLES.PET_OWNER && (
                   <li className="nav-item">
                     <Link to="/cart" className="nav-link position-relative" title="Cart">

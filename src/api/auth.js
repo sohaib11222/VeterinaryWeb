@@ -54,3 +54,19 @@ export const resetPassword = async (email, code, newPassword) => {
   return api.post(API_ROUTES.AUTH.RESET_PASSWORD, { email, code, newPassword })
 }
 
+export const verifyResetCode = async (email, code) => {
+  return api.post(API_ROUTES.AUTH.VERIFY_RESET_CODE, { email, code })
+}
+
+export const requestChangePasswordCode = async () => {
+  return api.post(API_ROUTES.AUTH.REQUEST_CHANGE_PASSWORD_CODE)
+}
+
+export const verifyChangePasswordCode = async (code) => {
+  return api.post(API_ROUTES.AUTH.VERIFY_CHANGE_PASSWORD_CODE, { code })
+}
+
+export const changePasswordWithCode = async (code, newPassword) => {
+  return api.post(API_ROUTES.AUTH.CHANGE_PASSWORD, { code, newPassword })
+}
+

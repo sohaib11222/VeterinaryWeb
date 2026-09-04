@@ -1,7 +1,23 @@
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 import Breadcrumb from '../components/common/Breadcrumb'
+import { useFooterOptions } from '../queries/footerOptionQueries'
+import { useCreateContactQuery } from '../mutations/contactQueryMutations'
+
+const DEFAULT_CONTACT_DETAILS = {
+  address: '3556 Beech Street, USA',
+  supportEmail: 'support@mypetplus.com',
+  phoneNumber: '+1 315 369 5943',
+}
 
 const ContactUs = () => {
+  const { data: footerResponse } = useFooterOptions()
+  const createContactQuery = useCreateContactQuery()
+  const contactDetails = {
+    ...DEFAULT_CONTACT_DETAILS,
+    ...(footerResponse?.data || footerResponse || {}),
+  }
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -20,16 +36,20 @@ const ContactUs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    // TODO: Handle form submission
-    console.log('Form submitted:', formData)
-    alert('Thank you for your message! We will get back to you soon.')
-    // Reset form
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      services: '',
-      message: ''
+    createContactQuery.mutate(formData, {
+      onSuccess: () => {
+        toast.success('Thank you for your message! We will get back to you soon.')
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          services: '',
+          message: ''
+        })
+      },
+      onError: (error) => {
+        toast.error(error?.message || 'Unable to send your message. Please try again.')
+      },
     })
   }
 
@@ -53,7 +73,7 @@ const ContactUs = () => {
                   </div>
                   <div className="contact-details">
                     <h4>Address</h4>
-                    <p>8432 Mante Highway, Aminaport, USA</p>
+                    <p>{contactDetails.address}</p>
                   </div>
                 </div>
               </div>
@@ -64,7 +84,7 @@ const ContactUs = () => {
                   </div>
                   <div className="contact-details">
                     <h4>Phone Number</h4>
-                    <p>+1 315 369 5943</p>
+                    <p><a href={`tel:${String(contactDetails.phoneNumber).replace(/\s+/g, '')}`}>{contactDetails.phoneNumber}</a></p>
                   </div>
                 </div>
               </div>
@@ -75,7 +95,7 @@ const ContactUs = () => {
                   </div>
                   <div className="contact-details">
                     <h4>Email Address</h4>
-                    <p>support@mypetplus.com</p>
+                    <p><a href={`mailto:${contactDetails.supportEmail}`}>{contactDetails.supportEmail}</a></p>
                   </div>
                 </div>
               </div>
@@ -152,7 +172,13 @@ const ContactUs = () => {
                       </div>
                       <div className="col-md-12">
                         <div className="form-group-btn mb-0">
-                          <button type="submit" className="btn btn-primary-gradient">Send Message</button>
+                          <button
+                            type="submit"
+                            className="btn btn-primary-gradient"
+                            disabled={createContactQuery.isPending}
+                          >
+                            {createContactQuery.isPending ? 'Sending...' : 'Send Message'}
+                          </button>
                         </div>
                       </div>
                     </div>

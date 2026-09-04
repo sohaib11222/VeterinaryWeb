@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { useBlogPost } from '../../queries/blogQueries'
 import { useCreateBlogPost, useUpdateBlogPost, useUploadBlogCoverImage } from '../../mutations/blogMutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import RichTextEditor from '../../components/common/RichTextEditor'
 
 const toTags = (input) => {
   if (!input) return []
@@ -20,6 +21,12 @@ const slugify = (value) =>
     .trim()
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9-]/g, '')
+
+const contentHasText = (value) => String(value || '')
+  .replace(/<[^>]*>/g, ' ')
+  .replace(/&nbsp;/gi, ' ')
+  .replace(/\s+/g, ' ')
+  .trim().length > 0
 
 const DoctorBlogCreateEdit = () => {
   const { id } = useParams()
@@ -99,7 +106,7 @@ const DoctorBlogCreateEdit = () => {
       return
     }
 
-    if (!content.trim()) {
+    if (!contentHasText(content)) {
       toast.error('Content is required')
       return
     }
@@ -189,11 +196,9 @@ const DoctorBlogCreateEdit = () => {
 
                         <div className="mb-3">
                           <label className="form-label">Content</label>
-                          <textarea
-                            className="form-control"
-                            rows="12"
+                          <RichTextEditor
                             value={content}
-                            onChange={(e) => setContent(e.target.value)}
+                            onChange={setContent}
                             disabled={isSubmitting}
                           />
                         </div>

@@ -2,7 +2,13 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Breadcrumb from '../components/common/Breadcrumb'
 import { usePublicReviews } from '../queries/reviewQueries'
+import { useFooterOptions } from '../queries/footerOptionQueries'
 import { getImageUrl } from '../utils/apiConfig'
+
+const DEFAULT_CONTACT_OPTIONS = {
+  address: '3556 Beech Street, USA',
+  phoneNumber: '+1 315 369 5943',
+}
 
 const AboutUs = () => {
   const whyChooseUs = [
@@ -89,6 +95,11 @@ const AboutUs = () => {
     page: 1,
     limit: 9
   })
+  const { data: footerResponse } = useFooterOptions()
+  const contactOptions = {
+    ...DEFAULT_CONTACT_OPTIONS,
+    ...(footerResponse?.data || footerResponse || {}),
+  }
 
   const testimonials = useMemo(() => {
     const payload = reviewsRes?.data ?? reviewsRes
@@ -181,7 +192,8 @@ const AboutUs = () => {
                   </div>
                   <div className="about-contact-text">
                     <p>Questions or urgent care?</p>
-                    <h4>+1 315 369 5943</h4>
+                    <h4><a href={`tel:${contactOptions.phoneNumber}`}>{contactOptions.phoneNumber}</a></h4>
+                    <p className="mb-0"><i className="fa-solid fa-location-dot me-1" aria-hidden="true"></i>{contactOptions.address}</p>
                   </div>
                 </div>
                 <div className="about-actions">

@@ -207,22 +207,12 @@ const ProfileSettings = () => {
                       <ul className="nav nav-tabs-bottom" role="tablist">
                         <li className="nav-item" role="presentation">
                           <Link className="nav-link veterinary-nav-link active" to="/profile-settings">
-                            <i className="fa-solid fa-user me-2"></i>Profile
+                            <i className="fa-solid fa-user me-2"></i>Account Settings
                           </Link>
                         </li>
                         <li className="nav-item" role="presentation">
                           <Link className="nav-link veterinary-nav-link" to="/change-password">
                             <i className="fa-solid fa-lock me-2"></i>Change Password
-                          </Link>
-                        </li>
-                        <li className="nav-item" role="presentation">
-                          <Link className="nav-link veterinary-nav-link" to="/two-factor-authentication">
-                            <i className="fa-solid fa-shield-halved me-2"></i>2 Factor Authentication
-                          </Link>
-                        </li>
-                        <li className="nav-item" role="presentation">
-                          <Link className="nav-link veterinary-nav-link" to="/delete-account">
-                            <i className="fa-solid fa-user-xmark me-2"></i>Delete Account
                           </Link>
                         </li>
                       </ul>
