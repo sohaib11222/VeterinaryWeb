@@ -5,6 +5,12 @@ import { toast } from 'react-toastify'
 import { useOrder } from '../../queries/orderQueries'
 import { useUpdateOrderStatus, useUpdateShippingFee } from '../../mutations/orderMutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import {
+  DELIVERY_DAY_OPTIONS,
+  calculateExpectedDeliveryPreview,
+  deliveryStatusBadgeClass,
+  formatDeliveryStatus,
+} from '../../utils/deliveryMonitoring'
 
 const STATUS_OPTIONS = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED']
 
@@ -17,6 +23,7 @@ const PharmacyAdminOrderDetails = () => {
 
   const [showShippingModal, setShowShippingModal] = useState(false)
   const [shippingFee, setShippingFee] = useState('')
+  const [deliveryDays, setDeliveryDays] = useState('')
 
   const payload = orderQuery.data?.data ?? orderQuery.data
   const order = payload?.data ?? payload
@@ -67,6 +74,7 @@ const PharmacyAdminOrderDetails = () => {
       order?.initialShipping ??
       0
     setShippingFee(String(current))
+    setDeliveryDays(order?.promisedDeliveryDays ? String(order.promisedDeliveryDays) : '')
     setShowShippingModal(true)
   }
 
@@ -76,12 +84,18 @@ const PharmacyAdminOrderDetails = () => {
       toast.error('Please enter a valid shipping fee (non-negative number)')
       return
     }
+    const selectedDeliveryDays = Number(deliveryDays)
+    if (!DELIVERY_DAY_OPTIONS.includes(selectedDeliveryDays)) {
+      toast.error('Please select an expected delivery time between 2 and 5 days')
+      return
+    }
 
     try {
-      await updateShippingFeeMutation.mutateAsync({ orderId, shippingFee: fee })
-      toast.success('Shipping fee updated')
+      await updateShippingFeeMutation.mutateAsync({ orderId, shippingFee: fee, deliveryDays: selectedDeliveryDays })
+      toast.success('Shipping fee and delivery commitment sent')
       setShowShippingModal(false)
       setShippingFee('')
+      setDeliveryDays('')
       orderQuery.refetch()
     } catch (error) {
       toast.error(error?.message || 'Failed to update shipping fee')
@@ -134,6 +148,9 @@ const PharmacyAdminOrderDetails = () => {
   const shippingSet = finalShipping !== null && finalShipping !== undefined
 
   const total = Number(order?.total ?? order?.finalTotal ?? order?.initialTotal ?? 0)
+  const expectedDeliveryDate = order?.expectedDeliveryDate
+    ? new Date(order.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })
+    : '—'
 
   return (
     <div className="content">
@@ -158,6 +175,35 @@ const PharmacyAdminOrderDetails = () => {
                 {getStatusBadge(order?.status)}
                 <p className="text-muted small mb-0 mt-2">Payment: {order?.paymentStatus || '—'}</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card mb-4">
+          <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h4 className="card-title mb-0">Delivery Commitment</h4>
+            {order?.expectedDeliveryDate ? (
+              <span className={`badge ${deliveryStatusBadgeClass(order?.deliveryStatus)}`}>
+                {formatDeliveryStatus(order?.deliveryStatus, order?.daysLate)}
+              </span>
+            ) : (
+              <span className="badge badge-secondary">Awaiting Delivery</span>
+            )}
+          </div>
+          <div className="card-body">
+            <div className="row g-3">
+              <div className="col-md-4"><strong>Estimated delivery</strong><div className="text-muted">2–5 Days</div></div>
+              <div className="col-md-4"><strong>Pharmacy promise</strong><div className="text-muted">{order?.promisedDeliveryDays ? `${order.promisedDeliveryDays} Days` : 'Not set'}</div></div>
+              <div className="col-md-4"><strong>Expected delivery date</strong><div className="text-muted">{expectedDeliveryDate}</div></div>
+              <div className="col-md-4"><strong>Order requested</strong><div className="text-muted">{formatDate(order?.requestedAt || order?.createdAt)}</div></div>
+              <div className="col-md-4"><strong>Payment request sent</strong><div className="text-muted">{formatDate(order?.shippingFeeAddedAt || order?.shippingUpdatedAt)}</div></div>
+              <div className="col-md-4"><strong>Customer paid</strong><div className="text-muted">{formatDate(order?.customerPaidAt)}</div></div>
+              {order?.actualDeliveredAt && (
+                <>
+                  <div className="col-md-4"><strong>Delivered</strong><div className="text-muted">{formatDate(order.actualDeliveredAt)}</div></div>
+                  <div className="col-md-4"><strong>Actual delivery time</strong><div className="text-muted">{order.totalActualDeliveryDays ?? '—'} Days</div></div>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -312,6 +358,7 @@ const PharmacyAdminOrderDetails = () => {
                     onClick={() => {
                       setShowShippingModal(false)
                       setShippingFee('')
+                      setDeliveryDays('')
                     }}
                   ></button>
                 </div>
@@ -332,6 +379,19 @@ const PharmacyAdminOrderDetails = () => {
                       </small>
                     )}
                   </div>
+                  <div className="mb-3">
+                    <label className="form-label">Expected Delivery Time <span className="text-danger">*</span></label>
+                    <select className="form-select" value={deliveryDays} onChange={(e) => setDeliveryDays(e.target.value)} required>
+                      <option value="">Select delivery time</option>
+                      {DELIVERY_DAY_OPTIONS.map((days) => <option key={days} value={days}>{days} Days</option>)}
+                    </select>
+                    {calculateExpectedDeliveryPreview(deliveryDays) && (
+                      <small className="text-muted d-block mt-2">
+                        Expected delivery date: {calculateExpectedDeliveryPreview(deliveryDays).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+                      </small>
+                    )}
+                    <small className="text-muted d-block mt-1">Only 2–5 days can be promised. The delivery date is calculated automatically.</small>
+                  </div>
                 </div>
                 <div className="modal-footer">
                   <button
@@ -340,6 +400,7 @@ const PharmacyAdminOrderDetails = () => {
                     onClick={() => {
                       setShowShippingModal(false)
                       setShippingFee('')
+                      setDeliveryDays('')
                     }}
                   >
                     Cancel

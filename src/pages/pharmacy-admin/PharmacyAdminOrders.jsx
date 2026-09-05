@@ -2,6 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useOrders } from '../../queries/orderQueries'
 import { useUpdateOrderStatus, useUpdateShippingFee } from '../../mutations/orderMutations'
+import {
+  DELIVERY_DAY_OPTIONS,
+  calculateExpectedDeliveryPreview,
+  deliveryStatusBadgeClass,
+  formatDeliveryStatus,
+} from '../../utils/deliveryMonitoring'
 import { toast } from 'react-toastify'
 
 const normalizeListPayload = (payload) => {
@@ -44,6 +50,7 @@ const PharmacyAdminOrders = () => {
 
   const [showShippingModal, setShowShippingModal] = useState(false)
   const [shippingFee, setShippingFee] = useState('')
+  const [deliveryDays, setDeliveryDays] = useState('')
   const [selectedOrderForShipping, setSelectedOrderForShipping] = useState(null)
 
   const { items: orders } = useMemo(() => normalizeListPayload(ordersQuery.data), [ordersQuery.data])
@@ -65,6 +72,7 @@ const PharmacyAdminOrders = () => {
       order?.initialShipping ??
       0
     setShippingFee(String(current))
+    setDeliveryDays(order?.promisedDeliveryDays ? String(order.promisedDeliveryDays) : '')
     setShowShippingModal(true)
   }
 
@@ -76,14 +84,20 @@ const PharmacyAdminOrders = () => {
       toast.error('Please enter a valid shipping fee (non-negative number)')
       return
     }
+    const selectedDeliveryDays = Number(deliveryDays)
+    if (!DELIVERY_DAY_OPTIONS.includes(selectedDeliveryDays)) {
+      toast.error('Please select an expected delivery time between 2 and 5 days')
+      return
+    }
 
     const id = selectedOrderForShipping?._id || selectedOrderForShipping?.id
     try {
-      await updateShippingFee.mutateAsync({ orderId: id, shippingFee: fee })
-      toast.success('Shipping fee updated')
+      await updateShippingFee.mutateAsync({ orderId: id, shippingFee: fee, deliveryDays: selectedDeliveryDays })
+      toast.success('Shipping fee and delivery commitment sent')
       setShowShippingModal(false)
       setSelectedOrderForShipping(null)
       setShippingFee('')
+      setDeliveryDays('')
     } catch (error) {
       toast.error(error?.message || 'Failed to update shipping fee')
     }
@@ -141,6 +155,8 @@ const PharmacyAdminOrders = () => {
                     <th>Shipping</th>
                     <th>Payment</th>
                     <th>Status</th>
+                    <th>Expected Delivery</th>
+                    <th>Delivery Monitoring</th>
                     <th style={{ width: 300 }}>Actions</th>
                   </tr>
                 </thead>
@@ -156,6 +172,10 @@ const PharmacyAdminOrders = () => {
                       : (typeof finalShipping === 'number' ? finalShipping.toFixed(2) : finalShipping)
                     const paymentStatus = o?.paymentStatus || '—'
                     const status = o?.status || '—'
+                    const expectedDelivery = o?.expectedDeliveryDate
+                      ? new Date(o.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                      : '—'
+                    const deliveryStatus = formatDeliveryStatus(o?.deliveryStatus, o?.daysLate)
 
                     const isPaid = String(paymentStatus).toUpperCase() === 'PAID'
                     const normalizedStatus = String(status).toUpperCase()
@@ -168,6 +188,12 @@ const PharmacyAdminOrders = () => {
                         <td data-label="Shipping">{shippingDisplay}</td>
                         <td data-label="Payment">{paymentStatus}</td>
                         <td data-label="Status">{status}</td>
+                        <td data-label="Expected Delivery">{expectedDelivery}</td>
+                        <td data-label="Delivery Monitoring">
+                          {o?.expectedDeliveryDate ? (
+                            <span className={`badge ${deliveryStatusBadgeClass(o?.deliveryStatus)}`}>{deliveryStatus}</span>
+                          ) : <span className="badge badge-secondary">Awaiting Delivery</span>}
+                        </td>
                         <td data-label="Actions">
                           <div className="d-flex gap-2 align-items-center pharmacy-order-actions">
                             <Link to={`/pharmacy-admin/orders/${id}`} className="btn btn-sm btn-outline-secondary">
@@ -223,6 +249,7 @@ const PharmacyAdminOrders = () => {
                       setShowShippingModal(false)
                       setSelectedOrderForShipping(null)
                       setShippingFee('')
+                      setDeliveryDays('')
                     }}
                   ></button>
                 </div>
@@ -238,6 +265,26 @@ const PharmacyAdminOrders = () => {
                       onChange={(e) => setShippingFee(e.target.value)}
                     />
                   </div>
+                  <div className="mb-3">
+                    <label className="form-label">Expected Delivery Time <span className="text-danger">*</span></label>
+                    <select
+                      className="form-select"
+                      value={deliveryDays}
+                      onChange={(e) => setDeliveryDays(e.target.value)}
+                      required
+                    >
+                      <option value="">Select delivery time</option>
+                      {DELIVERY_DAY_OPTIONS.map((days) => (
+                        <option key={days} value={days}>{days} Days</option>
+                      ))}
+                    </select>
+                    {calculateExpectedDeliveryPreview(deliveryDays) && (
+                      <small className="text-muted d-block mt-2">
+                        Expected delivery date: {calculateExpectedDeliveryPreview(deliveryDays).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
+                      </small>
+                    )}
+                    <small className="text-muted d-block mt-1">The date is calculated automatically when you send the payment request.</small>
+                  </div>
                 </div>
                 <div className="modal-footer">
                   <button
@@ -247,6 +294,7 @@ const PharmacyAdminOrders = () => {
                       setShowShippingModal(false)
                       setSelectedOrderForShipping(null)
                       setShippingFee('')
+                      setDeliveryDays('')
                     }}
                   >
                     Cancel

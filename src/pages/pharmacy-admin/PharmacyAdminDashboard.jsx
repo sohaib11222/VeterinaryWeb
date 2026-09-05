@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useOrders } from '../../queries/orderQueries'
 import { useUpdateOrderStatus } from '../../mutations/orderMutations'
+import { deliveryStatusBadgeClass, formatDeliveryStatus } from '../../utils/deliveryMonitoring'
 import { useMyPetStoreSubscription, usePetStoreSetupStatus } from '../../queries/petStoreQueries'
 import { usePharmacyPendingPrescriptionCount } from '../../queries/productPrescriptionRequestQueries'
 import PharmacySetupModal from '../../components/common/PharmacySetupModal'
@@ -191,6 +192,8 @@ const PharmacyAdminDashboard = () => {
                               <th>Total</th>
                               <th>Payment</th>
                               <th>Status</th>
+                              <th>Expected Delivery</th>
+                              <th>Delivery Monitoring</th>
                               <th style={{ width: 220 }}>Update</th>
                             </tr>
                           </thead>
@@ -202,6 +205,11 @@ const PharmacyAdminDashboard = () => {
                               const total = o?.total ?? o?.finalTotal ?? o?.initialTotal
                               const paymentStatus = o?.paymentStatus || '—'
                               const status = o?.status || '—'
+                              const isPaid = String(paymentStatus).toUpperCase() === 'PAID'
+                              const normalizedStatus = String(status).toUpperCase()
+                              const expectedDelivery = o?.expectedDeliveryDate
+                                ? new Date(o.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                                : '—'
 
                               return (
                                 <tr key={id}>
@@ -210,15 +218,24 @@ const PharmacyAdminDashboard = () => {
                                   <td data-label="Total">{typeof total === 'number' ? total.toFixed(2) : total}</td>
                                   <td data-label="Payment">{paymentStatus}</td>
                                   <td data-label="Status">{status}</td>
+                                  <td data-label="Expected Delivery">{expectedDelivery}</td>
+                                  <td data-label="Delivery Monitoring">
+                                    {o?.expectedDeliveryDate ? (
+                                      <span className={`badge ${deliveryStatusBadgeClass(o?.deliveryStatus)}`}>
+                                        {formatDeliveryStatus(o?.deliveryStatus, o?.daysLate)}
+                                      </span>
+                                    ) : <span className="badge badge-secondary">Awaiting Delivery</span>}
+                                  </td>
                                   <td data-label="Update">
                                     <select
                                       className="form-select form-select-sm"
                                       value={status}
                                       onChange={(e) => setOrderStatus(id, e.target.value)}
                                       disabled={updateStatus.isPending}
+                                      title={!isPaid ? 'Only CANCELLED is allowed before payment' : undefined}
                                     >
                                       {['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'].map((s) => (
-                                        <option key={s} value={s}>
+                                        <option key={s} value={s} disabled={!isPaid && s !== 'CANCELLED' && s !== normalizedStatus}>
                                           {s}
                                         </option>
                                       ))}

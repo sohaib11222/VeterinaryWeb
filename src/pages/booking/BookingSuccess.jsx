@@ -21,7 +21,7 @@ const BookingSuccess = () => {
 
   return (
     <>
-      <Breadcrumb title="Patient" li1="Booking" li2="Booking" />
+      <Breadcrumb title="My Pet" li1="Booking" li2="Booking" />
       <div className="content success-page-cont">
         <div className="container">
           <div className="row justify-content-center">

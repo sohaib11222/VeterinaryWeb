@@ -59,8 +59,8 @@ const InvoiceReport = () => {
                       <thead>
                         <tr>
                           <th>Invoice Number</th>
-                          <th>Patient ID</th>
-                          <th>Patient Name</th>
+                          <th>Pet ID</th>
+                          <th>Pet Name</th>
                           <th>Total Amount</th>
                           <th>Created Date</th>
                           <th>Status</th>
@@ -130,19 +130,19 @@ const InvoiceReport = () => {
                   </div>
                   <div className="col-12 col-sm-6">
                     <div className="mb-3">
-                      <label className="mb-2">Patient ID</label>
+                      <label className="mb-2">Pet ID</label>
                       <input type="text" className="form-control" defaultValue="#PT002" />
                     </div>
                   </div>
                   <div className="col-12 col-sm-6">
                     <div className="mb-3">
-                      <label className="mb-2">Patient Name</label>
+                      <label className="mb-2">Pet Name</label>
                       <input type="text" className="form-control" defaultValue="R Amer" />
                     </div>
                   </div>
                   <div className="col-12 col-sm-6">
                     <div className="mb-3">
-                      <label className="mb-2">Patient Image</label>
+                      <label className="mb-2">Pet Image</label>
                       <input type="file" className="form-control" />
                     </div>
                   </div>

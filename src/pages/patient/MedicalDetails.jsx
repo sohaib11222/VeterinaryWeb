@@ -64,7 +64,7 @@ const MedicalDetails = () => {
                       <thead>
                         <tr>
                           <th>ID</th>
-                          <th>Patient Name</th>
+                          <th>My Pet Name</th>
                           <th>BMI</th>
                           <th>Heart Rate</th>
                           <th>FBC Status</th>

@@ -32,7 +32,7 @@ const DoctorCompletedAppointment = () => {
             </li>
             <li className="appointment-info">
               <div className="person-info">
-                <p>Person with patient</p>
+                <p>Pet owner</p>
                 <ul className="d-flex apponitment-types">
                   <li>Andrew</li>
                 </ul>

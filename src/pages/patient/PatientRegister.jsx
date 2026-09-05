@@ -10,7 +10,7 @@ const PatientRegister = () => {
             <div className="account-content">
               <div className="account-info">
                 <div className="login-title">
-                  <h3>Patient Registration</h3>
+                <h3>My Pet Registration</h3>
                   <p className="mb-0">Create your account to get started</p>
                 </div>
                 <form action="/patient-register-step1">

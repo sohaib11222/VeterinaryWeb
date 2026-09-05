@@ -26,7 +26,7 @@ const AppointmentList = () => {
                         <tr>
                           <th>Doctor Name</th>
                           <th>Speciality</th>
-                          <th>Patient Name</th>
+                          <th>Pet Name</th>
                           <th>Apointment Time</th>
                           <th>Status</th>
                           <th>Amount</th>

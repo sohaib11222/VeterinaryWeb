@@ -44,11 +44,11 @@ const PatientList = () => {
           <div className="page-header">
             <div className="row">
               <div className="col-sm-12">
-                <h3 className="page-title">List of Patient</h3>
+                <h3 className="page-title">My Pets</h3>
                 <ul className="breadcrumb">
                   <li className="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
                   <li className="breadcrumb-item"><a href="javascript:(0);">Users</a></li>
-                  <li className="breadcrumb-item active">Patient</li>
+                  <li className="breadcrumb-item active">My Pet</li>
                 </ul>
               </div>
             </div>
@@ -62,8 +62,8 @@ const PatientList = () => {
                     <table className="datatable table table-hover table-center mb-0" id="patient_data">
                       <thead>
                         <tr>
-                          <th>Patient ID</th>
-                          <th>Patient Name</th>
+                          <th>Pet ID</th>
+                          <th>Pet Name</th>
                           <th>Age</th>
                           <th>Address</th>
                           <th>Phone</th>

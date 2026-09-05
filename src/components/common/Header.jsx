@@ -424,7 +424,7 @@ const Header = () => {
                           <li><Link to="/doctor/dashboard">Doctor Dashboard</Link></li>
                           <li><Link to="/appointments">Appointments</Link></li>
                           <li><Link to="/available-timings">Available Timing</Link></li>
-                          <li><Link to="/my-patients">Patients List</Link></li>
+                          <li><Link to="/my-patients">My Pets</Link></li>
                           <li><Link to="/chat-doctor">Chat</Link></li>
                           <li><Link to="/invoices">Invoices</Link></li>
                           <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
@@ -436,7 +436,7 @@ const Header = () => {
                           <li><Link to="/doctor/dashboard">Doctor Dashboard</Link></li>
                           <li><Link to="/appointments">Appointments</Link></li>
                           <li><Link to="/available-timings">Available Timing</Link></li>
-                          <li><Link to="/my-patients">Patients List</Link></li>
+                          <li><Link to="/my-patients">My Pets</Link></li>
                           <li><Link to="/chat-doctor">Chat</Link></li>
                           <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
                           <li><Link to="/reviews">Reviews</Link></li>
@@ -455,13 +455,13 @@ const Header = () => {
                       onClick={toggleMobileSubmenu('patients')}
                       aria-expanded={openMobileSubmenu === 'patients'}
                     >
-                      Patients <i className="fas fa-chevron-down"></i>
+                      My Pets <i className="fas fa-chevron-down"></i>
                     </a>
                     <ul
                       className="submenu"
                       style={{ display: openMobileSubmenu === 'patients' ? 'block' : undefined }}
                     >
-                      <li><Link to="/patient/dashboard">Patient Dashboard</Link></li>
+                      <li><Link to="/patient/dashboard">My Pet Dashboard</Link></li>
 
                       <li>
                         <Link to="/search">Search Doctor</Link>
@@ -638,7 +638,7 @@ const Header = () => {
                       </div>
                     </div>
                     {role === ROLES.VETERINARIAN && <Link className="dropdown-item" to="/doctor/dashboard">Dashboard</Link>}
-                    {role === ROLES.PET_OWNER && <Link className="dropdown-item" to="/patient/dashboard">Dashboard</Link>}
+                    {role === ROLES.PET_OWNER && <Link className="dropdown-item" to="/patient/dashboard">My Pet Dashboard</Link>}
                     {role === ROLES.ADMIN && <Link className="dropdown-item" to="/admin/index_admin">Dashboard</Link>}
                     {(role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && <Link className="dropdown-item" to="/pharmacy-admin/dashboard">Pharmacy Dashboard</Link>}
                     {role === ROLES.VETERINARIAN && <Link className="dropdown-item" to="/doctor-profile-settings">Profile Settings</Link>}

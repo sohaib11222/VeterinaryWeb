@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { useOrders } from '../../queries/orderQueries'
 import { useCancelOrder, usePayForOrder } from '../../mutations/orderMutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { deliveryStatusBadgeClass, formatDeliveryStatus } from '../../utils/deliveryMonitoring'
 
 const OrderHistory = () => {
   const navigate = useNavigate()
@@ -155,9 +156,21 @@ const OrderHistory = () => {
                                 Waiting for pharmacy to set shipping fee
                               </div>
                             )}
+                            {order?.expectedDeliveryDate && (
+                              <div className="text-muted small mt-1">
+                                Estimated delivery: {new Date(order.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              </div>
+                            )}
                           </div>
                           <div className="text-end">
                             {getStatusBadge(status)}
+                            {order?.expectedDeliveryDate && (
+                              <div className="mt-1">
+                                <span className={`badge ${deliveryStatusBadgeClass(order?.deliveryStatus)}`}>
+                                  {formatDeliveryStatus(order?.deliveryStatus, order?.daysLate)}
+                                </span>
+                              </div>
+                            )}
                             <div className="text-muted small">Payment: {paymentStatus || '—'}</div>
                             <h5 className="mt-2 mb-0">Total: €{Number(order?.total || 0).toFixed(2)}</h5>
                           </div>

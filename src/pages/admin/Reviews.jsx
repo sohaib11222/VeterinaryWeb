@@ -58,7 +58,7 @@ const Reviews = () => {
                     <table className="datatable table table-hover table-center mb-0" id="review_data">
                       <thead>
                         <tr>
-                          <th>Patient Name</th>
+                          <th>Pet Name</th>
                           <th>Doctor Name</th>
                           <th>Ratings</th>
                           <th>Description</th>

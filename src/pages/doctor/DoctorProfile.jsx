@@ -372,7 +372,7 @@ const DoctorProfile = () => {
                       <div>
                         <div style={{ fontWeight: 700 }}>{recommendPercent}% Recommend</div>
                         <div className="text-muted" style={{ fontSize: 13 }}>
-                          {reviewCount ? `${reviewCount} patients would recommend this vet` : 'No recommendations yet'}
+                          {reviewCount ? `${reviewCount} pet owners would recommend this vet` : 'No recommendations yet'}
                         </div>
                       </div>
                     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../contexts/AuthContext'
 import { useVeterinarians } from '../../queries/veterinarianQueries'
@@ -12,6 +12,7 @@ import Breadcrumb from '../../components/common/Breadcrumb'
 
 const Search = () => {
   const { user } = useAuth()
+  const [urlSearchParams] = useSearchParams()
   const [searchTerm, setSearchTerm] = useState('')
   const [location, setLocation] = useState('')
   const [selectedSpecialization, setSelectedSpecialization] = useState('')
@@ -37,6 +38,15 @@ const Search = () => {
   const { data: favoritesData } = useFavorites(userId, { limit: 500 })
   const addFavorite = useAddFavorite()
   const removeFavorite = useRemoveFavorite()
+
+  const urlSearch = urlSearchParams.get('search') || ''
+  const urlCity = urlSearchParams.get('city') || ''
+
+  useEffect(() => {
+    setSearchTerm(urlSearch)
+    setLocation(urlCity)
+    setPage(1)
+  }, [urlSearch, urlCity])
 
   useEffect(() => {
     setFavoriteOverrides({})

@@ -211,7 +211,7 @@ const DoctorAppointmentDetails = () => {
                       >
                         <img
                           src={patientImage}
-                          alt="Patient"
+                          alt="Pet"
                           style={{
                             width: '100%',
                             height: '100%',

@@ -40,7 +40,7 @@ const DoctorUpcomingAppointment = () => {
             </li>
             <li className="appointment-action">
               <div className="detail-badge-info">
-                <span className="badge bg-grey me-2">New Patient</span>
+                <span className="badge bg-grey me-2">New Pet</span>
                 <span className="badge bg-yellow">Upcoming</span>
               </div>
               <div className="consult-fees">

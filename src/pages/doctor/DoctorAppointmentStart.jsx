@@ -32,7 +32,7 @@ const DoctorAppointmentStart = () => {
             </li>
             <li className="appointment-info">
               <div className="person-info">
-                <p>Person with patient</p>
+                <p>Pet owner</p>
                 <ul className="d-flex apponitment-types">
                   <li>Andrew (45)</li>
                 </ul>
@@ -95,7 +95,7 @@ const DoctorAppointmentStart = () => {
           <div className="create-details-card">
             <div className="create-details-card-head">
               <div className="card-title-text">
-                <h5>Patient Information</h5>
+                <h5>Pet Information</h5>
               </div>
               <div className="patient-info-box">
                 <div className="row">

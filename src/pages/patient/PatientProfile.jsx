@@ -48,7 +48,7 @@ const PatientProfile = () => {
           <div className="col-lg-12 col-xl-12">
             <div className="appointment-patient">
               <div className="dashboard-header">
-                <h3><Link to="/my-patients"><i className="fa-solid fa-arrow-left"></i> Patient Details</Link></h3>
+                <h3><Link to="/my-patients"><i className="fa-solid fa-arrow-left"></i> My Pet Details</Link></h3>
               </div>
 
               <div className="patient-wrap">

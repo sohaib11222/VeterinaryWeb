@@ -105,7 +105,7 @@ const PatientSidebar = () => {
             <li className={isActive('/patient/dashboard') ? 'active' : ''}>
               <Link to="/patient/dashboard">
                 <i className="fa-solid fa-shapes"></i>
-                <span>Pet Dashboard</span>
+                <span>My Pet Dashboard</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>

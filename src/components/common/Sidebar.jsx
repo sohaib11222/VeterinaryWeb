@@ -60,7 +60,7 @@ const Sidebar = ({ userType = 'patient' }) => {
             </li>
             <li className={isActive('/my-patients') ? 'active' : ''}>
               <Link to="/my-patients">
-                <i className="feather-users"></i> <span>My Patients</span>
+                <i className="feather-users"></i> <span>My Pets</span>
               </Link>
             </li>
             <li className={isActive('/schedule-timings') ? 'active' : ''}>
@@ -106,7 +106,7 @@ const Sidebar = ({ userType = 'patient' }) => {
           <ul className="sidebar-menu">
             <li className={isActive('/patient-dashboard') ? 'active' : ''}>
               <Link to="/patient-dashboard">
-                <i className="feather-grid"></i> <span>Dashboard</span>
+                <i className="feather-grid"></i> <span>My Pet Dashboard</span>
               </Link>
             </li>
             <li className={isActive('/patient-appointments') ? 'active' : ''}>
@@ -187,7 +187,7 @@ const Sidebar = ({ userType = 'patient' }) => {
             </li>
             <li className={isActive('/admin/patient-list') ? 'active' : ''}>
               <Link to="/admin/patient-list">
-                <i className="feather-users"></i> <span>Patient List</span>
+                <i className="feather-users"></i> <span>Pet List</span>
               </Link>
             </li>
             <li className={isActive('/admin/reviews') ? 'active' : ''}>

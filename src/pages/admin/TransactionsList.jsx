@@ -56,8 +56,8 @@ const TransactionsList = () => {
                       <thead>
                         <tr>
                           <th>Invoice Number</th>
-                          <th>Patient ID</th>
-                          <th>Patient Name</th>
+                          <th>Pet ID</th>
+                          <th>Pet Name</th>
                           <th>Total Amount</th>
                           <th className="text-center">Status</th>
                           <th className="text-end">Actions</th>

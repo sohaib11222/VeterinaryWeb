@@ -17,7 +17,7 @@ const PatientBilling = () => {
                       <Link to="/profile-settings">Hendrita Hayes</Link>
                     </h3>
                     <div className="patient-details">
-                      <h5 className="mb-0">Patient ID : PT254654</h5>
+                      <h5 className="mb-0">My Pet ID : PT254654</h5>
                     </div>
                     <span>Female <i className="fa-solid fa-circle"></i> 32 years 03 Months</span>
                   </div>

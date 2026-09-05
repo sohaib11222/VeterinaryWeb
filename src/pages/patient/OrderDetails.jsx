@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { useOrder } from '../../queries/orderQueries'
 import { useCancelOrder, usePayForOrder } from '../../mutations/orderMutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { deliveryStatusBadgeClass, formatDeliveryStatus } from '../../utils/deliveryMonitoring'
 
 const OrderDetails = () => {
   const { orderId } = useParams()
@@ -155,6 +156,25 @@ const OrderDetails = () => {
           <div className="alert alert-success mb-4">
             <i className="fe fe-check-circle me-2"></i>
             Payment completed. Your order is being processed.
+          </div>
+        )}
+
+        {order?.expectedDeliveryDate && (
+          <div className="card mb-4 border-primary">
+            <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <h4 className="card-title mb-0">Delivery Commitment</h4>
+              <span className={`badge ${deliveryStatusBadgeClass(order?.deliveryStatus)}`}>
+                {formatDeliveryStatus(order?.deliveryStatus, order?.daysLate)}
+              </span>
+            </div>
+            <div className="card-body">
+              <p className="mb-2"><strong>Estimated Delivery: 2–5 Days</strong></p>
+              <p className="mb-2">Pharmacy commitment: <strong>{order?.promisedDeliveryDays} Days</strong></p>
+              <p className="mb-0">Expected Delivery Date: <strong>{new Date(order.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</strong></p>
+              {order?.deliveryStatus === 'LATE' && order?.daysLate ? (
+                <p className="text-danger small mb-0 mt-2">This order is currently {order.daysLate} day{Number(order.daysLate) === 1 ? '' : 's'} late.</p>
+              ) : null}
+            </div>
           </div>
         )}
 

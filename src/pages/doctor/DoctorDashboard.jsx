@@ -316,7 +316,7 @@ const DoctorDashboard = () => {
                     <i className="fa-solid fa-paw me-3"></i>
                     Veterinary Dashboard
                   </h2>
-                  <p className="dashboard-subtitle">Manage your pet appointments and patients</p>
+                  <p className="dashboard-subtitle">Manage your pet appointments and pet records</p>
                 </div>
               </div>
             </div>

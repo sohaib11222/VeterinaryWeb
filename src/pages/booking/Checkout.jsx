@@ -146,7 +146,7 @@ const Checkout = () => {
                 <div className="card-body">
                   <form onSubmit={handleSubmit}>
                     <div className="info-widget">
-                      <h4 className="card-title">Patient Information</h4>
+                      <h4 className="card-title">My Pet Information</h4>
                       <div className="row">
                         <div className="col-md-6 col-sm-12">
                           <div className="mb-3 card-label">

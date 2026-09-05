@@ -15,7 +15,7 @@ const PaitentDetails = () => {
         <div className="row">
           <div className="col-lg-8 col-md-12">
             <div className="paitent-header">
-              <h4 className="paitent-title">Patient Details</h4>
+              <h4 className="paitent-title">My Pet Details</h4>
             </div>
             <div className="paitent-appointment">
               <form action="/consultation">
