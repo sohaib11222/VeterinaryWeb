@@ -1,8 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useMemo, useState } from 'react'
 
 import { useAppointments } from '../../queries'
-import { useGetOrCreateConversation } from '../../mutations'
+import { useAppointmentChat } from '../../hooks/useAppointmentChat'
 import RescheduleFeePayment from '../../components/appointments/RescheduleFeePayment'
 import { getImageUrl } from '../../utils/apiConfig'
 
@@ -20,12 +20,11 @@ const statusBadgeClass = (status) => {
 }
 
 const PatientAppointments = () => {
-  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [activeTab, setActiveTab] = useState('all')
   const [chatAlert, setChatAlert] = useState('')
   const appointmentsQuery = useAppointments({ limit: 50, search: search.trim() || undefined })
-  const getOrCreateConversation = useGetOrCreateConversation()
+  const { openChat: openAppointmentChat, openingAppointmentId, isOpening } = useAppointmentChat('/chat')
 
   const appointments = useMemo(() => unwrapAppointments(appointmentsQuery.data), [appointmentsQuery.data])
   const mappedAppointments = useMemo(() => appointments.map((appointment) => {
@@ -66,22 +65,9 @@ const PatientAppointments = () => {
   }), [mappedAppointments])
 
   const openChat = async (appointment) => {
-    const raw = appointment?.raw
-    const appointmentId = appointment?.id
-    const veterinarianId = typeof raw?.veterinarianId === 'object' ? raw.veterinarianId?._id : raw?.veterinarianId
-    const petOwnerId = typeof raw?.petOwnerId === 'object' ? raw.petOwnerId?._id : raw?.petOwnerId
-    if (!appointmentId || !veterinarianId || !petOwnerId) {
-      setChatAlert('This appointment cannot be opened in chat yet.')
-      return
-    }
-
     try {
       setChatAlert('')
-      const response = await getOrCreateConversation.mutateAsync({ veterinarianId, petOwnerId, appointmentId })
-      const outer = response?.data ?? response
-      const conversation = outer?.data ?? outer
-      if (!conversation?._id) throw new Error('Unable to open the appointment chat')
-      navigate(`/chat?conversationId=${encodeURIComponent(String(conversation._id))}&appointmentId=${encodeURIComponent(String(appointmentId))}`)
+      await openAppointmentChat(appointment)
     } catch (error) {
       setChatAlert(error?.data?.message || error?.message || 'Unable to open this appointment chat.')
     }
@@ -96,7 +82,7 @@ const PatientAppointments = () => {
         <p className="dashboard-subtitle">Search, review, pay for, and join your pet’s appointments.</p>
       </div>
 
-      {chatAlert && <div className="alert alert-warning alert-dismissible fade show" role="alert">{chatAlert}<button type="button" className="btn-close" onClick={() => setChatAlert('')} aria-label="Close" /></div>}
+      {openingAppointmentId ? <div className="alert alert-info" role="status"><i className="fa-solid fa-spinner fa-spin me-2" />Opening chat…</div> : chatAlert && <div className="alert alert-warning alert-dismissible fade show" role="alert">{chatAlert}<button type="button" className="btn-close" onClick={() => setChatAlert('')} aria-label="Close" /></div>}
 
       <div className="dashboard-card veterinary-card mb-4"><div className="dashboard-card-body">
         <label className="visually-hidden" htmlFor="patient-appointments-search">Search appointments</label>
@@ -112,7 +98,7 @@ const PatientAppointments = () => {
           : visibleAppointments.map((appointment) => <article key={appointment.id} className="appointment-wrap veterinary-appointment mb-3"><ul>
             <li><div className="patinet-information"><Link to={appointment.detailsUrl}><img src={appointment.vetImage} alt="Veterinarian" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/assets/img/doctors/doctor-thumb-21.jpg' }} /></Link><div className="patient-info"><p>{appointment.number}</p><h6><Link to={appointment.detailsUrl}>{appointment.vetName}</Link></h6><small className="text-muted">Pet: {appointment.petName}{appointment.petBreed ? ` · ${appointment.petBreed}` : ''}</small></div></div></li>
             <li className="appointment-info"><p><i className="fa-solid fa-clock" />{appointment.date} · {appointment.time}</p><div className="d-flex flex-wrap gap-2"><span className="badge veterinary-badge">{appointment.type}</span><span className="badge veterinary-badge">{appointment.reason}</span><span className={`badge ${statusBadgeClass(appointment.status)}`}>{appointment.status.replace('_', ' ')}</span></div></li>
-            <li className="appointment-action"><ul><li><Link to={appointment.detailsUrl} className="veterinary-action-btn" title="View appointment"><i className="fa-solid fa-eye" /></Link></li><li><button type="button" className="veterinary-action-btn appointment-chat-action" title="Open chat" onClick={() => openChat(appointment)} disabled={getOrCreateConversation.isPending}><i className="fa-solid fa-comments" /></button></li></ul></li>
+            <li className="appointment-action"><ul><li><Link to={appointment.detailsUrl} className="veterinary-action-btn" title="View appointment"><i className="fa-solid fa-eye" /></Link></li><li><button type="button" className="veterinary-action-btn appointment-chat-action" title="Open chat" onClick={() => openChat(appointment)} disabled={isOpening(appointment.id)} aria-label={isOpening(appointment.id) ? 'Opening chat' : 'Open chat'}>{isOpening(appointment.id) ? <i className="fa-solid fa-spinner fa-spin" /> : <i className="fa-solid fa-comments" />}</button></li></ul></li>
             <li className="appointment-start d-flex flex-wrap gap-2">{appointment.status === 'PENDING_PAYMENT' ? <RescheduleFeePayment requestId={appointment.raw?.rescheduleRequestId?._id || appointment.raw?.rescheduleRequestId} fee={appointment.raw?.rescheduleFee} className="btn btn-primary btn-sm rounded-pill" onPaid={() => appointmentsQuery.refetch()} /> : appointment.raw?.bookingType === 'ONLINE' && appointment.status === 'CONFIRMED' ? <Link to={`/video-call?appointmentId=${encodeURIComponent(String(appointment.id))}`} className="start-link veterinary-start-btn">Join video call</Link> : <Link to={appointment.detailsUrl} className="start-link veterinary-start-btn">View appointment</Link>}</li>
           </ul></article>)}
       </div></div>

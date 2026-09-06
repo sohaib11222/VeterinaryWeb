@@ -71,10 +71,21 @@ const Chat = () => {
   const pinnedConversations = useMemo(() => filteredConversations.slice(0, 3), [filteredConversations])
   const recentConversations = useMemo(() => filteredConversations.slice(3), [filteredConversations])
 
-  const selectedConversation = useMemo(
-    () => conversations.find((c) => String(c?._id) === String(selectedConversationId)) || null,
-    [conversations, selectedConversationId]
-  )
+  const selectedConversation = useMemo(() => {
+    const existing = conversations.find((c) => String(c?._id) === String(selectedConversationId))
+    if (existing || !selectedConversationId) return existing || null
+
+    // The appointment page prepares the conversation before navigation. Keep
+    // the chat usable while the conversations list catches up in the background.
+    return {
+      _id: selectedConversationId,
+      conversationType: 'VETERINARIAN_PET_OWNER',
+      veterinarianId: appointment?.veterinarianId || null,
+      petOwnerId: currentUserId,
+      appointmentId: appointmentIdFromUrl,
+      status: 'ACTIVE',
+    }
+  }, [appointment, appointmentIdFromUrl, conversations, currentUserId, selectedConversationId])
   const isConversationCompleted = String(selectedConversation?.status || '').toUpperCase() === 'COMPLETED'
 
   const {
@@ -101,10 +112,13 @@ const Chat = () => {
   }, [messagesResponse])
 
   useEffect(() => {
-    if (conversationsError?.message) {
+    // The appointment opener already has the conversation ID. The sidebar is
+    // secondary, so a temporary list refresh failure must not interrupt chat
+    // initialization with a misleading network error toast.
+    if (conversationsError?.message && !appointmentIdFromUrl) {
       toast.error(conversationsError.message)
     }
-  }, [conversationsError])
+  }, [appointmentIdFromUrl, conversationsError])
 
   useEffect(() => {
     if (messagesError?.message) {
@@ -333,6 +347,13 @@ const Chat = () => {
     if (didAutoOpenRef.current) return
     if (!appointment) return
 
+    // Appointment buttons prepare the conversation before navigation. Do not
+    // issue a second create request when the URL already contains its ID.
+    if (conversationIdFromUrl) {
+      didAutoOpenRef.current = true
+      return
+    }
+
     const vetId = appointment?.veterinarianId && (typeof appointment.veterinarianId === 'object' ? appointment.veterinarianId._id : appointment.veterinarianId)
     const ownerId = appointment?.petOwnerId && (typeof appointment.petOwnerId === 'object' ? appointment.petOwnerId._id : appointment.petOwnerId)
     const aptId = appointment?._id
@@ -340,9 +361,11 @@ const Chat = () => {
 
     let stopped = false
     let lastError = ''
+    let opening = false
 
     const tryOpen = async () => {
-      if (stopped || didAutoOpenRef.current) return
+      if (stopped || didAutoOpenRef.current || opening) return
+      opening = true
       try {
         const res = await getOrCreateConversation.mutateAsync({ veterinarianId: vetId, petOwnerId: ownerId, appointmentId: aptId })
         const payload = res?.data ?? res
@@ -369,6 +392,8 @@ const Chat = () => {
           lastError = msg
           toast.error(msg)
         }
+      } finally {
+        opening = false
       }
     }
 
@@ -1170,8 +1195,8 @@ const Chat = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="d-flex align-items-center justify-content-center h-100 text-muted">
-                    Select a conversation
+                  <div className="d-flex align-items-center justify-content-center h-100 text-muted flex-column gap-2">
+                    {appointmentIdFromUrl && !conversationIdFromUrl ? <><i className="fa-solid fa-spinner fa-spin" />Opening chat…</> : 'Select a conversation'}
                   </div>
                 )}
               </div>

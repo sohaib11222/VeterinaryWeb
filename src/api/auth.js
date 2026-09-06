@@ -54,6 +54,14 @@ export const resetPassword = async (email, code, newPassword) => {
   return api.post(API_ROUTES.AUTH.RESET_PASSWORD, { email, code, newPassword })
 }
 
+export const verifyEmail = async (email, code) => {
+  return api.post(API_ROUTES.AUTH.VERIFY_EMAIL, { email, code })
+}
+
+export const resendEmailVerification = async (email) => {
+  return api.post(API_ROUTES.AUTH.RESEND_EMAIL_VERIFICATION, { email })
+}
+
 export const verifyResetCode = async (email, code) => {
   return api.post(API_ROUTES.AUTH.VERIFY_RESET_CODE, { email, code })
 }

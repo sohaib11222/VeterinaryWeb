@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useAppointments } from '../../queries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useAppointmentChat } from '../../hooks/useAppointmentChat'
 
 const PatientAppointmentsGrid = () => {
   const { data: appointmentsResponse, isLoading } = useAppointments({ limit: 50 })
+  const [chatAlert, setChatAlert] = useState('')
+  const { openChat: openAppointmentChat, openingAppointmentId, isOpening } = useAppointmentChat('/chat')
 
   const appointments = useMemo(() => {
     const payload = appointmentsResponse?.data ?? appointmentsResponse
@@ -27,6 +30,7 @@ const PatientAppointmentsGrid = () => {
           _id: a._id,
           id: a.appointmentNumber || a._id,
           appointmentId,
+          _raw: a,
           doctor: vet.name || vet.fullName || vet.email || 'Veterinarian',
           doctorImg: getImageUrl(vet.profileImage) || '/assets/img/doctors/doctor-thumb-21.jpg',
           date: dateStr,
@@ -44,6 +48,15 @@ const PatientAppointmentsGrid = () => {
       case 'hospital': return <i className="isax isax-hospital5"></i>
       case 'call': return <i className="isax isax-call5"></i>
       default: return <i className="isax isax-video5"></i>
+    }
+  }
+
+  const handleOpenChat = async (appointment) => {
+    try {
+      setChatAlert('')
+      await openAppointmentChat(appointment)
+    } catch (error) {
+      setChatAlert(error?.data?.message || error?.message || 'Unable to open this appointment chat.')
     }
   }
 
@@ -104,6 +117,7 @@ const PatientAppointmentsGrid = () => {
             </div>
 
             <div className="tab-content appointment-tab-content appoint-patient">
+              {openingAppointmentId ? <div className="alert alert-info" role="status"><i className="fa-solid fa-spinner fa-spin me-2" />Opening chat…</div> : chatAlert && <div className="alert alert-warning" role="alert">{chatAlert}<button type="button" className="btn-close float-end" onClick={() => setChatAlert('')} aria-label="Close" /></div>}
               <div className="tab-pane fade show active" id="pills-upcoming" role="tabpanel">
                 <div className="row">
                   {isLoading ? (
@@ -145,9 +159,9 @@ const PatientAppointmentsGrid = () => {
                                 <Link to={apt.detailsUrl}><i className="isax isax-eye4"></i></Link>
                               </li>
                               <li>
-                                <Link to={apt.appointmentId ? `/chat?appointmentId=${apt.appointmentId}` : '/chat'}>
-                                  <i className="isax isax-messages-25"></i>
-                                </Link>
+                                <button type="button" className="border-0 bg-transparent p-0" onClick={() => handleOpenChat(apt)} disabled={isOpening(apt.appointmentId)} title={isOpening(apt.appointmentId) ? 'Opening chat' : 'Open chat'}>
+                                  {isOpening(apt.appointmentId) ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="isax isax-messages-25"></i>}
+                                </button>
                               </li>
                               <li>
                                 <a href="#"><i className="isax isax-close-circle5"></i></a>

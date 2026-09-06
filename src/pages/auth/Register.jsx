@@ -45,6 +45,14 @@ const Register = () => {
         password: data.password,
       }
       const response = await registerUser(payload, 'patient')
+      if (response?.requiresEmailVerification) {
+        toast.success('Verification code sent to your email address.')
+        navigate(`/verify-email?email=${encodeURIComponent(response.email || data.email)}`, {
+          state: { email: response.email || data.email },
+        })
+        return
+      }
+
       toast.success('Registration successful!')
 
       const role = response?.user?.role

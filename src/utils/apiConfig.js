@@ -48,6 +48,8 @@ export const API_ROUTES = {
   // ==================== Auth ====================
   AUTH: {
     REGISTER: '/auth/register',
+    VERIFY_EMAIL: '/auth/verify-email',
+    RESEND_EMAIL_VERIFICATION: '/auth/resend-email-verification',
     LOGIN: '/auth/login',
     CHANGE_PASSWORD: '/auth/change-password',
     REQUEST_CHANGE_PASSWORD_CODE: '/auth/change-password/request-code',

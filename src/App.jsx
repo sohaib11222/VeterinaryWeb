@@ -31,6 +31,7 @@ import BlogDetails from './pages/blog/BlogDetails'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import ForgotPassword from './pages/auth/ForgotPassword'
+import VerifyEmail from './pages/auth/VerifyEmail'
 import DoctorSignup from './pages/auth/DoctorSignup'
 import DoctorRegister from './pages/auth/DoctorRegister'
 import DoctorRegisterStep1 from './pages/auth/DoctorRegisterStep1'
@@ -220,6 +221,7 @@ function App() {
                 <Route path="/login" element={<AuthLayout><Login /></AuthLayout>} />
                 <Route path="/register" element={<AuthLayout><Register /></AuthLayout>} />
                 <Route path="/forgot-password" element={<AuthLayout><ForgotPassword /></AuthLayout>} />
+                <Route path="/verify-email" element={<AuthLayout><VerifyEmail /></AuthLayout>} />
                 <Route path="/doctor-signup" element={<AuthLayout><DoctorSignup /></AuthLayout>} />
                 <Route path="/doctor-register" element={<AuthLayout><DoctorRegister /></AuthLayout>} />
                 <Route path="/doctor-register-step1" element={<AuthLayout><DoctorRegisterStep1 /></AuthLayout>} />

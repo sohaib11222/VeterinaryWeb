@@ -31,22 +31,29 @@ export const AuthProvider = ({ children }) => {
     setLoading(false)
   }
 
+  const setSession = (payload) => {
+    const data = payload?.data ?? payload
+    if (data?.token) {
+      localStorage.setItem('token', data.token)
+    }
+    if (data?.refreshToken) {
+      localStorage.setItem('refreshToken', data.refreshToken)
+    }
+    // A pending email-verification response includes a preview user but no
+    // authentication token. Do not treat that preview as a signed-in session.
+    if (data?.user && data?.token) {
+      const normalized = normalizeUser(data.user)
+      localStorage.setItem('user', JSON.stringify(normalized))
+      setUser(normalized)
+    }
+    return data
+  }
+
   const login = async (email, password, userType = 'patient') => {
     try {
       const payload = await authApi.login(email, password, userType)
       const data = payload?.data ?? payload
-      if (data?.token) {
-        localStorage.setItem('token', data.token)
-      }
-      if (data?.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken)
-      }
-      if (data?.user) {
-        const normalized = normalizeUser(data.user)
-        localStorage.setItem('user', JSON.stringify(normalized))
-        setUser(normalized)
-      }
-      return data
+      return setSession(data)
     } catch (error) {
       throw error
     }
@@ -56,18 +63,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const outer = await authApi.register(payload, userType)
       const data = outer?.data ?? outer
-      if (data?.token) {
-        localStorage.setItem('token', data.token)
-      }
-      if (data?.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken)
-      }
-      if (data?.user) {
-        const normalized = normalizeUser(data.user)
-        localStorage.setItem('user', JSON.stringify(normalized))
-        setUser(normalized)
-      }
-      return data
+      return setSession(data)
     } catch (error) {
       throw error
     }
@@ -92,7 +88,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateUser, loading }}>
+    <AuthContext.Provider value={{ user, login, register, setSession, logout, updateUser, loading }}>
       {children}
     </AuthContext.Provider>
   )

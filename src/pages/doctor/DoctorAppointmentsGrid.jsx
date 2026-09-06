@@ -1,13 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useMemo, useState } from 'react'
 
 import { useAppointments } from '../../queries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useAppointmentChat } from '../../hooks/useAppointmentChat'
 
 const DoctorAppointmentsGrid = () => {
-  const navigate = useNavigate()
   const { data: appointmentsResponse, isLoading } = useAppointments({ limit: 50 })
   const [chatAlert, setChatAlert] = useState('')
+  const { openChat: openAppointmentChat, openingAppointmentId, isOpening } = useAppointmentChat('/chat-doctor')
 
   const appointments = useMemo(() => {
     const payload = appointmentsResponse?.data ?? appointmentsResponse
@@ -87,21 +88,21 @@ const DoctorAppointmentsGrid = () => {
       })
   }, [appointments])
 
-  const handleOpenChat = (appointment) => {
-    const appointmentId = appointment?._id || appointment?.appointmentId
-    if (!appointmentId) {
-      setChatAlert('Unable to open chat for this appointment')
-      return
+  const handleOpenChat = async (appointment) => {
+    try {
+      setChatAlert('')
+      await openAppointmentChat(appointment)
+    } catch (error) {
+      setChatAlert(error?.data?.message || error?.message || 'Unable to open this appointment chat.')
     }
-
-    setChatAlert('')
-    navigate(`/chat-doctor?appointmentId=${encodeURIComponent(String(appointmentId))}`)
   }
 
   return (
     <div className="content veterinary-dashboard">
       <div className="container-fluid">
-        {chatAlert ? (
+        {openingAppointmentId ? (
+          <div className="alert alert-info" role="status"><i className="fa-solid fa-spinner fa-spin me-2" />Opening chat…</div>
+        ) : chatAlert ? (
           <div className="alert alert-warning" role="alert">
             {chatAlert}
           </div>
@@ -304,9 +305,10 @@ const DoctorAppointmentsGrid = () => {
                               type="button"
                               className="veterinary-action-btn appointment-chat-action"
                               onClick={() => handleOpenChat(apt)}
+                              disabled={isOpening(apt._id || apt.appointmentId)}
                               title="Chat"
                             >
-                              <i className="isax isax-messages-25"></i>
+                              {isOpening(apt._id || apt.appointmentId) ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="isax isax-messages-25"></i>}
                             </button>
                           </li>
                         </ul>
