@@ -9,6 +9,7 @@ import Feedback from '../components/home/Feedback'
 import Blogsection from '../components/home/Blogsection'
 import Chooseus from '../components/home/Chooseus'
 import InsuranceCompaniesSection from '../components/home/InsuranceCompaniesSection'
+import EmergencyVeterinarianSection from '../components/home/EmergencyVeterinarianSection'
 import Footer from '../components/common/Footer'
 import ProgressCircle from '../components/home/ProgressCircle'
 
@@ -59,8 +60,7 @@ const Index = () => {
             <div className="row">
               <div className="col-12">
                 <div className="home-hero-v2__content aos" data-aos="fade-up">
-                  <h1 className="home-hero-v2__title">Everything your pet needs, <span>close to you</span></h1>
-                  <p className="home-hero-v2__subtitle">Find the best professionals and services for your pet’s well-being.</p>
+                  <h1 className="home-hero-v2__title">Everything for your pet, <span>close to you.</span></h1>
                   <form className="home-hero-search" onSubmit={handleHeroSearch}>
                     <div className="home-hero-search__field home-hero-search__field--service">
                       <i className="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
@@ -124,6 +124,7 @@ const Index = () => {
       {/* /Popular Section */}
       {/* <HomeFeatures /> */}
       {/* <HomeBlog/> */}
+      <EmergencyVeterinarianSection />
       <SpecializationsSection />
       <Ourdoctors />
       <Feedback />
