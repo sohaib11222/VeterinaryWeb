@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 
 import { registerPetSitter, resendEmailVerification, verifyEmail } from '../../api/auth'
 import { useAuth } from '../../contexts/AuthContext'
+import InternationalPhoneInput, { isE164Phone } from '../../components/common/InternationalPhoneInput'
 import { useUpdatePetSitterProfile } from '../../mutations/petSitterMutations'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
@@ -13,7 +14,7 @@ const SERVICES = ['DOG_SITTING', 'CAT_SITTING', 'HOME_BOARDING', 'HOME_VISITS', 
 const label = (value) => value.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase())
 
 const initialBasic = {
-  fullName: '', email: '', phone: '', dob: '', gender: '', address: '', city: '', province: '', region: '', password: '', confirmPassword: '',
+  fullName: '', email: '', phone: '', dob: '', gender: '', address: '', city: '', province: '', postalCode: '', region: '', password: '', confirmPassword: '',
 }
 
 const initialDetails = {
@@ -48,6 +49,7 @@ const PetSitterRegister = () => {
   const submitBasicDetails = async (event) => {
     event.preventDefault()
     if (!photo) return toast.error('Please upload a profile photo')
+    if (!isE164Phone(basic.phone)) return toast.error('Please select your country and enter a valid phone number')
     if (basic.password.length < 8) return toast.error('Password must be at least 8 characters')
     if (basic.password !== basic.confirmPassword) return toast.error('Passwords do not match')
 
@@ -121,7 +123,7 @@ const PetSitterRegister = () => {
         phone: basic.phone,
         dob: basic.dob || null,
         gender: basic.gender || null,
-        address: { line1: basic.address || null, city: basic.city || null, state: basic.province || null, country: basic.region || null },
+        address: { line1: basic.address || null, city: basic.city || null, state: basic.province || null, zip: basic.postalCode || null, country: basic.region || null },
         bio: details.bio,
         petSittingExperience: details.petSittingExperience,
         experienceYears: Number(details.experienceYears || 0),
@@ -177,12 +179,13 @@ const PetSitterRegister = () => {
                       <div className="col-md-6"><label className="form-label">Full name *</label><input className="form-control" required value={basic.fullName} onChange={(event) => updateBasic('fullName', event.target.value)} /></div>
                       <div className="col-md-6"><label className="form-label">Profile photo *</label><input className="form-control" type="file" accept="image/jpeg,image/png,image/webp" required onChange={(event) => setPhoto(event.target.files?.[0] || null)} /></div>
                       <div className="col-md-6"><label className="form-label">Email address *</label><input className="form-control" type="email" autoComplete="email" required value={basic.email} onChange={(event) => updateBasic('email', event.target.value)} /></div>
-                      <div className="col-md-6"><label className="form-label">Phone number *</label><input className="form-control" required value={basic.phone} onChange={(event) => updateBasic('phone', event.target.value)} /></div>
+                      <div className="col-md-6"><label className="form-label">Phone number *</label><InternationalPhoneInput value={basic.phone} onChange={(phone) => updateBasic('phone', phone)} invalid={Boolean(basic.phone) && !isE164Phone(basic.phone)} /><small className="text-muted d-block mt-1">Select the country code before entering the number.</small></div>
                       <div className="col-md-4"><label className="form-label">Date of birth</label><input className="form-control" type="date" value={basic.dob} onChange={(event) => updateBasic('dob', event.target.value)} /></div>
                       <div className="col-md-4"><label className="form-label">Gender</label><select className="form-select" value={basic.gender} onChange={(event) => updateBasic('gender', event.target.value)}><option value="">Select gender</option><option value="MALE">Male</option><option value="FEMALE">Female</option><option value="OTHER">Other</option></select></div>
                       <div className="col-md-4"><label className="form-label">City</label><input className="form-control" value={basic.city} onChange={(event) => updateBasic('city', event.target.value)} /></div>
-                      <div className="col-md-6"><label className="form-label">Province</label><input className="form-control" value={basic.province} onChange={(event) => updateBasic('province', event.target.value)} /></div>
-                      <div className="col-md-6"><label className="form-label">Region / country</label><input className="form-control" value={basic.region} onChange={(event) => updateBasic('region', event.target.value)} /></div>
+                      <div className="col-md-4"><label className="form-label">Province</label><input className="form-control" value={basic.province} onChange={(event) => updateBasic('province', event.target.value)} /></div>
+                      <div className="col-md-4"><label className="form-label">CAP / Postal code</label><input className="form-control" value={basic.postalCode} onChange={(event) => updateBasic('postalCode', event.target.value)} /></div>
+                      <div className="col-md-4"><label className="form-label">Region / country</label><input className="form-control" value={basic.region} onChange={(event) => updateBasic('region', event.target.value)} /></div>
                       <div className="col-12"><label className="form-label">Address</label><input className="form-control" value={basic.address} onChange={(event) => updateBasic('address', event.target.value)} /></div>
                       <div className="col-md-6"><label className="form-label">Password *</label><input className="form-control" type="password" autoComplete="new-password" minLength="8" required value={basic.password} onChange={(event) => updateBasic('password', event.target.value)} /></div>
                       <div className="col-md-6"><label className="form-label">Confirm password *</label><input className="form-control" type="password" autoComplete="new-password" minLength="8" required value={basic.confirmPassword} onChange={(event) => updateBasic('confirmPassword', event.target.value)} /></div>
