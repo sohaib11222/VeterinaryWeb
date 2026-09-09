@@ -19,10 +19,11 @@ export const usePetOwnerAppointments = (params = {}) =>
     queryFn: () => api.get(API_ROUTES.PET_OWNER.APPOINTMENTS, { params }),
   })
 
-export const usePetOwnerPayments = (params = {}) =>
+export const usePetOwnerPayments = (params = {}, queryOptions = {}) =>
   useQuery({
     queryKey: ['petOwner', 'payments', params],
     queryFn: () => api.get(API_ROUTES.PET_OWNER.PAYMENTS, { params }),
+    ...queryOptions,
   })
 
 export const usePetOwnerInvoice = (transactionId) =>

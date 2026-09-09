@@ -7,7 +7,7 @@ import { useUserById } from '../../queries/userQueries'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useMyPetStore } from '../../queries/petStoreQueries'
 
-const ROLES = { PET_OWNER: 'PET_OWNER', VETERINARIAN: 'VETERINARIAN', ADMIN: 'ADMIN', PET_STORE: 'PET_STORE', PARAPHARMACY: 'PARAPHARMACY' }
+const ROLES = { PET_OWNER: 'PET_OWNER', VETERINARIAN: 'VETERINARIAN', ADMIN: 'ADMIN', PET_STORE: 'PET_STORE', PARAPHARMACY: 'PARAPHARMACY', PET_SITTER: 'PET_SITTER' }
 
 const Header = () => {
   const location = useLocation()
@@ -470,6 +470,7 @@ const Header = () => {
                         <li><Link to="/search-2">Search Doctor 2</Link></li>
                       </ul> */}
                       </li>
+                      <li><Link to="/pet-sitters">Find Pet Sitters</Link></li>
 
 
                       {/* <li><Link to="/checkout">Checkout</Link></li>
@@ -535,6 +536,7 @@ const Header = () => {
                     </button>
                   </li>
                 )}
+                {!user && <li><Link to="/pet-sitter/register">Become a Pet Sitter</Link></li>}
               </ul>
             </div>
 
@@ -640,6 +642,8 @@ const Header = () => {
                     {role === ROLES.VETERINARIAN && <Link className="dropdown-item" to="/doctor/dashboard">Dashboard</Link>}
                     {role === ROLES.PET_OWNER && <Link className="dropdown-item" to="/patient/dashboard">My Pet Dashboard</Link>}
                     {role === ROLES.ADMIN && <Link className="dropdown-item" to="/admin/index_admin">Dashboard</Link>}
+                    {role === ROLES.PET_SITTER && <Link className="dropdown-item" to="/pet-sitter/dashboard">Pet Sitter Dashboard</Link>}
+                    {role === ROLES.PET_SITTER && <Link className="dropdown-item" to="/pet-sitter/profile">My Profile</Link>}
                     {(role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && <Link className="dropdown-item" to="/pharmacy-admin/dashboard">Pharmacy Dashboard</Link>}
                     {role === ROLES.VETERINARIAN && <Link className="dropdown-item" to="/doctor-profile-settings">Profile Settings</Link>}
                     {(role === ROLES.PET_OWNER || role === ROLES.ADMIN || role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && <Link className="dropdown-item" to="/profile-settings">Profile Settings</Link>}

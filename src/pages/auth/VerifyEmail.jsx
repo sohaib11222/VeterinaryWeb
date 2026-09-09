@@ -34,7 +34,8 @@ const VerifyEmail = () => {
       const response = await verifyEmail(normalizedEmail, normalizedCode)
       setSession(response)
       toast.success('Email verified. Your MyPetPlus account is ready.')
-      navigate('/patient/dashboard', { replace: true })
+      const verifiedRole = response?.user?.role || response?.data?.user?.role || location.state?.role || searchParams.get('role')
+      navigate(verifiedRole === 'PET_SITTER' ? '/pet-sitter/dashboard' : '/patient/dashboard', { replace: true })
     } catch (error) {
       toast.error(error?.message || 'The verification code is invalid or expired')
     } finally {

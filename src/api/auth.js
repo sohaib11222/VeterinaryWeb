@@ -13,6 +13,9 @@ const mapUserTypeToRole = (userType) => {
       return 'PET_STORE'
     case 'parapharmacy':
       return 'PARAPHARMACY'
+    case 'pet_sitter':
+    case 'pet-sitter':
+      return 'PET_SITTER'
     case 'pet_owner':
     case 'patient':
     default:
@@ -52,6 +55,11 @@ export const forgotPassword = async (email) => {
 
 export const resetPassword = async (email, code, newPassword) => {
   return api.post(API_ROUTES.AUTH.RESET_PASSWORD, { email, code, newPassword })
+}
+
+export const registerPetSitter = async (formData) => {
+  const res = await api.upload(API_ROUTES.AUTH.PET_SITTER_REGISTER, formData)
+  return res?.data ?? res
 }
 
 export const verifyEmail = async (email, code) => {

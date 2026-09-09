@@ -20,7 +20,7 @@ const PendingApprovalStatus = () => {
         const role = String(me?.role || user?.role || '').toUpperCase()
         const status = String(me?.status || user?.status || '').toUpperCase()
         if (status === 'APPROVED') {
-          navigate(role === 'VETERINARIAN' ? '/doctor/dashboard' : (role === 'PET_STORE' || role === 'PARAPHARMACY') ? '/pharmacy-admin/dashboard' : '/')
+          navigate(role === 'VETERINARIAN' ? '/doctor/dashboard' : (role === 'PET_STORE' || role === 'PARAPHARMACY') ? '/pharmacy-admin/dashboard' : role === 'PET_SITTER' ? '/pet-sitter/dashboard' : '/')
           return
         }
         if (status === 'REJECTED' || status === 'BLOCKED') toast.error('Your account was rejected or blocked. Please update your documents or contact support.')
@@ -43,7 +43,7 @@ const PendingApprovalStatus = () => {
 
   const role = String(user?.role || '').toUpperCase()
   const isPharmacy = role === 'PET_STORE' || role === 'PARAPHARMACY'
-  const accountLabel = role === 'PARAPHARMACY' ? 'Parapharmacy' : role === 'PET_STORE' ? 'Pharmacy' : 'Veterinary professional'
+  const accountLabel = role === 'PARAPHARMACY' ? 'Parapharmacy' : role === 'PET_STORE' ? 'Pharmacy' : role === 'PET_SITTER' ? 'Pet Sitter' : 'Veterinary professional'
   const updateDocsPath = role === 'VETERINARIAN' ? '/doctor-verification-upload' : '/pet-store-verification-upload'
 
   return (

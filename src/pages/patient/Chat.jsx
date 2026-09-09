@@ -7,6 +7,14 @@ import { useAppointment, useConversations, useMessages, useUnreadChatCount } fro
 import { useGetOrCreateConversation, useMarkConversationRead, useSendMessage, useUploadChatFiles } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
+const isPetSitterConversation = (conversation) => conversation?.conversationType === 'PET_SITTER_PET_OWNER'
+
+const getConversationParticipant = (conversation) => {
+  if (isPetSitterConversation(conversation)) return conversation?.petSitterId
+  const veterinarian = conversation?.veterinarianId
+  return veterinarian?.userId || veterinarian
+}
+
 const Chat = () => {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -14,6 +22,7 @@ const Chat = () => {
 
   const conversationIdFromUrl = searchParams.get('conversationId')
   const appointmentIdFromUrl = searchParams.get('appointmentId')
+  const petSitterIdFromUrl = searchParams.get('petSitterId')
 
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedConversationId, setSelectedConversationId] = useState(conversationIdFromUrl || '')
@@ -24,12 +33,14 @@ const Chat = () => {
   const currentUserImage = getImageUrl(user?.profileImage) || '/assets/img/doctors-dashboard/profile-06.jpg'
 
   const didAutoOpenRef = useRef(false)
+  const didAutoOpenPetSitterRef = useRef(false)
   const messagesEndRef = useRef(null)
   const messagesContainerRef = useRef(null)
-  const lastMarkedReadConversationRef = useRef(null)
 
   const [uploadingFiles, setUploadingFiles] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+  const [pendingFiles, setPendingFiles] = useState([])
+  const [pendingFilePreviews, setPendingFilePreviews] = useState([])
   const fileInputRef = useRef(null)
 
   const { data: appointmentResponse } = useAppointment(appointmentIdFromUrl)
@@ -61,9 +72,8 @@ const Chat = () => {
     const q = searchTerm.trim().toLowerCase()
     if (!q) return conversations
     return conversations.filter((c) => {
-      const vet = c?.veterinarianId
-      const vetUser = vet?.userId || vet
-      const name = (vetUser?.name || vetUser?.fullName || vetUser?.email || '').toLowerCase()
+      const participant = getConversationParticipant(c)
+      const name = (participant?.name || participant?.fullName || participant?.email || '').toLowerCase()
       return name.includes(q)
     })
   }, [conversations, searchTerm])
@@ -79,14 +89,29 @@ const Chat = () => {
     // the chat usable while the conversations list catches up in the background.
     return {
       _id: selectedConversationId,
-      conversationType: 'VETERINARIAN_PET_OWNER',
-      veterinarianId: appointment?.veterinarianId || null,
+      conversationType: petSitterIdFromUrl && !appointmentIdFromUrl ? 'PET_SITTER_PET_OWNER' : 'VETERINARIAN_PET_OWNER',
+      veterinarianId: petSitterIdFromUrl && !appointmentIdFromUrl ? null : appointment?.veterinarianId || null,
+      petSitterId: petSitterIdFromUrl && !appointmentIdFromUrl ? petSitterIdFromUrl : null,
       petOwnerId: currentUserId,
-      appointmentId: appointmentIdFromUrl,
+      appointmentId: petSitterIdFromUrl && !appointmentIdFromUrl ? null : appointmentIdFromUrl,
       status: 'ACTIVE',
     }
-  }, [appointment, appointmentIdFromUrl, conversations, currentUserId, selectedConversationId])
+  }, [appointment, appointmentIdFromUrl, conversations, currentUserId, petSitterIdFromUrl, selectedConversationId])
   const isConversationCompleted = String(selectedConversation?.status || '').toUpperCase() === 'COMPLETED'
+
+  useEffect(() => {
+    const previews = pendingFiles.map((file) => ({
+      file,
+      url: file.type?.startsWith('image/') ? URL.createObjectURL(file) : null,
+    }))
+    setPendingFilePreviews(previews)
+
+    return () => {
+      previews.forEach((preview) => {
+        if (preview.url) URL.revokeObjectURL(preview.url)
+      })
+    }
+  }, [pendingFiles])
 
   const {
     data: messagesResponse,
@@ -142,6 +167,7 @@ const Chat = () => {
   const handleSelectConversation = (c) => {
     const id = c?._id
     if (!id) return
+    setPendingFiles([])
     setSelectedConversationId(id)
     setIsMobileConversationOpen(true)
     setSearchParams((prev) => {
@@ -149,6 +175,9 @@ const Chat = () => {
       next.set('conversationId', String(id))
       const aptId = c?.appointmentId && (typeof c.appointmentId === 'object' ? c.appointmentId._id : c.appointmentId)
       if (aptId) next.set('appointmentId', String(aptId))
+      else next.delete('appointmentId')
+      if (isPetSitterConversation(c)) next.set('petSitterId', String(c?.petSitterId?._id || c?.petSitterId || ''))
+      else next.delete('petSitterId')
       return next
     })
   }
@@ -162,7 +191,7 @@ const Chat = () => {
     }
 
     const text = newMessage.trim()
-    if (!text) {
+    if (!text && !pendingFiles.length) {
       toast.error('Please enter a message or select a file')
       return
     }
@@ -171,28 +200,61 @@ const Chat = () => {
       return
     }
 
+    const petSitterChat = isPetSitterConversation(selectedConversation)
     const vetId = selectedConversation?.veterinarianId && (typeof selectedConversation.veterinarianId === 'object' ? selectedConversation.veterinarianId._id : selectedConversation.veterinarianId)
+    const petSitterId = selectedConversation?.petSitterId && (typeof selectedConversation.petSitterId === 'object' ? selectedConversation.petSitterId._id : selectedConversation.petSitterId)
     const ownerId = selectedConversation?.petOwnerId && (typeof selectedConversation.petOwnerId === 'object' ? selectedConversation.petOwnerId._id : selectedConversation.petOwnerId)
     const aptId = selectedConversation?.appointmentId && (typeof selectedConversation.appointmentId === 'object' ? selectedConversation.appointmentId._id : selectedConversation.appointmentId)
 
-    if (!vetId || !ownerId || !aptId) {
+    if (petSitterChat && (!petSitterId || !ownerId)) {
+      toast.error('Invalid Pet Sitter conversation details')
+      return
+    }
+    if (!petSitterChat && (!vetId || !ownerId || !aptId)) {
       toast.error('Invalid conversation details')
       return
     }
 
     try {
-      await sendMessage.mutateAsync({
-        conversationId: selectedConversationId,
-        veterinarianId: vetId,
-        petOwnerId: ownerId,
-        appointmentId: aptId,
-        message: text,
-        type: 'TEXT',
-      })
+      let attachments = []
+      if (pendingFiles.length) {
+        setUploadingFiles(true)
+        setUploadProgress(0)
+        const formData = new FormData()
+        pendingFiles.forEach((file) => formData.append('files', file))
+        const response = await uploadChatFiles.mutateAsync({
+          formData,
+          onUploadProgress: (event) => {
+            if (event.total) setUploadProgress(Math.round((event.loaded * 100) / event.total))
+          },
+        })
+        const uploadPayload = response?.data?.data ?? response?.data ?? response
+        const urls = uploadPayload?.urls || response?.urls || []
+        if (!Array.isArray(urls) || urls.length !== pendingFiles.length) {
+          throw new Error('One or more files could not be uploaded')
+        }
+        attachments = pendingFiles.map((file, index) => ({
+          type: file.type?.startsWith('image/') ? 'image' : 'file',
+          url: urls[index],
+          name: file.name,
+          size: file.size,
+          mimeType: file.type || null,
+        }))
+      }
+
+      const payload = petSitterChat
+        ? { conversationId: selectedConversationId, petSitterId, petOwnerId: ownerId, message: text || undefined, type: attachments.length ? 'FILE' : 'TEXT', attachments }
+        : { conversationId: selectedConversationId, veterinarianId: vetId, petOwnerId: ownerId, appointmentId: aptId, message: text || undefined, type: attachments.length ? 'FILE' : 'TEXT', attachments }
+      await sendMessage.mutateAsync(payload)
       setNewMessage('')
+      setPendingFiles([])
+      setUploadProgress(0)
       scrollToBottom()
     } catch (err) {
       toast.error(err?.message || 'Failed to send message')
+    } finally {
+      setUploadingFiles(false)
+      setUploadProgress(0)
     }
   }
 
@@ -248,7 +310,7 @@ const Chat = () => {
     return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(ext)
   }
 
-  const handleFileSelect = async (e) => {
+  const handleFileSelect = (e) => {
     if (isConversationCompleted) {
       toast.info('This chat has been marked as completed by the veterinarian.')
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -258,7 +320,7 @@ const Chat = () => {
     const files = Array.from(e.target.files || [])
     if (files.length === 0) return
 
-    if (files.length > 10) {
+    if (pendingFiles.length + files.length > 10) {
       toast.error('You can send up to 10 files at once.')
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
@@ -278,69 +340,48 @@ const Chat = () => {
       return
     }
 
-    const vetId =
-      selectedConversation?.veterinarianId &&
-      (typeof selectedConversation.veterinarianId === 'object'
-        ? selectedConversation.veterinarianId._id
-        : selectedConversation.veterinarianId)
-    const ownerId =
-      selectedConversation?.petOwnerId &&
-      (typeof selectedConversation.petOwnerId === 'object' ? selectedConversation.petOwnerId._id : selectedConversation.petOwnerId)
-    const aptId =
-      selectedConversation?.appointmentId &&
-      (typeof selectedConversation.appointmentId === 'object' ? selectedConversation.appointmentId._id : selectedConversation.appointmentId)
-
-    if (!vetId || !ownerId || !aptId) {
-      toast.error('Invalid conversation details')
-      if (fileInputRef.current) fileInputRef.current.value = ''
-      return
-    }
-
-    setUploadingFiles(true)
-    setUploadProgress(0)
-    try {
-      const formData = new FormData()
-      files.forEach((file) => formData.append('files', file))
-      const res = await uploadChatFiles.mutateAsync({
-        formData,
-        onUploadProgress: (event) => {
-          if (event.total) setUploadProgress(Math.round((event.loaded * 100) / event.total))
-        },
-      })
-      const urls = res?.data?.urls || res?.urls || []
-      if (!Array.isArray(urls) || urls.length !== files.length) {
-        throw new Error('One or more files could not be uploaded')
-      }
-      const uploaded = files.map((file, index) => ({
-        type: file.type?.startsWith('image/') ? 'image' : 'file',
-        url: urls[index],
-        name: file.name,
-        size: file.size,
-        mimeType: file.type || null,
-      }))
-
-      const messageText = newMessage.trim()
-      const payload = {
-        conversationId: selectedConversationId,
-        veterinarianId: vetId,
-        petOwnerId: ownerId,
-        appointmentId: aptId,
-        type: 'FILE',
-        attachments: uploaded,
-      }
-      if (messageText) payload.message = messageText
-
-      await sendMessage.mutateAsync(payload)
-      setNewMessage('')
-      scrollToBottom()
-    } catch (err) {
-      toast.error(err?.message || 'Failed to upload/send files')
-    } finally {
-      setUploadingFiles(false)
-      setUploadProgress(0)
-      if (fileInputRef.current) fileInputRef.current.value = ''
-    }
+    setPendingFiles((current) => [...current, ...files])
+    if (fileInputRef.current) fileInputRef.current.value = ''
   }
+
+  const removePendingFile = (index) => {
+    setPendingFiles((current) => current.filter((_, fileIndex) => fileIndex !== index))
+  }
+
+  useEffect(() => {
+    if (!petSitterIdFromUrl || appointmentIdFromUrl || !currentUserId || conversationsLoading || didAutoOpenPetSitterRef.current) return
+
+    const existingConversation = conversations.find((conversation) => {
+      if (!isPetSitterConversation(conversation)) return false
+      const sitterId = typeof conversation.petSitterId === 'object' ? conversation.petSitterId?._id : conversation.petSitterId
+      const ownerId = typeof conversation.petOwnerId === 'object' ? conversation.petOwnerId?._id : conversation.petOwnerId
+      return String(sitterId || '') === String(petSitterIdFromUrl) && String(ownerId || currentUserId) === String(currentUserId)
+    })
+
+    const openConversation = async () => {
+      try {
+        const response = existingConversation
+          ? existingConversation
+          : await getOrCreateConversation.mutateAsync({ petSitterId: petSitterIdFromUrl, petOwnerId: currentUserId })
+        const payload = response?.data ?? response
+        const conversation = payload?.data ?? payload
+        if (!conversation?._id) throw new Error('Unable to prepare the Pet Sitter conversation')
+        didAutoOpenPetSitterRef.current = true
+        setSelectedConversationId(conversation._id)
+        setIsMobileConversationOpen(true)
+        setSearchParams((previous) => {
+          const next = new URLSearchParams(previous)
+          next.set('conversationId', String(conversation._id))
+          next.set('petSitterId', String(petSitterIdFromUrl))
+          return next
+        })
+      } catch (error) {
+        toast.error(error?.message || 'Unable to open Pet Sitter chat')
+      }
+    }
+
+    openConversation()
+  }, [appointmentIdFromUrl, conversations, conversationsLoading, currentUserId, getOrCreateConversation, petSitterIdFromUrl, setSearchParams])
 
   useEffect(() => {
     if (!appointmentIdFromUrl) return
@@ -409,17 +450,10 @@ const Chat = () => {
 
   useEffect(() => {
     if (!selectedConversationId) return
-    if (lastMarkedReadConversationRef.current === String(selectedConversationId)) return
-
     const unread = selectedConversation?.unreadCount || 0
-    if (unread <= 0) {
-      lastMarkedReadConversationRef.current = String(selectedConversationId)
-      return
-    }
-
-    lastMarkedReadConversationRef.current = String(selectedConversationId)
+    if (unread <= 0) return
     markRead.mutate(selectedConversationId)
-  }, [selectedConversationId])
+  }, [markRead, selectedConversation?.unreadCount, selectedConversationId])
 
   const handleMessageKeyDown = (event) => {
     if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return
@@ -907,10 +941,9 @@ const Chat = () => {
                       <div className="text-center py-3 text-muted">No chats</div>
                     ) : (
                       pinnedConversations.map((c) => {
-                        const vet = c?.veterinarianId
-                        const vetUser = vet?.userId || vet
-                        const name = vetUser?.name || vetUser?.fullName || vetUser?.email || 'Veterinarian'
-                        const avatar = getImageUrl(vetUser?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
+                        const participant = getConversationParticipant(c)
+                        const name = participant?.name || participant?.fullName || participant?.email || (isPetSitterConversation(c) ? 'Pet Sitter' : 'Veterinarian')
+                        const avatar = getImageUrl(participant?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
                         const preview = c?.lastMessage?.message || c?.lastMessage?.fileName || '—'
                         const time = formatConversationTime(c)
                         const unread = c?.unreadCount || 0
@@ -954,7 +987,7 @@ const Chat = () => {
                                   )}
                                 </div>
                               </div>
-                              <p className="chat-item-message">{preview}</p>
+                              <p className="chat-item-message">{isPetSitterConversation(c) ? 'Pet Sitter · ' : ''}{preview}</p>
                             </div>
                           </a>
                         )
@@ -973,10 +1006,9 @@ const Chat = () => {
                       <div className="text-center py-3 text-muted">No more chats</div>
                     ) : (
                       recentConversations.map((c) => {
-                        const vet = c?.veterinarianId
-                        const vetUser = vet?.userId || vet
-                        const name = vetUser?.name || vetUser?.fullName || vetUser?.email || 'Veterinarian'
-                        const avatar = getImageUrl(vetUser?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
+                        const participant = getConversationParticipant(c)
+                        const name = participant?.name || participant?.fullName || participant?.email || (isPetSitterConversation(c) ? 'Pet Sitter' : 'Veterinarian')
+                        const avatar = getImageUrl(participant?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
                         const preview = c?.lastMessage?.message || c?.lastMessage?.fileName || '—'
                         const time = formatConversationTime(c)
                         const unread = c?.unreadCount || 0
@@ -1020,7 +1052,7 @@ const Chat = () => {
                                   )}
                                 </div>
                               </div>
-                              <p className="chat-item-message">{preview}</p>
+                              <p className="chat-item-message">{isPetSitterConversation(c) ? 'Pet Sitter · ' : ''}{preview}</p>
                             </div>
                           </a>
                         )
@@ -1047,7 +1079,7 @@ const Chat = () => {
                         <div className="chat-details-avatar">
                           <img
                             src={
-                              getImageUrl((selectedConversation?.veterinarianId?.profileImage)) ||
+                              getImageUrl(getConversationParticipant(selectedConversation)?.profileImage) ||
                               '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
                             }
                             alt="User"
@@ -1055,11 +1087,12 @@ const Chat = () => {
                         </div>
                         <div className="chat-details-user-info">
                           <h5>
-                            {selectedConversation?.veterinarianId?.name ||
-                              selectedConversation?.veterinarianId?.fullName ||
-                              selectedConversation?.veterinarianId?.email ||
-                              'Veterinarian'}
+                            {getConversationParticipant(selectedConversation)?.name ||
+                              getConversationParticipant(selectedConversation)?.fullName ||
+                              getConversationParticipant(selectedConversation)?.email ||
+                              (isPetSitterConversation(selectedConversation) ? 'Pet Sitter' : 'Veterinarian')}
                           </h5>
+                          {isPetSitterConversation(selectedConversation) && <span className="badge bg-primary-subtle text-primary">Pet Sitter · Direct chat</span>}
                         </div>
                       </div>
                       <div className="chat-details-actions">
@@ -1153,6 +1186,21 @@ const Chat = () => {
                       <div ref={messagesEndRef} />
                     </div>
 
+                    {pendingFiles.length > 0 && (
+                      <div className="d-flex flex-wrap gap-2 px-3 pt-3" aria-label="Selected attachments">
+                        {pendingFilePreviews.map(({ file, url }, index) => (
+                          <div className="border rounded p-2 d-flex align-items-center gap-2" style={{ maxWidth: 260 }} key={`${file.name}-${file.lastModified}-${index}`}>
+                            {url ? <img src={url} alt={file.name} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 6 }} /> : <i className="fa-solid fa-file-lines fa-2x text-secondary" />}
+                            <div className="small text-truncate" style={{ maxWidth: 150 }} title={file.name}>
+                              <div className="text-truncate">{file.name}</div>
+                              <span className="text-muted">{formatFileSize(file.size)}</span>
+                            </div>
+                            <button type="button" className="btn btn-sm btn-light" onClick={() => removePendingFile(index)} aria-label={`Remove ${file.name}`} title="Remove file"><i className="fa-solid fa-xmark" /></button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                     {/* Chat Input Area */}
                     <div className="chat-input-area">
                       <div className="chat-input-actions">
@@ -1187,7 +1235,7 @@ const Chat = () => {
                         className="chat-send-button"
                         title="Send"
                         onClick={handleSend}
-                        disabled={!newMessage.trim() || sendMessage.isPending || uploadingFiles || isConversationCompleted}
+                        disabled={(!newMessage.trim() && !pendingFiles.length) || sendMessage.isPending || uploadingFiles || isConversationCompleted}
                       >
                         <i className="fa-solid fa-paper-plane"></i>
                       </button>

@@ -182,6 +182,9 @@ const Register = () => {
                       <Link to="/pharmacy-register?type=parapharmacy" className="btn veterinary-btn-outline-primary account-btn veterinary-doctor-register-btn">
                         <i className="fa-solid fa-prescription-bottle-medical me-2"></i>Parapharmacy
                       </Link>
+                      <Link to="/pet-sitter/register" className="btn veterinary-btn-outline-primary account-btn veterinary-doctor-register-btn">
+                        <i className="fa-solid fa-paw me-2"></i>Pet Sitter
+                      </Link>
                     </div>
                     <div className="account-footer veterinary-register-footer">
                       <p className="veterinary-footer-text">

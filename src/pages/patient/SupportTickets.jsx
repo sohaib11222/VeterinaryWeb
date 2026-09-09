@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 
 import { useSupportTickets } from '../../queries/supportTicketQueries'
 import { SUPPORT_CATEGORIES, SUPPORT_STATUSES, priorityBadgeClass, supportBadgeClass, supportLabel, unwrapApiData } from '../../constants/supportTickets'
@@ -10,6 +10,8 @@ const SupportTickets = () => {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('')
   const [category, setCategory] = useState('')
+  const location = useLocation()
+  const basePath = location.pathname.startsWith('/pet-sitter') ? '/pet-sitter' : '/patient'
   const ticketsQuery = useSupportTickets({ page: 1, limit: 50, search, status, category })
   const data = useMemo(() => unwrapApiData(ticketsQuery.data) || {}, [ticketsQuery.data])
   const tickets = Array.isArray(data.tickets) ? data.tickets : []
@@ -22,7 +24,7 @@ const SupportTickets = () => {
             <h3 className="mb-1"><i className="fa-solid fa-headset text-primary me-2" />Support Center</h3>
             <p className="text-muted mb-0">Track your requests and keep every reply, document, and update in one secure place.</p>
           </div>
-          <Link to="/patient/support-tickets/new" className="btn btn-primary"><i className="fa-solid fa-plus me-2" />Create support ticket</Link>
+          <Link to={`${basePath}/support-tickets/new`} className="btn btn-primary"><i className="fa-solid fa-plus me-2" />Create support ticket</Link>
         </div>
 
         <div className="card mb-4">
@@ -36,7 +38,7 @@ const SupportTickets = () => {
         </div>
 
         {ticketsQuery.isLoading ? <div className="text-center py-5"><div className="spinner-border text-primary" /></div> : ticketsQuery.isError ? <div className="alert alert-danger">{ticketsQuery.error?.message || 'Unable to load your support tickets.'}</div> : tickets.length === 0 ? (
-          <div className="card"><div className="card-body text-center py-5"><i className="fa-regular fa-life-ring fa-3x text-muted mb-3" /><h4>No support tickets yet</h4><p className="text-muted">Need help with an appointment, payment, or order? Create a ticket and our support team can investigate.</p><Link className="btn btn-outline-primary" to="/patient/support-tickets/new">Contact support</Link></div></div>
+          <div className="card"><div className="card-body text-center py-5"><i className="fa-regular fa-life-ring fa-3x text-muted mb-3" /><h4>No support tickets yet</h4><p className="text-muted">Need help? Create a ticket and our support team can investigate.</p><Link className="btn btn-outline-primary" to={`${basePath}/support-tickets/new`}>Contact support</Link></div></div>
         ) : (
           <div className="card"><div className="table-responsive"><table className="table table-hover align-middle mb-0"><thead><tr><th>Ticket</th><th>Category</th><th>Status</th><th>Priority</th><th>Last updated</th><th className="text-end">Action</th></tr></thead><tbody>{tickets.map((ticket) => (
             <tr key={ticket._id}>
@@ -45,7 +47,7 @@ const SupportTickets = () => {
               <td><span className={`badge ${supportBadgeClass(ticket.status)}`}>{supportLabel(ticket.status)}</span></td>
               <td><span className={`badge ${priorityBadgeClass(ticket.priority)}`}>{supportLabel(ticket.priority)}</span></td>
               <td><small>{dateTime(ticket.lastMessageAt || ticket.updatedAt)}</small>{ticket.unreadForPatient && <span className="badge bg-danger ms-2">New reply</span>}</td>
-              <td className="text-end"><Link className="btn btn-sm btn-outline-primary" to={`/patient/support-tickets/${ticket._id}`}>View</Link></td>
+              <td className="text-end"><Link className="btn btn-sm btn-outline-primary" to={`${basePath}/support-tickets/${ticket._id}`}>View</Link></td>
             </tr>
           ))}</tbody></table></div></div>
         )}

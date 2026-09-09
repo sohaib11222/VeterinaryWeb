@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -45,6 +45,7 @@ import PharmacyRegisterStep2 from './pages/auth/PharmacyRegisterStep2'
 import PharmacyRegisterStep3 from './pages/auth/PharmacyRegisterStep3'
 import PharmacyPhoneVerification from './pages/auth/PharmacyPhoneVerification'
 import PetStoreVerificationUpload from './pages/auth/PetStoreVerificationUpload'
+import PetSitterRegister from './pages/auth/PetSitterRegister'
 
 // Doctor Pages
 import DoctorDashboard from './pages/doctor/DoctorDashboard'
@@ -140,6 +141,16 @@ import SupportTicketDetail from './pages/patient/SupportTicketDetail'
 // Admin Pages
 import VaccineCatalog from './pages/admin/VaccineCatalog'
 import SubscriptionPlanPrices from './pages/admin/SubscriptionPlanPrices'
+import PetSitterAdminList from './pages/admin/PetSitterAdminList'
+import AdminSupportTickets from './pages/admin/AdminSupportTickets'
+
+// Pet Sitter pages
+import PetSitterList from './pages/pet-sitter/PetSitterList'
+import PetSitterProfile from './pages/pet-sitter/PetSitterProfile'
+import PetSitterDashboard from './pages/pet-sitter/PetSitterDashboard'
+import PetSitterProfileSettings from './pages/pet-sitter/PetSitterProfileSettings'
+import PetSitterChat from './pages/pet-sitter/PetSitterChat'
+import PetSitterChangePassword from './pages/pet-sitter/PetSitterChangePassword'
 
 // Pharmacy Admin Pages
 import PharmacyAdminDashboard from './pages/pharmacy-admin/PharmacyAdminDashboard'
@@ -179,6 +190,11 @@ import PaymentSuccess from './pages/pharmacy/PaymentSuccess'
 // Error Pages
 import Error404 from './pages/Error404'
 import Error500 from './pages/Error500'
+
+const LegacyPetSitterChatRedirect = () => {
+  const location = useLocation()
+  return <Navigate to={`/chat${location.search}`} replace />
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -222,6 +238,7 @@ function App() {
                 <Route path="/register" element={<AuthLayout><Register /></AuthLayout>} />
                 <Route path="/forgot-password" element={<AuthLayout><ForgotPassword /></AuthLayout>} />
                 <Route path="/verify-email" element={<AuthLayout><VerifyEmail /></AuthLayout>} />
+                <Route path="/pet-sitter/register" element={<AuthLayout><PetSitterRegister /></AuthLayout>} />
                 <Route path="/doctor-signup" element={<AuthLayout><DoctorSignup /></AuthLayout>} />
                 <Route path="/doctor-register" element={<AuthLayout><DoctorRegister /></AuthLayout>} />
                 <Route path="/doctor-register-step1" element={<AuthLayout><DoctorRegisterStep1 /></AuthLayout>} />
@@ -604,6 +621,27 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/pet-sitters"
+              element={
+                <ProtectedRoute role="ADMIN">
+                  <DashboardLayout breadcrumb={{ title: "Admin", li1: "Pet Sitters", li2: "Pet Sitter Management" }}><PetSitterAdminList /></DashboardLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/admin/support-tickets" element={<ProtectedRoute role="ADMIN"><DashboardLayout breadcrumb={{ title: "Admin", li1: "Support", li2: "Support Tickets" }}><AdminSupportTickets /></DashboardLayout></ProtectedRoute>} />
+
+            {/* Pet Sitter public discovery and role dashboard */}
+            <Route path="/pet-sitters" element={<MainLayout><PetSitterList /></MainLayout>} />
+            <Route path="/pet-sitters/:id" element={<MainLayout><PetSitterProfile /></MainLayout>} />
+            <Route path="/pet-sitter-chat" element={<ProtectedRoute role="PET_OWNER"><LegacyPetSitterChatRedirect /></ProtectedRoute>} />
+            <Route path="/pet-sitter/dashboard" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Dashboard", li2: "Overview" }}><PetSitterDashboard /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/pet-sitter/profile" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Profile", li2: "My Profile" }}><PetSitterProfileSettings /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/pet-sitter/chats" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout><PetSitterChat /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/pet-sitter/change-password" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Settings", li2: "Change Password" }}><PetSitterChangePassword /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/pet-sitter/support-tickets" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Support", li2: "Support Tickets" }}><SupportTickets /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/pet-sitter/support-tickets/new" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Support", li2: "Create Ticket" }}><CreateSupportTicket /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/pet-sitter/support-tickets/:ticketId" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Support", li2: "Ticket Details" }}><SupportTicketDetail /></DashboardLayout></ProtectedRoute>} />
 
                 {/* Patient Routes - Protected (PET_OWNER) */}
                 <Route

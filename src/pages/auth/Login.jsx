@@ -76,6 +76,15 @@ const Login = () => {
           toast.error('Your parapharmacy account is not active. Please contact support.')
           navigate('/login')
         }
+      } else if (role === 'PET_SITTER') {
+        if (status === 'APPROVED') {
+          navigate('/pet-sitter/dashboard')
+        } else if (status === 'PENDING') {
+          navigate('/pending-approval')
+        } else {
+          toast.error('Your Pet Sitter account is not active. Please contact support.')
+          navigate('/login')
+        }
       } else {
         navigate('/patient/dashboard')
       }

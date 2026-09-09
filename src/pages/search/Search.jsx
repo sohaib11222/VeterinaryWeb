@@ -223,6 +223,10 @@ const Search = () => {
 
       <section className="search-page-header">
         <div className="container">
+          <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <h2 className="mb-0">Find the right veterinarian for your pet</h2>
+            <Link to="/pet-sitters" className="btn btn-outline-primary"><i className="fa-solid fa-paw me-2" />Find Pet Sitters</Link>
+          </div>
           <div className="doctors-search-box doctors-search-box-clean">
             <div className="search-box-one">
               <form onSubmit={handleSearch}>

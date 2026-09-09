@@ -48,6 +48,7 @@ export const API_ROUTES = {
   // ==================== Auth ====================
   AUTH: {
     REGISTER: '/auth/register',
+    PET_SITTER_REGISTER: '/auth/register-pet-sitter',
     VERIFY_EMAIL: '/auth/verify-email',
     RESEND_EMAIL_VERIFICATION: '/auth/resend-email-verification',
     LOGIN: '/auth/login',
@@ -154,6 +155,14 @@ export const API_ROUTES = {
     DELETE: (id) => `/products/${id}`,
   },
 
+  PET_SITTERS: {
+    LIST: '/pet-sitters',
+    PUBLIC_PROFILE: (id) => `/pet-sitters/${id}`,
+    ME: '/pet-sitters/me/profile',
+    UPDATE_ME: '/pet-sitters/me/profile',
+    UPLOAD_DOCUMENTS: '/pet-sitters/me/documents',
+  },
+
   PRODUCT_PRESCRIPTIONS: {
     BASE: '/product-prescription-requests',
     MINE: '/product-prescription-requests/mine',
@@ -172,6 +181,10 @@ export const API_ROUTES = {
     REOPEN: (id) => `/support-tickets/${id}/reopen`,
     UNREAD_COUNT: '/support-tickets/unread-count',
     UPLOAD_ATTACHMENTS: '/support-tickets/attachments',
+    ADMIN_LIST: '/support-tickets/admin',
+    ADMIN_GET: (id) => `/support-tickets/admin/${id}`,
+    ADMIN_UPDATE: (id) => `/support-tickets/admin/${id}`,
+    ADMIN_REPLY: (id) => `/support-tickets/admin/${id}/messages`,
   },
 
   FOOTER_OPTIONS: {
@@ -369,6 +382,11 @@ export const API_ROUTES = {
     MEDICAL_RECORDS: '/upload/medical-records',
     CHAT: '/upload/chat',
     CHAT_MULTIPLE: '/upload/chat/multiple',
+  },
+
+  ADMIN: {
+    PET_SITTERS: '/admin/pet-sitters',
+    PET_SITTER_STATUS: (id) => `/admin/pet-sitters/${id}/status`,
   },
 }
 

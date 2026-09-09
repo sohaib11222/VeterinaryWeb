@@ -2,10 +2,12 @@ import { Link, useLocation } from 'react-router-dom'
 import { useMemo } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMyPetStore } from '../../queries/petStoreQueries'
+import { useMyPetSitterProfile } from '../../queries/petSitterQueries'
 import { usePharmacyPendingPrescriptionCount } from '../../queries/productPrescriptionRequestQueries'
 import { useOrders } from '../../queries/orderQueries'
 import { useWithdrawalRequests } from '../../queries/balanceQueries'
 import { useUnreadChatCount } from '../../queries/chatQueries'
+import { useSupportTicketUnreadCount } from '../../queries/supportTicketQueries'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const Sidebar = ({ userType = 'patient' }) => {
@@ -16,6 +18,7 @@ const Sidebar = ({ userType = 'patient' }) => {
   const role = String(user?.role || '').toUpperCase()
   const storeEnabled = userType === 'pharmacy_admin' && (role === 'PET_STORE' || role === 'PARAPHARMACY')
   const myPetStoreQuery = useMyPetStore({ enabled: storeEnabled })
+  const myPetSitterQuery = useMyPetSitterProfile({ enabled: userType === 'pet_sitter' })
   const pendingPrescriptionQuery = usePharmacyPendingPrescriptionCount({ enabled: userType === 'pharmacy_admin' && role === 'PET_STORE' })
   const pendingOrdersQuery = useOrders(
     { status: 'PENDING', page: 1, limit: 1 },
@@ -25,7 +28,11 @@ const Sidebar = ({ userType = 'patient' }) => {
     { status: 'PENDING', page: 1, limit: 1 },
     { enabled: storeEnabled }
   )
-  const unreadAdminMessagesQuery = useUnreadChatCount({ enabled: storeEnabled })
+  const unreadAdminMessagesQuery = useUnreadChatCount({
+    enabled: storeEnabled || userType === 'pet_sitter',
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
+  })
   const petStore = useMemo(() => {
     const payload = myPetStoreQuery.data?.data ?? myPetStoreQuery.data
     return payload?.data ?? payload
@@ -42,6 +49,8 @@ const Sidebar = ({ userType = 'patient' }) => {
   const unreadAdminMessages = unreadAdminMessagesQuery.data?.data?.unreadCount
     ?? unreadAdminMessagesQuery.data?.unreadCount
     ?? 0
+  const unreadSupportTicketsQuery = useSupportTicketUnreadCount({ enabled: userType === 'pet_sitter' })
+  const unreadSupportTickets = unreadSupportTicketsQuery.data?.data?.unreadCount ?? unreadSupportTicketsQuery.data?.unreadCount ?? 0
 
   if (userType === 'doctor') {
     return (
@@ -190,6 +199,12 @@ const Sidebar = ({ userType = 'patient' }) => {
                 <i className="feather-users"></i> <span>Pet List</span>
               </Link>
             </li>
+            <li className={isActive('/admin/pet-sitters') ? 'active' : ''}>
+              <Link to="/admin/pet-sitters"><i className="feather-heart"></i> <span>Pet Sitters</span></Link>
+            </li>
+            <li className={isActive('/admin/support-tickets') ? 'active' : ''}>
+              <Link to="/admin/support-tickets"><i className="feather-headphones"></i> <span>Support Tickets</span></Link>
+            </li>
             <li className={isActive('/admin/reviews') ? 'active' : ''}>
               <Link to="/admin/reviews">
                 <i className="feather-star"></i> <span>Reviews</span>
@@ -214,6 +229,13 @@ const Sidebar = ({ userType = 'patient' }) => {
         </div>
       </div>
     )
+  }
+
+  if (userType === 'pet_sitter') {
+    const petSitterProfile = myPetSitterQuery.data?.data ?? myPetSitterQuery.data ?? {}
+    const profileImage = getImageUrl(petSitterProfile?.profileImage || user?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
+    const displayName = petSitterProfile?.fullName || petSitterProfile?.name || user?.fullName || user?.name || 'Pet Sitter'
+    return <div className="profile-sidebar veterinary-sidebar"><div className="widget-profile veterinary-profile-widget"><div className="profile-info-widget"><Link to="/pet-sitter/profile" className="booking-doc-img"><img src={profileImage} alt="Pet Sitter" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/assets/img/doctors-dashboard/doctor-profile-img.jpg' }} /></Link><div className="profile-det-info"><h3><Link to="/pet-sitter/profile">{displayName}</Link></h3><span className="badge veterinary-role-badge"><i className="fa-solid fa-paw me-1" />Pet Sitter</span></div></div></div><div className="dashboard-widget veterinary-dashboard-menu"><nav className="dashboard-menu"><ul><li className={isActive('/pet-sitter/dashboard') ? 'active' : ''}><Link to="/pet-sitter/dashboard"><i className="fa-solid fa-shapes" /><span>Dashboard</span></Link></li><li className={isActive('/pet-sitter/profile') ? 'active' : ''}><Link to="/pet-sitter/profile"><i className="fa-solid fa-user-pen" /><span>My Profile</span></Link></li><li className={isActive('/pet-sitter/chats') ? 'active' : ''}><Link to="/pet-sitter/chats"><i className="fa-solid fa-comments" /><span>Chats</span>{unreadAdminMessages > 0 && <small className="unread-msg veterinary-badge">{unreadAdminMessages}</small>}</Link></li><li className={isActive('/pet-sitter/support-tickets') ? 'active' : ''}><Link to="/pet-sitter/support-tickets"><i className="fa-solid fa-headset" /><span>Support Tickets</span>{unreadSupportTickets > 0 && <small className="unread-msg veterinary-badge">{unreadSupportTickets}</small>}</Link></li><li className={isActive('/pet-sitter/change-password') ? 'active' : ''}><Link to="/pet-sitter/change-password"><i className="fa-solid fa-key" /><span>Change Password</span></Link></li></ul></nav></div></div>
   }
 
   if (userType === 'pharmacy_admin') {

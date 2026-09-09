@@ -54,8 +54,9 @@ const DashboardLayout = ({ children, breadcrumb }) => {
                         location.pathname === '/patient/prescription'
   const isAdminRoute = location.pathname.startsWith('/admin')
   const isPharmacyAdminRoute = location.pathname.startsWith('/pharmacy-admin')
+  const isPetSitterRoute = location.pathname.startsWith('/pet-sitter') || location.pathname === '/pet-sitter-chat'
   const isChatRoute = location.pathname === '/chat' || location.pathname === '/chat-doctor' || location.pathname === '/doctor/admin-chat' || location.pathname === '/pharmacy-admin/admin-chat'
-  const showSidebar = !isChatRoute && (isDoctorRoute || isPatientRoute || isPharmacyAdminRoute)
+  const showSidebar = !isChatRoute && (isDoctorRoute || isPatientRoute || isPharmacyAdminRoute || isAdminRoute || isPetSitterRoute)
 
   useEffect(() => {
     setIsSidebarOpen(false)
@@ -90,6 +91,10 @@ const DashboardLayout = ({ children, breadcrumb }) => {
       ? <PatientSidebar />
       : isPharmacyAdminRoute
         ? <Sidebar userType="pharmacy_admin" />
+        : isAdminRoute
+          ? <Sidebar userType="admin" />
+          : isPetSitterRoute
+            ? <Sidebar userType="pet_sitter" />
         : null
 
   const closeSidebarAfterNavigation = (event) => {
@@ -142,7 +147,7 @@ const DashboardLayout = ({ children, breadcrumb }) => {
             )}
             <div className="row">
               {showSidebar && !isCompactLayout && renderSidebar()}
-              <main className={`dashboard-main-column ${(isDoctorRoute || isPatientRoute) && !isChatRoute
+              <main className={`dashboard-main-column ${(isDoctorRoute || isPatientRoute || isPetSitterRoute || isAdminRoute) && !isChatRoute
                 ? "col-lg-8 col-xl-9"
                 : isPharmacyAdminRoute && !isChatRoute
                   ? "col-lg-8 col-xl-9"

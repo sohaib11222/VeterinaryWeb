@@ -36,7 +36,7 @@ const ProtectedRoute = ({
     )
   }
 
-  if (userRole === 'PET_STORE' || userRole === 'PARAPHARMACY') {
+  if (userRole === 'PET_STORE' || userRole === 'PARAPHARMACY' || userRole === 'PET_SITTER') {
     const status = user?.status
 
     if (requireApproved && status !== 'APPROVED') {
@@ -54,7 +54,7 @@ const ProtectedRoute = ({
 
     if (!allowPending && status === 'PENDING' && !requireApproved) {
       const currentPath = window.location.pathname
-      if (currentPath !== '/pending-approval' && (currentPath.startsWith('/pet-store') || currentPath.startsWith('/parapharmacy') || currentPath.startsWith('/pharmacy-admin'))) {
+      if (currentPath !== '/pending-approval' && (currentPath.startsWith('/pet-store') || currentPath.startsWith('/parapharmacy') || currentPath.startsWith('/pharmacy-admin') || currentPath.startsWith('/pet-sitter'))) {
         return <Navigate to="/pending-approval" replace />
       }
     }
