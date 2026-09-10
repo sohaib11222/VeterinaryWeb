@@ -13,11 +13,11 @@ body {
 .home-hero-v2 {
   position: relative;
   width: 100%;
-  min-height: 500px;
+  min-height: 560px;
   padding: 72px 0 48px;
   background-image: url('/assets/img/mainhero.png');
   background-size: cover;
-  background-position: center;
+  background-position: center bottom;
   background-repeat: no-repeat;
 }
 
@@ -34,7 +34,7 @@ body {
 
 .home-hero-v2__content {
   max-width: 1160px;
-  padding-top: 42px;
+  padding-top: 192px;
   color: #ffffff;
 }
 
@@ -65,8 +65,8 @@ body {
   display: grid;
   grid-template-columns: minmax(250px, 1.45fr) minmax(185px, 1fr) minmax(190px, 1fr) minmax(130px, .52fr);
   align-items: stretch;
-  width: min(100%, 1160px);
-  min-height: 94px;
+  width: min(100%, 1120px);
+  min-height: 84px;
   overflow: hidden;
   background: rgba(255, 255, 255, .97);
   border: 1px solid rgba(221, 230, 238, .9);
@@ -202,7 +202,7 @@ body {
   align-items: center;
   gap: 14px;
   min-width: 0;
-  padding: 15px 20px;
+  padding: 12px 18px;
   border-left: 1px solid #e3eaf0;
 }
 
@@ -258,9 +258,9 @@ body {
 
 .home-hero-search__button {
   align-self: center;
-  min-height: 58px;
+  min-height: 52px;
   margin: 10px 12px 10px 0;
-  padding: 12px 22px;
+  padding: 10px 20px;
   color: #ffffff;
   font-size: 20px;
   font-weight: 700;
@@ -363,7 +363,7 @@ body.home-hero-header-transparent .home-hero-v2 {
 
 @media (max-width: 991.98px) {
   .home-hero-v2 {
-    min-height: 480px;
+    min-height: 535px;
     padding: 62px 0 46px;
   }
 
@@ -409,14 +409,14 @@ body.home-hero-header-transparent .home-hero-v2 {
   }
 
   .home-hero-search__button {
-    min-height: 56px;
+    min-height: 52px;
     margin-right: 10px;
   }
 }
 
 @media (max-width: 575.98px) {
   .home-hero-v2 {
-    min-height: 430px;
+    min-height: 480px;
     padding: 52px 0 38px;
   }
 
@@ -430,7 +430,7 @@ body.home-hero-header-transparent .home-hero-v2 {
   }
 
   .home-hero-v2__content {
-    padding-top: 24px;
+    padding-top: 174px;
   }
 
   .home-emergency-vet {
@@ -469,7 +469,7 @@ body.home-hero-header-transparent .home-hero-v2 {
 
   .home-hero-v2 {
     background-image: url('/assets/img/phonebanner.png');
-    background-position: center;
+    background-position: center bottom;
   }
 
   .home-hero-v2 .row {
@@ -490,7 +490,7 @@ body.home-hero-header-transparent .home-hero-v2 {
 
   .home-hero-search__field,
   .home-hero-search__field:nth-child(3) {
-    padding: 13px 16px;
+    padding: 11px 15px;
     border-top: 1px solid #e3eaf0;
     border-left: 0;
   }

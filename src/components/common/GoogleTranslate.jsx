@@ -203,6 +203,8 @@ const GoogleTranslate = () => {
     <>
       <style>{`
         .goog-te-banner-frame{position:fixed!important;top:0!important;left:0!important;width:100%!important;z-index:9998!important;height:auto!important}
+        .goog-te-balloon-frame,.goog-te-balloon-frame iframe,.goog-te-ftab,.goog-tooltip,.goog-tooltip:hover{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+        .goog-text-highlight{background:none!important;box-shadow:none!important}
         body:not(.top){padding-top:0!important}
         body.top{padding-top:0!important}
         body.top .header,body.top .header-fixed,body.top .header-custom,body.top header{margin-top:42px!important;transition:margin-top .3s ease!important}

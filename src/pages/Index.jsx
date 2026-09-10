@@ -18,6 +18,30 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [animal, setAnimal] = useState('')
   const [location, setLocation] = useState('')
+  const [isItalian, setIsItalian] = useState(false)
+
+  useEffect(() => {
+    const readGoogleLanguage = () => {
+      const translationCookie = document.cookie
+        .split(';')
+        .map((item) => item.trim())
+        .find((item) => item.startsWith('googtrans='))
+        ?.split('=').slice(1).join('=')
+
+      let language = ''
+      try {
+        language = decodeURIComponent(translationCookie || '')
+      } catch {
+        language = translationCookie || ''
+      }
+
+      setIsItalian(language.split('/').pop() === 'it')
+    }
+
+    readGoogleLanguage()
+    const interval = window.setInterval(readGoogleLanguage, 500)
+    return () => window.clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     // Initialize AOS animations
@@ -60,7 +84,7 @@ const Index = () => {
             <div className="row">
               <div className="col-12">
                 <div className="home-hero-v2__content aos" data-aos="fade-up">
-                  <h1 className="home-hero-v2__title">Everything for your pet, <span>close to you.</span></h1>
+                  <h1 className="home-hero-v2__title">{isItalian ? <>Tutto per il tuo pet<br /><span>vicino a te.</span></> : <>Everything for your pet<br /><span>close to you.</span></>}</h1>
                   <form className="home-hero-search" onSubmit={handleHeroSearch}>
                     <div className="home-hero-search__field home-hero-search__field--service">
                       <i className="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
