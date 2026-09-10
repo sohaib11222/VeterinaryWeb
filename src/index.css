@@ -416,18 +416,19 @@ body.home-hero-header-transparent .home-hero-v2 {
 
 @media (max-width: 767.98px) {
   .home-hero-v2 {
+    min-height: 640px;
     background-image: url('/assets/img/mobile-hero.png');
     background-position: center top;
   }
 
   .home-hero-v2__content {
-    padding-top: 130px;
+    padding-top: 220px;
   }
 }
 
 @media (max-width: 575.98px) {
   .home-hero-v2 {
-    min-height: 480px;
+    min-height: 700px;
     padding: 52px 0 38px;
   }
 
@@ -438,6 +439,10 @@ body.home-hero-header-transparent .home-hero-v2 {
   .home-hero-v2__title {
     font-size: 32px;
     margin-bottom: 16px;
+  }
+
+  .home-hero-v2__content {
+    padding-top: 250px;
   }
 
   .home-emergency-vet {
