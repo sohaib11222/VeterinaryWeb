@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
@@ -9,6 +10,7 @@ import { API_ROUTES } from '../../utils/apiConfig'
 import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const SocialMedia = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -49,7 +51,7 @@ const SocialMedia = () => {
       if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Unsupported protocol')
       return url.toString()
     } catch {
-      toast.error(`Invalid ${label} URL`)
+      toast.error(t('doctorRemaining.social.invalidUrl', { label }))
       return null
     }
   }
@@ -71,7 +73,7 @@ const SocialMedia = () => {
 
     try {
       await updateProfile.mutateAsync({ socialLinks: cleaned })
-      toast.success('Social media links updated successfully')
+      toast.success(t('doctorRemaining.social.updated'))
 
       const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
       const nextProfile = refreshed?.data ?? refreshed
@@ -83,7 +85,7 @@ const SocialMedia = () => {
         }
       }
     } catch (err) {
-      const message = err?.response?.data?.message || err?.message || 'Failed to update social media links'
+      const message = err?.response?.data?.message || err?.message || t('doctorRemaining.social.updateFailed')
       toast.error(message)
     }
   }
@@ -102,9 +104,9 @@ const SocialMedia = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-share-nodes me-3"></i>
-                    Veterinary Social Media
+                    {t('doctorRemaining.social.title')}
                   </h2>
-                  <p className="dashboard-subtitle">Connect with pet owners through social media platforms</p>
+                  <p className="dashboard-subtitle">{t('doctorRemaining.social.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -115,14 +117,14 @@ const SocialMedia = () => {
                 <form className="social-media-form" onSubmit={handleSubmit}>
                   <div className="social-media-links d-flex align-items-center mb-3">
                     <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
-                      <label className="col-form-label mb-0">Facebook</label>
+                      <label className="col-form-label mb-0">{t('doctorRemaining.social.facebook')}</label>
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
                         type="text"
                         inputMode="url"
                         className="form-control veterinary-input"
-                        placeholder="Add Facebook URL"
+                        placeholder={t('doctorRemaining.social.addUrl', { network: t('doctorRemaining.social.facebook') })}
                         value={socialLinks.facebook}
                         onChange={(e) => handleChange('facebook', e.target.value)}
                         disabled={isLoading || updateProfile.isPending}
@@ -135,14 +137,14 @@ const SocialMedia = () => {
 
                   <div className="social-media-links d-flex align-items-center mb-3">
                     <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
-                      <label className="col-form-label mb-0">Instagram</label>
+                      <label className="col-form-label mb-0">{t('doctorRemaining.social.instagram')}</label>
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
                         type="text"
                         inputMode="url"
                         className="form-control veterinary-input"
-                        placeholder="Add Instagram URL"
+                        placeholder={t('doctorRemaining.social.addUrl', { network: t('doctorRemaining.social.instagram') })}
                         value={socialLinks.instagram}
                         onChange={(e) => handleChange('instagram', e.target.value)}
                         disabled={isLoading || updateProfile.isPending}
@@ -155,14 +157,14 @@ const SocialMedia = () => {
 
                   <div className="social-media-links d-flex align-items-center mb-3">
                     <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
-                      <label className="col-form-label mb-0">LinkedIn</label>
+                      <label className="col-form-label mb-0">{t('doctorRemaining.social.linkedin')}</label>
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
                         type="text"
                         inputMode="url"
                         className="form-control veterinary-input"
-                        placeholder="Add LinkedIn URL"
+                        placeholder={t('doctorRemaining.social.addUrl', { network: t('doctorRemaining.social.linkedin') })}
                         value={socialLinks.linkedin}
                         onChange={(e) => handleChange('linkedin', e.target.value)}
                         disabled={isLoading || updateProfile.isPending}
@@ -175,14 +177,14 @@ const SocialMedia = () => {
 
                   <div className="social-media-links d-flex align-items-center mb-3">
                     <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
-                      <label className="col-form-label mb-0">Twitter</label>
+                      <label className="col-form-label mb-0">{t('doctorRemaining.social.twitter')}</label>
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
                         type="text"
                         inputMode="url"
                         className="form-control veterinary-input"
-                        placeholder="Add Twitter URL"
+                        placeholder={t('doctorRemaining.social.addUrl', { network: t('doctorRemaining.social.twitter') })}
                         value={socialLinks.twitter}
                         onChange={(e) => handleChange('twitter', e.target.value)}
                         disabled={isLoading || updateProfile.isPending}
@@ -195,14 +197,14 @@ const SocialMedia = () => {
 
                   <div className="social-media-links d-flex align-items-center mb-3">
                     <div className="input-block input-block-new select-social-link me-3" style={{ minWidth: 160 }}>
-                      <label className="col-form-label mb-0">Website</label>
+                      <label className="col-form-label mb-0">{t('doctorRemaining.social.website')}</label>
                     </div>
                     <div className="input-block input-block-new flex-fill me-3">
                       <input
                         type="text"
                         inputMode="url"
                         className="form-control veterinary-input"
-                        placeholder="Add Website URL"
+                        placeholder={t('doctorRemaining.social.addUrl', { network: t('doctorRemaining.social.website') })}
                         value={socialLinks.website}
                         onChange={(e) => handleChange('website', e.target.value)}
                         disabled={isLoading || updateProfile.isPending}
@@ -216,11 +218,11 @@ const SocialMedia = () => {
                   <div className="form-set-button mt-4">
                     <Link to="/doctor/dashboard" className="btn veterinary-btn-secondary me-2">
                       <i className="fa-solid fa-times me-2"></i>
-                      Cancel
+                      {t('doctorRemaining.social.cancel')}
                     </Link>
                     <button type="submit" className="btn veterinary-btn-primary" disabled={isLoading || updateProfile.isPending}>
                       <i className="fa-solid fa-save me-2"></i>
-                      {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+                      {updateProfile.isPending ? t('doctorRemaining.social.saving') : t('doctorRemaining.social.save')}
                     </button>
                   </div>
                 </form>
@@ -233,16 +235,16 @@ const SocialMedia = () => {
                   <i className="fa-solid fa-lightbulb"></i>
                 </div>
                 <div className="flex-grow-1 ms-3">
-                  <h6 className="alert-heading">Veterinary Social Media Tips</h6>
+                  <h6 className="alert-heading">{t('doctorRemaining.social.tipsTitle')}</h6>
                   <p className="mb-2 small">
-                    <strong>Best practices for veterinary practices:</strong>
+                    <strong>{t('doctorRemaining.social.bestPractices')}</strong>
                   </p>
                   <ul className="small mb-0">
-                    <li>Share pet care tips and educational content</li>
-                    <li>Post before/after treatment success stories (with permission)</li>
-                    <li>Feature your clinic team and facilities</li>
-                    <li>Engage with pet owners through Q&A sessions</li>
-                    <li>Share seasonal pet health reminders</li>
+                    <li>{t('doctorRemaining.social.tip1')}</li>
+                    <li>{t('doctorRemaining.social.tip2')}</li>
+                    <li>{t('doctorRemaining.social.tip3')}</li>
+                    <li>{t('doctorRemaining.social.tip4')}</li>
+                    <li>{t('doctorRemaining.social.tip5')}</li>
                   </ul>
                 </div>
               </div>

@@ -6,8 +6,10 @@ import { Link } from 'react-router-dom'
 import { useAppointments } from '../../queries'
 import { useAcceptAppointment, useRejectAppointment } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const DoctorRequest = () => {
+  const { t, language } = useLanguage()
   const [rejectModal, setRejectModal] = useState({ show: false, appointmentId: null, reason: '' })
 
   const requestParams = useMemo(() => ({ status: 'PENDING', limit: 50 }), [])
@@ -23,29 +25,29 @@ const DoctorRequest = () => {
   }, [appointmentsResponse])
 
   const formatDateTime = (dateString, timeString) => {
-    if (!dateString) return 'N/A'
+    if (!dateString) return t('doctorRequests.notAvailable')
     const date = new Date(dateString)
-    const formattedDate = date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+    const formattedDate = date.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     return `${formattedDate} ${timeString || ''}`.trim()
   }
 
   const getBookingTypeDisplay = (bookingType) => {
     switch (String(bookingType || '').toUpperCase()) {
       case 'ONLINE':
-        return { icon: 'fa-solid fa-video text-primary', text: 'Video Call' }
+        return { icon: 'fa-solid fa-video text-primary', text: t('doctorRequests.videoCall') }
       case 'VISIT':
-        return { icon: 'fa-solid fa-clinic-medical text-success', text: 'Clinic Visit' }
+        return { icon: 'fa-solid fa-clinic-medical text-success', text: t('doctorRequests.clinicVisit') }
       default:
-        return { icon: 'fa-solid fa-circle-info text-info', text: bookingType || 'N/A' }
+        return { icon: 'fa-solid fa-circle-info text-info', text: bookingType || t('doctorRequests.notAvailable') }
     }
   }
 
   const handleAccept = async (appointmentId) => {
     try {
       await accept.mutateAsync(appointmentId)
-      toast.success('Appointment accepted successfully!')
+      toast.success(t('doctorRequests.accepted'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to accept appointment')
+      toast.error(err?.message || t('doctorRequests.acceptFailed'))
     }
   }
 
@@ -58,10 +60,10 @@ const DoctorRequest = () => {
     if (!appointmentId) return
     try {
       await reject.mutateAsync({ appointmentId, data: { reason: rejectModal.reason || null } })
-      toast.success('Appointment rejected successfully!')
+      toast.success(t('doctorRequests.rejected'))
       setRejectModal({ show: false, appointmentId: null, reason: '' })
     } catch (err) {
-      toast.error(err?.message || 'Failed to reject appointment')
+      toast.error(err?.message || t('doctorRequests.rejectFailed'))
     }
   }
 
@@ -76,9 +78,9 @@ const DoctorRequest = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-calendar-check me-3"></i>
-                    Pet Requests
+                    {t('doctorRequests.title')}
                   </h2>
-                  <p className="dashboard-subtitle">Manage pet appointment requests from owners</p>
+                  <p className="dashboard-subtitle">{t('doctorRequests.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -91,11 +93,11 @@ const DoctorRequest = () => {
                       <div className="col-lg-8">
                         <h5 className="card-title mb-0">
                           <i className="fa-solid fa-list me-2"></i>
-                          Pending Pet Requests
+                          {t('doctorRequests.pendingTitle')}
                         </h5>
                       </div>
                       <div className="col-lg-4 text-end">
-                        <span className="text-muted">{appointments.length} pending</span>
+                        <span className="text-muted">{t('doctorRequests.pendingCount', { count: appointments.length })}</span>
                       </div>
                     </div>
                   </div>
@@ -106,14 +108,14 @@ const DoctorRequest = () => {
             {isLoading && (
               <div className="text-center py-5">
                 <div className="spinner-border" role="status">
-                  <span className="visually-hidden">Loading...</span>
+                  <span className="visually-hidden">{t('doctorRequests.loading')}</span>
                 </div>
               </div>
             )}
 
             {!isLoading && appointments.length === 0 && (
               <div className="text-center py-5">
-                <p className="text-muted">No pending appointment requests</p>
+                <p className="text-muted">{t('doctorRequests.empty')}</p>
               </div>
             )}
 
@@ -146,7 +148,7 @@ const DoctorRequest = () => {
                                   <Link to={detailsUrl}>
                                     <img
                                       src={petImage}
-                                      alt="Pet Image"
+                                      alt={t('doctorRequests.petImage')}
                                       onError={(e) => {
                                         e.currentTarget.onerror = null
                                         e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
@@ -157,9 +159,9 @@ const DoctorRequest = () => {
                                     <p>#{appointmentNumber}</p>
                                     <h6>
                                       <Link to={detailsUrl}>{petName}{petBreed}</Link>
-                                      <span className="badge veterinary-badge new-tag">New</span>
+                                      <span className="badge veterinary-badge new-tag">{t('doctorRequests.new')}</span>
                                     </h6>
-                                    <small className="text-muted">Owner: {ownerName}</small>
+                                    <small className="text-muted">{t('doctorRequests.owner')}: {ownerName}</small>
                                   </div>
                                 </div>
                               </li>
@@ -168,10 +170,10 @@ const DoctorRequest = () => {
                                   <i className="fa-solid fa-clock"></i>
                                   {formatDateTime(appointment?.appointmentDate, appointment?.appointmentTime)}
                                 </p>
-                                <p className="md-text">{appointment?.reason || 'Consultation'}</p>
+                                <p className="md-text">{appointment?.reason || t('doctorRequests.consultation')}</p>
                               </li>
                               <li className="appointment-type">
-                                <p className="md-text">Type of Appointment</p>
+                                <p className="md-text">{t('doctorRequests.typeOfAppointment')}</p>
                                 <p>
                                   <i className={bookingType.icon}></i>
                                   {bookingType.text}
@@ -188,7 +190,7 @@ const DoctorRequest = () => {
                                       style={{ cursor: accept.isPending ? 'not-allowed' : 'pointer' }}
                                     >
                                       <i className="fa-solid fa-check-circle"></i>
-                                      <span>{accept.isPending ? 'Processing...' : 'Accept'}</span>
+                                      <span>{accept.isPending ? t('doctorRequests.processing') : t('doctorRequests.accept')}</span>
                                     </button>
                                   </li>
                                   <li>
@@ -200,7 +202,7 @@ const DoctorRequest = () => {
                                       style={{ cursor: reject.isPending ? 'not-allowed' : 'pointer' }}
                                     >
                                       <i className="fa-solid fa-times-circle"></i>
-                                      <span>Reject</span>
+                                      <span>{t('doctorRequests.reject')}</span>
                                     </button>
                                   </li>
                                 </ul>
@@ -230,7 +232,7 @@ const DoctorRequest = () => {
                   >
                     <div className="modal-content">
                       <div className="modal-header">
-                        <h5 className="modal-title">Reject Appointment</h5>
+                        <h5 className="modal-title">{t('doctorRequests.rejectModalTitle')}</h5>
                         <button
                           type="button"
                           className="btn-close"
@@ -239,13 +241,13 @@ const DoctorRequest = () => {
                       </div>
                       <div className="modal-body">
                         <div className="form-group">
-                          <label>Reason for Rejection (Optional)</label>
+                          <label>{t('doctorRequests.reasonOptional')}</label>
                           <textarea
                             className="form-control"
                             rows="4"
                             value={rejectModal.reason}
                             onChange={(e) => setRejectModal((prev) => ({ ...prev, reason: e.target.value }))}
-                            placeholder="Enter reason for rejection..."
+                            placeholder={t('doctorRequests.reasonPlaceholder')}
                           ></textarea>
                         </div>
                       </div>
@@ -255,7 +257,7 @@ const DoctorRequest = () => {
                           className="btn btn-secondary"
                           onClick={() => setRejectModal({ show: false, appointmentId: null, reason: '' })}
                         >
-                          Cancel
+                          {t('doctorRequests.cancel')}
                         </button>
                         <button
                           type="button"
@@ -263,7 +265,7 @@ const DoctorRequest = () => {
                           onClick={confirmReject}
                           disabled={reject.isPending}
                         >
-                          {reject.isPending ? 'Rejecting...' : 'Reject Appointment'}
+                          {reject.isPending ? t('doctorRequests.rejecting') : t('doctorRequests.rejectAppointment')}
                         </button>
                       </div>
                     </div>

@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useFooterOptions } from '../../queries/footerOptionQueries'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const DEFAULT_FOOTER_OPTIONS = {
   address: '3556 Beech Street, USA',
@@ -20,6 +21,7 @@ const socialIconFor = (platform) => {
 }
 
 const Footer = () => {
+  const { t } = useLanguage()
   const location = useLocation()
   const path = location.pathname
   const { data: footerResponse } = useFooterOptions()
@@ -43,10 +45,7 @@ const Footer = () => {
                   <Link to="/"><img src="/assets/img/pet-logo.jpg" alt="logo" /></Link>
                 </div>
                 <div className="footer-about-content">
-                  <p>
-                    Book veterinary visits, manage pet records, and stay on top of follow-ups — all in
-                    one place.
-                  </p>
+                  <p>{t('home.footerDescription')}</p>
                 </div>
               </div>
             </div>
@@ -55,18 +54,18 @@ const Footer = () => {
               <div className="row">
                 <div className="col-lg-3 col-md-4">
                   <div className="footer-widget footer-menu">
-                    <h2 className="footer-title">Company</h2>
+                    <h2 className="footer-title">{t('home.company')}</h2>
                     <ul>
-                      <li><Link to="/">Home</Link></li>
-                      <li><Link to="/search">Specialities</Link></li>
-                      <li><Link to="/search">Consult</Link></li>
+                      <li><Link to="/">{t('common.home')}</Link></li>
+                      <li><Link to="/search">{t('home.specialities')}</Link></li>
+                      <li><Link to="/search">{t('home.consult')}</Link></li>
                     </ul>
                   </div>
                 </div>
 
                 <div className="col-lg-3 col-md-4">
                   <div className="footer-widget footer-menu">
-                    <h2 className="footer-title">Specialities</h2>
+                    <h2 className="footer-title">{t('home.specialities')}</h2>
                     <ul>
                       <li><Link to="/search">Neurology</Link></li>
                       <li><Link to="/search">Cardiology</Link></li>
@@ -77,7 +76,7 @@ const Footer = () => {
 
                 <div className="col-lg-6 col-md-4">
                   <div className="footer-widget footer-contact">
-                    <h2 className="footer-title">Contact Us</h2>
+                    <h2 className="footer-title">{t('home.contactUs')}</h2>
                     <div className="footer-contact-info">
                       <div className="footer-address">
                         <p><i className="isax isax-location"></i> {footerOptions.address}</p>
@@ -96,11 +95,11 @@ const Footer = () => {
 
             <div className="col-lg-3 col-md-7">
               <div className="footer-widget">
-                <h2 className="footer-title">Join Our Newsletter</h2>
+                <h2 className="footer-title">{t('home.joinNewsletter')}</h2>
                 <div className="subscribe-form">
                   <form action="#">
-                    <input type="email" className="form-control" placeholder="Enter Email" />
-                    <button type="submit" className="btn">Submit</button>
+                    <input type="email" className="form-control" placeholder={t('home.emailPlaceholder')} />
+                    <button type="submit" className="btn">{t('home.footerSubmit')}</button>
                   </form>
                 </div>
                 <div className="social-icon">
@@ -131,13 +130,13 @@ const Footer = () => {
             <div className="row">
               <div className="col-md-6 col-lg-6">
                 <div className="copyright-text">
-                  <p className="mb-0">Copyright © {new Date().getFullYear()} MyPetPlus. All Rights Reserved</p>
+                  <p className="mb-0">Copyright © {new Date().getFullYear()} MyPetPlus. {t('home.allRightsReserved')}</p>
                 </div>
               </div>
               <div className="col-md-6 col-lg-6">
                 <div className="copyright-menu">
                   <ul className="policy-menu">
-                    <li><Link to="/login">Login & Register</Link></li>
+                    <li><Link to="/login">{t('home.loginRegister')}</Link></li>
                   </ul>
                 </div>
               </div>

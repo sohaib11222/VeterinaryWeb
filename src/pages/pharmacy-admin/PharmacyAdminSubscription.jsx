@@ -5,9 +5,11 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useSubscriptionPlans } from '../../queries/subscriptionQueries'
 import { useMyPetStoreSubscription } from '../../queries/petStoreQueries'
 import { useBuyPetStoreSubscription } from '../../mutations/petStoreMutations'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const PharmacyAdminSubscription = () => {
   const { user } = useAuth()
+  const { t, language } = useLanguage()
   const role = String(user?.role || '').toUpperCase()
 
   const [selectedPlan, setSelectedPlan] = useState(null)
@@ -38,86 +40,86 @@ const PharmacyAdminSubscription = () => {
 
   const formatPlanTitle = (name) => {
     const n = String(name || '').trim().toUpperCase()
-    if (n === 'STARTER') return 'Starter Plan'
-    if (n === 'PRO') return 'Pro Plan'
-    if (n === 'PREMIUM') return 'Premium Plan'
-    return name || 'Plan'
+    if (n === 'STARTER') return t('pharmacyAdmin.subscription.starter')
+    if (n === 'PRO') return t('pharmacyAdmin.subscription.pro')
+    if (n === 'PREMIUM') return t('pharmacyAdmin.subscription.premium')
+    return name || t('pharmacyAdmin.subscription.planFallback')
   }
 
   const formatDuration = (days) => {
     const d = Number(days)
     if (!Number.isFinite(d) || d <= 0) return '—'
     const months = Math.round(d / 30)
-    if (months <= 1) return '1 month'
-    return `${months} months`
+    if (months <= 1) return `1 ${t('pharmacyAdmin.subscription.month')}`
+    return `${months} ${t('pharmacyAdmin.subscription.months')}`
   }
 
   const formatDate = (dateString) => {
     if (!dateString) return '—'
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' })
+    return date.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { year: 'numeric', month: 'short', day: 'numeric' })
   }
 
   const onConfirmBuy = async () => {
     if (!selectedPlan?._id) return
     try {
       await buy.mutateAsync({ planId: selectedPlan._id })
-      toast.success('Subscription updated')
+      toast.success(t('pharmacyAdmin.subscription.updated'))
       setSelectedPlan(null)
     } catch (error) {
-      toast.error(error?.message || 'Failed to purchase subscription')
+      toast.error(error?.message || t('pharmacyAdmin.subscription.purchaseFailed'))
     }
   }
 
   return (
     <div>
       <div className="page-header">
-        <h3 className="page-title">Subscription</h3>
+        <h3 className="page-title">{t('pharmacyAdmin.subscription.title')}</h3>
       </div>
 
       {role === 'PARAPHARMACY' && (
         <div className="alert alert-info">
-          Parapharmacy accounts do not require a subscription.
+          {t('pharmacyAdmin.subscription.parapharmacyNote')}
         </div>
       )}
 
       {role !== 'PET_STORE' ? null : plansQuery.isLoading || mySubQuery.isLoading ? (
         <div className="text-center py-4">
           <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">{t('pharmacyAdmin.subscription.loading')}</span>
           </div>
         </div>
       ) : plansQuery.isError ? (
-        <div className="alert alert-danger">{plansQuery.error?.message || 'Failed to load plans'}</div>
+        <div className="alert alert-danger">{plansQuery.error?.message || t('pharmacyAdmin.subscription.failedPlans')}</div>
       ) : mySubQuery.isError ? (
-        <div className="alert alert-danger">{mySubQuery.error?.message || 'Failed to load subscription'}</div>
+        <div className="alert alert-danger">{mySubQuery.error?.message || t('pharmacyAdmin.subscription.failedSubscription')}</div>
       ) : (
         <>
           <div className="card mb-4">
             <div className="card-body">
               <div className="d-flex align-items-center justify-content-between flex-wrap" style={{ gap: 12 }}>
                 <div>
-                  <h5 className="mb-1">Current Subscription</h5>
+                  <h5 className="mb-1">{t('pharmacyAdmin.subscription.current')}</h5>
                   {mySub?.subscriptionPlan ? (
                     <>
                       <div className="text-muted">
-                        Plan: <strong>{formatPlanTitle(mySub.subscriptionPlan?.name) || '—'}</strong>
+                        {t('pharmacyAdmin.subscription.plan')}: <strong>{formatPlanTitle(mySub.subscriptionPlan?.name) || '—'}</strong>
                       </div>
                       <div className="text-muted">
                         {mySub?.hasActiveSubscription ? (
-                          <>Expires on: {formatDate(mySub.subscriptionExpiresAt)}</>
+                          <>{t('pharmacyAdmin.subscription.expires')}: {formatDate(mySub.subscriptionExpiresAt)}</>
                         ) : (
-                          <>Expired on: {formatDate(mySub.subscriptionExpiresAt)}</>
+                          <>{t('pharmacyAdmin.subscription.expired')}: {formatDate(mySub.subscriptionExpiresAt)}</>
                         )}
                       </div>
                     </>
                   ) : (
-                    <div className="text-muted">No active subscription</div>
+                    <div className="text-muted">{t('pharmacyAdmin.subscription.noActive')}</div>
                   )}
                 </div>
                 <div>
                   <span className={`badge ${mySub?.hasActiveSubscription ? 'bg-success' : 'bg-danger'}`}>
-                    {mySub?.hasActiveSubscription ? 'Active' : 'Inactive'}
+                    {mySub?.hasActiveSubscription ? t('pharmacyAdmin.dashboard.active') : t('pharmacyAdmin.dashboard.inactive')}
                   </span>
                 </div>
               </div>
@@ -125,7 +127,7 @@ const PharmacyAdminSubscription = () => {
           </div>
 
           {plans.length === 0 ? (
-            <div className="alert alert-info">No plans available.</div>
+            <div className="alert alert-info">{t('pharmacyAdmin.subscription.noPlans')}</div>
           ) : (
             <div className="row">
               {plans.map((plan) => {
@@ -137,7 +139,7 @@ const PharmacyAdminSubscription = () => {
                         <h4 className="mb-2">{formatPlanTitle(plan.name)}</h4>
                         <div className="mb-3">
                           <h2 className="mb-0">{formatPrice(plan.price)}</h2>
-                          <div className="text-muted small">Full access for {formatDuration(plan.durationInDays)}</div>
+                          <div className="text-muted small">{t('pharmacyAdmin.subscription.fullAccessFor', { duration: formatDuration(plan.durationInDays) })}</div>
                         </div>
 
                         <div className="mb-3">
@@ -151,13 +153,13 @@ const PharmacyAdminSubscription = () => {
                               ))}
                             </ul>
                           ) : (
-                            <div className="text-muted">Full access</div>
+                            <div className="text-muted">{t('pharmacyAdmin.subscription.fullAccess')}</div>
                           )}
                         </div>
 
                         {isCurrent ? (
                           <button className="btn btn-outline-success w-100" disabled>
-                            Current Plan
+                            {t('pharmacyAdmin.subscription.currentPlan')}
                           </button>
                         ) : (
                           <button
@@ -165,7 +167,7 @@ const PharmacyAdminSubscription = () => {
                             onClick={() => setSelectedPlan(plan)}
                             disabled={buy.isPending}
                           >
-                            Buy Plan
+                            {t('pharmacyAdmin.subscription.buyPlan')}
                           </button>
                         )}
                       </div>
@@ -196,24 +198,24 @@ const PharmacyAdminSubscription = () => {
                 <div className="modal-dialog modal-dialog-centered" role="document" onClick={(e) => e.stopPropagation()}>
                   <div className="modal-content">
                     <div className="modal-header">
-                      <h5 className="modal-title">Confirm Purchase</h5>
+                      <h5 className="modal-title">{t('pharmacyAdmin.subscription.confirmPurchase')}</h5>
                       <button type="button" className="btn-close" onClick={() => setSelectedPlan(null)}></button>
                     </div>
                     <div className="modal-body">
                       <div className="mb-2">
-                        Plan: <strong>{selectedPlan.name}</strong>
+                        {t('pharmacyAdmin.subscription.plan')}: <strong>{formatPlanTitle(selectedPlan.name)}</strong>
                       </div>
                       <div className="mb-2">
-                        Price: <strong>{formatPrice(selectedPlan.price)}</strong>
+                        {t('pharmacyAdmin.subscription.price')}: <strong>{formatPrice(selectedPlan.price)}</strong>
                       </div>
-                      <div className="text-muted small">This will activate immediately.</div>
+                      <div className="text-muted small">{t('pharmacyAdmin.subscription.activate')}</div>
                     </div>
                     <div className="modal-footer">
                       <button className="btn btn-secondary" onClick={() => setSelectedPlan(null)} disabled={buy.isPending}>
-                        Cancel
+                        {t('pharmacyAdmin.subscription.cancel')}
                       </button>
                       <button className="btn btn-primary" onClick={onConfirmBuy} disabled={buy.isPending}>
-                        {buy.isPending ? 'Processing...' : 'Confirm & Pay'}
+                        {buy.isPending ? t('pharmacyAdmin.subscription.processing') : t('pharmacyAdmin.subscription.confirmPay')}
                       </button>
                     </div>
                   </div>

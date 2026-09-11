@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useActiveInsuranceCompanies } from '../../queries/insuranceQueries'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
@@ -11,6 +12,7 @@ import { API_ROUTES } from '../../utils/apiConfig'
 import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const DoctorInsuranceSettings = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const { data: profileRes, isLoading: profileLoading } = useVeterinarianProfile()
@@ -59,7 +61,7 @@ const DoctorInsuranceSettings = () => {
     e.preventDefault()
 
     if (convenzionato && selectedInsuranceIds.length === 0) {
-      toast.warning('Please select at least one insurance company if you accept insurance')
+      toast.warning(t('doctorRemaining.insurance.required'))
       return
     }
 
@@ -71,7 +73,7 @@ const DoctorInsuranceSettings = () => {
       },
       {
         onSuccess: async () => {
-          toast.success('Insurance settings updated successfully')
+          toast.success(t('doctorRemaining.insurance.updated'))
 
           try {
             const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
@@ -90,7 +92,7 @@ const DoctorInsuranceSettings = () => {
             }
           }
         },
-        onError: (err) => toast.error(err?.data?.message || err?.message || 'Failed to update insurance settings'),
+        onError: (err) => toast.error(err?.data?.message || err?.message || t('doctorRemaining.insurance.updateFailed')),
       }
     )
   }
@@ -108,9 +110,9 @@ const DoctorInsuranceSettings = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-shield-alt me-3"></i>
-                    Insurance
+                    {t('doctorRemaining.insurance.title')}
                   </h2>
-                  <p className="dashboard-subtitle">Manage the insurance companies you accept for your veterinary practice</p>
+                  <p className="dashboard-subtitle">{t('doctorRemaining.insurance.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -118,7 +120,7 @@ const DoctorInsuranceSettings = () => {
             <DoctorProfileTabs />
 
             <div className="dashboard-header border-0 mb-0">
-              <h3>Insurance Settings</h3>
+              <h3>{t('doctorRemaining.insurance.section')}</h3>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -126,7 +128,7 @@ const DoctorInsuranceSettings = () => {
                 <div className="dashboard-card-body">
                   <div className="form-wrap mb-4">
                     <label className="col-form-label">
-                      Do you accept insurance? <span className="text-danger">*</span>
+                      {t('doctorRemaining.insurance.accept')} <span className="text-danger">*</span>
                     </label>
                     <div className="form-check form-switch">
                       <input
@@ -138,31 +140,31 @@ const DoctorInsuranceSettings = () => {
                         disabled={updateProfile.isPending || profileLoading}
                       />
                       <label className="form-check-label" htmlFor="convenzionato">
-                        {convenzionato ? 'Yes, I accept insurance' : 'No, I do not accept insurance'}
+                        {convenzionato ? t('doctorRemaining.insurance.yes') : t('doctorRemaining.insurance.no')}
                       </label>
                     </div>
                     <small className="form-text text-muted">
-                      Enable this if you are partnered with insurance companies and accept insurance payments
+                      {t('doctorRemaining.insurance.acceptHint')}
                     </small>
                   </div>
 
                   {convenzionato && (
                     <div className="form-wrap">
                       <label className="col-form-label mb-3">
-                        Select Insurance Companies <span className="text-danger">*</span>
+                        {t('doctorRemaining.insurance.companies')} <span className="text-danger">*</span>
                       </label>
 
                       {insuranceLoading ? (
                         <div className="text-center py-4">
                           <div className="spinner-border spinner-border-sm" role="status">
-                            <span className="visually-hidden">Loading...</span>
+                            <span className="visually-hidden">{t('doctorRemaining.insurance.loading')}</span>
                           </div>
-                          <p className="mt-2 mb-0">Loading insurance companies...</p>
+                          <p className="mt-2 mb-0">{t('doctorRemaining.insurance.loading')}</p>
                         </div>
                       ) : insuranceCompanies.length === 0 ? (
                         <div className="alert alert-warning mb-0">
                           <i className="fa-solid fa-exclamation-triangle me-2"></i>
-                          No active insurance companies available. Please contact admin to add insurance companies.
+                          {t('doctorRemaining.insurance.none')}
                         </div>
                       ) : (
                         <div className="row">
@@ -236,7 +238,7 @@ const DoctorInsuranceSettings = () => {
                       {convenzionato && selectedInsuranceIds.length === 0 && insuranceCompanies.length > 0 && (
                         <div className="alert alert-info mt-3 mb-0">
                           <i className="fa-solid fa-info-circle me-2"></i>
-                          Please select at least one insurance company
+                          {t('doctorRemaining.insurance.required')}
                         </div>
                       )}
                     </div>
@@ -246,7 +248,7 @@ const DoctorInsuranceSettings = () => {
 
               <div className="modal-btn text-end mt-4">
                 <Link to="/doctor/dashboard" className="btn veterinary-btn-secondary me-2">
-                  <i className="fa-solid fa-times me-1"></i>Cancel
+                  <i className="fa-solid fa-times me-1"></i>{t('doctorRemaining.insurance.cancel')}
                 </Link>
                 <button
                   type="submit"
@@ -256,11 +258,11 @@ const DoctorInsuranceSettings = () => {
                   {updateProfile.isPending ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2" role="status"></span>
-                      Saving...
+                      {t('doctorRemaining.insurance.saving')}
                     </>
                   ) : (
                     <>
-                      <i className="fa-solid fa-save me-1"></i>Save Changes
+                      <i className="fa-solid fa-save me-1"></i>{t('doctorRemaining.insurance.save')}
                     </>
                   )}
                 </button>

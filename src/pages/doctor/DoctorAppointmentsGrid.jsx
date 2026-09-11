@@ -4,8 +4,10 @@ import { useMemo, useState } from 'react'
 import { useAppointments } from '../../queries'
 import { getImageUrl } from '../../utils/apiConfig'
 import { useAppointmentChat } from '../../hooks/useAppointmentChat'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const DoctorAppointmentsGrid = () => {
+  const { language, t } = useLanguage()
   const { data: appointmentsResponse, isLoading } = useAppointments({ limit: 50 })
   const [chatAlert, setChatAlert] = useState('')
   const { openChat: openAppointmentChat, openingAppointmentId, isOpening } = useAppointmentChat('/chat-doctor')
@@ -21,7 +23,7 @@ const DoctorAppointmentsGrid = () => {
       .filter((a) => ['PENDING', 'CONFIRMED'].includes(String(a.status || '').toUpperCase()))
       .map((a) => {
         const pet = a.petId || {}
-        const dateStr = a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString() : ''
+        const dateStr = a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB') : ''
         const timeStr = a.appointmentTime || ''
         const appointmentId = a._id
         const detailsUrl = appointmentId ? `/doctor-appointment-details?id=${appointmentId}` : '/doctor-appointment-details'
@@ -30,22 +32,22 @@ const DoctorAppointmentsGrid = () => {
           _id: a._id,
           appointmentId,
           id: a.appointmentNumber || a._id,
-          patientName: pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : 'Pet',
+          patientName: pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : t('doctorPets.pet'),
           dateTime: `${dateStr} ${timeStr}`.trim(),
-          visitType: a.reason || 'Consultation',
+          visitType: a.reason || t('doctorLegacy.consultation'),
           detailsUrl,
           petImg,
           _raw: a,
         }
       })
-  }, [appointments])
+  }, [appointments, language, t])
 
   const completedAppointments = useMemo(() => {
     return appointments
       .filter((a) => String(a.status || '').toUpperCase() === 'COMPLETED')
       .map((a) => {
         const pet = a.petId || {}
-        const dateStr = a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString() : ''
+        const dateStr = a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB') : ''
         const timeStr = a.appointmentTime || ''
         const appointmentId = a._id
         const detailsUrl = appointmentId ? `/doctor-appointment-details?id=${appointmentId}` : '/doctor-appointment-details'
@@ -54,22 +56,22 @@ const DoctorAppointmentsGrid = () => {
           _id: a._id,
           appointmentId,
           id: a.appointmentNumber || a._id,
-          patientName: pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : 'Pet',
+          patientName: pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : t('doctorPets.pet'),
           dateTime: `${dateStr} ${timeStr}`.trim(),
-          visitType: a.reason || 'Consultation',
+          visitType: a.reason || t('doctorLegacy.consultation'),
           detailsUrl,
           petImg,
           _raw: a,
         }
       })
-  }, [appointments])
+  }, [appointments, language, t])
 
   const cancelledAppointments = useMemo(() => {
     return appointments
       .filter((a) => ['CANCELLED', 'REJECTED'].includes(String(a.status || '').toUpperCase()))
       .map((a) => {
         const pet = a.petId || {}
-        const dateStr = a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString() : ''
+        const dateStr = a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB') : ''
         const timeStr = a.appointmentTime || ''
         const appointmentId = a._id
         const detailsUrl = appointmentId ? `/doctor-appointment-details?id=${appointmentId}` : '/doctor-appointment-details'
@@ -78,22 +80,22 @@ const DoctorAppointmentsGrid = () => {
           _id: a._id,
           appointmentId,
           id: a.appointmentNumber || a._id,
-          patientName: pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : 'Pet',
+          patientName: pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : t('doctorPets.pet'),
           dateTime: `${dateStr} ${timeStr}`.trim(),
-          visitType: a.reason || 'Consultation',
+          visitType: a.reason || t('doctorLegacy.consultation'),
           detailsUrl,
           petImg,
           _raw: a,
         }
       })
-  }, [appointments])
+  }, [appointments, language, t])
 
   const handleOpenChat = async (appointment) => {
     try {
       setChatAlert('')
       await openAppointmentChat(appointment)
     } catch (error) {
-      setChatAlert(error?.data?.message || error?.message || 'Unable to open this appointment chat.')
+      setChatAlert(error?.data?.message || error?.message || t('doctorLegacy.unableChat'))
     }
   }
 
@@ -101,7 +103,7 @@ const DoctorAppointmentsGrid = () => {
     <div className="content veterinary-dashboard">
       <div className="container-fluid">
         {openingAppointmentId ? (
-          <div className="alert alert-info" role="status"><i className="fa-solid fa-spinner fa-spin me-2" />Opening chat…</div>
+          <div className="alert alert-info" role="status"><i className="fa-solid fa-spinner fa-spin me-2" />{t('doctorLegacy.openingChat')}</div>
         ) : chatAlert ? (
           <div className="alert alert-warning" role="alert">
             {chatAlert}
@@ -110,24 +112,24 @@ const DoctorAppointmentsGrid = () => {
         <div className="filter-head">
           <div className="position-relative daterange-wraper me-2">
             <div className="input-groupicon calender-input">
-              <input type="text" className="form-control date-range bookingrange" placeholder="From Date - To Date " />
+              <input type="text" className="form-control date-range bookingrange" placeholder={t('doctorLegacy.fromTo')} />
             </div>
             <i className="isax isax-calendar-1"></i>
           </div>
           <div className="form-sorts dropdown">
-            <a href="javascript:void(0);" className="dropdown-toggle" id="table-filter"><i className="isax isax-filter me-2"></i>Filter By</a>
+            <a href="javascript:void(0);" className="dropdown-toggle" id="table-filter"><i className="isax isax-filter me-2"></i>{t('doctorLegacy.filterBy')}</a>
             <div className="filter-dropdown-menu">
               <div className="filter-set-view">
                 <div className="accordion" id="accordionExample">
                   <div className="filter-set-content">
                     <div className="filter-set-content-head">
-                      <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Name<i className="fa-solid fa-chevron-right"></i></a>
+                      <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">{t('doctorLegacy.name')}<i className="fa-solid fa-chevron-right"></i></a>
                     </div>
                     <div className="filter-set-contents accordion-collapse collapse show" id="collapseTwo" data-bs-parent="#accordionExample">
                       <ul>
                         <li>
                           <div className="input-block dash-search-input w-100">
-                            <input type="text" className="form-control" placeholder="Search" />
+                            <input type="text" className="form-control" placeholder={t('doctorLegacy.search')} />
                             <span className="search-icon"><i className="fa-solid fa-magnifying-glass"></i></span>
                           </div>
                         </li>
@@ -136,7 +138,7 @@ const DoctorAppointmentsGrid = () => {
                   </div>
                   <div className="filter-set-content">
                     <div className="filter-set-content-head">
-                      <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Appointment Type<i className="fa-solid fa-chevron-right"></i></a>
+                      <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">{t('doctorLegacy.appointmentType')}<i className="fa-solid fa-chevron-right"></i></a>
                     </div>
                     <div className="filter-set-contents accordion-collapse collapse show" id="collapseOne" data-bs-parent="#accordionExample">
                       <ul>
@@ -145,7 +147,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" defaultChecked />
                               <span className="checkmarks"></span>
-                              <span className="check-title">All Type</span>
+                              <span className="check-title">{t('doctorLegacy.allType')}</span>
                             </label>
                           </div>
                         </li>
@@ -154,7 +156,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" />
                               <span className="checkmarks"></span>
-                              <span className="check-title">Video Call</span>
+                              <span className="check-title">{t('doctorLegacy.videoCall')}</span>
                             </label>
                           </div>
                         </li>
@@ -163,7 +165,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" />
                               <span className="checkmarks"></span>
-                              <span className="check-title">Audio Call</span>
+                              <span className="check-title">{t('doctorLegacy.audioCall')}</span>
                             </label>
                           </div>
                         </li>
@@ -172,7 +174,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" />
                               <span className="checkmarks"></span>
-                              <span className="check-title">Chat</span>
+                              <span className="check-title">{t('doctorLegacy.chat')}</span>
                             </label>
                           </div>
                         </li>
@@ -181,7 +183,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" />
                               <span className="checkmarks"></span>
-                              <span className="check-title">Direct Visit</span>
+                              <span className="check-title">{t('doctorLegacy.directVisit')}</span>
                             </label>
                           </div>
                         </li>
@@ -190,7 +192,7 @@ const DoctorAppointmentsGrid = () => {
                   </div>
                   <div className="filter-set-content">
                     <div className="filter-set-content-head">
-                      <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Visit Type<i className="fa-solid fa-chevron-right"></i></a>
+                      <a href="#" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">{t('doctorLegacy.visitType')}<i className="fa-solid fa-chevron-right"></i></a>
                     </div>
                     <div className="filter-set-contents accordion-collapse collapse show" id="collapseThree" data-bs-parent="#accordionExample">
                       <ul>
@@ -199,7 +201,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" defaultChecked />
                               <span className="checkmarks"></span>
-                              <span className="check-title">All Visit</span>
+                              <span className="check-title">{t('doctorLegacy.allVisit')}</span>
                             </label>
                           </div>
                         </li>
@@ -208,7 +210,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" />
                               <span className="checkmarks"></span>
-                              <span className="check-title">General</span>
+                              <span className="check-title">{t('doctorLegacy.general')}</span>
                             </label>
                           </div>
                         </li>
@@ -217,7 +219,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" />
                               <span className="checkmarks"></span>
-                              <span className="check-title">Consultation</span>
+                              <span className="check-title">{t('doctorLegacy.consultation')}</span>
                             </label>
                           </div>
                         </li>
@@ -226,7 +228,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" />
                               <span className="checkmarks"></span>
-                              <span className="check-title">Follow-up</span>
+                              <span className="check-title">{t('doctorLegacy.followUp')}</span>
                             </label>
                           </div>
                         </li>
@@ -235,7 +237,7 @@ const DoctorAppointmentsGrid = () => {
                             <label className="checkboxs">
                               <input type="checkbox" />
                               <span className="checkmarks"></span>
-                              <span className="check-title">Direct Visit</span>
+                              <span className="check-title">{t('doctorLegacy.directVisit')}</span>
                             </label>
                           </div>
                         </li>
@@ -244,8 +246,8 @@ const DoctorAppointmentsGrid = () => {
                   </div>
                 </div>
                 <div className="filter-reset-btns">
-                  <a href="#" className="btn btn-light">Reset</a>
-                  <a href="#" className="btn btn-primary">Filter Now</a>
+                  <a href="#" className="btn btn-light">{t('doctorLegacy.reset')}</a>
+                  <a href="#" className="btn btn-primary">{t('doctorLegacy.filterNow')}</a>
                 </div>
               </div>
             </div>
@@ -258,7 +260,7 @@ const DoctorAppointmentsGrid = () => {
             {isLoading ? (
               <div className="col-12 text-center py-5">
                 <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
+                  <span className="visually-hidden">{t('doctorLegacy.loading')}</span>
                 </div>
               </div>
             ) : (
@@ -272,7 +274,7 @@ const DoctorAppointmentsGrid = () => {
                             <Link to={apt.detailsUrl}>
                               <img
                                 src={apt.petImg}
-                                alt="Pet Image"
+                                alt={t('doctorLegacy.petImage')}
                                 onError={(e) => {
                                   e.currentTarget.onerror = null
                                   e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
@@ -306,14 +308,14 @@ const DoctorAppointmentsGrid = () => {
                               className="veterinary-action-btn appointment-chat-action"
                               onClick={() => handleOpenChat(apt)}
                               disabled={isOpening(apt._id || apt.appointmentId)}
-                              title="Chat"
+                              title={t('doctorLegacy.chatAction')}
                             >
                               {isOpening(apt._id || apt.appointmentId) ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="isax isax-messages-25"></i>}
                             </button>
                           </li>
                         </ul>
                         <div className="appointment-start">
-                          <Link to={apt.detailsUrl} className="start-link">View</Link>
+                          <Link to={apt.detailsUrl} className="start-link">{t('doctorLegacy.view')}</Link>
                         </div>
                       </li>
                     </ul>
@@ -325,7 +327,7 @@ const DoctorAppointmentsGrid = () => {
             {/* More appointment grids would continue here... */}
             <div className="col-md-12">
               <div className="loader-item text-center">
-                <a href="javascript:void(0);" className="btn btn-load">Load More</a>
+                <a href="javascript:void(0);" className="btn btn-load">{t('doctorLegacy.loadMore')}</a>
               </div>
             </div>
           </div>
@@ -343,7 +345,7 @@ const DoctorAppointmentsGrid = () => {
                             <Link to={apt.detailsUrl}>
                               <img
                                 src={apt.petImg}
-                                alt="Pet Image"
+                                alt={t('doctorLegacy.petImage')}
                                 onError={(e) => {
                                   e.currentTarget.onerror = null
                                   e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
@@ -367,7 +369,7 @@ const DoctorAppointmentsGrid = () => {
                         </ul>
                       </li>
                       <li className="appointment-detail-btn">
-                        <Link to={apt.detailsUrl} className="start-link w-100">View Details</Link>
+                        <Link to={apt.detailsUrl} className="start-link w-100">{t('doctorLegacy.viewDetails')}</Link>
                       </li>
                     </ul>
                   </div>
@@ -375,7 +377,7 @@ const DoctorAppointmentsGrid = () => {
               ))
             ) : (
               <div className="col-md-12 text-center py-4">
-                <p className="text-muted">No cancelled appointments.</p>
+                <p className="text-muted">{t('doctorLegacy.noCancelled')}</p>
               </div>
             )}
           </div>
@@ -393,7 +395,7 @@ const DoctorAppointmentsGrid = () => {
                             <Link to={apt.detailsUrl}>
                               <img
                                 src={apt.petImg}
-                                alt="Pet Image"
+                                alt={t('doctorLegacy.petImage')}
                                 onError={(e) => {
                                   e.currentTarget.onerror = null
                                   e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
@@ -417,7 +419,7 @@ const DoctorAppointmentsGrid = () => {
                         </ul>
                       </li>
                       <li className="appointment-detail-btn">
-                        <Link to={apt.detailsUrl} className="start-link w-100">View Details</Link>
+                        <Link to={apt.detailsUrl} className="start-link w-100">{t('doctorLegacy.viewDetails')}</Link>
                       </li>
                     </ul>
                   </div>
@@ -425,7 +427,7 @@ const DoctorAppointmentsGrid = () => {
               ))
             ) : (
               <div className="col-md-12 text-center py-4">
-                <p className="text-muted">No completed appointments.</p>
+                <p className="text-muted">{t('doctorLegacy.noCompleted')}</p>
               </div>
             )}
           </div>

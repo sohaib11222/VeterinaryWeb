@@ -5,6 +5,7 @@ import { toast } from 'react-toastify'
 import { useCart } from '../../contexts/CartContext'
 import { useProducts } from '../../queries/productQueries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const extractProducts = (payload, fallbackLimit = 12) => {
   const outer = payload?.data ?? payload
@@ -18,6 +19,7 @@ const extractProducts = (payload, fallbackLimit = 12) => {
 }
 
 const ProductAll = () => {
+  const { t } = useLanguage()
   const { addToCart } = useCart()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -77,34 +79,34 @@ const ProductAll = () => {
     e.preventDefault()
     e.stopPropagation()
     if (product?.stock === 0) {
-      toast.error('Product is out of stock')
+      toast.error(t('shop.outOfStock'))
       return
     }
 
     addToCart(product, 1)
-    toast.success(`${product?.name || 'Product'} added to cart!`)
+    toast.success(t('shop.addedToCart', { quantity: 1, name: product?.name || t('shop.product') }))
   }
 
   return (
     <>
-      <Breadcrumb title="Pharmacy" li1="Products" li2="All Products" />
+      <Breadcrumb title={t('shop.pharmacy')} li1={t('shop.products')} li2={t('shop.allProducts')} />
       <div className="content pharmacy-products-mobile">
         <div className="container">
           <div className="row">
             <div className="col-md-5 col-lg-3 col-xl-3 theiaStickySidebar">
               <div className="card search-filter">
                 <div className="card-header">
-                  <h4 className="card-title mb-0">Filter</h4>
+                  <h4 className="card-title mb-0">{t('shop.filter')}</h4>
                 </div>
                 <div className="card-body">
                   <div className="filter-widget mb-4">
-                    <h4>Search</h4>
+                    <h4>{t('shop.search')}</h4>
                     <form onSubmit={handleSearch}>
                       <div className="input-group mb-3">
                         <input
                           type="text"
                           className="form-control"
-                          placeholder="Search products..."
+                          placeholder={t('shop.searchProducts')}
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -116,11 +118,11 @@ const ProductAll = () => {
                   </div>
 
                   <div className="filter-widget">
-                    <h4>Categories</h4>
+                    <h4>{t('shop.categories')}</h4>
                     <div>
                       <label className="custom_check">
                         <input type="checkbox" checked={!selectedCategory} onChange={() => handleCategoryChange('')} />
-                        <span className="checkmark"></span> All Categories
+                        <span className="checkmark"></span> {t('shop.allCategories')}
                       </label>
                     </div>
                     {categories.map((cat, idx) => (
@@ -145,7 +147,7 @@ const ProductAll = () => {
                         setSearchParams(params)
                       }}
                     >
-                      Clear Filters
+                      {t('shop.clearFilters')}
                     </button>
                   </div>
                 </div>
@@ -155,10 +157,9 @@ const ProductAll = () => {
             <div className="col-md-7 col-lg-9 col-xl-9 pharmacy-product-results">
               <div className="row align-items-center pb-3">
                 <div className="col-md-12">
-                  <h3 className="title pharmacy-title">{sellerId ? 'Pharmacy Products' : 'All Products'}</h3>
+                  <h3 className="title pharmacy-title">{sellerId ? t('shop.pharmacyProducts') : t('shop.allProducts')}</h3>
                   <span className="sort-title">
-                    Showing {products.length} of {pagination.total} products
-                    {sellerId ? ' from this pharmacy' : ''}
+                    {t('shop.showingProducts', { shown: products.length, total: pagination.total, suffix: sellerId ? t('shop.fromThisPharmacy') : '' })}
                   </span>
                 </div>
               </div>
@@ -166,14 +167,14 @@ const ProductAll = () => {
               {productsQuery.isLoading ? (
                 <div className="text-center py-5">
                   <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">{t('shop.loading')}</span>
                   </div>
                 </div>
               ) : productsQuery.isError ? (
-                <div className="alert alert-danger">{productsQuery.error?.message || 'Failed to load products'}</div>
+                <div className="alert alert-danger">{productsQuery.error?.message || t('shop.failedProducts')}</div>
               ) : products.length === 0 ? (
                 <div className="text-center py-5">
-                  <p className="text-muted">No products found. Try adjusting your filters.</p>
+                  <p className="text-muted">{t('shop.noProducts')}</p>
                 </div>
               ) : (
                 <>
@@ -218,7 +219,7 @@ const ProductAll = () => {
                                     <Link
                                       to={`/product-description?id=${productId}`}
                                       className="cart-icon"
-                                      title="Prescription required — view product"
+                                      title={t('shop.prescriptionRequired')}
                                     >
                                       <i className="fas fa-file-prescription"></i>
                                     </Link>
@@ -227,7 +228,7 @@ const ProductAll = () => {
                                     href="#"
                                     className="cart-icon"
                                     onClick={(e) => handleAddToCart(e, product)}
-                                    title="Add to Cart"
+                                    title={t('shop.addToCart')}
                                   >
                                     <i className="fas fa-shopping-cart"></i>
                                   </a>
@@ -248,7 +249,7 @@ const ProductAll = () => {
                           <ul className="pagination justify-content-center">
                             <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
                               <button className="page-link" onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
-                                Previous
+                                {t('shop.previous')}
                               </button>
                             </li>
                             {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((n) => (
@@ -260,7 +261,7 @@ const ProductAll = () => {
                             ))}
                             <li className={`page-item ${page === pagination.pages ? 'disabled' : ''}`}>
                               <button className="page-link" onClick={() => handlePageChange(page + 1)} disabled={page === pagination.pages}>
-                                Next
+                                {t('shop.next')}
                               </button>
                             </li>
                           </ul>

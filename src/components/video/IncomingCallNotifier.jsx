@@ -4,11 +4,13 @@ import { toast } from 'react-toastify'
 
 import * as videoApi from '../../api/video'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const payloadData = (response) => response?.data?.data ?? response?.data ?? response
 
 const IncomingCallNotifier = () => {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [incoming, setIncoming] = useState(null)
   const [answering, setAnswering] = useState(false)
@@ -55,7 +57,7 @@ const IncomingCallNotifier = () => {
         state: { videoCall: acceptedPayload },
       })
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Unable to answer the call')
+      toast.error(err?.response?.data?.message || err?.message || t('videoCall.unableAnswer'))
       setIncoming(null)
     } finally {
       setAnswering(false)
@@ -68,7 +70,7 @@ const IncomingCallNotifier = () => {
     try {
       await videoApi.endVideoSession(incoming._id)
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Unable to decline the call')
+      toast.error(err?.response?.data?.message || err?.message || t('videoCall.unableDecline'))
     } finally {
       setIncoming(null)
       setDeclining(false)
@@ -76,24 +78,24 @@ const IncomingCallNotifier = () => {
   }
 
   if (!incoming) return null
-  const callerName = incoming.caller?.name || 'Incoming caller'
+  const callerName = incoming.caller?.name || t('videoCall.incomingCaller')
   const appointment = incoming.appointmentId || {}
 
   return (
-    <div style={overlayStyle} role="alertdialog" aria-modal="true" aria-label="Incoming video call">
+    <div style={overlayStyle} role="alertdialog" aria-modal="true" aria-label={t('videoCall.incoming')}>
       <div style={cardStyle}>
         <div style={pulseStyle}><i className="fa-solid fa-phone" /></div>
-        <div style={{ fontSize: 13, letterSpacing: '.08em', color: '#79909a', fontWeight: 700 }}>INCOMING VIDEO CALL</div>
+        <div style={{ fontSize: 13, letterSpacing: '.08em', color: '#79909a', fontWeight: 700 }}>{t('videoCall.incoming')}</div>
         <h3 style={{ margin: '9px 0 6px' }}>{callerName}</h3>
         <p style={{ color: '#60717c', margin: 0 }}>
-          {appointment.appointmentNumber ? `${appointment.appointmentNumber} · ` : ''}Appointment call
+          {appointment.appointmentNumber ? `${appointment.appointmentNumber} · ` : ''}{t('videoCall.appointmentCall')}
         </p>
         <div style={actionsStyle}>
           <button type="button" onClick={decline} disabled={declining || answering} style={{ ...roundButtonStyle, background: '#ea4d57' }}>
-            <i className="fa-solid fa-phone-slash" /><span>Decline</span>
+            <i className="fa-solid fa-phone-slash" /><span>{t('videoCall.decline')}</span>
           </button>
           <button type="button" onClick={answer} disabled={declining || answering} style={{ ...roundButtonStyle, background: '#20b358' }}>
-            <i className="fa-solid fa-phone" /><span>{answering ? 'Connecting…' : 'Accept'}</span>
+            <i className="fa-solid fa-phone" /><span>{answering ? t('videoCall.connectingShort') : t('videoCall.accept')}</span>
           </button>
         </div>
       </div>

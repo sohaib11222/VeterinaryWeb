@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useLanguage } from '../contexts/LanguageContext'
 
 // Import components - matching home7 structure
 import Header from '../components/common/Header'
@@ -18,30 +19,7 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [animal, setAnimal] = useState('')
   const [location, setLocation] = useState('')
-  const [isItalian, setIsItalian] = useState(false)
-
-  useEffect(() => {
-    const readGoogleLanguage = () => {
-      const translationCookie = document.cookie
-        .split(';')
-        .map((item) => item.trim())
-        .find((item) => item.startsWith('googtrans='))
-        ?.split('=').slice(1).join('=')
-
-      let language = ''
-      try {
-        language = decodeURIComponent(translationCookie || '')
-      } catch {
-        language = translationCookie || ''
-      }
-
-      setIsItalian(language.split('/').pop() === 'it')
-    }
-
-    readGoogleLanguage()
-    const interval = window.setInterval(readGoogleLanguage, 500)
-    return () => window.clearInterval(interval)
-  }, [])
+  const { t } = useLanguage()
 
   useEffect(() => {
     // Initialize AOS animations
@@ -59,9 +37,17 @@ const Index = () => {
     event.preventDefault()
 
     const params = new URLSearchParams()
-    if (searchTerm.trim()) params.set('search', searchTerm.trim())
+    const normalizedSearch = searchTerm.trim().toLowerCase().replace(/[._-]+/g, ' ')
+    const searchingPetSitters = /\bpet\s*sitters?\b/.test(normalizedSearch) || normalizedSearch === 'petsitter' || normalizedSearch === 'petsitters'
+    params.set('type', searchingPetSitters ? 'petSitters' : 'veterinarians')
+    if (searchTerm.trim() && !searchingPetSitters) params.set('search', searchTerm.trim())
     if (animal) params.set('animal', animal)
-    if (location.trim()) params.set('city', location.trim())
+    if (location.trim()) {
+      params.set('location', location.trim())
+      // Keep the broad location search for cities/regions, but also send an
+      // explicit postal-code filter when the home input contains a ZIP/CAP.
+      if (/^\d[\d\s-]{2,9}$/.test(location.trim())) params.set('postalCode', location.trim())
+    }
 
     const queryString = params.toString()
     navigate(queryString ? `/search?${queryString}` : '/search')
@@ -84,53 +70,53 @@ const Index = () => {
             <div className="row">
               <div className="col-12">
                 <div className="home-hero-v2__content aos" data-aos="fade-up">
-                  <h1 className="home-hero-v2__title">{isItalian ? <>Tutto per il tuo pet<br /><span>vicino a te.</span></> : <>Everything for your pet<br /><span>close to you.</span></>}</h1>
+                  <h1 className="home-hero-v2__title">{t('home.heroTitle1')}<br /><span>{t('home.heroTitle2')}</span></h1>
                   <form className="home-hero-search" onSubmit={handleHeroSearch}>
                     <div className="home-hero-search__field home-hero-search__field--service">
                       <i className="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                       <label htmlFor="hero-service-search">
-                        <span>What are you looking for?</span>
+                        <span>{t('home.lookingFor')}</span>
                         <input
                           id="hero-service-search"
                           type="search"
                           value={searchTerm}
                           onChange={(event) => setSearchTerm(event.target.value)}
-                          placeholder="Veterinarian, grooming, dog sitter..."
+                          placeholder={t('home.lookingPlaceholder')}
                         />
                       </label>
                     </div>
                     <div className="home-hero-search__field">
                       <i className="fa-solid fa-paw" aria-hidden="true"></i>
                       <label htmlFor="hero-animal-search">
-                        <span>For which animal?</span>
+                        <span>{t('home.forAnimal')}</span>
                         <select
                           id="hero-animal-search"
                           value={animal}
                           onChange={(event) => setAnimal(event.target.value)}
                         >
-                          <option value="">Dog, cat, rabbit...</option>
-                          <option value="Dog">Dog</option>
-                          <option value="Cat">Cat</option>
-                          <option value="Rabbit">Rabbit</option>
-                          <option value="Bird">Bird</option>
-                          <option value="Other">Other pet</option>
+                          <option value="">{t('home.animalPlaceholder')}</option>
+                          <option value="Dog">{t('home.dog')}</option>
+                          <option value="Cat">{t('home.cat')}</option>
+                          <option value="Rabbit">{t('home.rabbit')}</option>
+                          <option value="Bird">{t('home.bird')}</option>
+                          <option value="Other">{t('home.otherPet')}</option>
                         </select>
                       </label>
                     </div>
                     <div className="home-hero-search__field">
                       <i className="fa-solid fa-location-dot" aria-hidden="true"></i>
                       <label htmlFor="hero-location-search">
-                        <span>Where?</span>
+                        <span>{t('home.where')}</span>
                         <input
                           id="hero-location-search"
                           type="text"
                           value={location}
                           onChange={(event) => setLocation(event.target.value)}
-                          placeholder="City or ZIP code"
+                          placeholder={t('home.locationPlaceholder')}
                         />
                       </label>
                     </div>
-                    <button type="submit" className="home-hero-search__button">Search</button>
+                    <button type="submit" className="home-hero-search__button">{t('home.search')}</button>
                   </form>
                 </div>
               </div>

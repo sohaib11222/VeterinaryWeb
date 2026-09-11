@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { useClinicsWithCoordinates } from '../../queries'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const ClinicMapView = () => {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const mapRef = useRef(null)
   const mapInstanceRef = useRef(null)
   const markersRef = useRef([])
@@ -23,7 +25,7 @@ const ClinicMapView = () => {
   // Get user's location
   useEffect(() => {
     if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by your browser.')
+      toast.error(t('patient.clinics.geoUnsupported'))
       setUserLocation({ lat: 40.7128, lng: -74.006 })
       return
     }
@@ -39,7 +41,7 @@ const ClinicMapView = () => {
       },
       () => {
         setLocationPermission(false)
-        toast.error('Location permission denied. Using default location.')
+        toast.error(t('patient.clinics.locationDenied'))
         setUserLocation({ lat: 40.7128, lng: -74.006 })
       }
     )
@@ -109,13 +111,13 @@ const ClinicMapView = () => {
         layer.on('tileerror', () => {
           if (!tileFallbackTriedRef.current) {
             tileFallbackTriedRef.current = true
-            toast.error('Map tiles failed to load. Switching map provider...')
+            toast.error(t('patient.clinics.mapFallback'))
             addTileLayer(
               'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
               '© OpenStreetMap contributors © CARTO'
             )
           } else {
-            toast.error('Map tiles failed to load. Please check your internet connection.')
+            toast.error(t('patient.clinics.mapFailed'))
           }
         })
 
@@ -245,7 +247,7 @@ const ClinicMapView = () => {
 
           const userMarker = L.marker([userLat, userLng], { icon: userIcon })
             .addTo(map)
-            .bindPopup('Your Location')
+            .bindPopup(t('patient.clinics.centerLocation'))
 
           markersRef.current.push(userMarker)
         }
@@ -333,9 +335,9 @@ const ClinicMapView = () => {
           lng: position.coords.longitude,
         }
         setUserLocation(coords)
-        toast.success('Location updated. Nearby clinics refreshed.')
+        toast.success(t('patient.clinics.locationUpdated'))
       },
-      () => toast.error('Could not update location.')
+      () => toast.error(t('patient.clinics.locationUpdateFailed'))
     )
   }
 
@@ -343,7 +345,7 @@ const ClinicMapView = () => {
     setShowClinicModal(false)
     const vetId = clinic?.veterinarianId || clinic?.doctorId
     if (!vetId) {
-      toast.error('Veterinarian information not available')
+      toast.error(t('patient.clinics.vetUnavailable'))
       return
     }
     navigate(`/booking?vet=${vetId}`)
@@ -353,7 +355,7 @@ const ClinicMapView = () => {
     setShowClinicModal(false)
     const vetId = clinic?.veterinarianId || clinic?.doctorId
     if (!vetId) {
-      toast.error('Veterinarian information not available')
+      toast.error(t('patient.clinics.vetUnavailable'))
       return
     }
     navigate(`/doctor-profile/${vetId}`)
@@ -382,7 +384,7 @@ const ClinicMapView = () => {
                   className="btn btn-light shadow-sm"
                   onClick={handleRefreshLocation}
                   style={{ width: '40px', height: '40px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  title="Refresh Location"
+                  title={t('patient.clinics.refreshLocation')}
                 >
                   <i className="fe fe-refresh-cw"></i>
                 </button>
@@ -394,7 +396,7 @@ const ClinicMapView = () => {
                     }
                   }}
                   style={{ width: '40px', height: '40px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  title="Center on My Location"
+                  title={t('patient.clinics.centerLocation')}
                 >
                   <i className="fe fe-navigation"></i>
                 </button>
@@ -414,7 +416,7 @@ const ClinicMapView = () => {
                 }}
               >
                 <label className="form-label mb-2" style={{ fontSize: '12px', fontWeight: '600' }}>
-                  Search Radius: {radius} km
+                  {t('patient.clinics.searchRadius', { radius })}
                 </label>
                 <div className="d-flex gap-2">
                   {[5, 10, 15, 20, 25].map((r) => (
@@ -447,9 +449,9 @@ const ClinicMapView = () => {
                 >
                   <div className="text-center">
                     <div className="spinner-border text-primary mb-2" role="status">
-                      <span className="visually-hidden">Loading...</span>
+                      <span className="visually-hidden">{t('patient.clinics.loading')}</span>
                     </div>
-                    <p className="text-muted mb-0">Finding nearby clinics...</p>
+                    <p className="text-muted mb-0">{t('patient.clinics.finding')}</p>
                   </div>
                 </div>
               )}
@@ -472,9 +474,9 @@ const ClinicMapView = () => {
                   }}
                 >
                   <i className="fe fe-alert-circle text-danger"></i>
-                  <span className="flex-grow-1 text-danger">Failed to load clinics</span>
+                  <span className="flex-grow-1 text-danger">{t('patient.clinics.loadFailed')}</span>
                   <button className="btn btn-sm btn-primary" onClick={() => refetch()}>
-                    Retry
+                    {t('patient.clinics.retry')}
                   </button>
                 </div>
               )}
@@ -496,9 +498,9 @@ const ClinicMapView = () => {
                 >
                   <div className="text-center">
                     <div className="spinner-border text-primary mb-2" role="status">
-                      <span className="visually-hidden">Loading...</span>
+                      <span className="visually-hidden">{t('patient.clinics.loading')}</span>
                     </div>
-                    <p className="text-muted mb-0">Loading map...</p>
+                    <p className="text-muted mb-0">{t('patient.clinics.loadingMap')}</p>
                   </div>
                 </div>
               )}
@@ -509,37 +511,37 @@ const ClinicMapView = () => {
             <div className="p-4">
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h5 className="mb-0">
-                  <span className="text-primary">{nearbyClinics.length}</span> Nearby Clinics
+                  {t('patient.clinics.nearby', { count: nearbyClinics.length })}
                 </h5>
                 {!locationPermission && (
                   <span className="badge bg-warning text-dark">
                     <i className="fe fe-alert-circle me-1"></i>
-                    Location disabled
+                    {t('patient.clinics.locationDisabled')}
                   </span>
                 )}
               </div>
 
               <div className="d-flex align-items-center justify-content-between mb-3">
                 <Link to="/search" className="btn btn-sm btn-outline-secondary">
-                  <i className="fe fe-arrow-left me-1"></i> Back
+                  <i className="fe fe-arrow-left me-1"></i> {t('patient.clinics.back')}
                 </Link>
                 <Link to="/map-grid" className="btn btn-sm btn-outline-primary">
-                  <i className="fe fe-grid me-1"></i> Search Map
+                  <i className="fe fe-grid me-1"></i> {t('patient.clinics.searchMap')}
                 </Link>
               </div>
 
               {isLoadingClinics ? (
                 <div className="text-center py-5">
                   <div className="spinner-border text-primary mb-2" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">{t('patient.clinics.loading')}</span>
                   </div>
-                  <p className="text-muted mb-0">Loading clinics...</p>
+                  <p className="text-muted mb-0">{t('patient.clinics.loadingClinics')}</p>
                 </div>
               ) : nearbyClinics.length === 0 ? (
                 <div className="text-center py-5">
                   <i className="fe fe-map-pin" style={{ fontSize: '48px', color: '#6c757d' }}></i>
-                  <p className="mt-3 mb-1 fw-semibold">No clinics found nearby</p>
-                  <p className="text-muted small">Try increasing the search radius</p>
+                  <p className="mt-3 mb-1 fw-semibold">{t('patient.clinics.none')}</p>
+                  <p className="text-muted small">{t('patient.clinics.noneHint')}</p>
                 </div>
               ) : (
                 <div className="list-group">
@@ -573,7 +575,7 @@ const ClinicMapView = () => {
                           {clinic.distance && (
                             <div className="d-flex align-items-center">
                               <i className="fe fe-navigation me-1" style={{ fontSize: '12px', color: '#0d6efd' }}></i>
-                              <span className="text-primary small fw-semibold">{Number(clinic.distance).toFixed(1)} km away</span>
+                              <span className="text-primary small fw-semibold">{t('patient.clinics.away', { distance: Number(clinic.distance).toFixed(1) })}</span>
                             </div>
                           )}
                         </div>
@@ -602,18 +604,18 @@ const ClinicMapView = () => {
               </div>
               <div className="modal-body">
                 <div className="mb-3">
-                  <label className="form-label small text-muted text-uppercase">Veterinarian</label>
+                  <label className="form-label small text-muted text-uppercase">{t('patient.clinics.veterinarian')}</label>
                   <p className="mb-0">{selectedClinic.veterinarianName || selectedClinic.doctorName || '—'}</p>
                 </div>
                 <div className="mb-3">
-                  <label className="form-label small text-muted text-uppercase">Address</label>
+                  <label className="form-label small text-muted text-uppercase">{t('patient.clinics.address')}</label>
                   <p className="mb-0">
                     {selectedClinic.address || '—'}{selectedClinic.city ? `, ${selectedClinic.city}` : ''}
                   </p>
                 </div>
                 {selectedClinic.phone && (
                   <div className="mb-3">
-                    <label className="form-label small text-muted text-uppercase">Phone</label>
+                    <label className="form-label small text-muted text-uppercase">{t('patient.clinics.phone')}</label>
                     <p className="mb-0">
                       <a href={`tel:${selectedClinic.phone}`}>{selectedClinic.phone}</a>
                     </p>
@@ -621,19 +623,19 @@ const ClinicMapView = () => {
                 )}
                 {selectedClinic.distance && (
                   <div className="mb-3">
-                    <label className="form-label small text-muted text-uppercase">Distance</label>
-                    <p className="mb-0">{Number(selectedClinic.distance).toFixed(1)} km away</p>
+                    <label className="form-label small text-muted text-uppercase">{t('patient.clinics.distance')}</label>
+                    <p className="mb-0">{t('patient.clinics.away', { distance: Number(selectedClinic.distance).toFixed(1) })}</p>
                   </div>
                 )}
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-outline-primary" onClick={() => handleViewVet(selectedClinic)}>
                   <i className="fe fe-user me-2"></i>
-                  View Veterinarian
+                  {t('patient.clinics.viewVeterinarian')}
                 </button>
                 <button type="button" className="btn btn-primary" onClick={() => handleBookAppointment(selectedClinic)}>
                   <i className="fe fe-calendar me-2"></i>
-                  Book Appointment
+                  {t('patient.clinics.bookAppointment')}
                 </button>
                 <Link
                   to="/clinic-navigation"
@@ -650,7 +652,7 @@ const ClinicMapView = () => {
                   onClick={() => setShowClinicModal(false)}
                 >
                   <i className="fe fe-navigation me-2"></i>
-                  Navigate
+                  {t('patient.clinics.navigate')}
                 </Link>
               </div>
             </div>

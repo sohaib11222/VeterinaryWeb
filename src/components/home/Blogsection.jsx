@@ -8,8 +8,10 @@ import { useBlogPosts } from "../../queries/blogQueries";
 import { getImageUrl } from "../../utils/apiConfig";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const Blogsection = () => {
+  const { t } = useLanguage();
   //Aos
 
   useEffect(() => {
@@ -115,24 +117,24 @@ const Blogsection = () => {
               <div className="section-header-fourteen service-inner-fourteen">
                 <div className="service-inner-fourteen">
                   <div className="service-inner-fourteen-two">
-                    <h3>BLOG</h3>
+                    <h3>{t('home.blogEyebrow')}</h3>
                   </div>
                 </div>
-                <h2>Our Blogs</h2>
-                <p>Our Recent Articles</p>
+                <h2>{t('home.ourBlogs')}</h2>
+                <p>{t('home.recentArticles')}</p>
               </div>
             </div>
           </div>
           {error ? (
-            <div className="text-center py-5 text-danger">Failed to load articles</div>
+            <div className="text-center py-5 text-danger">{t('home.failedArticles')}</div>
           ) : isLoading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('home.loadingArticles')}</span>
               </div>
             </div>
           ) : blogCards.length === 0 ? (
-            <div className="text-center py-5 text-muted">No articles available.</div>
+            <div className="text-center py-5 text-muted">{t('home.noArticles')}</div>
           ) : (
             <OwlCarousel
               className="blog-slider-fourteen owl-theme aos"
@@ -223,7 +225,7 @@ const Blogsection = () => {
               to="/blog"
               className="btn btn-primary btn-view"
             >
-              Read More Articles
+              {t('home.readMoreArticles')}
             </Link>
           </div>
         </div>

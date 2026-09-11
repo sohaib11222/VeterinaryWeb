@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const PatientReports = () => {
+  const { t } = useLanguage()
   return (
     <div className="content doctor-content patient-reports-mobile">
       <div className="container">
@@ -27,18 +29,18 @@ const PatientReports = () => {
           </div>
           <div className="col-lg-8 col-xl-9">
             <div className="dashboard-header">
-              <h3>Medical Reports</h3>
+              <h3>{t('patient.reports.title')}</h3>
             </div>
             <div className="dashboard-header border-0 m-0">
               <ul className="header-list-btns">
                 <li>
                   <div className="input-block dash-search-input">
-                    <input type="text" className="form-control" placeholder="Search reports" />
+                    <input type="text" className="form-control" placeholder={t('patient.reports.search')} />
                     <span className="search-icon"><i className="isax isax-search-normal"></i></span>
                   </div>
                 </li>
               </ul>
-              <a href="javascript:void(0);" className="btn btn-md btn-primary-gradient rounded-pill" data-bs-toggle="modal" data-bs-target="#upload_report">Upload Report</a>
+              <a href="javascript:void(0);" className="btn btn-md btn-primary-gradient rounded-pill" data-bs-toggle="modal" data-bs-target="#upload_report">{t('patient.reports.upload')}</a>
             </div>
             <div className="card">
               <div className="card-body">
@@ -46,64 +48,64 @@ const PatientReports = () => {
                   <table className="table table-hover table-center mb-0 patient-reports-mobile-table">
                     <thead>
                       <tr>
-                        <th>Report Name</th>
-                        <th>Date</th>
-                        <th>Doctor</th>
-                        <th>Type</th>
-                        <th>Action</th>
+                        <th>{t('patient.reports.reportName')}</th>
+                        <th>{t('patient.reports.date')}</th>
+                        <th>{t('patient.reports.doctor')}</th>
+                        <th>{t('patient.reports.type')}</th>
+                        <th>{t('patient.reports.action')}</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td data-label="Report">
+                        <td data-label={t('patient.reports.title')}>
                           <a href="javascript:void(0);">Blood Test Report</a>
                         </td>
-                        <td data-label="Date">15 Jan 2024</td>
-                        <td data-label="Doctor">Dr. John Doe</td>
-                        <td data-label="Type"><span className="badge badge-success-bg">Lab Report</span></td>
-                        <td data-label="Actions">
+                        <td data-label={t('patient.reports.date')}>15 Jan 2024</td>
+                        <td data-label={t('patient.reports.doctor')}>Dr. John Doe</td>
+                        <td data-label={t('patient.reports.type')}><span className="badge badge-success-bg">Lab Report</span></td>
+                        <td data-label={t('patient.reports.action')}>
                           <div className="d-flex align-items-center">
                             <a href="javascript:void(0);" className="btn btn-sm bg-info-light me-2">
-                              <i className="isax isax-eye"></i> View
+                              <i className="isax isax-eye"></i> {t('patient.reports.view')}
                             </a>
                             <a href="javascript:void(0);" className="btn btn-sm bg-primary-light">
-                              <i className="isax isax-document-download"></i> Download
+                              <i className="isax isax-document-download"></i> {t('patient.reports.download')}
                             </a>
                           </div>
                         </td>
                       </tr>
                       <tr>
-                        <td data-label="Report">
+                        <td data-label={t('patient.reports.title')}>
                           <a href="javascript:void(0);">X-Ray Report</a>
                         </td>
-                        <td data-label="Date">10 Jan 2024</td>
-                        <td data-label="Doctor">Dr. Sarah Smith</td>
-                        <td data-label="Type"><span className="badge badge-warning-bg">Imaging</span></td>
-                        <td data-label="Actions">
+                        <td data-label={t('patient.reports.date')}>10 Jan 2024</td>
+                        <td data-label={t('patient.reports.doctor')}>Dr. Sarah Smith</td>
+                        <td data-label={t('patient.reports.type')}><span className="badge badge-warning-bg">Imaging</span></td>
+                        <td data-label={t('patient.reports.action')}>
                           <div className="d-flex align-items-center">
                             <a href="javascript:void(0);" className="btn btn-sm bg-info-light me-2">
-                              <i className="isax isax-eye"></i> View
+                              <i className="isax isax-eye"></i> {t('patient.reports.view')}
                             </a>
                             <a href="javascript:void(0);" className="btn btn-sm bg-primary-light">
-                              <i className="isax isax-document-download"></i> Download
+                              <i className="isax isax-document-download"></i> {t('patient.reports.download')}
                             </a>
                           </div>
                         </td>
                       </tr>
                       <tr>
-                        <td data-label="Report">
+                        <td data-label={t('patient.reports.title')}>
                           <a href="javascript:void(0);">ECG Report</a>
                         </td>
-                        <td data-label="Date">05 Jan 2024</td>
-                        <td data-label="Doctor">Dr. Michael Brown</td>
-                        <td data-label="Type"><span className="badge badge-success-bg">Lab Report</span></td>
-                        <td data-label="Actions">
+                        <td data-label={t('patient.reports.date')}>05 Jan 2024</td>
+                        <td data-label={t('patient.reports.doctor')}>Dr. Michael Brown</td>
+                        <td data-label={t('patient.reports.type')}><span className="badge badge-success-bg">Lab Report</span></td>
+                        <td data-label={t('patient.reports.action')}>
                           <div className="d-flex align-items-center">
                             <a href="javascript:void(0);" className="btn btn-sm bg-info-light me-2">
-                              <i className="isax isax-eye"></i> View
+                              <i className="isax isax-eye"></i> {t('patient.reports.view')}
                             </a>
                             <a href="javascript:void(0);" className="btn btn-sm bg-primary-light">
-                              <i className="isax isax-document-download"></i> Download
+                              <i className="isax isax-document-download"></i> {t('patient.reports.download')}
                             </a>
                           </div>
                         </td>

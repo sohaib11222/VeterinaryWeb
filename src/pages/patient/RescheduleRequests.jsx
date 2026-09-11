@@ -4,8 +4,10 @@ import { toast } from 'react-toastify'
 
 import { useRescheduleRequests } from '../../queries'
 import { usePayRescheduleFee } from '../../mutations/scheduleMutations'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const RescheduleRequests = () => {
+  const { t } = useLanguage()
   const requestsQuery = useRescheduleRequests()
   const payFee = usePayRescheduleFee()
 
@@ -20,10 +22,10 @@ const RescheduleRequests = () => {
 
   const statusBadge = (status) => {
     const s = String(status || '').toUpperCase()
-    if (s === 'APPROVED') return <span className="badge bg-success">Approved</span>
-    if (s === 'PENDING') return <span className="badge bg-warning text-dark">Pending</span>
-    if (s === 'REJECTED') return <span className="badge bg-danger">Rejected</span>
-    if (s === 'CANCELLED') return <span className="badge bg-secondary">Cancelled</span>
+    if (s === 'APPROVED') return <span className="badge bg-success">{t('patient.appointment.confirmed')}</span>
+    if (s === 'PENDING') return <span className="badge bg-warning text-dark">{t('patient.appointment.pending')}</span>
+    if (s === 'REJECTED') return <span className="badge bg-danger">{t('patient.appointment.rejected')}</span>
+    if (s === 'CANCELLED') return <span className="badge bg-secondary">{t('patient.appointment.cancelled')}</span>
     return <span className="badge bg-secondary">{s || '—'}</span>
   }
 
@@ -36,11 +38,11 @@ const RescheduleRequests = () => {
     if (!selected?._id) return
     try {
       await payFee.mutateAsync({ id: selected._id, paymentMethod: 'STRIPE' })
-      toast.success('Reschedule fee paid successfully. Appointment confirmed.')
+      toast.success(t('patient.reschedule.paidSuccess'))
       setShowPayModal(false)
       setSelected(null)
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Payment failed')
+      toast.error(err?.response?.data?.message || err?.message || t('patient.paymentFailed'))
     }
   }
 
@@ -52,11 +54,11 @@ const RescheduleRequests = () => {
             <Link to="/patient/dashboard" className="back-arrow">
               <i className="fa-solid fa-arrow-left"></i>
             </Link>
-            <h3>Reschedule Requests</h3>
+            <h3>{t('patient.reschedule.requests')}</h3>
           </div>
           <div>
             <Link to="/patient/request-reschedule" className="btn btn-outline-primary btn-sm">
-              Request Reschedule
+              {t('patient.reschedule.request')}
             </Link>
           </div>
         </div>
@@ -66,22 +68,22 @@ const RescheduleRequests = () => {
             {requestsQuery.isLoading ? (
               <div className="text-center py-4">
                 <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
+                  <span className="visually-hidden">{t('common.loading')}</span>
                 </div>
               </div>
             ) : requestsQuery.isError ? (
-              <div className="alert alert-danger">{requestsQuery.error?.message || 'Failed to load requests'}</div>
+              <div className="alert alert-danger">{requestsQuery.error?.message || t('patient.reschedule.failedLoad')}</div>
             ) : requests.length === 0 ? (
-              <div className="alert alert-info mb-0">No reschedule requests found.</div>
+              <div className="alert alert-info mb-0">{t('patient.reschedule.noRequests')}</div>
             ) : (
               <div className="table-responsive">
                 <table className="table table-hover mb-0">
                   <thead>
                     <tr>
-                      <th>Original</th>
-                      <th>Status</th>
-                      <th>Fee</th>
-                      <th>New Appointment</th>
+                      <th>{t('patient.reschedule.original')}</th>
+                      <th>{t('patient.status')}</th>
+                      <th>{t('patient.reschedule.fee')}</th>
+                      <th>{t('patient.reschedule.newAppointment')}</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -113,7 +115,7 @@ const RescheduleRequests = () => {
                           <td>
                             {newApt ? (
                               <Link to={`/patient-appointment-details?id=${newApt?._id || newApt}`} className="btn btn-sm btn-outline-primary">
-                                View
+                                {t('common.view', 'View')}
                               </Link>
                             ) : (
                               <span className="text-muted">{newLabel}</span>
@@ -122,7 +124,7 @@ const RescheduleRequests = () => {
                           <td className="text-end">
                             {canPay && (
                               <button className="btn btn-sm btn-primary" onClick={() => openPay(r)}>
-                                Pay Fee
+                                {t('patient.reschedule.payFee')}
                               </button>
                             )}
                             {String(r?.status || '').toUpperCase() === 'REJECTED' && r?.rejectionReason && (
@@ -130,7 +132,7 @@ const RescheduleRequests = () => {
                                 className="btn btn-sm btn-outline-secondary"
                                 onClick={() => toast.info(r.rejectionReason, { autoClose: 6000 })}
                               >
-                                View Reason
+                                {t('patient.reschedule.viewReason')}
                               </button>
                             )}
                           </td>
@@ -150,7 +152,7 @@ const RescheduleRequests = () => {
               <div className="modal-dialog modal-dialog-centered">
                 <div className="modal-content">
                   <div className="modal-header">
-                    <h5 className="modal-title">Pay Reschedule Fee</h5>
+                    <h5 className="modal-title">{t('patient.reschedule.payTitle')}</h5>
                     <button
                       type="button"
                       className="btn-close"
@@ -162,12 +164,12 @@ const RescheduleRequests = () => {
                   </div>
                   <div className="modal-body">
                     <p className="mb-1">
-                      <strong>Fee:</strong>{' '}
+                      <strong>{t('patient.reschedule.fee')}:</strong>{' '}
                       {selected?.rescheduleFee !== null && selected?.rescheduleFee !== undefined
                         ? `€${Number(selected.rescheduleFee).toFixed(2)}`
                         : '—'}
                     </p>
-                    <p className="text-muted mb-0">Click confirm to proceed.</p>
+                    <p className="text-muted mb-0">{t('patient.reschedule.confirmPrompt')}</p>
                   </div>
                   <div className="modal-footer">
                     <button
@@ -179,10 +181,10 @@ const RescheduleRequests = () => {
                       }}
                       disabled={payFee.isPending}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                     <button type="button" className="btn btn-primary" onClick={confirmPay} disabled={payFee.isPending}>
-                      {payFee.isPending ? 'Processing...' : 'Confirm Payment'}
+                      {payFee.isPending ? t('patient.reschedule.processing') : t('patient.reschedule.confirmPayment')}
                     </button>
                   </div>
                 </div>

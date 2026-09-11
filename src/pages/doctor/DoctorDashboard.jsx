@@ -10,8 +10,10 @@ import { getImageUrl } from '../../utils/apiConfig'
 import ProfileIncompleteModal from '../../components/common/ProfileIncompleteModal'
 import AddTimingsModal from '../../components/common/AddTimingsModal'
 import BuySubscriptionModal from '../../components/common/BuySubscriptionModal'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const DoctorDashboard = () => {
+  const { t, language } = useLanguage()
   const acceptAppointment = useAcceptAppointment()
   const rejectAppointment = useRejectAppointment()
 
@@ -107,7 +109,7 @@ const DoctorDashboard = () => {
       const d = new Date(start)
       d.setDate(start.getDate() + i)
       const key = d.toISOString().slice(0, 10)
-      days.push({ key, label: d.toLocaleDateString(undefined, { weekday: 'short' }), date: d, appointments: 0 })
+      days.push({ key, label: d.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { weekday: 'short' }), date: d, appointments: 0 })
     }
 
     const byKey = new Map(days.map((d) => [d.key, d]))
@@ -123,7 +125,14 @@ const DoctorDashboard = () => {
     })
 
     return days
-  }, [appointments])
+  }, [appointments, language])
+
+  const weekRangeLabel = useMemo(() => {
+    if (!weekSeries.length) return ''
+    const locale = language === 'it' ? 'it-IT' : 'en-GB'
+    const format = (date) => date.toLocaleDateString(locale, { day: 'numeric', month: 'short' })
+    return `${format(weekSeries[0].date)} - ${format(weekSeries[weekSeries.length - 1].date)}`
+  }, [weekSeries, language])
 
   const formatMoney = (amount) => {
     const n = Number(amount)
@@ -224,14 +233,14 @@ const DoctorDashboard = () => {
     if (!date) return '—'
     const d = new Date(date)
     if (Number.isNaN(d.getTime())) return '—'
-    const dateStr = d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+    const dateStr = d.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     if (!time) return dateStr
     const [hh, mm] = String(time).split(':')
     if (!hh || !mm) return `${dateStr} ${time}`
     const dt = new Date(d.getFullYear(), d.getMonth(), d.getDate(), Number(hh), Number(mm))
     const timeStr = Number.isNaN(dt.getTime())
       ? String(time)
-      : dt.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+      : dt.toLocaleTimeString(language === 'it' ? 'it-IT' : 'en-GB', { hour: '2-digit', minute: '2-digit' })
     return `${dateStr} ${timeStr}`
   }
 
@@ -251,16 +260,16 @@ const DoctorDashboard = () => {
       ? formatDateTime(a.appointmentDate, a.appointmentTime).split(' ').slice(-1)[0]
       : ''
 
-    return isToday ? `Today, ${timeStr}` : formatDateTime(a.appointmentDate, a.appointmentTime)
+    return isToday ? `${t('doctorDashboard.today')}, ${timeStr}` : formatDateTime(a.appointmentDate, a.appointmentTime)
   }
 
   const handleAccept = async (appointmentId) => {
     if (!appointmentId) return
     try {
       await acceptAppointment.mutateAsync(appointmentId)
-      toast.success('Appointment accepted')
+      toast.success(t('doctorDashboard.appointmentAccepted'))
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to accept appointment')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorDashboard.acceptFailed'))
     }
   }
 
@@ -268,9 +277,9 @@ const DoctorDashboard = () => {
     if (!appointmentId) return
     try {
       await rejectAppointment.mutateAsync({ appointmentId, data: {} })
-      toast.success('Appointment rejected')
+      toast.success(t('doctorDashboard.appointmentRejected'))
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to reject appointment')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorDashboard.rejectFailed'))
     }
   }
 
@@ -282,7 +291,7 @@ const DoctorDashboard = () => {
   }, [])
 
   return (
-    <div className="content veterinary-dashboard doctor-dashboard-mobile">
+      <div className="content veterinary-dashboard doctor-dashboard-mobile">
       <ProfileIncompleteModal
         show={showProfileModal}
         onClose={() => {
@@ -314,9 +323,9 @@ const DoctorDashboard = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-paw me-3"></i>
-                    Veterinary Dashboard
+                    {t('doctorDashboard.title')}
                   </h2>
-                  <p className="dashboard-subtitle">Manage your pet appointments and pet records</p>
+                  <p className="dashboard-subtitle">{t('doctorDashboard.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -327,9 +336,9 @@ const DoctorDashboard = () => {
                 <div className="dashboard-box-col">
                   <div className="dashboard-widget-box veterinary-widget">
                     <div className="dashboard-content-info">
-                      <h6>Total Pets</h6>
+                        <h6>{t('doctorDashboard.totalPets')}</h6>
                       <h4>{dashboardLoading || appointmentsLoading ? '—' : totalPets}</h4>
-                      <span className="text-muted">Pet owners: {dashboardLoading ? '—' : dashboard?.totalPetOwners ?? 0}</span>
+                      <span className="text-muted">{t('doctorDashboard.petOwners')}: {dashboardLoading ? '—' : dashboard?.totalPetOwners ?? 0}</span>
                     </div>
                     <div className="dashboard-widget-icon">
                       <span className="dash-icon-box"><i className="fa-solid fa-paw"></i></span>
@@ -341,9 +350,9 @@ const DoctorDashboard = () => {
                 <div className="dashboard-box-col">
                   <div className="dashboard-widget-box veterinary-widget">
                     <div className="dashboard-content-info">
-                      <h6>Pets Today</h6>
+                        <h6>{t('doctorDashboard.petsToday')}</h6>
                       <h4>{dashboardLoading ? '—' : todayPetsCount}</h4>
-                      <span className="text-muted">Appointments today: {dashboardLoading ? '—' : dashboard?.todayAppointments?.count ?? 0}</span>
+                      <span className="text-muted">{t('doctorDashboard.appointmentsToday')}: {dashboardLoading ? '—' : dashboard?.todayAppointments?.count ?? 0}</span>
                     </div>
                     <div className="dashboard-widget-icon">
                       <span className="dash-icon-box"><i className="fa-solid fa-dog"></i></span>
@@ -355,9 +364,9 @@ const DoctorDashboard = () => {
                 <div className="dashboard-box-col">
                   <div className="dashboard-widget-box veterinary-widget">
                     <div className="dashboard-content-info">
-                      <h6>Appointments Today</h6>
+                        <h6>{t('doctorDashboard.appointmentsTodayTitle')}</h6>
                       <h4>{dashboardLoading ? '—' : dashboard?.todayAppointments?.count ?? 0}</h4>
-                      <span className="text-muted">This week: {dashboardLoading ? '—' : dashboard?.weeklyAppointments?.count ?? 0}</span>
+                      <span className="text-muted">{t('doctorDashboard.thisWeek')}: {dashboardLoading ? '—' : dashboard?.weeklyAppointments?.count ?? 0}</span>
                     </div>
                     <div className="dashboard-widget-icon">
                       <span className="dash-icon-box"><i className="fa-solid fa-calendar-days"></i></span>
@@ -374,14 +383,14 @@ const DoctorDashboard = () => {
                   <div className="dashboard-card veterinary-card">
                     <div className="dashboard-card-head">
                       <div className="header-title">
-                        <h5><i className="fa-solid fa-clock me-2"></i>Next Appointment</h5>
+                        <h5><i className="fa-solid fa-clock me-2"></i>{t('doctorDashboard.nextAppointment')}</h5>
                       </div>
                     </div>
                     <div className="dashboard-card-body">
                       {appointmentsLoading ? (
-                        <div className="text-center py-3 text-muted">Loading...</div>
+                        <div className="text-center py-3 text-muted">{t('doctorDashboard.loading')}</div>
                       ) : !nextAppointment ? (
-                        <div className="text-center py-3 text-muted">No upcoming appointments</div>
+                        <div className="text-center py-3 text-muted">{t('doctorDashboard.noUpcomingAppointments')}</div>
                       ) : (
                         <>
                           <div className="upcoming-patient-info">
@@ -389,7 +398,7 @@ const DoctorDashboard = () => {
                               <span className="img-avatar">
                                 <img
                                   src={getImageUrl(nextAppointment?.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
-                                  alt="Img"
+                                  alt={t('doctorDashboard.image')}
                                   onError={(e) => {
                                     e.currentTarget.onerror = null
                                     e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
@@ -399,16 +408,16 @@ const DoctorDashboard = () => {
                               <div className="name-info">
                                 <span>{nextAppointment?.appointmentNumber || nextAppointment?._id}</span>
                                 <h6>
-                                  {(nextAppointment?.petId?.name || 'Pet')}
+                                  {(nextAppointment?.petId?.name || t('doctorDashboard.pet'))}
                                   {nextAppointment?.petId?.breed ? ` (${nextAppointment.petId.breed})` : ''}
                                 </h6>
                                 <small className="text-muted">
-                                  Owner: {(nextAppointment?.petOwnerId?.name || nextAppointment?.petOwnerId?.fullName || 'Pet Owner')}
+                                  {t('doctorDashboard.petOwner')}: {(nextAppointment?.petOwnerId?.name || nextAppointment?.petOwnerId?.fullName || t('doctorDashboard.petOwner'))}
                                 </small>
                               </div>
                             </div>
                             <div className="date-details">
-                              <span className="badge table-badge">{nextAppointment?.reason || 'Consultation'}</span>
+                               <span className="badge table-badge">{nextAppointment?.reason || t('doctorDashboard.consultation')}</span>
                               <h6>{formatNextAppointmentTime(nextAppointment)}</h6>
                             </div>
                           </div>
@@ -418,7 +427,7 @@ const DoctorDashboard = () => {
                                 to={nextAppointment?._id ? `/chat-doctor?appointmentId=${nextAppointment._id}` : '/chat-doctor'}
                                 className="btn btn-outline-primary btn-sm me-2"
                               >
-                                <i className="fa-solid fa-message me-1"></i>Chat
+                                 <i className="fa-solid fa-message me-1"></i>{t('doctorDashboard.chat')}
                               </Link>
                               {String(nextAppointment?.bookingType || '').toUpperCase() === 'ONLINE' &&
                               String(nextAppointment?.status || '').toUpperCase() === 'CONFIRMED' ? (
@@ -426,14 +435,14 @@ const DoctorDashboard = () => {
                                   to={nextAppointment?._id ? `/doctor/video-call?appointmentId=${nextAppointment._id}` : '/doctor/video-call'}
                                   className="btn btn-primary btn-sm"
                                 >
-                                  <i className="fa-solid fa-video me-1"></i>Start
+                                   <i className="fa-solid fa-video me-1"></i>{t('doctorDashboard.start')}
                                 </Link>
                               ) : (
                                 <Link
                                   to={nextAppointment?._id ? `/doctor-appointment-details?id=${nextAppointment._id}` : '/doctor-appointment-details'}
                                   className="btn btn-primary btn-sm"
                                 >
-                                  <i className="fa-solid fa-eye me-1"></i>View
+                                   <i className="fa-solid fa-eye me-1"></i>{t('doctorDashboard.view')}
                                 </Link>
                               )}
                             </div>
@@ -448,35 +457,35 @@ const DoctorDashboard = () => {
                   <div className="dashboard-card veterinary-card">
                     <div className="dashboard-card-head">
                       <div className="header-title">
-                        <h5><i className="fa-solid fa-chart-line me-2"></i>Today's Overview</h5>
+                        <h5><i className="fa-solid fa-chart-line me-2"></i>{t('doctorDashboard.todaysOverview')}</h5>
                       </div>
                     </div>
                     <div className="dashboard-card-body">
                       <div className="quick-stats-grid">
                         <div className="stat-item">
                           <div className="stat-number">{dashboardLoading ? '—' : todayCounts.completed}</div>
-                          <div className="stat-label">Completed</div>
+                           <div className="stat-label">{t('doctorDashboard.completed')}</div>
                           <div className="stat-icon text-success">
                             <i className="fa-solid fa-check-circle"></i>
                           </div>
                         </div>
                         <div className="stat-item">
                           <div className="stat-number">{dashboardLoading ? '—' : todayCounts.pending}</div>
-                          <div className="stat-label">Pending</div>
+                           <div className="stat-label">{t('doctorDashboard.pending')}</div>
                           <div className="stat-icon text-warning">
                             <i className="fa-solid fa-clock"></i>
                           </div>
                         </div>
                         <div className="stat-item">
                           <div className="stat-number">{dashboardLoading ? '—' : todayCounts.cancelled}</div>
-                          <div className="stat-label">Cancelled</div>
+                           <div className="stat-label">{t('doctorDashboard.cancelled')}</div>
                           <div className="stat-icon text-danger">
                             <i className="fa-solid fa-times-circle"></i>
                           </div>
                         </div>
                       </div>
                       <div className="mt-3 text-muted" style={{ fontSize: 13 }}>
-                        Unread messages: {dashboardLoading ? '—' : dashboard?.unreadMessagesCount ?? 0} &nbsp;|&nbsp; Unread notifications: {dashboardLoading ? '—' : dashboard?.unreadNotificationsCount ?? 0}
+                         {t('doctorDashboard.unreadMessages')}: {dashboardLoading ? '—' : dashboard?.unreadMessagesCount ?? 0} &nbsp;|&nbsp; {t('doctorDashboard.unreadNotifications')}: {dashboardLoading ? '—' : dashboard?.unreadNotificationsCount ?? 0}
                       </div>
                     </div>
                   </div>
@@ -490,11 +499,11 @@ const DoctorDashboard = () => {
                     <div className="dashboard-card-head border-0">
                       <div className="header-title">
                         <h5>
-                          <i className="fa-solid fa-chart-bar me-2"></i>Weekly Overview
+                           <i className="fa-solid fa-chart-bar me-2"></i>{t('doctorDashboard.weeklyOverview')}
                         </h5>
                       </div>
                       <div className="chart-create-date">
-                        <h6>Mar 14 - Mar 21</h6>
+                        <h6>{weekRangeLabel}</h6>
                       </div>
                     </div>
                     <div className="dashboard-card-body">
@@ -511,7 +520,7 @@ const DoctorDashboard = () => {
                               aria-controls="pills-revenue"
                               aria-selected="false"
                             >
-                              Revenue
+                               {t('doctorDashboard.revenue')}
                             </button>
                           </li>
                           <li className="nav-item" role="presentation">
@@ -525,7 +534,7 @@ const DoctorDashboard = () => {
                               aria-controls="pills-appointment"
                               aria-selected="true"
                             >
-                              Appointments
+                               {t('doctorDashboard.appointments')}
                             </button>
                           </li>
                         </ul>
@@ -534,22 +543,22 @@ const DoctorDashboard = () => {
                             <div style={{ padding: 10 }}>
                               <div className="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                  <h6 className="mb-1">Total Earnings</h6>
+                                  <h6 className="mb-1">{t('doctorDashboard.totalEarnings')}</h6>
                                   <h4 className="mb-0">{dashboardLoading ? '—' : formatMoney(dashboard?.earningsFromAppointments)}</h4>
                                 </div>
                                 <div className="text-end">
-                                  <h6 className="mb-1">Subscription</h6>
+                                   <h6 className="mb-1">{t('doctorDashboard.subscription')}</h6>
                                   <div className="text-muted" style={{ fontSize: 13 }}>
                                     {dashboardLoading
                                       ? '—'
                                       : dashboard?.subscription?.hasActiveSubscription
-                                      ? `Active (${dashboard?.subscription?.expiresInDays ?? 0} days left)`
-                                      : 'Inactive'}
+                                       ? `${t('doctorDashboard.active')} (${dashboard?.subscription?.expiresInDays ?? 0} ${t('doctorDashboard.daysLeft')})`
+                                       : t('doctorDashboard.inactive')}
                                   </div>
                                 </div>
                               </div>
                               <div className="text-muted" style={{ fontSize: 13 }}>
-                                Profile strength: {dashboardLoading ? '—' : `${dashboard?.profileStrength ?? 0}%`}
+                                 {t('doctorDashboard.profileStrength')}: {dashboardLoading ? '—' : `${dashboard?.profileStrength ?? 0}%`}
                               </div>
                             </div>
                           </div>
@@ -577,25 +586,25 @@ const DoctorDashboard = () => {
                     <div className="dashboard-card-head">
                       <div className="header-title">
                         <h5>
-                          <i className="fa-solid fa-users me-2"></i>Recent Pets
+                           <i className="fa-solid fa-users me-2"></i>{t('doctorDashboard.recentPets')}
                         </h5>
                       </div>
                       <div className="card-view-link">
-                        <Link to="/my-patients">View All</Link>
+                         <Link to="/my-patients">{t('doctorDashboard.viewAll')}</Link>
                       </div>
                     </div>
                     <div className="dashboard-card-body">
                       <div className="d-flex recent-patient-grid-boxes">
                         {appointmentsLoading ? (
-                          <div className="text-center py-3 text-muted w-100">Loading...</div>
+                           <div className="text-center py-3 text-muted w-100">{t('doctorDashboard.loading')}</div>
                         ) : recentPets.length === 0 ? (
-                          <div className="text-center py-3 text-muted w-100">No pets yet</div>
+                           <div className="text-center py-3 text-muted w-100">{t('doctorDashboard.noPets')}</div>
                         ) : (
                           recentPets.map((item, idx) => {
                             const pet = item.pet || {}
                             const img = getImageUrl(pet?.photo) || `/assets/img/doctors-dashboard/profile-0${idx + 1}.jpg`
                             const lastVisit = item.lastDate
-                              ? item.lastDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+                               ? item.lastDate.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
                               : '—'
 
                             return (
@@ -603,7 +612,7 @@ const DoctorDashboard = () => {
                                 <Link to="/my-patients" className="patient-img">
                                   <img
                                     src={img}
-                                    alt="Img"
+                                       alt={t('doctorDashboard.image')}
                                     onError={(e) => {
                                       e.currentTarget.onerror = null
                                       e.currentTarget.src = '/assets/img/doctors-dashboard/profile-01.jpg'
@@ -611,11 +620,11 @@ const DoctorDashboard = () => {
                                   />
                                 </Link>
                                 <h5>
-                                  <Link to="/my-patients">{pet?.name || 'Pet'}</Link>
+                                   <Link to="/my-patients">{pet?.name || t('doctorDashboard.pet')}</Link>
                                 </h5>
                                 <span className="text-muted">{pet?.breed || pet?.species || '—'}</span>
                                 <div className="date-info">
-                                  <p>Last Visit<br />{lastVisit}</p>
+                                   <p>{t('doctorDashboard.lastVisit')}<br />{lastVisit}</p>
                                 </div>
                               </div>
                             )

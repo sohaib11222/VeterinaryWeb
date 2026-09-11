@@ -4,6 +4,7 @@ import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 import { getNextTabPath } from '../../utils/profileSettingsTabs'
@@ -13,7 +14,9 @@ const emptyClinic = () => ({
   address: '',
   city: '',
   state: '',
+  region: '',
   country: '',
+  zip: '',
   phone: '',
   lat: null,
   lng: null,
@@ -22,6 +25,7 @@ const emptyClinic = () => ({
 })
 
 const DoctorClinicsSettings = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const { data, isLoading } = useVeterinarianProfile()
@@ -40,7 +44,9 @@ const DoctorClinicsSettings = () => {
           address: c.address || '',
           city: c.city || '',
           state: c.state || '',
+          region: c.region || '',
           country: c.country || '',
+          zip: c.zip || '',
           phone: c.phone || '',
           lat: c.lat ?? null,
           lng: c.lng ?? null,
@@ -74,7 +80,9 @@ const DoctorClinicsSettings = () => {
           address: (c.address || '').trim(),
           city: (c.city || '').trim(),
           state: (c.state || '').trim(),
+          region: (c.region || '').trim(),
           country: (c.country || '').trim(),
+          zip: (c.zip || '').trim(),
           phone: (c.phone || '').trim(),
           lat: c.lat != null && c.lat !== '' ? Number(c.lat) : null,
           lng: c.lng != null && c.lng !== '' ? Number(c.lng) : null,
@@ -84,12 +92,12 @@ const DoctorClinicsSettings = () => {
         .filter((c) => c.name)
 
       if (cleaned.length === 0) {
-        toast.error('Add at least one clinic with a name')
+      toast.error(t('doctorRemaining.clinics.nameRequired'))
         return
       }
 
       await updateProfile.mutateAsync({ clinics: cleaned })
-      toast.success('Clinics updated successfully')
+      toast.success(t('doctorRemaining.clinics.updated'))
 
       const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
       const nextProfile = refreshed?.data ?? refreshed
@@ -101,7 +109,7 @@ const DoctorClinicsSettings = () => {
         }
       }
     } catch (err) {
-      const message = err?.response?.data?.message || err?.message || 'Failed to update clinics'
+      const message = err?.response?.data?.message || err?.message || t('doctorRemaining.clinics.updateFailed')
       toast.error(message)
     }
   }
@@ -113,7 +121,7 @@ const DoctorClinicsSettings = () => {
         style={{ minHeight: '60vh' }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('doctorRemaining.profile.loading')}</span>
         </div>
       </div>
     )
@@ -133,10 +141,10 @@ const DoctorClinicsSettings = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-clinic-medical me-3"></i>
-                    Veterinary Clinics
+                    {t('doctorRemaining.clinics.title')}
                   </h2>
                   <p className="dashboard-subtitle">
-                    Manage your veterinary clinic locations and facilities
+                    {t('doctorRemaining.clinics.subtitle')}
                   </p>
                 </div>
               </div>
@@ -153,7 +161,7 @@ const DoctorClinicsSettings = () => {
                         <div className="col-12 d-flex justify-content-between align-items-center">
                           <h5 className="card-title mb-0">
                             <i className="fa-solid fa-hospital me-2"></i>
-                            Clinic Locations
+                            {t('doctorRemaining.clinics.section')}
                           </h5>
                           <button
                             type="button"
@@ -161,7 +169,7 @@ const DoctorClinicsSettings = () => {
                             onClick={addClinic}
                           >
                             <i className="fa-solid fa-plus me-2"></i>
-                            Add New Clinic
+                            {t('doctorRemaining.clinics.add')}
                           </button>
                         </div>
                       </div>
@@ -175,14 +183,14 @@ const DoctorClinicsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-hospital me-2"></i>
-                                      Veterinary Clinic Name <span className="text-danger">*</span>
+                                      {t('doctorRemaining.clinics.name')} <span className="text-danger">*</span>
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={clinic.name}
                                       onChange={(e) => handleChange(index, 'name', e.target.value)}
-                                      placeholder="e.g., MyPetPlus Veterinary Clinic"
+                                      placeholder={t('doctorRemaining.clinics.namePlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -190,14 +198,14 @@ const DoctorClinicsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-map-marker-alt me-2"></i>
-                                      City
+                                      {t('doctorRemaining.clinics.city')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={clinic.city}
                                       onChange={(e) => handleChange(index, 'city', e.target.value)}
-                                      placeholder="City"
+                                      placeholder={t('doctorRemaining.clinics.city')}
                                     />
                                   </div>
                                 </div>
@@ -205,14 +213,29 @@ const DoctorClinicsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-map me-2"></i>
-                                      State
+                                      {t('doctorRemaining.clinics.state')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={clinic.state}
                                       onChange={(e) => handleChange(index, 'state', e.target.value)}
-                                      placeholder="State"
+                                      placeholder={t('doctorRemaining.clinics.state')}
+                                    />
+                                  </div>
+                                </div>
+                                <div className="col-md-6">
+                                  <div className="form-wrap">
+                                    <label className="col-form-label">
+                                      <i className="fa-solid fa-map-location-dot me-2"></i>
+                                      {t('doctorRemaining.clinics.region')}
+                                    </label>
+                                    <input
+                                      type="text"
+                                      className="form-control veterinary-input"
+                                      value={clinic.region}
+                                      onChange={(e) => handleChange(index, 'region', e.target.value)}
+                                      placeholder={t('doctorRemaining.clinics.region')}
                                     />
                                   </div>
                                 </div>
@@ -220,14 +243,29 @@ const DoctorClinicsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-globe me-2"></i>
-                                      Country
+                                      {t('doctorRemaining.clinics.country')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={clinic.country}
                                       onChange={(e) => handleChange(index, 'country', e.target.value)}
-                                      placeholder="Country"
+                                      placeholder={t('doctorRemaining.clinics.country')}
+                                    />
+                                  </div>
+                                </div>
+                                <div className="col-md-6">
+                                  <div className="form-wrap">
+                                    <label className="col-form-label">
+                                      <i className="fa-solid fa-envelopes-bulk me-2"></i>
+                                      {t('doctorRemaining.clinics.postalCode')}
+                                    </label>
+                                    <input
+                                      type="text"
+                                      className="form-control veterinary-input"
+                                      value={clinic.zip}
+                                      onChange={(e) => handleChange(index, 'zip', e.target.value)}
+                                      placeholder={t('doctorRemaining.clinics.postalCode')}
                                     />
                                   </div>
                                 </div>
@@ -235,14 +273,14 @@ const DoctorClinicsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-phone me-2"></i>
-                                      Phone
+                                      {t('doctorRemaining.clinics.phone')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={clinic.phone}
                                       onChange={(e) => handleChange(index, 'phone', e.target.value)}
-                                      placeholder="Phone number"
+                                      placeholder={t('doctorRemaining.clinics.phonePlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -250,14 +288,14 @@ const DoctorClinicsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-home me-2"></i>
-                                      Address
+                                      {t('doctorRemaining.clinics.address')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={clinic.address}
                                       onChange={(e) => handleChange(index, 'address', e.target.value)}
-                                      placeholder="Full address"
+                                      placeholder={t('doctorRemaining.clinics.addressPlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -265,7 +303,7 @@ const DoctorClinicsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-location-dot me-2"></i>
-                                      Latitude
+                                      {t('doctorRemaining.clinics.latitude')}
                                     </label>
                                     <input
                                       type="number"
@@ -279,7 +317,7 @@ const DoctorClinicsSettings = () => {
                                           handleChange(index, 'lat', n)
                                         }
                                       }}
-                                      placeholder="e.g., 40.7128"
+                                      placeholder={t('doctorRemaining.clinics.latitudePlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -287,7 +325,7 @@ const DoctorClinicsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-location-dot me-2"></i>
-                                      Longitude
+                                      {t('doctorRemaining.clinics.longitude')}
                                     </label>
                                     <input
                                       type="number"
@@ -301,7 +339,7 @@ const DoctorClinicsSettings = () => {
                                           handleChange(index, 'lng', n)
                                         }
                                       }}
-                                      placeholder="e.g., -74.0060"
+                                      placeholder={t('doctorRemaining.clinics.longitudePlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -312,7 +350,7 @@ const DoctorClinicsSettings = () => {
                                     onClick={() => removeClinic(index)}
                                   >
                                     <i className="fa-solid fa-trash me-1"></i>
-                                    Remove
+                                    {t('doctorRemaining.clinics.remove')}
                                   </button>
                                 </div>
                               </div>
@@ -328,7 +366,7 @@ const DoctorClinicsSettings = () => {
                           disabled={updateProfile.isPending}
                         >
                           <i className="fa-solid fa-save me-1"></i>
-                          {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+                          {updateProfile.isPending ? t('doctorRemaining.clinics.saving') : t('doctorRemaining.clinics.save')}
                         </button>
                       </div>
                     </form>

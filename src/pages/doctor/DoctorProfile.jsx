@@ -7,6 +7,7 @@ import { useReviewsByVeterinarian } from '../../queries/reviewQueries'
 import { useFavorites } from '../../queries/favoriteQueries'
 import { useAddFavorite, useRemoveFavorite } from '../../mutations/favoriteMutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const PUBLIC_SOCIAL_LINKS = [
   { key: 'facebook', label: 'Facebook', icon: 'fa-facebook-f' },
@@ -31,6 +32,7 @@ const DoctorProfile = () => {
   const { userId } = useParams()
   const [searchParams] = useSearchParams()
   const { user } = useAuth()
+  const { t } = useLanguage()
 
   const veterinarianId = userId || searchParams.get('id')
 
@@ -85,28 +87,28 @@ const DoctorProfile = () => {
   const handleFavoriteToggle = (e) => {
     e.preventDefault()
     if (!user || user.role !== 'PET_OWNER') {
-      toast.info('Please log in as a pet owner to add favorites')
+      toast.info(t('patient.doctorProfile.favoriteLogin'))
       return
     }
     if (!vetUserId) {
-      toast.error('Veterinarian not found')
+      toast.error(t('patient.doctorProfile.notFound'))
       return
     }
     const idStr = String(vetUserId)
     if (isFavorited) {
       const favId = favoriteIdByVetId[idStr]
       if (!favId) {
-        toast.error('Favorite not found')
+        toast.error(t('patient.doctorProfile.notFoundFavorite'))
         return
       }
       removeFavorite.mutate(favId, {
-        onSuccess: () => toast.success('Removed from favorites'),
-        onError: (err) => toast.error(err?.response?.data?.message || err?.message || 'Failed to remove from favorites'),
+        onSuccess: () => toast.success(t('patient.doctorProfile.favoriteRemoved')),
+        onError: (err) => toast.error(err?.response?.data?.message || err?.message || t('patient.doctorProfile.favoriteRemoveFailed')),
       })
     } else {
       addFavorite.mutate(vetUserId, {
-        onSuccess: () => toast.success('Veterinarian added to favorites'),
-        onError: (err) => toast.error(err?.response?.data?.message || err?.message || 'Failed to add to favorites'),
+        onSuccess: () => toast.success(t('patient.doctorProfile.favoriteAdded')),
+        onError: (err) => toast.error(err?.response?.data?.message || err?.message || t('patient.doctorProfile.favoriteAddFailed')),
       })
     }
   }
@@ -127,7 +129,7 @@ const DoctorProfile = () => {
   const insuranceCompanies = Array.isArray(profile?.insuranceCompanies) ? profile.insuranceCompanies : []
   const hasInsurance = (profile?.convenzionato === true || profile?.acceptsInsurance === true) && insuranceCompanies.length > 0
 
-  const doctorName = profile?.userId?.fullName || profile?.userId?.name || 'Veterinarian'
+  const doctorName = profile?.userId?.fullName || profile?.userId?.name || t('patient.doctorProfile.veterinarian')
   const doctorImage = getImageUrl(profile?.userId?.profileImage) || '/assets/img/doctors/doc-profile-02.jpg'
   const firstClinic = profile?.clinics?.[0]
   const locationText = firstClinic
@@ -136,7 +138,7 @@ const DoctorProfile = () => {
   const specializationName =
     (profile?.specializations?.[0] && typeof profile.specializations[0] === 'object'
       ? profile.specializations[0].name
-      : profile?.specializations?.[0]) || 'Veterinary'
+      : profile?.specializations?.[0]) || t('patient.doctorProfile.veterinarian')
   const rating = Number(profile?.ratingAvg || 0)
   const publicSocialLinks = useMemo(() => (
     PUBLIC_SOCIAL_LINKS
@@ -176,9 +178,9 @@ const DoctorProfile = () => {
         <div className="container">
           <div className="text-center py-5">
             <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
+              <span className="visually-hidden">{t('common.loading', 'Loading…')}</span>
             </div>
-            <p className="mt-3 text-muted">Loading veterinarian profile...</p>
+            <p className="mt-3 text-muted">{t('patient.doctorProfile.loading')}</p>
           </div>
         </div>
       </div>
@@ -190,9 +192,9 @@ const DoctorProfile = () => {
       <div className="content doctor-content">
         <div className="container">
           <div className="alert alert-danger">
-            <h5>Veterinarian Not Found</h5>
-            <p>{profileError?.message || 'The veterinarian you\'re looking for does not exist.'}</p>
-            <Link to="/search" className="btn btn-primary">Browse Veterinarians</Link>
+            <h5>{t('patient.doctorProfile.notFound')}</h5>
+            <p>{profileError?.message || t('patient.doctorProfile.notExist')}</p>
+            <Link to="/search" className="btn btn-primary">{t('patient.doctorProfile.browse')}</Link>
           </div>
         </div>
       </div>
@@ -214,14 +216,14 @@ const DoctorProfile = () => {
                 </div>
                 <div className="doc-info-cont" style={{ flex: 1 }}>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-                    <span className="badge doc-avail-badge"><i className="fa-solid fa-circle"></i>Available </span>
+                    <span className="badge doc-avail-badge"><i className="fa-solid fa-circle"></i>{t('patient.doctorProfile.available')} </span>
                   </div>
                   <h4 className="doc-name">
                     {doctorName}
                     <img src="/assets/img/icons/badge-check.svg" alt="Img" style={{ marginLeft: '8px' }} />
                     <span className="badge doctor-role-badge"><i className="fa-solid fa-circle"></i>{specializationName}</span>
                   </h4>
-                  <p>{profile?.title || 'Veterinary Professional'}</p>
+            <p>{profile?.title || t('patient.doctorProfile.professionalFallback')}</p>
                   <p className="address-detail">
                     <span className="loc-icon"><i className="feather-map-pin"></i></span>
                     {locationText}
@@ -244,7 +246,7 @@ const DoctorProfile = () => {
               <div className="doc-info-right" style={{ flex: '1', paddingTop: '4px' }}>
                 <div className="d-flex justify-content-between align-items-start" style={{ gap: '16px', marginBottom: '12px' }}>
                   <div style={{ flex: 1 }}>
-                    <h6 className="mb-2" style={{ fontWeight: 600 }}>Social Media</h6>
+                    <h6 className="mb-2" style={{ fontWeight: 600 }}>{t('patient.doctorProfile.socialMedia')}</h6>
                     <div className="d-flex" style={{ gap: '10px', flexWrap: 'wrap' }}>
                       {publicSocialLinks.length > 0 ? publicSocialLinks.map(({ key, label, icon, style, href }) => (
                         <a
@@ -252,13 +254,13 @@ const DoctorProfile = () => {
                           href={href}
                           target="_blank"
                           rel="noreferrer noopener"
-                          aria-label={`${doctorName} on ${label}`}
-                          title={label}
+                          aria-label={`${doctorName} on ${t(`doctorRemaining.social.${key}`)}`}
+                          title={t(`doctorRemaining.social.${key}`)}
                         >
                           <i className={`${style || 'fa-brands'} ${icon}`}></i>
                         </a>
                       )) : (
-                        <span className="text-muted small">No social links added</span>
+                        <span className="text-muted small">{t('patient.doctorProfile.noSocial')}</span>
                       )}
                     </div>
                   </div>
@@ -266,7 +268,7 @@ const DoctorProfile = () => {
                   <a
                     href="#"
                     onClick={handleFavoriteToggle}
-                    title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+                    title={isFavorited ? t('patient.doctorProfile.removeFavorite') : t('patient.doctorProfile.addFavorite')}
                     style={{
                       width: '40px',
                       height: '40px',
@@ -280,7 +282,7 @@ const DoctorProfile = () => {
                       textDecoration: 'none',
                       flexShrink: 0,
                     }}
-                    aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+                    aria-label={isFavorited ? t('patient.doctorProfile.removeFavorite') : t('patient.doctorProfile.addFavorite')}
                   >
                     <i className={`fa ${isFavorited ? 'fa-solid' : 'fa-regular'} fa-heart`} style={{ color: isFavorited ? '#e63b3b' : '#0E82FD' }}></i>
                   </a>
@@ -289,17 +291,17 @@ const DoctorProfile = () => {
                 <ul className="doctors-activities" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                   <li>
                     <div className="hospital-info">
-                      <span className="list-icon"><img src="/assets/img/icons/thumb-icon.svg" alt="Img" /></span>
-                      <p><b>{recommendPercent}% </b> Recommend</p>
+                      <span className="list-icon"><img src="/assets/img/icons/thumb-icon.svg" alt="" /></span>
+                      <p><b>{recommendPercent}% </b>{t('patient.doctorProfile.recommend')}</p>
                     </div>
                   </li>
                   <li>
                     <div className="hospital-info">
-                      <span className="list-icon"><img src="/assets/img/icons/watch-icon.svg" alt="Img" /></span>
-                      <p>Online consultations</p>
+                      <span className="list-icon"><img src="/assets/img/icons/watch-icon.svg" alt="" /></span>
+                      <p>{t('patient.doctorProfile.onlineConsultations')}</p>
                     </div>
                     <p className="text-muted" style={{ marginLeft: '52px', marginTop: '-6px' }}>
-                      The consultation is possible on site and online
+                      {t('patient.doctorProfile.consultationDescription')}
                     </p>
                   </li>
                 </ul>
@@ -312,19 +314,19 @@ const DoctorProfile = () => {
               <div className="col-lg-8">
                 <div className="card" style={{ borderRadius: '14px', border: '1px solid #eef1f6' }}>
                   <div className="card-body">
-                    <h5 className="mb-3">Short Bio</h5>
+                    <h5 className="mb-3">{t('patient.doctorProfile.shortBio')}</h5>
                     <p className="text-muted" style={{ marginBottom: '8px' }}>
-                      {hasBiography ? profile.biography : 'No biography provided yet.'}
+                      {hasBiography ? profile.biography : t('patient.doctorProfile.noBiography')}
                     </p>
-                    <a href="#" onClick={(e) => e.preventDefault()} style={{ textDecoration: 'none', fontWeight: 600 }}>Read more</a>
+                    <a href="#" onClick={(e) => e.preventDefault()} style={{ textDecoration: 'none', fontWeight: 600 }}>{t('patient.doctorProfile.readMore')}</a>
                   </div>
                 </div>
 
                 <div className="card" style={{ borderRadius: '14px', border: '1px solid #eef1f6', marginTop: '16px' }}>
                   <div className="card-body">
-                    <h5 className="mb-3">Services and price list</h5>
+                    <h5 className="mb-3">{t('patient.doctorProfile.servicesPrice')}</h5>
                     {servicesPreview.length === 0 ? (
-                      <p className="text-muted mb-0">No services listed.</p>
+                      <p className="text-muted mb-0">{t('patient.doctorProfile.noServices')}</p>
                     ) : (
                       <div className="table-responsive">
                         <table className="table mb-2" style={{ borderCollapse: 'separate', borderSpacing: '0 10px' }}>
@@ -332,7 +334,7 @@ const DoctorProfile = () => {
                             {servicesPreview.map((s, idx) => (
                               <tr key={idx} style={{ background: '#fff' }}>
                                 <td style={{ borderTop: '1px solid #eef1f6', borderBottom: '1px solid #eef1f6' }}>
-                                  {s?.name || 'Service'}
+                                  {s?.name || t('patient.doctorProfile.service')}
                                 </td>
                                 <td className="text-end" style={{ borderTop: '1px solid #eef1f6', borderBottom: '1px solid #eef1f6', fontWeight: 700 }}>
                                   {s?.price != null ? `€${s.price}` : '—'}
@@ -343,7 +345,7 @@ const DoctorProfile = () => {
                         </table>
                       </div>
                     )}
-                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveSection('services') }} style={{ textDecoration: 'none', fontWeight: 600 }}>Read more</a>
+                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveSection('services') }} style={{ textDecoration: 'none', fontWeight: 600 }}>{t('patient.doctorProfile.readMore')}</a>
                   </div>
                 </div>
               </div>
@@ -351,16 +353,16 @@ const DoctorProfile = () => {
               <div className="col-lg-4">
                 <div className="card" style={{ borderRadius: '14px', border: '1px solid #eef1f6' }}>
                   <div className="card-body">
-                    <h5 className="mb-3">About the doctor</h5>
+                    <h5 className="mb-3">{t('patient.doctorProfile.about')}</h5>
 
                     <div className="d-flex" style={{ gap: '10px', marginBottom: '12px' }}>
                       <div style={{ width: 34, height: 34, borderRadius: 10, background: '#f5f8ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <i className="fa-solid fa-briefcase" style={{ color: '#0E82FD' }}></i>
                       </div>
                       <div>
-                        <div style={{ fontWeight: 700 }}>{experienceYears || 0} years of experience</div>
+                        <div style={{ fontWeight: 700 }}>{t('patient.doctorProfile.yearsExperience', { count: experienceYears || 0 })}</div>
                         <div className="text-muted" style={{ fontSize: 13 }}>
-                          {firstClinic?.name ? `${firstClinic.name}${firstClinic.city ? ` ${firstClinic.city}` : ''}` : 'Experience details not available'}
+                          {firstClinic?.name ? `${firstClinic.name}${firstClinic.city ? ` ${firstClinic.city}` : ''}` : t('patient.doctorProfile.experienceUnavailable')}
                         </div>
                       </div>
                     </div>
@@ -370,9 +372,9 @@ const DoctorProfile = () => {
                         <i className="fa-solid fa-thumbs-up" style={{ color: '#0E82FD' }}></i>
                       </div>
                       <div>
-                        <div style={{ fontWeight: 700 }}>{recommendPercent}% Recommend</div>
+                        <div style={{ fontWeight: 700 }}>{recommendPercent}% {t('patient.doctorProfile.recommend')}</div>
                         <div className="text-muted" style={{ fontSize: 13 }}>
-                          {reviewCount ? `${reviewCount} pet owners would recommend this vet` : 'No recommendations yet'}
+                          {reviewCount ? t('patient.doctorProfile.recommendationCount', { count: reviewCount }) : t('patient.doctorProfile.noRecommendations')}
                         </div>
                       </div>
                     </div>
@@ -382,9 +384,9 @@ const DoctorProfile = () => {
                         <i className="fa-solid fa-video" style={{ color: '#0E82FD' }}></i>
                       </div>
                       <div>
-                        <div style={{ fontWeight: 700 }}>Online consultations</div>
+                        <div style={{ fontWeight: 700 }}>{t('patient.doctorProfile.onlineConsultations')}</div>
                         <div className="text-muted" style={{ fontSize: 13 }}>
-                          The consultation is possible on site and online
+                          {t('patient.doctorProfile.consultationDescription')}
                         </div>
                       </div>
                     </div>
@@ -394,7 +396,7 @@ const DoctorProfile = () => {
                       className="btn btn-primary w-100"
                       style={{ borderRadius: '10px', padding: '12px 16px', fontWeight: 600 }}
                     >
-                      Book an appointment now
+                      {t('patient.doctorProfile.bookAppointment')}
                     </Link>
                   </div>
                 </div>
@@ -432,9 +434,9 @@ const DoctorProfile = () => {
                     className="bg-blue"
                     style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <img src="/assets/img/icons/calendar3.svg" alt="Reviews" style={{ width: '20px', height: '20px' }} />
+                    <img src="/assets/img/icons/calendar3.svg" alt="" style={{ width: '20px', height: '20px' }} />
                   </span>
-                  <span style={{ fontSize: '14px', fontWeight: '500' }}>{reviewCount > 0 ? `${reviewCount}+ Reviews` : 'No Reviews Yet'}</span>
+                  <span style={{ fontSize: '14px', fontWeight: '500' }}>{reviewCount > 0 ? t('patient.doctorProfile.reviewSummary', { count: reviewCount }) : t('patient.doctorProfile.noReviewsSummary')}</span>
                 </li>
                 <li
                   style={{
@@ -452,10 +454,10 @@ const DoctorProfile = () => {
                     className="bg-dark-blue"
                     style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <img src="/assets/img/icons/bullseye.svg" alt="Experience" style={{ width: '20px', height: '20px' }} />
+                    <img src="/assets/img/icons/bullseye.svg" alt="" style={{ width: '20px', height: '20px' }} />
                   </span>
                   <span style={{ fontSize: '14px', fontWeight: '500' }}>
-                    {experienceYears > 0 ? `In Practice for ${experienceYears} ${experienceYears === 1 ? 'Year' : 'Years'}` : 'Experience Not Available'}
+                    {experienceYears > 0 ? t('patient.doctorProfile.practiceSummary', { count: experienceYears, unit: t(`patient.doctorProfile.${experienceYears === 1 ? 'year' : 'years'}`) }) : t('patient.doctorProfile.experienceUnavailableShort')}
                   </span>
                 </li>
                 <li
@@ -474,25 +476,25 @@ const DoctorProfile = () => {
                     className="bg-green"
                     style={{ width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    <img src="/assets/img/icons/bookmark-star.svg" alt="Awards" style={{ width: '20px', height: '20px' }} />
+                    <img src="/assets/img/icons/bookmark-star.svg" alt="" style={{ width: '20px', height: '20px' }} />
                   </span>
-                  <span style={{ fontSize: '14px', fontWeight: '500' }}>{hasAwards ? `${profile.awards.length}+ Awards` : 'No Awards Listed'}</span>
+                  <span style={{ fontSize: '14px', fontWeight: '500' }}>{hasAwards ? t('patient.doctorProfile.awardsSummary', { count: profile.awards.length }) : t('patient.doctorProfile.noAwardsSummary')}</span>
                 </li>
               </ul>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '14px', borderTop: '1px solid #e0e0e0' }}>
                 <p style={{ margin: 0, fontSize: '15px', color: '#666' }}>
                   <span style={{ fontWeight: '600', color: '#0d6efd' }}>
-                    Price :
+                    {t('patient.doctorProfile.price')} :
                     {profile?.consultationFees?.clinic && profile?.consultationFees?.online
                       ? ` €${profile.consultationFees.clinic} - €${profile.consultationFees.online}`
                       : profile?.consultationFees?.clinic
                       ? ` €${profile.consultationFees.clinic}`
                       : profile?.consultationFees?.online
                       ? ` €${profile.consultationFees.online}`
-                      : ' Contact for pricing'}
+                      : ` ${t('patient.doctorProfile.contactPricing')}`}
                   </span>{' '}
-                  for a Session
+                  {t('patient.doctorProfile.forSession')}
                 </p>
                 <div className="clinic-booking">
                   <Link
@@ -500,7 +502,7 @@ const DoctorProfile = () => {
                     to={vetUserId ? `/booking?vet=${vetUserId}` : '/booking'}
                     style={{ padding: '12px 32px', borderRadius: '10px', fontWeight: '600', textDecoration: 'none', display: 'inline-block' }}
                   >
-                    Book Appointment
+                    {t('patient.doctorProfile.bookAppointmentShort')}
                   </Link>
                 </div>
               </div>
@@ -511,112 +513,112 @@ const DoctorProfile = () => {
         <div className="doctors-detailed-info" style={{ padding: '0 15px' }}>
           <ul className="information-title-list">
             <li className={activeSection === 'doc_bio' ? 'active' : ''}>
-              <a href="#doc_bio" onClick={(e) => { e.preventDefault(); setActiveSection('doc_bio') }}>Doctor Bio</a>
+              <a href="#doc_bio" onClick={(e) => { e.preventDefault(); setActiveSection('doc_bio') }}>{t('patient.doctorProfile.bio')}</a>
             </li>
             <li className={activeSection === 'experience' ? 'active' : ''}>
-              <a href="#experience" onClick={(e) => { e.preventDefault(); setActiveSection('experience') }}>Experience</a>
+              <a href="#experience" onClick={(e) => { e.preventDefault(); setActiveSection('experience') }}>{t('patient.doctorProfile.experience')}</a>
             </li>
             <li className={activeSection === 'education' ? 'active' : ''}>
-              <a href="#education" onClick={(e) => { e.preventDefault(); setActiveSection('education') }}>Education</a>
+              <a href="#education" onClick={(e) => { e.preventDefault(); setActiveSection('education') }}>{t('patient.doctorProfile.education')}</a>
             </li>
             <li className={activeSection === 'awards' ? 'active' : ''}>
-              <a href="#awards" onClick={(e) => { e.preventDefault(); setActiveSection('awards') }}>Awards</a>
+              <a href="#awards" onClick={(e) => { e.preventDefault(); setActiveSection('awards') }}>{t('patient.doctorProfile.awards')}</a>
             </li>
             <li className={activeSection === 'insurance' ? 'active' : ''}>
-              <a href="#insurance" onClick={(e) => { e.preventDefault(); setActiveSection('insurance') }}>Insurances</a>
+              <a href="#insurance" onClick={(e) => { e.preventDefault(); setActiveSection('insurance') }}>{t('patient.doctorProfile.insurances')}</a>
             </li>
             <li className={activeSection === 'services' ? 'active' : ''}>
-              <a href="#services" onClick={(e) => { e.preventDefault(); setActiveSection('services') }}>Treatments</a>
+              <a href="#services" onClick={(e) => { e.preventDefault(); setActiveSection('services') }}>{t('patient.doctorProfile.treatments')}</a>
             </li>
             <li className={activeSection === 'speciality' ? 'active' : ''}>
-              <a href="#speciality" onClick={(e) => { e.preventDefault(); setActiveSection('speciality') }}>Speciality</a>
+              <a href="#speciality" onClick={(e) => { e.preventDefault(); setActiveSection('speciality') }}>{t('patient.doctorProfile.speciality')}</a>
             </li>
             <li className={activeSection === 'availability' ? 'active' : ''}>
-              <a href="#availability" onClick={(e) => { e.preventDefault(); setActiveSection('availability') }}>Availability</a>
+              <a href="#availability" onClick={(e) => { e.preventDefault(); setActiveSection('availability') }}>{t('patient.doctorProfile.availability')}</a>
             </li>
             <li className={activeSection === 'clinic' ? 'active' : ''}>
-              <a href="#clinic" onClick={(e) => { e.preventDefault(); setActiveSection('clinic') }}>Clinics</a>
+              <a href="#clinic" onClick={(e) => { e.preventDefault(); setActiveSection('clinic') }}>{t('patient.doctorProfile.clinics')}</a>
             </li>
             <li className={activeSection === 'membership' ? 'active' : ''}>
-              <a href="#membership" onClick={(e) => { e.preventDefault(); setActiveSection('membership') }}>Memberships</a>
+              <a href="#membership" onClick={(e) => { e.preventDefault(); setActiveSection('membership') }}>{t('patient.doctorProfile.memberships')}</a>
             </li>
             <li className={activeSection === 'bussiness_hour' ? 'active' : ''}>
-              <a href="#bussiness_hour" onClick={(e) => { e.preventDefault(); setActiveSection('bussiness_hour') }}>Business Hours</a>
+              <a href="#bussiness_hour" onClick={(e) => { e.preventDefault(); setActiveSection('bussiness_hour') }}>{t('patient.doctorProfile.businessHours')}</a>
             </li>
             <li className={activeSection === 'review' ? 'active' : ''}>
-              <a href="#review" onClick={(e) => { e.preventDefault(); setActiveSection('review') }}>Review</a>
+              <a href="#review" onClick={(e) => { e.preventDefault(); setActiveSection('review') }}>{t('patient.doctorProfile.review')}</a>
             </li>
           </ul>
 
           <div className="doc-information-main" style={{ padding: '20px 0' }}>
             <div className={`doc-information-details bio-detail ${activeSection === 'doc_bio' ? '' : 'd-none'}`} id="doc_bio">
-              <div className="detail-title"><h4>Doctor Bio</h4></div>
-              <p>{hasBiography ? profile.biography : 'No biography provided yet.'}</p>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.bio')}</h4></div>
+              <p>{hasBiography ? profile.biography : t('patient.doctorProfile.noBiography')}</p>
             </div>
 
             <div className={`doc-information-details ${activeSection === 'experience' ? '' : 'd-none'}`} id="experience">
-              <div className="detail-title"><h4>Experience</h4></div>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.experience')}</h4></div>
               {hasExperience ? (
                 <div className="experience-list">
                   {profile.experience.map((exp, index) => (
                     <div key={index} className="experience-item mb-3">
-                      <h5>{exp.hospital || 'Hospital Name Not Available'}</h5>
+                      <h5>{exp.hospital || t('patient.doctorProfile.hospitalUnavailable')}</h5>
                       {exp.designation && <p className="text-muted mb-1">{exp.designation}</p>}
                       <p className="text-muted">
                         {exp.fromYear && exp.toYear
                           ? `${exp.fromYear} - ${exp.toYear}`
                           : exp.fromYear
-                          ? `Since ${exp.fromYear}`
-                          : 'Dates not available'}
+                          ? t('patient.doctorProfile.since', { year: exp.fromYear })
+                          : t('patient.doctorProfile.datesUnavailable')}
                       </p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-muted">Experience information not available.</p>
+                <p className="text-muted">{t('patient.doctorProfile.unavailableExperience')}</p>
               )}
             </div>
 
             <div className={`doc-information-details ${activeSection === 'education' ? '' : 'd-none'}`} id="education">
-              <div className="detail-title"><h4>Education</h4></div>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.education')}</h4></div>
               {hasEducation ? (
                 <div className="education-list">
                   {profile.education.map((edu, index) => (
                     <div key={index} className="education-item mb-3">
-                      <h5>{edu.degree || 'Degree Not Available'}</h5>
+                      <h5>{edu.degree || t('patient.doctorProfile.degreeUnavailable')}</h5>
                       {edu.college && <p className="text-muted mb-1">{edu.college}</p>}
                       {edu.year && <p className="text-muted">{edu.year}</p>}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-muted">Education information not available.</p>
+                <p className="text-muted">{t('patient.doctorProfile.unavailableEducation')}</p>
               )}
             </div>
 
             <div className={`doc-information-details ${activeSection === 'awards' ? '' : 'd-none'}`} id="awards">
-              <div className="detail-title"><h4>Awards</h4></div>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.awards')}</h4></div>
               {hasAwards ? (
                 <div className="awards-list">
                   {profile.awards.map((award, index) => (
                     <div key={index} className="award-item mb-2">
-                      <h5>{award.title || 'Award Title Not Available'}</h5>
+                      <h5>{award.title || t('patient.doctorProfile.awardTitleUnavailable')}</h5>
                       {award.year && <p className="text-muted">{award.year}</p>}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-muted">Awards information not available.</p>
+                <p className="text-muted">{t('patient.doctorProfile.unavailableAwards')}</p>
               )}
             </div>
 
             <div className={`doc-information-details ${activeSection === 'insurance' ? '' : 'd-none'}`} id="insurance">
-              <div className="detail-title"><h4>Insurances</h4></div>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.insurances')}</h4></div>
               {hasInsurance ? (
                 <div className="row">
                   {insuranceCompanies.map((ins) => {
                     const id = ins?._id || ins?.id || ins
-                    const name = typeof ins === 'object' && ins !== null ? (ins.name || 'Insurance') : 'Insurance'
+                    const name = typeof ins === 'object' && ins !== null ? (ins.name || t('patient.doctorProfile.insuranceName')) : t('patient.doctorProfile.insuranceName')
                     const logoUrl = typeof ins === 'object' && ins !== null ? getImageUrl(ins.logo) : null
                     return (
                       <div key={String(id)} className="col-6 col-md-4 col-lg-3 mb-3">
@@ -655,31 +657,31 @@ const DoctorProfile = () => {
                   })}
                 </div>
               ) : (
-                <p className="text-muted">Insurance information not available.</p>
+                <p className="text-muted">{t('patient.doctorProfile.unavailableInsurance')}</p>
               )}
             </div>
 
             <div className={`doc-information-details ${activeSection === 'services' ? '' : 'd-none'}`} id="services">
-              <div className="detail-title"><h4>Services & Treatments</h4></div>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.servicesPrice')}</h4></div>
               {hasServices ? (
                 <div className="services-list">
                   <ul className="list-unstyled">
                     {profile.services.map((service, index) => (
                       <li key={index} className="mb-2">
                         <i className="fas fa-check-circle text-primary me-2"></i>
-                        <strong>{service.name || 'Service Name'}</strong>
+                        <strong>{service.name || t('patient.doctorProfile.serviceName')}</strong>
                         {service.price != null && <span className="text-muted ms-2">- €{service.price}</span>}
                       </li>
                     ))}
                   </ul>
                 </div>
               ) : (
-                <p className="text-muted">No services listed.</p>
+                <p className="text-muted">{t('patient.doctorProfile.noServices')}</p>
               )}
             </div>
 
             <div className={`doc-information-details ${activeSection === 'speciality' ? '' : 'd-none'}`} id="speciality">
-              <div className="detail-title"><h4>Speciality</h4></div>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.speciality')}</h4></div>
               {hasSpeciality ? (
                 <div>
                   <ul className="list-unstyled mb-0">
@@ -689,22 +691,22 @@ const DoctorProfile = () => {
                   </ul>
                 </div>
               ) : (
-                <p className="text-muted">Speciality information not available.</p>
+                <p className="text-muted">{t('patient.doctorProfile.unavailableSpecialty')}</p>
               )}
             </div>
 
             <div className={`doc-information-details ${activeSection === 'availability' ? '' : 'd-none'}`} id="availability">
-              <div className="detail-title"><h4>Availability</h4></div>
-              <p className="text-muted">Availability information not available.</p>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.availability')}</h4></div>
+              <p className="text-muted">{t('patient.doctorProfile.unavailableAvailability')}</p>
             </div>
 
             <div className={`doc-information-details ${activeSection === 'clinic' ? '' : 'd-none'}`} id="clinic">
-              <div className="detail-title"><h4>Clinics</h4></div>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.clinics')}</h4></div>
               {hasClinics ? (
                 <div className="clinics-list">
                   {profile.clinics.map((clinic, index) => (
                     <div key={index} className="clinic-item mb-4 p-3 border rounded">
-                      <h5>{clinic.name || 'Clinic Name Not Available'}</h5>
+                      <h5>{clinic.name || t('patient.doctorProfile.clinicNameUnavailable')}</h5>
                       {(clinic.address || clinic.city || clinic.state || clinic.country) && (
                         <p className="mb-1">
                           <i className="fas fa-map-marker-alt text-primary me-2"></i>
@@ -721,42 +723,42 @@ const DoctorProfile = () => {
                   ))}
                 </div>
               ) : (
-                <p className="text-muted">Clinics information not available.</p>
+                <p className="text-muted">{t('patient.doctorProfile.unavailableClinics')}</p>
               )}
             </div>
 
             <div className={`doc-information-details ${activeSection === 'membership' ? '' : 'd-none'}`} id="membership">
-              <div className="detail-title"><h4>Memberships</h4></div>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.memberships')}</h4></div>
               {hasMemberships ? (
                 <div className="memberships-list">
                   <ul className="list-unstyled">
                     {profile.memberships.map((m, index) => (
                       <li key={index} className="mb-2">
                         <i className="fas fa-certificate text-primary me-2"></i>
-                        {m.name || 'Membership Name Not Available'}
+                        {m.name || t('patient.doctorProfile.membershipNameUnavailable')}
                       </li>
                     ))}
                   </ul>
                 </div>
               ) : (
-                <p className="text-muted">Memberships information not available.</p>
+                <p className="text-muted">{t('patient.doctorProfile.unavailableMemberships')}</p>
               )}
             </div>
 
             <div className={`doc-information-details ${activeSection === 'bussiness_hour' ? '' : 'd-none'}`} id="bussiness_hour">
-              <div className="detail-title"><h4>Business Hours</h4></div>
-              <p className="text-muted">Business hours not available.</p>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.businessHours')}</h4></div>
+              <p className="text-muted">{t('patient.doctorProfile.unavailableHours')}</p>
             </div>
 
             <div className={`doc-information-details ${activeSection === 'review' ? '' : 'd-none'}`} id="review">
-              <div className="detail-title"><h4>Review</h4></div>
+              <div className="detail-title"><h4>{t('patient.doctorProfile.review')}</h4></div>
               {reviews.length === 0 ? (
-                <p className="text-muted">No reviews yet.</p>
+                <p className="text-muted">{t('patient.doctorProfile.noReviews')}</p>
               ) : (
                 <div>
                   {reviews.map((r) => {
                     const reviewer = r?.petOwnerId
-                    const reviewerName = reviewer?.fullName || reviewer?.name || 'Pet Owner'
+                    const reviewerName = reviewer?.fullName || reviewer?.name || t('patient.doctorProfile.petOwner')
                     const reviewerImage = getImageUrl(reviewer?.profileImage) || '/assets/img/doctors-dashboard/profile-06.jpg'
                     return (
                       <div key={r._id} className="card mb-3">

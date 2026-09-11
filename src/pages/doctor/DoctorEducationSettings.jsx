@@ -4,11 +4,13 @@ import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const DoctorEducationSettings = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const { data, isLoading } = useVeterinarianProfile()
@@ -62,7 +64,7 @@ const DoctorEducationSettings = () => {
         education: cleaned,
       })
 
-      toast.success('Education updated successfully')
+      toast.success(t('doctorRemaining.education.updated'))
 
       const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
       const nextProfile = refreshed?.data ?? refreshed
@@ -74,7 +76,7 @@ const DoctorEducationSettings = () => {
         }
       }
     } catch (err) {
-      const message = err?.response?.data?.message || err?.message || 'Failed to update education'
+      const message = err?.response?.data?.message || err?.message || t('doctorRemaining.education.updateFailed')
       toast.error(message)
     }
   }
@@ -86,7 +88,7 @@ const DoctorEducationSettings = () => {
         style={{ minHeight: '60vh' }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('doctorRemaining.profile.loading')}</span>
         </div>
       </div>
     )
@@ -106,10 +108,10 @@ const DoctorEducationSettings = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-graduation-cap me-3"></i>
-                    Veterinary Education
+                    {t('doctorRemaining.education.title')}
                   </h2>
                   <p className="dashboard-subtitle">
-                    Manage your veterinary education background and academic credentials
+                    {t('doctorRemaining.education.subtitle')}
                   </p>
                 </div>
               </div>
@@ -128,7 +130,7 @@ const DoctorEducationSettings = () => {
                         <div className="col-12 d-flex justify-content-between align-items-center">
                           <h5 className="card-title mb-0">
                             <i className="fa-solid fa-university me-2"></i>
-                            Academic Background
+                            {t('doctorRemaining.education.section')}
                           </h5>
                           <button
                             type="button"
@@ -136,7 +138,7 @@ const DoctorEducationSettings = () => {
                             onClick={addEducation}
                           >
                             <i className="fa-solid fa-plus me-2"></i>
-                            Add New Education
+                            {t('doctorRemaining.education.add')}
                           </button>
                         </div>
                       </div>
@@ -150,14 +152,14 @@ const DoctorEducationSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-university me-2"></i>
-                                      Institution / College
+                                      {t('doctorRemaining.education.institution')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={edu.college}
                                       onChange={(e) => handleChange(index, 'college', e.target.value)}
-                                      placeholder="e.g., University of Veterinary Medicine"
+                                      placeholder={t('doctorRemaining.education.institutionPlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -165,14 +167,14 @@ const DoctorEducationSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-book-medical me-2"></i>
-                                      Course / Degree
+                                      {t('doctorRemaining.education.course')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={edu.degree}
                                       onChange={(e) => handleChange(index, 'degree', e.target.value)}
-                                      placeholder="e.g., Doctor of Veterinary Medicine"
+                                      placeholder={t('doctorRemaining.education.coursePlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -180,14 +182,14 @@ const DoctorEducationSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-calendar-check me-2"></i>
-                                      Year
+                                      {t('doctorRemaining.education.year')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={edu.year}
                                       onChange={(e) => handleChange(index, 'year', e.target.value)}
-                                      placeholder="e.g., 2015"
+                                      placeholder={t('doctorRemaining.education.yearPlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -198,7 +200,7 @@ const DoctorEducationSettings = () => {
                                     onClick={() => removeEducation(index)}
                                   >
                                     <i className="fa-solid fa-trash me-1"></i>
-                                    Remove
+                                    {t('doctorRemaining.education.remove')}
                                   </button>
                                 </div>
                               </div>
@@ -214,7 +216,7 @@ const DoctorEducationSettings = () => {
                           disabled={updateProfile.isPending}
                         >
                           <i className="fa-solid fa-save me-1"></i>
-                          {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+                          {updateProfile.isPending ? t('doctorRemaining.education.saving') : t('doctorRemaining.education.save')}
                         </button>
                       </div>
                     </form>

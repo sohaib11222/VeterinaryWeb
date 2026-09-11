@@ -3,6 +3,7 @@ import { toast } from 'react-toastify'
 import Breadcrumb from '../components/common/Breadcrumb'
 import { useFooterOptions } from '../queries/footerOptionQueries'
 import { useCreateContactQuery } from '../mutations/contactQueryMutations'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const DEFAULT_CONTACT_DETAILS = {
   address: '3556 Beech Street, USA',
@@ -11,6 +12,7 @@ const DEFAULT_CONTACT_DETAILS = {
 }
 
 const ContactUs = () => {
+  const { t } = useLanguage()
   const { data: footerResponse } = useFooterOptions()
   const createContactQuery = useCreateContactQuery()
   const contactDetails = {
@@ -38,7 +40,7 @@ const ContactUs = () => {
     e.preventDefault()
     createContactQuery.mutate(formData, {
       onSuccess: () => {
-        toast.success('Thank you for your message! We will get back to you soon.')
+        toast.success(t('publicPages.contact.thankYou'))
         setFormData({
           name: '',
           email: '',
@@ -48,14 +50,14 @@ const ContactUs = () => {
         })
       },
       onError: (error) => {
-        toast.error(error?.message || 'Unable to send your message. Please try again.')
+      toast.error(error?.message || t('publicPages.contact.failed'))
       },
     })
   }
 
   return (
     <>
-      <Breadcrumb title="Contact Us" li1="Contact Us" li2="Contact Us" />
+      <Breadcrumb title={t('publicPages.contact.title')} li1={t('publicPages.contact.title')} li2={t('publicPages.contact.title')} />
 
       {/* Contact Us */}
       <section className="contact-section">
@@ -63,8 +65,8 @@ const ContactUs = () => {
           <div className="row">
             <div className="col-lg-5 col-md-12">
               <div className="section-inner-header contact-inner-header">
-                <h6>Get in touch</h6>
-                <h2>Have Any Question?</h2>
+                <h6>{t('publicPages.contact.eyebrow')}</h6>
+                <h2>{t('publicPages.contact.heading')}</h2>
               </div>
               <div className="card contact-card">
                 <div className="card-body">
@@ -72,7 +74,7 @@ const ContactUs = () => {
                     <i className="isax isax-location5"></i>
                   </div>
                   <div className="contact-details">
-                    <h4>Address</h4>
+                    <h4>{t('publicPages.contact.address')}</h4>
                     <p>{contactDetails.address}</p>
                   </div>
                 </div>
@@ -83,7 +85,7 @@ const ContactUs = () => {
                     <i className="isax isax-call5"></i>
                   </div>
                   <div className="contact-details">
-                    <h4>Phone Number</h4>
+                    <h4>{t('publicPages.contact.phone')}</h4>
                     <p><a href={`tel:${String(contactDetails.phoneNumber).replace(/\s+/g, '')}`}>{contactDetails.phoneNumber}</a></p>
                   </div>
                 </div>
@@ -94,7 +96,7 @@ const ContactUs = () => {
                     <i className="isax isax-sms5"></i>
                   </div>
                   <div className="contact-details">
-                    <h4>Email Address</h4>
+                    <h4>{t('publicPages.contact.supportEmail')}</h4>
                     <p><a href={`mailto:${contactDetails.supportEmail}`}>{contactDetails.supportEmail}</a></p>
                   </div>
                 </div>
@@ -107,7 +109,7 @@ const ContactUs = () => {
                     <div className="row">
                       <div className="col-md-6">
                         <div className="mb-3">
-                          <label className="form-label">Name</label>
+                          <label className="form-label">{t('publicPages.contact.name')}</label>
                           <input
                             type="text"
                             className="form-control"
@@ -120,7 +122,7 @@ const ContactUs = () => {
                       </div>
                       <div className="col-md-6">
                         <div className="mb-3">
-                          <label className="form-label">Email</label>
+                          <label className="form-label">{t('publicPages.contact.email')}</label>
                           <input
                             type="email"
                             className="form-control"
@@ -133,7 +135,7 @@ const ContactUs = () => {
                       </div>
                       <div className="col-md-6">
                         <div className="mb-3">
-                          <label className="form-label">Phone Number</label>
+                          <label className="form-label">{t('publicPages.contact.phone')}</label>
                           <input
                             type="tel"
                             className="form-control"
@@ -146,7 +148,7 @@ const ContactUs = () => {
                       </div>
                       <div className="col-md-6">
                         <div className="mb-3">
-                          <label className="form-label">Services</label>
+                          <label className="form-label">{t('publicPages.contact.services')}</label>
                           <input
                             type="text"
                             className="form-control"
@@ -159,7 +161,7 @@ const ContactUs = () => {
                       </div>
                       <div className="col-md-12">
                         <div className="mb-3">
-                          <label className="form-label">Message</label>
+                          <label className="form-label">{t('publicPages.contact.message')}</label>
                           <textarea
                             className="form-control"
                             rows="6"
@@ -177,7 +179,7 @@ const ContactUs = () => {
                             className="btn btn-primary-gradient"
                             disabled={createContactQuery.isPending}
                           >
-                            {createContactQuery.isPending ? 'Sending...' : 'Send Message'}
+                            {createContactQuery.isPending ? t('publicPages.contact.sending') : t('publicPages.contact.send')}
                           </button>
                         </div>
                       </div>
@@ -198,7 +200,7 @@ const ContactUs = () => {
           allowFullScreen=""
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          title="Contact Map"
+          title={t('publicPages.contact.map')}
         ></iframe>
       </section>
       {/* /Contact Map */}

@@ -283,9 +283,28 @@ body.home-hero-header-transparent header.header {
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  overflow: visible;
   z-index: 9999;
-  background: transparent !important;
-  box-shadow: none !important;
+  background: #ffffff !important;
+  box-shadow: 0 2px 10px rgba(20, 43, 66, .08) !important;
+}
+
+body.home-hero-header-transparent header.header > .container {
+  width: 100%;
+  max-width: 1320px;
+}
+
+body.home-hero-header-transparent header.header .header-nav {
+  width: 100%;
+}
+
+/* The theme leaves the fixed header's vertical position implicit. Explicitly
+   anchoring it prevents route changes from carrying a stale top offset. */
+header.header-fixed {
+  top: 0;
 }
 
 @media (max-width: 991.98px) {
@@ -354,7 +373,11 @@ body.home-hero-header-transparent header.header {
 }
 
 body.home-hero-header-transparent header.header.inner-header {
-  background: transparent !important;
+  background: #ffffff !important;
+}
+
+body.home-hero-header-transparent header.header .header-nav {
+  background: #ffffff !important;
 }
 
 body.home-hero-header-transparent .home-hero-v2 {
@@ -726,7 +749,30 @@ body.home-hero-header-transparent .home-hero-v2 {
 /* Breadcrumb: clean top header */
 .breadcrumb-bar.breadcrumb-bar-clean {
   background: #f8fafc !important;
-  padding: 60px 0 40px !important;
+  position: relative;
+  z-index: 1;
+  min-height: 156px;
+  margin: 0;
+  padding: 42px 0 34px !important;
+  overflow: visible;
+  border-top: 1px solid #edf1f5;
+  border-bottom: 1px solid #edf1f5;
+}
+
+/* Dashboard headers are fixed. Reserve their exact height once, here, rather
+   than relying on the page content's padding (which was the source of clipped titles). */
+.dashboard-breadcrumb-host {
+  padding-top: 85px;
+}
+
+/* Public pages such as Contact Us place the shared heading directly after the
+   fixed header. Give that arrangement the same safe offset as dashboards. */
+.main-wrapper > .breadcrumb-bar.breadcrumb-bar-clean {
+  margin-top: 76px;
+}
+
+.dashboard-content-with-breadcrumb {
+  padding-top: 42px;
 }
 
 .breadcrumb-bar.breadcrumb-bar-clean .breadcrumb-title {
@@ -734,7 +780,7 @@ body.home-hero-header-transparent .home-hero-v2 {
   font-size: 40px;
   line-height: 1.15;
   font-weight: 700;
-  margin: 0 0 10px;
+  margin: 0 0 10px !important;
 }
 
 .breadcrumb-bar.breadcrumb-bar-clean .page-breadcrumb ol {
@@ -758,7 +804,20 @@ body.home-hero-header-transparent .home-hero-v2 {
 
 @media (max-width: 767.98px) {
   .breadcrumb-bar.breadcrumb-bar-clean {
-    padding: 44px 0 28px !important;
+    min-height: 132px;
+    padding: 34px 0 26px !important;
+  }
+
+  .dashboard-breadcrumb-host {
+    padding-top: 76px;
+  }
+
+  .main-wrapper > .breadcrumb-bar.breadcrumb-bar-clean {
+    margin-top: 68px;
+  }
+
+  .dashboard-content-with-breadcrumb {
+    padding-top: 28px;
   }
 
   .breadcrumb-bar.breadcrumb-bar-clean .breadcrumb-title {
@@ -2535,3 +2594,52 @@ body.home-hero-header-transparent .home-hero-v2 {
   }
 }
 
+.language-toggle {
+  display: inline-flex;
+  min-width: 66px;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border: 1px solid rgba(8, 123, 115, .24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .94);
+  color: #087b73;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(18, 54, 70, .08);
+  transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease;
+}
+
+.language-toggle:hover,
+.language-toggle:focus-visible {
+  border-color: #087b73;
+  background: #e7f8f1;
+  color: #075a59;
+  transform: translateY(-1px);
+}
+
+.language-toggle i { font-size: 15px; }
+
+.mobile-language-toggle { display: none !important; }
+
+@media (max-width: 991.98px) {
+  .mobile-language-toggle {
+    display: flex !important;
+    align-items: center;
+    padding: 14px 20px;
+    border-top: 1px solid rgba(8, 123, 115, .1);
+  }
+
+  .mobile-language-toggle .language-toggle {
+    width: auto;
+  }
+}
+
+.auth-shell__language-toggle { box-shadow: 0 8px 20px rgba(18, 54, 70, .12); }
+
+@media (max-width: 991px) {
+  .auth-shell__language-toggle { top: 16px; right: 18px; }
+}

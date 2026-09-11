@@ -6,9 +6,11 @@ import { useMyPetStore } from '../../queries/petStoreQueries'
 import { useCreatePetStore, useUpdatePetStore } from '../../mutations/petStoreMutations'
 import { api } from '../../utils/api'
 import { API_ROUTES, getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const PharmacyAdminProfile = () => {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const role = String(user?.role || '').toUpperCase()
 
   const myPetStoreQuery = useMyPetStore()
@@ -98,7 +100,7 @@ const PharmacyAdminProfile = () => {
     const url = payload?.url || payload?.data?.url
 
     if (!url) {
-      throw new Error('Failed to upload logo')
+      throw new Error(t('pharmacyAdmin.profile.logoUploadFailed'))
     }
 
     return url
@@ -109,12 +111,12 @@ const PharmacyAdminProfile = () => {
     if (!file) return
 
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      toast.error('Choose a JPG, PNG, or WebP logo')
+      toast.error(t('pharmacyAdmin.profile.chooseLogo'))
       e.target.value = ''
       return
     }
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Logo image must be 5 MB or smaller')
+      toast.error(t('pharmacyAdmin.profile.logoSize'))
       e.target.value = ''
       return
     }
@@ -132,13 +134,13 @@ const PharmacyAdminProfile = () => {
         if (previous.startsWith('blob:')) URL.revokeObjectURL(previous)
         return ''
       })
-      toast.success('Logo uploaded')
+      toast.success(t('pharmacyAdmin.profile.logoUploaded'))
     } catch (error) {
       setLogoPreview((previous) => {
         if (previous.startsWith('blob:')) URL.revokeObjectURL(previous)
         return ''
       })
-      toast.error(error?.message || 'Logo upload failed')
+      toast.error(error?.message || t('pharmacyAdmin.profile.logoUploadFailed'))
     } finally {
       e.target.value = ''
     }
@@ -149,19 +151,19 @@ const PharmacyAdminProfile = () => {
 
     const name = String(form.name || '').trim()
     if (!name) {
-      toast.error('Store name is required')
+      toast.error(t('pharmacyAdmin.profile.storeRequired'))
       return
     }
     const requiredProfileFields = [
-      ['Phone', form.phone],
-      ['Address line 1', form.address.line1],
-      ['City', form.address.city],
-      ['Country', form.address.country],
-      ['ZIP / postal code', form.address.zip],
+      [t('pharmacyAdmin.profile.phone'), form.phone],
+      [t('pharmacyAdmin.profile.address1'), form.address.line1],
+      [t('pharmacyAdmin.profile.city'), form.address.city],
+      [t('pharmacyAdmin.profile.country'), form.address.country],
+      [t('pharmacyAdmin.profile.zip'), form.address.zip],
     ]
     const missingField = requiredProfileFields.find(([, value]) => !String(value || '').trim())
     if (missingField) {
-      toast.error(`${missingField[0]} is required to complete your profile`)
+      toast.error(t('pharmacyAdmin.profile.fieldRequired', { field: missingField[0] }))
       return
     }
 
@@ -189,23 +191,23 @@ const PharmacyAdminProfile = () => {
     try {
       if (petStore?._id) {
         await updatePetStore.mutateAsync({ petStoreId: petStore._id, data: payload })
-        toast.success('Profile updated')
+        toast.success(t('pharmacyAdmin.profile.updated'))
       } else {
         await createPetStore.mutateAsync(payload)
-        toast.success('Profile created')
+        toast.success(t('pharmacyAdmin.profile.created'))
       }
     } catch (error) {
-      toast.error(error?.message || 'Failed to save profile')
+      toast.error(error?.message || t('pharmacyAdmin.profile.saveFailed'))
     }
   }
 
-  const title = role === 'PARAPHARMACY' ? 'Parapharmacy Profile' : 'Pharmacy Profile'
+  const title = role === 'PARAPHARMACY' ? t('pharmacyAdmin.profile.parapharmacyTitle') : t('pharmacyAdmin.profile.pharmacyTitle')
 
   return (
     <div>
       <div className="page-header">
         <h3 className="page-title">{title}</h3>
-        <div className="text-muted">Complete the required contact and address fields to publish your profile.</div>
+        <div className="text-muted">{t('pharmacyAdmin.profile.subtitle')}</div>
       </div>
 
       <div className="card">
@@ -213,35 +215,35 @@ const PharmacyAdminProfile = () => {
           {myPetStoreQuery.isLoading ? (
             <div className="text-center py-4">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('pharmacyAdmin.profile.loading')}</span>
               </div>
             </div>
           ) : myPetStoreQuery.isError ? (
-            <div className="alert alert-danger">{myPetStoreQuery.error?.message || 'Failed to load profile'}</div>
+            <div className="alert alert-danger">{myPetStoreQuery.error?.message || t('pharmacyAdmin.profile.failed')}</div>
           ) : (
             <form onSubmit={onSubmit}>
               <div className="row">
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Store Name <span className="text-danger">*</span></label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.storeName')} <span className="text-danger">*</span></label>
                   <input className="form-control" name="name" value={form.name} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Phone <span className="text-danger">*</span></label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.phone')} <span className="text-danger">*</span></label>
                   <input className="form-control" name="phone" value={form.phone} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Logo</label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.logo')}</label>
                   <input className="form-control" type="file" accept="image/*" onChange={handleLogoFile} />
                   {(logoPreview || form.logo) && (
                     <div className="mt-3 d-flex align-items-center gap-3 rounded border bg-light p-2">
                       <img
                         src={logoPreview || getImageUrl(form.logo)}
-                        alt="Selected business logo"
+                        alt={t('pharmacyAdmin.profile.logoPreview')}
                         style={{ width: 72, height: 72, borderRadius: 12, objectFit: 'cover', background: '#fff' }}
                       />
-                      <div className="small text-muted"><strong className="d-block text-dark">Logo preview</strong>Your selected logo will appear on your public profile.</div>
+                      <div className="small text-muted"><strong className="d-block text-dark">{t('pharmacyAdmin.profile.logoPreview')}</strong>{t('pharmacyAdmin.profile.logoHint')}</div>
                     </div>
                   )}
                 </div>
@@ -257,48 +259,48 @@ const PharmacyAdminProfile = () => {
                       id="isActive"
                     />
                     <label className="form-check-label" htmlFor="isActive">
-                      Active
+                      {t('pharmacyAdmin.profile.active')}
                     </label>
                   </div>
                 </div>
 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Address Line 1 <span className="text-danger">*</span></label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.address1')} <span className="text-danger">*</span></label>
                   <input className="form-control" name="address.line1" value={form.address.line1} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Address Line 2</label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.address2')}</label>
                   <input className="form-control" name="address.line2" value={form.address.line2} onChange={handleChange} />
                 </div>
 
                 <div className="col-md-4 mb-3">
-                  <label className="form-label">City <span className="text-danger">*</span></label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.city')} <span className="text-danger">*</span></label>
                   <input className="form-control" name="address.city" value={form.address.city} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-4 mb-3">
-                  <label className="form-label">State</label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.state')}</label>
                   <input className="form-control" name="address.state" value={form.address.state} onChange={handleChange} />
                 </div>
 
                 <div className="col-md-4 mb-3">
-                  <label className="form-label">ZIP / Postal Code <span className="text-danger">*</span></label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.zip')} <span className="text-danger">*</span></label>
                   <input className="form-control" name="address.zip" value={form.address.zip} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-4 mb-3">
-                  <label className="form-label">Country <span className="text-danger">*</span></label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.country')} <span className="text-danger">*</span></label>
                   <input className="form-control" name="address.country" value={form.address.country} onChange={handleChange} required />
                 </div>
 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Latitude</label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.latitude')}</label>
                   <input className="form-control" name="location.lat" value={form.location.lat} onChange={handleChange} />
                 </div>
 
                 <div className="col-md-6 mb-3">
-                  <label className="form-label">Longitude</label>
+                  <label className="form-label">{t('pharmacyAdmin.profile.longitude')}</label>
                   <input className="form-control" name="location.lng" value={form.location.lng} onChange={handleChange} />
                 </div>
 
@@ -308,7 +310,7 @@ const PharmacyAdminProfile = () => {
                     className="btn btn-primary"
                     disabled={createPetStore.isPending || updatePetStore.isPending}
                   >
-                    {createPetStore.isPending || updatePetStore.isPending ? 'Saving...' : 'Save'}
+                    {createPetStore.isPending || updatePetStore.isPending ? t('pharmacyAdmin.profile.saving') : t('pharmacyAdmin.profile.save')}
                   </button>
                 </div>
               </div>

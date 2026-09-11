@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { useBalance, useWithdrawalRequests } from '../../queries/balanceQueries'
 import { useRequestWithdrawal } from '../../mutations/balanceMutations'
 
 const DoctorPayment = () => {
+  const { t, language } = useLanguage()
   const [withdrawModalOpen, setWithdrawModalOpen] = useState(false)
   const [amount, setAmount] = useState('')
   const [paymentMethod, setPaymentMethod] = useState('STRIPE')
@@ -33,24 +35,24 @@ const DoctorPayment = () => {
 
   const statusBadge = (status) => {
     const s = String(status || '').toUpperCase()
-    if (s === 'APPROVED' || s === 'COMPLETED') return <span className="badge badge-success">Approved</span>
-    if (s === 'PENDING') return <span className="badge badge-warning">Pending</span>
-    if (s === 'REJECTED') return <span className="badge badge-danger">Rejected</span>
+    if (s === 'APPROVED' || s === 'COMPLETED') return <span className="badge badge-success">{t('doctorPayment.approved')}</span>
+    if (s === 'PENDING') return <span className="badge badge-warning">{t('doctorPayment.pendingStatus')}</span>
+    if (s === 'REJECTED') return <span className="badge badge-danger">{t('doctorPayment.rejected')}</span>
     return <span className="badge badge-secondary">{s || '—'}</span>
   }
 
   const submitWithdrawal = async () => {
     const n = Number(amount)
     if (!Number.isFinite(n) || n <= 0) {
-      toast.error('Please enter a valid amount')
+      toast.error(t('doctorPayment.validAmount'))
       return
     }
     if (n > Number(balance || 0)) {
-      toast.error('Insufficient balance')
+      toast.error(t('doctorPayment.insufficientBalance'))
       return
     }
     if (!paymentDetails.trim()) {
-      toast.error('Please enter payout details')
+      toast.error(t('doctorPayment.detailsRequired'))
       return
     }
 
@@ -60,12 +62,12 @@ const DoctorPayment = () => {
         paymentMethod,
         paymentDetails: paymentDetails.trim(),
       })
-      toast.success('Withdrawal request submitted successfully')
+      toast.success(t('doctorPayment.submitted'))
       setWithdrawModalOpen(false)
       setAmount('')
       setPaymentDetails('')
     } catch (error) {
-      toast.error(error?.message || 'Failed to submit withdrawal request')
+      toast.error(error?.message || t('doctorPayment.submitFailed'))
     }
   }
 
@@ -77,22 +79,22 @@ const DoctorPayment = () => {
 
           <div className="col-lg-12 col-xl-12">
             <div className="dashboard-header">
-              <h3>Payout Settings</h3>
+              <h3>{t('doctorPayment.title')}</h3>
             </div>
 
             <div className="payout-wrap">
               <div className="payout-title">
-                <h4>Preferred payout method</h4>
-                <p>Your earnings will be paid out using the method you provide when requesting a withdrawal.</p>
+                <h4>{t('doctorPayment.preferredMethod')}</h4>
+                <p>{t('doctorPayment.preferredDescription')}</p>
               </div>
 
               <div className="stripe-wrapper">
                 <div className="stripe-box active">
                   <div className="stripe-img">
-                    <img src="/assets/img/icons/stripe.svg" alt="img" />
+                    <img src="/assets/img/icons/stripe.svg" alt={t('doctorCommon.imageAlt')} />
                   </div>
                   <button className="btn" onClick={() => setWithdrawModalOpen(true)}>
-                    <i className="fa-solid fa-gear"></i>Configure
+                    <i className="fa-solid fa-gear"></i>{t('doctorPayment.requestWithdrawal')}
                   </button>
                 </div>
               </div>
@@ -100,31 +102,31 @@ const DoctorPayment = () => {
               <div className="mt-3">
                 <div className="d-flex justify-content-between align-items-center p-3 bg-light rounded">
                   <div>
-                    <p className="mb-1 text-muted">Available Balance</p>
+                    <p className="mb-1 text-muted">{t('doctorPayment.availableBalance')}</p>
                     {balanceQuery.isLoading ? <h4 className="mb-0">—</h4> : <h4 className="mb-0">€{Number(balance || 0).toFixed(2)}</h4>}
                   </div>
                   <button className="btn btn-primary" onClick={() => setWithdrawModalOpen(true)} disabled={balanceQuery.isLoading || Number(balance || 0) <= 0}>
-                    Request Withdrawal
+                    {t('doctorPayment.requestWithdrawal')}
                   </button>
                 </div>
               </div>
             </div>
 
             <div className="dashboard-header">
-              <h3>Withdrawal Requests</h3>
+              <h3>{t('doctorPayment.withdrawalRequests')}</h3>
             </div>
 
             {requestsQuery.isLoading ? (
               <div className="text-center py-5">
                 <div className="spinner-border" role="status">
-                  <span className="visually-hidden">Loading...</span>
+                  <span className="visually-hidden">{t('doctorPayment.loading')}</span>
                 </div>
               </div>
             ) : requestsQuery.isError ? (
-              <div className="alert alert-danger">{requestsQuery.error?.message || 'Failed to load withdrawal requests'}</div>
+              <div className="alert alert-danger">{requestsQuery.error?.message || t('doctorPayment.submitFailed')}</div>
             ) : requests.length === 0 ? (
               <div className="text-center py-5">
-                <p className="text-muted">No withdrawal requests found</p>
+                <p className="text-muted">{t('doctorPayment.empty')}</p>
               </div>
             ) : (
               <div className="custom-table">
@@ -132,12 +134,12 @@ const DoctorPayment = () => {
                   <table className="table table-center mb-0">
                     <thead>
                       <tr>
-                        <th>Date</th>
-                        <th>Payment Method</th>
-                        <th>Amount</th>
-                        <th>Fee</th>
-                        <th>Wallet Debit</th>
-                        <th>Status</th>
+                        <th>{t('doctorPayment.date')}</th>
+                        <th>{t('doctorPayment.paymentMethod')}</th>
+                        <th>{t('doctorPayment.amount')}</th>
+                        <th>{t('doctorPayment.fee')}</th>
+                        <th>{t('doctorPayment.walletDebit')}</th>
+                        <th>{t('doctorPayment.status')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -146,12 +148,12 @@ const DoctorPayment = () => {
                         const createdAt = r?.requestedAt || r?.createdAt
                         return (
                           <tr key={id}>
-                            <td>{createdAt ? new Date(createdAt).toLocaleDateString('en-GB') : '—'}</td>
+                            <td>{createdAt ? new Date(createdAt).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB') : '—'}</td>
                             <td>{r?.paymentMethod || '—'}</td>
                             <td>
                               <strong>€{Number(r?.amount || 0).toFixed(2)}</strong>
                               {r?.netAmount !== null && r?.netAmount !== undefined && r?.netAmount !== r?.amount && (
-                                <small className="d-block text-muted">You receive: €{Number(r.netAmount).toFixed(2)}</small>
+                                <small className="d-block text-muted">{t('doctorPayment.receive', { amount: `€${Number(r.netAmount).toFixed(2)}` })}</small>
                               )}
                             </td>
                             <td>
@@ -163,7 +165,7 @@ const DoctorPayment = () => {
                                   )}
                                 </>
                               ) : (
-                                <span className="text-muted">No fee</span>
+                                <span className="text-muted">{t('doctorPayment.noFee')}</span>
                               )}
                             </td>
                             <td>
@@ -216,58 +218,58 @@ const DoctorPayment = () => {
             <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Request Withdrawal</h5>
-                  <button type="button" className="btn-close" onClick={() => setWithdrawModalOpen(false)}></button>
+                  <h5 className="modal-title">{t('doctorPayment.requestTitle')}</h5>
+                  <button type="button" className="btn-close" onClick={() => setWithdrawModalOpen(false)} aria-label={t('doctorClinicHours.close')}></button>
                 </div>
                 <div className="modal-body">
                   <div className="form-group mb-3">
-                    <label>Available Balance</label>
+                    <label>{t('doctorPayment.availableBalance')}</label>
                     <input type="text" className="form-control" value={`€${Number(balance || 0).toFixed(2)}`} disabled />
                   </div>
                   <div className="form-group mb-3">
                     <label>
-                      Amount to Withdraw <span className="text-danger">*</span>
+                      {t('doctorPayment.amountToWithdraw')} <span className="text-danger">*</span>
                     </label>
                     <input
                       type="number"
                       className="form-control"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      placeholder="Enter amount"
+                      placeholder={t('doctorPayment.enterAmount')}
                       min="0"
                       max={Number(balance || 0)}
                       step="0.01"
                     />
                     <small className="form-text text-muted">
-                      Any withdrawal fee is withheld from this payout amount; it does not add to your wallet debit.
+                      {t('doctorPayment.feeHelper')}
                     </small>
                   </div>
                   <div className="form-group mb-3">
                     <label>
-                      Payment Method <span className="text-danger">*</span>
+                      {t('doctorPayment.paymentMethod')} <span className="text-danger">*</span>
                     </label>
                     <select className="form-control" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-                      <option value="STRIPE">Stripe</option>
-                      <option value="BANK_TRANSFER">Bank Transfer</option>
-                      <option value="PAYPAL">PayPal</option>
+                      <option value="STRIPE">{t('doctorCommon.stripe')}</option>
+                      <option value="BANK_TRANSFER">{t('doctorCommon.bankTransfer')}</option>
+                      <option value="PAYPAL">{t('doctorCommon.paypal')}</option>
                     </select>
                   </div>
                   <div className="form-group mb-3">
                     <label>
-                      Payout Details <span className="text-danger">*</span>
+                      {t('doctorPayment.payoutDetails')} <span className="text-danger">*</span>
                     </label>
                     <textarea
                       className="form-control"
                       rows="3"
                       value={paymentDetails}
                       onChange={(e) => setPaymentDetails(e.target.value)}
-                      placeholder="IBAN / account no / PayPal email / Stripe email"
+                      placeholder={t('doctorPayment.payoutPlaceholder')}
                     ></textarea>
                   </div>
                 </div>
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={() => setWithdrawModalOpen(false)}>
-                    Cancel
+                    {t('doctorPayment.cancel')}
                   </button>
                   <button
                     type="button"
@@ -275,7 +277,7 @@ const DoctorPayment = () => {
                     onClick={submitWithdrawal}
                     disabled={requestWithdrawal.isPending || !amount || !paymentDetails.trim()}
                   >
-                    {requestWithdrawal.isPending ? 'Submitting...' : 'Submit Request'}
+                    {requestWithdrawal.isPending ? t('doctorPayment.submitting') : t('doctorPayment.submitRequest')}
                   </button>
                 </div>
               </div>

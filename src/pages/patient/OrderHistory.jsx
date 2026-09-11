@@ -6,8 +6,10 @@ import { useOrders } from '../../queries/orderQueries'
 import { useCancelOrder, usePayForOrder } from '../../mutations/orderMutations'
 import { getImageUrl } from '../../utils/apiConfig'
 import { deliveryStatusBadgeClass, formatDeliveryStatus } from '../../utils/deliveryMonitoring'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const OrderHistory = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [filter, setFilter] = useState('all')
 
@@ -41,20 +43,20 @@ const OrderHistory = () => {
   const onPay = async (orderId) => {
     try {
       await payMutation.mutateAsync({ orderId, data: { paymentMethod: 'STRIPE' } })
-      toast.success('Payment successful')
+      toast.success(t('patient.paymentSuccessful'))
     } catch (error) {
-      toast.error(error?.message || 'Payment failed')
+      toast.error(error?.message || t('patient.paymentFailed'))
     }
   }
 
   const onCancel = async (orderId) => {
-    const ok = window.confirm('Cancel this order?')
+    const ok = window.confirm(t('patient.cancelThisOrder'))
     if (!ok) return
     try {
       await cancelMutation.mutateAsync(orderId)
-      toast.success('Order cancelled')
+      toast.success(t('patient.orderCancelled'))
     } catch (error) {
-      toast.error(error?.message || 'Cancel failed')
+      toast.error(error?.message || t('patient.cancelFailed'))
     }
   }
 
@@ -69,9 +71,9 @@ const OrderHistory = () => {
             <div className="dashboard-header">
               <div className="d-flex align-items-center mb-3">
                 <button className="btn btn-outline-secondary me-3" onClick={() => navigate(-1)}>
-                  <i className="fa-solid fa-chevron-left me-1"></i> Back
+                  <i className="fa-solid fa-chevron-left me-1"></i> {t('patient.back')}
                 </button>
-                <h3 className="mb-0">Order History</h3>
+                <h3 className="mb-0">{t('patient.orderHistory')}</h3>
               </div>
             </div>
 
@@ -84,30 +86,30 @@ const OrderHistory = () => {
                       className={`btn btn-sm ${filter === 'all' ? 'btn-primary' : 'btn-outline-primary'}`}
                       onClick={() => setFilter('all')}
                     >
-                      All Orders
+                      {t('patient.allOrders')}
                     </button>
                     <button
                       className={`btn btn-sm ${filter === 'delivered' ? 'btn-primary' : 'btn-outline-primary'}`}
                       onClick={() => setFilter('delivered')}
                     >
-                      Delivered
+                      {t('patient.delivered')}
                     </button>
                     <button
                       className={`btn btn-sm ${filter === 'shipped' ? 'btn-primary' : 'btn-outline-primary'}`}
                       onClick={() => setFilter('shipped')}
                     >
-                      Shipped
+                      {t('patient.shipped')}
                     </button>
                     <button
                       className={`btn btn-sm ${filter === 'cancelled' ? 'btn-primary' : 'btn-outline-primary'}`}
                       onClick={() => setFilter('cancelled')}
                     >
-                      Cancelled
+                      {t('patient.cancelled')}
                     </button>
                   </div>
                   <Link to="/pharmacy-index" className="btn btn-primary btn-sm">
                     <i className="fe fe-shopping-cart me-2"></i>
-                    Continue Shopping
+                    {t('patient.continueShopping')}
                   </Link>
                 </div>
               </div>
@@ -117,16 +119,16 @@ const OrderHistory = () => {
             <div className="card">
               <div className="card-body">
                 {ordersQuery.isLoading ? (
-                  <div className="text-center py-5 text-muted">Loading orders...</div>
+                  <div className="text-center py-5 text-muted">{t('patient.loadingOrders')}</div>
                 ) : ordersQuery.isError ? (
-                  <div className="alert alert-danger">{ordersQuery.error?.message || 'Failed to load orders'}</div>
+                  <div className="alert alert-danger">{ordersQuery.error?.message || t('patient.failedLoadOrders')}</div>
                 ) : orders.length === 0 ? (
                   <div className="text-center py-5">
                     <i className="fe fe-package" style={{ fontSize: '64px', color: '#dee2e6' }}></i>
-                    <h5 className="mt-3">No orders found</h5>
-                    <p className="text-muted">You haven't placed any orders yet.</p>
+                    <h5 className="mt-3">{t('patient.noOrdersFound')}</h5>
+                    <p className="text-muted">{t('patient.noOrdersYet')}</p>
                     <Link to="/pharmacy-index" className="btn btn-primary mt-3">
-                      Start Shopping
+                      {t('patient.startShopping')}
                     </Link>
                   </div>
                 ) : (
@@ -149,16 +151,16 @@ const OrderHistory = () => {
                             <h5 className="mb-1">Order #{orderNo}</h5>
                             <p className="text-muted small mb-0">
                               <i className="fe fe-calendar me-1"></i>
-                              Ordered on {createdAt}
+                              {t('patient.orderedOn')} {createdAt}
                             </p>
                             {paymentStatus === 'UNPAID' && !shippingSet && (
                               <div className="text-muted small mt-1">
-                                Waiting for pharmacy to set shipping fee
+                                {t('patient.waitingShippingFee')}
                               </div>
                             )}
                             {order?.expectedDeliveryDate && (
                               <div className="text-muted small mt-1">
-                                Estimated delivery: {new Date(order.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                {t('patient.estimatedDelivery')}: {new Date(order.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                               </div>
                             )}
                           </div>
@@ -171,14 +173,14 @@ const OrderHistory = () => {
                                 </span>
                               </div>
                             )}
-                            <div className="text-muted small">Payment: {paymentStatus || '—'}</div>
-                            <h5 className="mt-2 mb-0">Total: €{Number(order?.total || 0).toFixed(2)}</h5>
+                            <div className="text-muted small">{t('patient.payment')}: {paymentStatus || '—'}</div>
+                            <h5 className="mt-2 mb-0">{t('patient.total')}: €{Number(order?.total || 0).toFixed(2)}</h5>
                           </div>
                         </div>
 
                         {/* Order Items */}
                         <div className="order-items mb-3">
-                          <h6 className="mb-2">Items:</h6>
+                          <h6 className="mb-2">{t('patient.items')}:</h6>
                           <ul className="list-unstyled">
                             {(order?.items || []).map((item) => {
                               const p = item?.productId
@@ -211,16 +213,16 @@ const OrderHistory = () => {
                           </div>
                           <div className="order-actions">
                             <Link className="btn btn-sm btn-outline-primary me-2" to={`/order-details/${id}`}>
-                              View Details
+                              {t('patient.viewDetails')}
                             </Link>
                             {canPay && (
                               <button className="btn btn-sm btn-primary me-2" onClick={() => onPay(id)} disabled={payMutation.isPending}>
-                                Pay Now
+                                {t('patient.payNow')}
                               </button>
                             )}
                             {canCancel && (
                               <button className="btn btn-sm btn-outline-danger" onClick={() => onCancel(id)} disabled={cancelMutation.isPending}>
-                                Cancel Order
+                                {t('patient.cancelOrder')}
                               </button>
                             )}
                           </div>

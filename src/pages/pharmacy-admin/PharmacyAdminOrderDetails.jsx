@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 import { useOrder } from '../../queries/orderQueries'
 import { useUpdateOrderStatus, useUpdateShippingFee } from '../../mutations/orderMutations'
@@ -15,6 +16,7 @@ import {
 const STATUS_OPTIONS = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED']
 
 const PharmacyAdminOrderDetails = () => {
+  const { t, language } = useLanguage()
   const { orderId } = useParams()
 
   const orderQuery = useOrder(orderId)
@@ -44,7 +46,7 @@ const PharmacyAdminOrderDetails = () => {
   const formatDate = (dateString) => {
     if (!dateString) return '—'
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-GB', {
+    return date.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -81,34 +83,34 @@ const PharmacyAdminOrderDetails = () => {
   const submitShippingFee = async () => {
     const fee = Number(shippingFee)
     if (!Number.isFinite(fee) || fee < 0) {
-      toast.error('Please enter a valid shipping fee (non-negative number)')
+      toast.error(t('pharmacyAdmin.orderDetails.validShippingFee'))
       return
     }
     const selectedDeliveryDays = Number(deliveryDays)
     if (!DELIVERY_DAY_OPTIONS.includes(selectedDeliveryDays)) {
-      toast.error('Please select an expected delivery time between 2 and 5 days')
+      toast.error(t('pharmacyAdmin.orderDetails.validDeliveryTime'))
       return
     }
 
     try {
       await updateShippingFeeMutation.mutateAsync({ orderId, shippingFee: fee, deliveryDays: selectedDeliveryDays })
-      toast.success('Shipping fee and delivery commitment sent')
+      toast.success(t('pharmacyAdmin.orderDetails.shippingSent'))
       setShowShippingModal(false)
       setShippingFee('')
       setDeliveryDays('')
       orderQuery.refetch()
     } catch (error) {
-      toast.error(error?.message || 'Failed to update shipping fee')
+      toast.error(error?.message || t('pharmacyAdmin.orderDetails.shippingFailed'))
     }
   }
 
   const setOrderStatus = async (status) => {
     try {
       await updateStatusMutation.mutateAsync({ orderId, data: { status } })
-      toast.success('Order updated')
+      toast.success(t('pharmacyAdmin.orderDetails.orderUpdated'))
       orderQuery.refetch()
     } catch (error) {
-      toast.error(error?.message || 'Failed to update order')
+      toast.error(error?.message || t('pharmacyAdmin.orderDetails.updateFailed'))
     }
   }
 
@@ -118,9 +120,9 @@ const PharmacyAdminOrderDetails = () => {
         <div className="container">
           <div className="text-center py-5">
             <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
+              <span className="visually-hidden">{t('pharmacyAdmin.orderDetails.loading')}</span>
             </div>
-            <p className="mt-3">Loading order details...</p>
+            <p className="mt-3">{t('pharmacyAdmin.orderDetails.loadingText')}</p>
           </div>
         </div>
       </div>
@@ -133,10 +135,10 @@ const PharmacyAdminOrderDetails = () => {
         <div className="container">
           <div className="text-center py-5">
             <i className="fe fe-alert-circle" style={{ fontSize: '64px', color: '#dc3545' }}></i>
-            <h5 className="mt-3">Error Loading Order</h5>
-            <p className="text-muted">{orderQuery.error?.message || 'Failed to load order details'}</p>
+            <h5 className="mt-3">{t('pharmacyAdmin.orderDetails.errorTitle')}</h5>
+            <p className="text-muted">{orderQuery.error?.message || t('pharmacyAdmin.orderDetails.failed')}</p>
             <button className="btn btn-primary mt-3" onClick={() => orderQuery.refetch()}>
-              Retry
+              {t('pharmacyAdmin.orderDetails.retry')}
             </button>
           </div>
         </div>
@@ -149,17 +151,17 @@ const PharmacyAdminOrderDetails = () => {
 
   const total = Number(order?.total ?? order?.finalTotal ?? order?.initialTotal ?? 0)
   const expectedDeliveryDate = order?.expectedDeliveryDate
-    ? new Date(order.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })
+    ? new Date(order.expectedDeliveryDate).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { day: '2-digit', month: 'long', year: 'numeric' })
     : '—'
 
   return (
     <div className="content">
       <div className="container">
         <div className="dashboard-header d-flex justify-content-between align-items-center">
-          <h3>Order Details</h3>
+          <h3>{t('pharmacyAdmin.orderDetails.title')}</h3>
           <Link to="/pharmacy-admin/orders" className="btn btn-outline-primary btn-sm">
             <i className="fe fe-arrow-left me-2"></i>
-            Back to Orders
+            {t('pharmacyAdmin.orderDetails.back')}
           </Link>
         </div>
 
@@ -167,9 +169,9 @@ const PharmacyAdminOrderDetails = () => {
           <div className="card-body">
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <p className="text-muted mb-1">Order Number</p>
+                <p className="text-muted mb-1">{t('pharmacyAdmin.orderDetails.orderNumber')}</p>
                 <h4 className="mb-0">#{orderNo}</h4>
-                <p className="text-muted small mb-0 mt-2">Order Date: {formatDate(order?.createdAt)}</p>
+                <p className="text-muted small mb-0 mt-2">{t('pharmacyAdmin.orderDetails.orderDate')}: {formatDate(order?.createdAt)}</p>
               </div>
               <div className="text-end">
                 {getStatusBadge(order?.status)}
@@ -181,27 +183,27 @@ const PharmacyAdminOrderDetails = () => {
 
         <div className="card mb-4">
           <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <h4 className="card-title mb-0">Delivery Commitment</h4>
+            <h4 className="card-title mb-0">{t('pharmacyAdmin.orderDetails.deliveryCommitment')}</h4>
             {order?.expectedDeliveryDate ? (
               <span className={`badge ${deliveryStatusBadgeClass(order?.deliveryStatus)}`}>
                 {formatDeliveryStatus(order?.deliveryStatus, order?.daysLate)}
               </span>
             ) : (
-              <span className="badge badge-secondary">Awaiting Delivery</span>
+              <span className="badge badge-secondary">{t('pharmacyAdmin.orderDetails.awaitingDelivery')}</span>
             )}
           </div>
           <div className="card-body">
             <div className="row g-3">
-              <div className="col-md-4"><strong>Estimated delivery</strong><div className="text-muted">2–5 Days</div></div>
-              <div className="col-md-4"><strong>Pharmacy promise</strong><div className="text-muted">{order?.promisedDeliveryDays ? `${order.promisedDeliveryDays} Days` : 'Not set'}</div></div>
-              <div className="col-md-4"><strong>Expected delivery date</strong><div className="text-muted">{expectedDeliveryDate}</div></div>
-              <div className="col-md-4"><strong>Order requested</strong><div className="text-muted">{formatDate(order?.requestedAt || order?.createdAt)}</div></div>
-              <div className="col-md-4"><strong>Payment request sent</strong><div className="text-muted">{formatDate(order?.shippingFeeAddedAt || order?.shippingUpdatedAt)}</div></div>
-              <div className="col-md-4"><strong>Customer paid</strong><div className="text-muted">{formatDate(order?.customerPaidAt)}</div></div>
+              <div className="col-md-4"><strong>{t('pharmacyAdmin.orderDetails.estimatedDelivery')}</strong><div className="text-muted">{t('pharmacyAdmin.orderDetails.daysRange')}</div></div>
+              <div className="col-md-4"><strong>{t('pharmacyAdmin.orderDetails.pharmacyPromise')}</strong><div className="text-muted">{order?.promisedDeliveryDays ? t('pharmacyAdmin.orderDetails.days', { count: order.promisedDeliveryDays }) : t('pharmacyAdmin.orderDetails.notSet')}</div></div>
+              <div className="col-md-4"><strong>{t('pharmacyAdmin.orderDetails.expectedDeliveryDate')}</strong><div className="text-muted">{expectedDeliveryDate}</div></div>
+              <div className="col-md-4"><strong>{t('pharmacyAdmin.orderDetails.orderRequested')}</strong><div className="text-muted">{formatDate(order?.requestedAt || order?.createdAt)}</div></div>
+              <div className="col-md-4"><strong>{t('pharmacyAdmin.orderDetails.paymentRequestSent')}</strong><div className="text-muted">{formatDate(order?.shippingFeeAddedAt || order?.shippingUpdatedAt)}</div></div>
+              <div className="col-md-4"><strong>{t('pharmacyAdmin.orderDetails.customerPaid')}</strong><div className="text-muted">{formatDate(order?.customerPaidAt)}</div></div>
               {order?.actualDeliveredAt && (
                 <>
-                  <div className="col-md-4"><strong>Delivered</strong><div className="text-muted">{formatDate(order.actualDeliveredAt)}</div></div>
-                  <div className="col-md-4"><strong>Actual delivery time</strong><div className="text-muted">{order.totalActualDeliveryDays ?? '—'} Days</div></div>
+                  <div className="col-md-4"><strong>{t('pharmacyAdmin.orderDetails.delivered')}</strong><div className="text-muted">{formatDate(order.actualDeliveredAt)}</div></div>
+                  <div className="col-md-4"><strong>{t('pharmacyAdmin.orderDetails.actualDeliveryTime')}</strong><div className="text-muted">{order.totalActualDeliveryDays ? t('pharmacyAdmin.orderDetails.days', { count: order.totalActualDeliveryDays }) : '—'}</div></div>
                 </>
               )}
             </div>
@@ -210,19 +212,19 @@ const PharmacyAdminOrderDetails = () => {
 
         <div className="card mb-4">
           <div className="card-header">
-            <h4 className="card-title mb-0">Customer Information</h4>
+            <h4 className="card-title mb-0">{t('pharmacyAdmin.orderDetails.customerInformation')}</h4>
           </div>
           <div className="card-body">
             <div className="row mb-2">
-              <div className="col-sm-4"><strong>Name:</strong></div>
+              <div className="col-sm-4"><strong>{t('pharmacyAdmin.orderDetails.name')}</strong></div>
               <div className="col-sm-8">{customer.name}</div>
             </div>
             <div className="row mb-2">
-              <div className="col-sm-4"><strong>Email:</strong></div>
+              <div className="col-sm-4"><strong>{t('pharmacyAdmin.orderDetails.email')}</strong></div>
               <div className="col-sm-8">{customer.email}</div>
             </div>
             <div className="row">
-              <div className="col-sm-4"><strong>Phone:</strong></div>
+              <div className="col-sm-4"><strong>{t('pharmacyAdmin.orderDetails.phone')}</strong></div>
               <div className="col-sm-8">{customer.phone}</div>
             </div>
           </div>
@@ -231,7 +233,7 @@ const PharmacyAdminOrderDetails = () => {
         {order?.shippingAddress && (order.shippingAddress.line1 || order.shippingAddress.city) && (
           <div className="card mb-4">
             <div className="card-header">
-              <h4 className="card-title mb-0">Shipping Address</h4>
+              <h4 className="card-title mb-0">{t('pharmacyAdmin.orderDetails.shippingAddress')}</h4>
             </div>
             <div className="card-body">
               <p className="mb-1">{order.shippingAddress?.line1}</p>
@@ -246,7 +248,7 @@ const PharmacyAdminOrderDetails = () => {
 
         <div className="card mb-4">
           <div className="card-header">
-            <h4 className="card-title mb-0">Order Items</h4>
+            <h4 className="card-title mb-0">{t('pharmacyAdmin.orderDetails.orderItems')}</h4>
           </div>
           <div className="card-body">
             {(order?.items || []).map((item, index) => {
@@ -280,16 +282,16 @@ const PharmacyAdminOrderDetails = () => {
 
         <div className="card mb-4">
           <div className="card-header">
-            <h4 className="card-title mb-0">Order Summary</h4>
+            <h4 className="card-title mb-0">{t('pharmacyAdmin.orderDetails.orderSummary')}</h4>
           </div>
           <div className="card-body">
             <div className="d-flex justify-content-between mb-2">
-              <span>Subtotal</span>
+              <span>{t('pharmacyAdmin.orderDetails.subtotal')}</span>
               <span>€{Number(order?.subtotal || 0).toFixed(2)}</span>
             </div>
             <div className="d-flex justify-content-between mb-2">
               <div>
-                <span>Shipping</span>
+                <span>{t('pharmacyAdmin.orderDetails.shipping')}</span>
                 {shippingSet && order?.initialShipping !== undefined && order?.initialShipping !== order?.shipping && (
                   <small className="text-muted d-block">
                     Updated from €{Number(order?.initialShipping || 0).toFixed(2)}
@@ -305,7 +307,7 @@ const PharmacyAdminOrderDetails = () => {
             </div>
             <hr />
             <div className="d-flex justify-content-between">
-              <strong>Total</strong>
+              <strong>{t('pharmacyAdmin.orderDetails.total')}</strong>
               <strong>€{total.toFixed(2)}</strong>
             </div>
           </div>
@@ -320,7 +322,7 @@ const PharmacyAdminOrderDetails = () => {
                 onClick={openShippingModal}
                 disabled={updateShippingFeeMutation.isPending || isPaid}
               >
-                {shippingSet ? 'Update Shipping Fee' : 'Set Shipping Fee'}
+                {shippingSet ? t('pharmacyAdmin.orderDetails.updateShippingFee') : t('pharmacyAdmin.orderDetails.setShippingFee')}
               </button>
 
               <select
@@ -329,13 +331,13 @@ const PharmacyAdminOrderDetails = () => {
                 value={order?.status || ''}
                 onChange={(e) => setOrderStatus(e.target.value)}
                 disabled={updateStatusMutation.isPending}
-                title={!isPaid ? 'Only CANCELLED is allowed before payment' : undefined}
+                title={!isPaid ? t('pharmacyAdmin.orderDetails.onlyCancelled') : undefined}
               >
                 {STATUS_OPTIONS.map((s) => {
                   const optionDisabled = !isPaid && s !== 'CANCELLED' && s !== String(order?.status || '').toUpperCase()
                   return (
                     <option key={s} value={s} disabled={optionDisabled}>
-                      {s}
+                      {t(`pharmacyAdmin.dashboard.${s.toLowerCase()}`) || s}
                     </option>
                   )
                 })}
@@ -351,7 +353,7 @@ const PharmacyAdminOrderDetails = () => {
             <div className="modal-dialog" role="document">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Set Shipping Fee</h5>
+                  <h5 className="modal-title">{t('pharmacyAdmin.orderDetails.setShippingFee')}</h5>
                   <button
                     type="button"
                     className="btn-close"
@@ -364,7 +366,7 @@ const PharmacyAdminOrderDetails = () => {
                 </div>
                 <div className="modal-body">
                   <div className="mb-3">
-                    <label className="form-label">Shipping Fee (EUR)</label>
+                    <label className="form-label">{t('pharmacyAdmin.orderDetails.shippingFee')}</label>
                     <input
                       type="number"
                       className="form-control"
@@ -380,17 +382,17 @@ const PharmacyAdminOrderDetails = () => {
                     )}
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Expected Delivery Time <span className="text-danger">*</span></label>
+                    <label className="form-label">{t('pharmacyAdmin.orderDetails.expectedDeliveryTime')} <span className="text-danger">*</span></label>
                     <select className="form-select" value={deliveryDays} onChange={(e) => setDeliveryDays(e.target.value)} required>
-                      <option value="">Select delivery time</option>
-                      {DELIVERY_DAY_OPTIONS.map((days) => <option key={days} value={days}>{days} Days</option>)}
+                      <option value="">{t('pharmacyAdmin.orderDetails.selectDeliveryTime')}</option>
+                      {DELIVERY_DAY_OPTIONS.map((days) => <option key={days} value={days}>{t('pharmacyAdmin.orderDetails.days', { count: days })}</option>)}
                     </select>
                     {calculateExpectedDeliveryPreview(deliveryDays) && (
                       <small className="text-muted d-block mt-2">
                         Expected delivery date: {calculateExpectedDeliveryPreview(deliveryDays).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
                       </small>
                     )}
-                    <small className="text-muted d-block mt-1">Only 2–5 days can be promised. The delivery date is calculated automatically.</small>
+                    <small className="text-muted d-block mt-1">{t('pharmacyAdmin.orderDetails.promiseHint')}</small>
                   </div>
                 </div>
                 <div className="modal-footer">
@@ -403,10 +405,10 @@ const PharmacyAdminOrderDetails = () => {
                       setDeliveryDays('')
                     }}
                   >
-                    Cancel
+                    {t('pharmacyAdmin.orderDetails.cancel')}
                   </button>
                   <button type="button" className="btn btn-primary" onClick={submitShippingFee} disabled={updateShippingFeeMutation.isPending}>
-                    {updateShippingFeeMutation.isPending ? 'Saving...' : 'Save'}
+                    {updateShippingFeeMutation.isPending ? t('pharmacyAdmin.orderDetails.saving') : t('pharmacyAdmin.orderDetails.save')}
                   </button>
                 </div>
               </div>

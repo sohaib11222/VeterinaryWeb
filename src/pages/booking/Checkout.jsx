@@ -7,8 +7,10 @@ import { useVeterinarianPublicProfile, usePets } from '../../queries'
 import { useCreateAppointment } from '../../mutations/appointmentMutations'
 import { useProcessAppointmentPayment } from '../../mutations/paymentMutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const Checkout = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const { user } = useAuth()
   const [searchParams] = useSearchParams()
@@ -32,7 +34,7 @@ const Checkout = () => {
 
   const { data: vetProfileResponse, isLoading: vetLoading } = useVeterinarianPublicProfile(bookingDetails.veterinarianId)
   const vetProfile = useMemo(() => vetProfileResponse?.data ?? vetProfileResponse ?? null, [vetProfileResponse])
-  const vetName = vetProfile?.userId?.name || vetProfile?.userId?.fullName || vetProfile?.name || 'Veterinarian'
+  const vetName = vetProfile?.userId?.name || vetProfile?.userId?.fullName || vetProfile?.name || t('booking.veterinarian')
   const vetImage = getImageUrl(vetProfile?.userId?.profileImage) || '/assets/img/doctors/doctor-thumb-02.jpg'
 
   const consultationFee = useMemo(() => {
@@ -61,17 +63,17 @@ const Checkout = () => {
     e.preventDefault()
 
     if (!termsAccepted) {
-      toast.error('Please accept the terms and conditions')
+      toast.error(t('booking.acceptTerms'))
       return
     }
 
     if (!consultationFee) {
-      toast.error('Consultation fee is not set for this appointment type')
+      toast.error(t('booking.feeMissing'))
       return
     }
 
     if (!bookingDetails.veterinarianId || !bookingDetails.petId) {
-      toast.error('Invalid booking details. Please go back and try again.')
+      toast.error(t('booking.invalidHint'))
       return
     }
 
@@ -97,7 +99,7 @@ const Checkout = () => {
       const appointmentId = appointment?._id
 
       if (!appointmentId) {
-        throw new Error('Failed to create appointment')
+        throw new Error(t('booking.paymentFailed'))
       }
 
       // 2. Process payment for the appointment
@@ -107,11 +109,11 @@ const Checkout = () => {
         paymentMethod,
       })
 
-      toast.success('Payment successful! Appointment booked.')
+      toast.success(t('booking.paymentSuccess'))
       navigate(`/booking-success?appointmentId=${appointmentId}`)
     } catch (err) {
       console.error('Checkout error:', err)
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to process payment')
+      toast.error(err?.response?.data?.message || err?.message || t('booking.paymentFailed'))
     } finally {
       setIsProcessing(false)
     }
@@ -125,9 +127,9 @@ const Checkout = () => {
           <div className="row">
             <div className="col-lg-8 mx-auto">
               <div className="alert alert-warning">
-                <h5>Invalid Booking</h5>
-                <p>No booking details found. Please start from the booking page.</p>
-                <Link className="btn btn-primary" to="/search">Find a Veterinarian</Link>
+                <h5>{t('booking.invalid')}</h5>
+                <p>{t('booking.invalidHint')}</p>
+                <Link className="btn btn-primary" to="/search">{t('booking.findVet')}</Link>
               </div>
             </div>
           </div>
@@ -146,11 +148,11 @@ const Checkout = () => {
                 <div className="card-body">
                   <form onSubmit={handleSubmit}>
                     <div className="info-widget">
-                      <h4 className="card-title">My Pet Information</h4>
+                      <h4 className="card-title">{t('booking.petInformation')}</h4>
                       <div className="row">
                         <div className="col-md-6 col-sm-12">
                           <div className="mb-3 card-label">
-                            <label className="mb-2">Name</label>
+                            <label className="mb-2">{t('booking.name')}</label>
                             <input
                               className="form-control"
                               type="text"
@@ -161,7 +163,7 @@ const Checkout = () => {
                         </div>
                         <div className="col-md-6 col-sm-12">
                           <div className="mb-3 card-label">
-                            <label className="mb-2">Email</label>
+                            <label className="mb-2">{t('booking.email')}</label>
                             <input
                               className="form-control"
                               type="email"
@@ -172,18 +174,18 @@ const Checkout = () => {
                         </div>
                         <div className="col-md-6 col-sm-12">
                           <div className="mb-3 card-label">
-                            <label className="mb-2">Pet</label>
+                            <label className="mb-2">{t('booking.pet')}</label>
                             <input
                               className="form-control"
                               type="text"
-                              value={selectedPet ? `${selectedPet.name} (${selectedPet.species || selectedPet.breed || 'Pet'})` : 'Loading...'}
+                              value={selectedPet ? `${selectedPet.name} (${selectedPet.species || selectedPet.breed || t('booking.pet')})` : t('booking.loading')}
                               disabled
                             />
                           </div>
                         </div>
                         <div className="col-md-6 col-sm-12">
                           <div className="mb-3 card-label">
-                            <label className="mb-2">Reason</label>
+                            <label className="mb-2">{t('booking.reason')}</label>
                             <input
                               className="form-control"
                               type="text"
@@ -196,14 +198,14 @@ const Checkout = () => {
                     </div>
 
                     <div className="payment-widget">
-                      <h4 className="card-title">Payment Method</h4>
+                      <h4 className="card-title">{t('booking.paymentMethod')}</h4>
 
                       <div className="payment-list">
                         <div className="payment-radio paypal-option d-flex align-items-center">
                           <span className="checkmark"></span>
                           <div>
-                            <strong>Stripe</strong>
-                            <small className="d-block text-muted">Secure payment is processed with Stripe.</small>
+                            <strong>{t('booking.stripe')}</strong>
+                            <small className="d-block text-muted">{t('booking.secureStripe')}</small>
                           </div>
                         </div>
                       </div>
@@ -217,7 +219,7 @@ const Checkout = () => {
                             onChange={(e) => setTermsAccepted(e.target.checked)}
                           />
                           <label htmlFor="terms_accept" className="ms-2">
-                            I have read and accept <Link to="/terms-condition">Terms & Conditions</Link>
+                            {t('booking.termsAccept')} <Link to="/terms-condition">{t('booking.terms')}</Link>
                           </label>
                         </div>
                       </div>
@@ -229,7 +231,7 @@ const Checkout = () => {
                           onClick={() => navigate(-1)}
                           disabled={isProcessing}
                         >
-                          Back
+                          {t('booking.back')}
                         </button>
                         <button
                           type="submit"
@@ -239,10 +241,10 @@ const Checkout = () => {
                           {isProcessing ? (
                             <>
                               <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                              Processing...
+                              {t('booking.processing')}
                             </>
                           ) : (
-                            consultationFee ? `Confirm and Pay €${totalAmount.toFixed(2)}` : 'Fee not set'
+                            consultationFee ? t('booking.confirmPay', { amount: `€${totalAmount.toFixed(2)}` }) : t('booking.feeNotSet')
                           )}
                         </button>
                       </div>
@@ -255,37 +257,37 @@ const Checkout = () => {
             <div className="col-md-5 col-lg-4 theiaStickySidebar">
               <div className="card booking-card">
                 <div className="card-header">
-                  <h4 className="card-title">Booking Summary</h4>
+                  <h4 className="card-title">{t('booking.summary')}</h4>
                 </div>
                 <div className="card-body">
                   <div className="booking-doc-info">
                     <Link to={`/doctor-profile/${bookingDetails.veterinarianId}`} className="booking-doc-img">
-                      <img src={vetImage} alt="Veterinarian" />
+                      <img src={vetImage} alt={t('booking.veterinarian')} />
                     </Link>
                     <div className="booking-info">
                       <h4>
                         <Link to={`/doctor-profile/${bookingDetails.veterinarianId}`}>
-                          {vetLoading ? 'Loading...' : vetName}
+                          {vetLoading ? t('booking.loading') : vetName}
                         </Link>
                       </h4>
-                      <p className="text-muted mb-0">Veterinarian</p>
+                      <p className="text-muted mb-0">{t('booking.veterinarian')}</p>
                     </div>
                   </div>
 
                   <div className="booking-summary">
                     <div className="booking-item-wrap">
                       <ul className="booking-date">
-                        <li>Date: <span>{bookingDetails.appointmentDate ? new Date(bookingDetails.appointmentDate).toLocaleDateString() : '—'}</span></li>
-                        <li>Time: <span>{bookingDetails.appointmentTime || '—'}</span></li>
-                        <li>Type: <span>{bookingDetails.bookingType === 'ONLINE' ? 'Video Consultation' : 'Clinic Visit'}</span></li>
+                        <li>{t('booking.date')}: <span>{bookingDetails.appointmentDate ? new Date(bookingDetails.appointmentDate).toLocaleDateString() : '—'}</span></li>
+                        <li>{t('booking.time')}: <span>{bookingDetails.appointmentTime || '—'}</span></li>
+                        <li>{t('booking.type')}: <span>{bookingDetails.bookingType === 'ONLINE' ? t('booking.onlineConsultation') : t('booking.clinicVisit')}</span></li>
                       </ul>
                       <ul className="booking-fee">
-                        <li>Consultation Fee <span>{consultationFee ? `€${consultationFee.toFixed(2)}` : '—'}</span></li>
+                        <li>{t('booking.consultationFee')} <span>{consultationFee ? `€${consultationFee.toFixed(2)}` : '—'}</span></li>
                       </ul>
                       <div className="booking-total">
                         <ul className="booking-total-list">
                           <li>
-                            <span>Total</span>
+                            <span>{t('booking.total')}</span>
                             <span className="total-cost">{consultationFee ? `€${totalAmount.toFixed(2)}` : '—'}</span>
                           </li>
                         </ul>

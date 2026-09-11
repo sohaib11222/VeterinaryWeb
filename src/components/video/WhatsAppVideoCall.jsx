@@ -1,4 +1,5 @@
 import { ParticipantView, useCallStateHooks } from '@stream-io/video-react-sdk'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const MediaTile = ({ className, participant, fallbackText, title, role }) => (
   <section className={`whatsapp-call__tile ${className}`}>
@@ -19,6 +20,7 @@ const MediaTile = ({ className, participant, fallbackText, title, role }) => (
 )
 
 const WhatsAppVideoCall = ({ onEndCall, remoteRole, localRole, remoteFallback }) => {
+  const { t } = useLanguage()
   const { useCallCallingState, useParticipants, useMicrophoneState, useCameraState } = useCallStateHooks()
   const callingState = useCallCallingState()
   const participants = useParticipants()
@@ -29,8 +31,8 @@ const WhatsAppVideoCall = ({ onEndCall, remoteRole, localRole, remoteFallback })
     return (
       <div className="whatsapp-call whatsapp-call--joining">
         <div className="whatsapp-call__joining-content">
-          <div className="spinner-border text-light" role="status" aria-label="Joining video call" />
-          <p>Joining call…</p>
+          <div className="spinner-border text-light" role="status" aria-label={t('videoCall.joining')} />
+          <p>{t('videoCall.joiningCall')}</p>
         </div>
       </div>
     )
@@ -40,7 +42,7 @@ const WhatsAppVideoCall = ({ onEndCall, remoteRole, localRole, remoteFallback })
   const remoteParticipant = participants.find((participant) => !participant.isLocalParticipant) || null
   const getName = (participant, fallback) => participant?.user?.name || participant?.name || fallback
   const remoteName = getName(remoteParticipant, remoteRole)
-  const localName = getName(localParticipant, 'You')
+  const localName = getName(localParticipant, t('common.you', 'You'))
 
   const toggleMic = async () => {
     if (micState.microphone.enabled) await micState.microphone.disable()
@@ -91,17 +93,17 @@ const WhatsAppVideoCall = ({ onEndCall, remoteRole, localRole, remoteFallback })
       `}</style>
       <main className="whatsapp-call__stage">
         <MediaTile className="whatsapp-call__remote" participant={remoteParticipant} fallbackText={remoteFallback} title={remoteName} role={remoteRole} />
-        <MediaTile className="whatsapp-call__local" participant={localParticipant} fallbackText="Starting your camera…" title={localName} role={localRole} />
+        <MediaTile className="whatsapp-call__local" participant={localParticipant} fallbackText={t('videoCall.startingCameraFallback')} title={localName} role={localRole} />
         <header className="whatsapp-call__header">
-          <div><strong>{remoteName}</strong><span>Video consultation</span></div>
-          <div className="whatsapp-call__status">Connected</div>
+          <div><strong>{remoteName}</strong><span>{t('videoCall.consultation')}</span></div>
+          <div className="whatsapp-call__status">{t('videoCall.connected')}</div>
         </header>
-        <footer className="whatsapp-call__controls" aria-label="Call controls">
-          <button className={`whatsapp-call__button ${micState.microphone.enabled ? '' : 'whatsapp-call__button--disabled'}`} onClick={toggleMic} title={micState.microphone.enabled ? 'Mute microphone' : 'Unmute microphone'} aria-label={micState.microphone.enabled ? 'Mute microphone' : 'Unmute microphone'}>
+        <footer className="whatsapp-call__controls" aria-label={t('videoCall.controls')}>
+          <button className={`whatsapp-call__button ${micState.microphone.enabled ? '' : 'whatsapp-call__button--disabled'}`} onClick={toggleMic} title={micState.microphone.enabled ? t('videoCall.mute') : t('videoCall.unmute')} aria-label={micState.microphone.enabled ? t('videoCall.mute') : t('videoCall.unmute')}>
             <i className={`fa-solid ${micState.microphone.enabled ? 'fa-microphone' : 'fa-microphone-slash'}`} />
           </button>
-          <button className="whatsapp-call__button whatsapp-call__button--end" onClick={onEndCall} title="End call" aria-label="End call"><i className="fa-solid fa-phone-slash" /></button>
-          <button className={`whatsapp-call__button ${cameraState.camera.enabled ? '' : 'whatsapp-call__button--disabled'}`} onClick={toggleCamera} title={cameraState.camera.enabled ? 'Turn camera off' : 'Turn camera on'} aria-label={cameraState.camera.enabled ? 'Turn camera off' : 'Turn camera on'}>
+          <button className="whatsapp-call__button whatsapp-call__button--end" onClick={onEndCall} title={t('videoCall.end')} aria-label={t('videoCall.end')}><i className="fa-solid fa-phone-slash" /></button>
+          <button className={`whatsapp-call__button ${cameraState.camera.enabled ? '' : 'whatsapp-call__button--disabled'}`} onClick={toggleCamera} title={cameraState.camera.enabled ? t('videoCall.cameraOff') : t('videoCall.cameraOn')} aria-label={cameraState.camera.enabled ? t('videoCall.cameraOff') : t('videoCall.cameraOn')}>
             <i className={`fa-solid ${cameraState.camera.enabled ? 'fa-video' : 'fa-video-slash'}`} />
           </button>
         </footer>

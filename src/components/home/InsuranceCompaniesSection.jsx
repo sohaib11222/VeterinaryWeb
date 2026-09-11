@@ -2,8 +2,10 @@ import { useMemo } from 'react'
 import Owlcarousel from 'react-owl-carousel'
 import { useActiveInsuranceCompanies } from '../../queries/insuranceQueries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const InsuranceCompaniesSection = () => {
+  const { t } = useLanguage()
   const { data: res, isLoading } = useActiveInsuranceCompanies({
     refetchOnWindowFocus: false,
     staleTime: 60_000,
@@ -41,11 +43,11 @@ const InsuranceCompaniesSection = () => {
         <div className="section-header-fourteen service-inner-fourteen text-center">
           <div className="service-inner-fourteen">
             <div className="service-inner-fourteen-two">
-              <h3>INSURANCE PARTNERS</h3>
+            <h3>{t('home.insuranceEyebrow')}</h3>
             </div>
           </div>
-          <h2>Accepted Insurance Companies</h2>
-          <p>We work with leading providers to make care accessible</p>
+          <h2>{t('home.acceptedInsurance')}</h2>
+          <p>{t('home.insuranceDescription')}</p>
         </div>
 
         <Owlcarousel className="owl-theme" {...options}>

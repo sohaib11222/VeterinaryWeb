@@ -4,6 +4,7 @@ import AOS from 'aos'
 import 'aos/dist/aos.css'
 
 import { useSpecializations } from '../../queries/specializationQueries'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { bath_tub, big_paw, bottel, injection, pet_doctor, small_paw } from '../../assets/images'
 
 const iconSet = [injection, bottel, bath_tub, pet_doctor]
@@ -17,6 +18,7 @@ const defaultItems = [
 
 const SpecializationsSection = () => {
   const { data } = useSpecializations()
+  const { t } = useLanguage()
 
   useEffect(() => {
     AOS.init({ duration: 1200, once: true })
@@ -56,11 +58,11 @@ const SpecializationsSection = () => {
             <div className="section-header-fourteen service-inner-fourteen">
               <div className="service-inner-fourteen">
                 <div className="service-inner-fourteen-two">
-                  <h3>OUR SPECIALIZATIONS</h3>
+                  <h3>{t('home.specializationsEyebrow')}</h3>
                 </div>
               </div>
-              <h2>Browse Specializations</h2>
-              <p>Find the right veterinarian for your pet</p>
+              <h2>{t('home.browseSpecializations')}</h2>
+              <p>{t('home.specializationDescription')}</p>
             </div>
           </div>
         </div>
@@ -73,10 +75,10 @@ const SpecializationsSection = () => {
                   <img src={item.icon} alt="" />
                 </div>
                 <h4>{item.name}</h4>
-                <p>Explore veterinarians in this specialization.</p>
+                <p>{t('home.exploreSpecialization')}</p>
                 <div className="mt-3">
                   <Link to="/search" className="btn btn-sm btn-primary">
-                    View
+                    {t('home.view')}
                   </Link>
                 </div>
               </div>

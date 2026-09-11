@@ -2,8 +2,10 @@ import React, { useEffect } from "react";
 import { home_12_why_us } from "../../assets/images";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const Chooseus = () => {
+  const { t } = useLanguage();
   //Aos
 
   useEffect(() => {
@@ -19,11 +21,11 @@ const Chooseus = () => {
               <div className="section-header-fourteen text-center">
                 <div className="service-inner-fourteen justify-content-center">
                   <div className="service-inner-fourteen-two">
-                    <h3>Why Us</h3>
+                    <h3>{t('home.whyUs')}</h3>
                   </div>
                 </div>
-                <h2>Why Choose Us</h2>
-                <p>Trusted veterinary care for your pets — online and in-clinic.</p>
+                <h2>{t('home.whyChooseUs')}</h2>
+                <p>{t('home.whyUsDescription')}</p>
               </div>
             </div>
           </div>
@@ -51,7 +53,7 @@ const Chooseus = () => {
                           aria-expanded="true"
                           aria-controls="collapseOne"
                         >
-                          Do you offer online consultations?
+                          {t('home.onlineConsultationsQuestion')}
                         </button>
                       </h2>
                       <div
@@ -62,7 +64,7 @@ const Chooseus = () => {
                       >
                         <div className="accordion-body">
                           <h6>
-                            Yes. You can book an online consultation with a veterinarian for common concerns, follow-ups, and guidance. If your pet needs hands-on care, we’ll recommend an in-clinic visit.
+                            {t('home.onlineConsultationsAnswer')}
                           </h6>
                         </div>
                       </div>
@@ -77,7 +79,7 @@ const Chooseus = () => {
                           aria-expanded="false"
                           aria-controls="collapseTwo"
                         >
-                          How do I book an appointment?
+                          {t('home.bookAppointmentQuestion')}
                         </button>
                       </h2>
                       <div
@@ -88,7 +90,7 @@ const Chooseus = () => {
                       >
                         <div className="accordion-body">
                           <h6>
-                            Go to Search, pick a veterinarian, view their profile, and choose a time that works for you. You can book directly from the profile page in just a few steps.
+                            {t('home.bookAppointmentAnswer')}
                           </h6>
                         </div>
                       </div>
@@ -103,7 +105,7 @@ const Chooseus = () => {
                           aria-expanded="false"
                           aria-controls="collapseThree"
                         >
-                          Are your veterinarians verified?
+                          {t('home.verifiedVeterinariansQuestion')}
                         </button>
                       </h2>
                       <div
@@ -114,7 +116,7 @@ const Chooseus = () => {
                       >
                         <div className="accordion-body">
                           <h6>
-                            Yes. Veterinarians complete a verification process before they can accept appointments. You can also view ratings and reviews on each doctor’s profile.
+                            {t('home.verifiedVeterinariansAnswer')}
                           </h6>
                         </div>
                       </div>
@@ -129,7 +131,7 @@ const Chooseus = () => {
                           aria-expanded="false"
                           aria-controls="collapseFour"
                         >
-                          What pets do you support?
+                          {t('home.supportedPetsQuestion')}
                         </button>
                       </h2>
                       <div
@@ -140,7 +142,7 @@ const Chooseus = () => {
                       >
                         <div className="accordion-body">
                           <h6>
-                            We support common companion animals (dogs, cats, rabbits, and more). Availability may vary by veterinarian specialty and your location.
+                            {t('home.supportedPetsAnswer')}
                           </h6>
                         </div>
                       </div>
@@ -155,7 +157,7 @@ const Chooseus = () => {
                           aria-expanded="false"
                           aria-controls="collapseFive"
                         >
-                          What if my pet has an emergency?
+                          {t('home.emergencyQuestion')}
                         </button>
                       </h2>
                       <div
@@ -166,7 +168,7 @@ const Chooseus = () => {
                       >
                         <div className="accordion-body">
                           <h6>
-                            For urgent or life-threatening issues, please contact your nearest emergency veterinary clinic immediately. For non-emergency concerns, you can book the earliest available online or in-clinic appointment.
+                            {t('home.emergencyAnswer')}
                           </h6>
                         </div>
                       </div>

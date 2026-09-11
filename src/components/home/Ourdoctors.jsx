@@ -7,10 +7,12 @@ import {
 } from "../../assets/images";
 import { useVeterinarians } from "../../queries/veterinarianQueries";
 import { getImageUrl } from "../../utils/apiConfig";
+import { useLanguage } from "../../contexts/LanguageContext";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
 const Ourdoctors = () => {
+  const { t } = useLanguage();
   //Aos
 
   useEffect(() => {
@@ -103,12 +105,12 @@ const Ourdoctors = () => {
         image: coverImg,
         location: locationText,
         fee,
-        feeLabel: onlineFee != null ? "Online" : clinicFee != null ? "Clinic" : "Consultation",
+        feeLabel: onlineFee != null ? t('home.online') : clinicFee != null ? t('home.clinic') : t('home.consultation'),
         rating: vet?.ratingAvg ?? 0,
         ratingCount: vet?.ratingCount ?? 0,
       };
     });
-  }, [veterinarians]);
+  }, [veterinarians, t]);
 
   const carouselOptions = useMemo(() => {
     const canLoop = doctorCards.length > 4;
@@ -133,24 +135,24 @@ const Ourdoctors = () => {
               <div className="section-header-fourteen service-inner-fourteen">
                 <div className="service-inner-fourteen">
                   <div className="service-inner-fourteen-two">
-                    <h3>OUR TEAM</h3>
+                <h3>{t('home.teamEyebrow')}</h3>
                   </div>
                 </div>
-                <h2>Meet Our Doctors</h2>
-                <p>Our Qualified Professionals</p>
+                <h2>{t('home.meetDoctors')}</h2>
+                <p>{t('home.qualifiedProfessionals')}</p>
               </div>
             </div>
           </div>
           {error ? (
-            <div className="text-center py-5 text-danger">Failed to load doctors</div>
+            <div className="text-center py-5 text-danger">{t('home.failedDoctors')}</div>
           ) : isLoading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('common.loading')}</span>
               </div>
             </div>
           ) : doctorCards.length === 0 ? (
-            <div className="text-center py-5 text-muted">No doctors available.</div>
+            <div className="text-center py-5 text-muted">{t('home.noDoctors')}</div>
           ) : (
             <Owlcarousel
               className="blog-slider-twelve owl-theme aos"
@@ -196,7 +198,7 @@ const Ourdoctors = () => {
                         <span>({d.ratingCount || 0})</span>
                       </div>
                       <Link to={d.bookingLink} className="btn btn-primary">
-                        Consult
+                        {t('home.consult')}
                       </Link>
                     </div>
                   </div>
@@ -213,7 +215,7 @@ const Ourdoctors = () => {
               to="/search"
               className="btn btn-primary btn-view"
             >
-              See All Doctors
+              {t('home.seeAllDoctors')}
             </Link>
           </div>
         </div>

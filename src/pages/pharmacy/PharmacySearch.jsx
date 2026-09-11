@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import Breadcrumb from '../../components/common/Breadcrumb'
 import { usePetStores } from '../../queries/petStoreQueries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const extractPetStoreList = (payload) => {
   const outer = payload?.data ?? payload
@@ -16,6 +17,7 @@ const extractPetStoreList = (payload) => {
 }
 
 const PharmacySearch = () => {
+  const { t } = useLanguage()
   const [searchParams, setSearchParams] = useSearchParams()
 
   const search = searchParams.get('search') || ''
@@ -81,40 +83,40 @@ const PharmacySearch = () => {
   }
 
   const formatAddress = (address) => {
-    if (!address) return 'Address not available'
+    if (!address) return t('shop.addressUnavailable')
     const parts = [address.line1, address.line2, address.city, address.state, address.country, address.zip].filter(Boolean)
-    return parts.join(', ') || 'Address not available'
+    return parts.join(', ') || t('shop.addressUnavailable')
   }
 
   return (
     <>
-      <Breadcrumb title="Pharmacy" li1="Pharmacy Search" li2="Pharmacy Search" />
+      <Breadcrumb title={t('shop.pharmacy')} li1={t('shop.pharmacies')} li2={selectedKind === 'PARAPHARMACY' ? t('shop.parapharmacies') : t('shop.pharmacies')} />
       <div className="content pharmacy-search-mobile">
         <div className="container">
           <div className="row">
             <div className="col-md-12 col-lg-4 col-xl-3 theiaStickySidebar">
               <div className="card search-filter">
                 <div className="card-header">
-                  <h4 className="card-title mb-0">Search Filter</h4>
+                  <h4 className="card-title mb-0">{t('shop.searchFilter')}</h4>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleSearch}>
                     <div className="filter-widget mb-3">
-                      <label className="mb-2">Search</label>
+                      <label className="mb-2">{t('shop.search')}</label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder={selectedKind === 'PARAPHARMACY' ? 'Search parapharmacies...' : 'Search pharmacies...'}
+                        placeholder={selectedKind === 'PARAPHARMACY' ? `${t('shop.search')} ${t('shop.parapharmacies').toLowerCase()}…` : `${t('shop.search')} ${t('shop.pharmacies').toLowerCase()}…`}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />
                     </div>
                     <div className="filter-widget mb-3">
-                      <label className="mb-2">Location / City</label>
+                      <label className="mb-2">{t('shop.locationCity')}</label>
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Enter city..."
+                        placeholder={t('shop.enterCity')}
                         value={cityFilter}
                         onChange={(e) => setCityFilter(e.target.value)}
                       />
@@ -122,7 +124,7 @@ const PharmacySearch = () => {
 
                     {cities.length > 0 && (
                       <div className="filter-widget mb-3">
-                        <h4>Popular Cities</h4>
+                        <h4>{t('shop.popularCities')}</h4>
                         {cities.slice(0, 5).map((cityName, idx) => (
                           <div key={idx}>
                             <label className="custom_check">
@@ -139,7 +141,7 @@ const PharmacySearch = () => {
                     )}
 
                     <div className="btn-search">
-                      <button type="submit" className="btn w-100">Search</button>
+                      <button type="submit" className="btn w-100">{t('shop.search')}</button>
                     </div>
                     <div className="btn-search mt-2">
                       <button
@@ -152,7 +154,7 @@ const PharmacySearch = () => {
                           setSearchParams({ kind: 'PHARMACY' })
                         }}
                       >
-                        Clear Filters
+                        {t('shop.clearFilters')}
                       </button>
                     </div>
                   </form>
@@ -162,20 +164,20 @@ const PharmacySearch = () => {
 
             <div className="col-md-12 col-lg-8 col-xl-9">
               <div className="mb-3">
-                <div className="btn-group" role="group" aria-label="Pharmacy kind">
+                <div className="btn-group" role="group" aria-label={t('shop.pharmacy')}>
                   <button
                     type="button"
                     className={`btn ${selectedKind === 'PHARMACY' ? 'btn-primary' : 'btn-outline-primary'}`}
                     onClick={() => handleKindChange('PHARMACY')}
                   >
-                    Pharmacies
+                    {t('shop.pharmacies')}
                   </button>
                   <button
                     type="button"
                     className={`btn ${selectedKind === 'PARAPHARMACY' ? 'btn-primary' : 'btn-outline-primary'}`}
                     onClick={() => handleKindChange('PARAPHARMACY')}
                   >
-                    Parapharmacies
+                    {t('shop.parapharmacies')}
                   </button>
                 </div>
               </div>
@@ -183,20 +185,20 @@ const PharmacySearch = () => {
               {storesQuery.isLoading ? (
                 <div className="text-center py-5">
                   <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">{t('shop.loading')}</span>
                   </div>
                 </div>
               ) : storesQuery.isError ? (
-                <div className="alert alert-danger">{storesQuery.error?.message || 'Failed to load pharmacies'}</div>
+                <div className="alert alert-danger">{storesQuery.error?.message || t('shop.failedStores')}</div>
               ) : petStores.length === 0 ? (
                 <div className="text-center py-5">
-                  <p className="text-muted">No results found. Try adjusting your search filters.</p>
+                  <p className="text-muted">{t('shop.noResults')}</p>
                 </div>
               ) : (
                 <>
                   <div className="mb-3">
                     <p className="text-muted">
-                      Showing {petStores.length} of {pagination.total} {selectedKind === 'PARAPHARMACY' ? 'parapharmacies' : 'pharmacies'}
+                      {t('shop.showingStores', { shown: petStores.length, total: pagination.total, kind: selectedKind === 'PARAPHARMACY' ? t('shop.parapharmacies').toLowerCase() : t('shop.pharmacies').toLowerCase() })}
                     </p>
                   </div>
 
@@ -205,7 +207,7 @@ const PharmacySearch = () => {
                     const owner = store?.ownerId
                     const logo = getImageUrl(store?.logo || owner?.profileImage) || '/assets/img/medical-img1.jpg'
                     const address = formatAddress(store?.address)
-                    const phone = store?.phone || owner?.phone || 'Phone not available'
+                    const phone = store?.phone || owner?.phone || t('shop.phoneUnavailable')
                     const ownerId = typeof owner === 'object' ? owner?._id : owner
 
                     return (
@@ -246,11 +248,11 @@ const PharmacySearch = () => {
                                   to={`/product-all?sellerId=${ownerId || ''}&sellerType=PET_STORE`}
                                   className="view-pro-btn"
                                 >
-                                  Browse Products
+                                  {t('shop.browseProducts')}
                                 </Link>
                                 {store?.phone && (
                                   <a className="apt-btn" href={`tel:${store.phone}`}>
-                                    Call Now
+                                  {t('shop.callNow')}
                                   </a>
                                 )}
                               </div>
@@ -268,7 +270,7 @@ const PharmacySearch = () => {
                           <ul className="pagination justify-content-center">
                             <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
                               <button className="page-link" onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
-                                Previous
+                                {t('shop.previous')}
                               </button>
                             </li>
                             {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((n) => (
@@ -284,7 +286,7 @@ const PharmacySearch = () => {
                                 onClick={() => handlePageChange(page + 1)}
                                 disabled={page === pagination.pages}
                               >
-                                Next
+                                {t('shop.next')}
                               </button>
                             </li>
                           </ul>

@@ -9,9 +9,11 @@ import { useWithdrawalRequests } from '../../queries/balanceQueries'
 import { useUnreadChatCount } from '../../queries/chatQueries'
 import { useSupportTicketUnreadCount } from '../../queries/supportTicketQueries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const Sidebar = ({ userType = 'patient' }) => {
   const location = useLocation()
+  const { t } = useLanguage()
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/')
 
   const { user } = useAuth()
@@ -234,8 +236,8 @@ const Sidebar = ({ userType = 'patient' }) => {
   if (userType === 'pet_sitter') {
     const petSitterProfile = myPetSitterQuery.data?.data ?? myPetSitterQuery.data ?? {}
     const profileImage = getImageUrl(petSitterProfile?.profileImage || user?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
-    const displayName = petSitterProfile?.fullName || petSitterProfile?.name || user?.fullName || user?.name || 'Pet Sitter'
-    return <div className="profile-sidebar veterinary-sidebar"><div className="widget-profile veterinary-profile-widget"><div className="profile-info-widget"><Link to="/pet-sitter/profile" className="booking-doc-img"><img src={profileImage} alt="Pet Sitter" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/assets/img/doctors-dashboard/doctor-profile-img.jpg' }} /></Link><div className="profile-det-info"><h3><Link to="/pet-sitter/profile">{displayName}</Link></h3><span className="badge veterinary-role-badge"><i className="fa-solid fa-paw me-1" />Pet Sitter</span></div></div></div><div className="dashboard-widget veterinary-dashboard-menu"><nav className="dashboard-menu"><ul><li className={isActive('/pet-sitter/dashboard') ? 'active' : ''}><Link to="/pet-sitter/dashboard"><i className="fa-solid fa-shapes" /><span>Dashboard</span></Link></li><li className={isActive('/pet-sitter/profile') ? 'active' : ''}><Link to="/pet-sitter/profile"><i className="fa-solid fa-user-pen" /><span>My Profile</span></Link></li><li className={isActive('/pet-sitter/chats') ? 'active' : ''}><Link to="/pet-sitter/chats"><i className="fa-solid fa-comments" /><span>Chats</span>{unreadAdminMessages > 0 && <small className="unread-msg veterinary-badge">{unreadAdminMessages}</small>}</Link></li><li className={isActive('/pet-sitter/support-tickets') ? 'active' : ''}><Link to="/pet-sitter/support-tickets"><i className="fa-solid fa-headset" /><span>Support Tickets</span>{unreadSupportTickets > 0 && <small className="unread-msg veterinary-badge">{unreadSupportTickets}</small>}</Link></li><li className={isActive('/pet-sitter/change-password') ? 'active' : ''}><Link to="/pet-sitter/change-password"><i className="fa-solid fa-key" /><span>Change Password</span></Link></li></ul></nav></div></div>
+    const displayName = petSitterProfile?.fullName || petSitterProfile?.name || user?.fullName || user?.name || t('petSitterPanel.nav.role')
+    return <div className="profile-sidebar veterinary-sidebar"><div className="widget-profile veterinary-profile-widget"><div className="profile-info-widget"><Link to="/pet-sitter/profile" className="booking-doc-img"><img src={profileImage} alt={t('petSitterPanel.nav.role')} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = '/assets/img/doctors-dashboard/doctor-profile-img.jpg' }} /></Link><div className="profile-det-info"><h3><Link to="/pet-sitter/profile">{displayName}</Link></h3><span className="badge veterinary-role-badge"><i className="fa-solid fa-paw me-1" />{t('petSitterPanel.nav.role')}</span></div></div></div><div className="dashboard-widget veterinary-dashboard-menu"><nav className="dashboard-menu"><ul><li className={isActive('/pet-sitter/dashboard') ? 'active' : ''}><Link to="/pet-sitter/dashboard"><i className="fa-solid fa-shapes" /><span>{t('petSitterPanel.nav.dashboard')}</span></Link></li><li className={isActive('/pet-sitter/profile') ? 'active' : ''}><Link to="/pet-sitter/profile"><i className="fa-solid fa-user-pen" /><span>{t('petSitterPanel.nav.profile')}</span></Link></li><li className={isActive('/pet-sitter/chats') ? 'active' : ''}><Link to="/pet-sitter/chats"><i className="fa-solid fa-comments" /><span>{t('petSitterPanel.nav.chats')}</span>{unreadAdminMessages > 0 && <small className="unread-msg veterinary-badge">{unreadAdminMessages}</small>}</Link></li><li className={isActive('/pet-sitter/support-tickets') ? 'active' : ''}><Link to="/pet-sitter/support-tickets"><i className="fa-solid fa-headset" /><span>{t('petSitterPanel.nav.supportTickets')}</span>{unreadSupportTickets > 0 && <small className="unread-msg veterinary-badge">{unreadSupportTickets}</small>}</Link></li><li className={isActive('/pet-sitter/change-password') ? 'active' : ''}><Link to="/pet-sitter/change-password"><i className="fa-solid fa-key" /><span>{t('petSitterPanel.nav.changePassword')}</span></Link></li></ul></nav></div></div>
   }
 
   if (userType === 'pharmacy_admin') {
@@ -248,7 +250,7 @@ const Sidebar = ({ userType = 'patient' }) => {
       getImageUrl(petStore?.logo) ||
       getImageUrl(user?.profileImage) ||
       '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
-    const roleLabel = role === 'PARAPHARMACY' ? 'Parapharmacy' : 'Pharmacy'
+    const roleLabel = role === 'PARAPHARMACY' ? t('pharmacyAdmin.nav.parapharmacy') : t('pharmacyAdmin.nav.pharmacy')
 
     return (
       <div className="profile-sidebar veterinary-sidebar">
@@ -257,7 +259,7 @@ const Sidebar = ({ userType = 'patient' }) => {
             <Link to="/pharmacy-admin/profile" className="booking-doc-img">
               <img
                 src={profileImage}
-                alt="Store"
+                alt={t('pharmacyAdmin.setup.store')}
                 onError={(e) => {
                   e.currentTarget.onerror = null
                   e.currentTarget.src = '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
@@ -272,7 +274,7 @@ const Sidebar = ({ userType = 'patient' }) => {
                 <Link to="/pharmacy-admin/profile">{displayName}</Link>
               </h3>
               <div className="patient-details">
-                <h5 className="mb-0">{roleLabel} ID : {user?.id || user?._id || '—'}</h5>
+                <h5 className="mb-0">{t('pharmacyAdmin.nav.storeId', { name: roleLabel })} : {user?.id || user?._id || '—'}</h5>
               </div>
               <span className="badge veterinary-role-badge">
                 <i className="fa-solid fa-circle"></i>{roleLabel}
@@ -287,14 +289,14 @@ const Sidebar = ({ userType = 'patient' }) => {
               <li className={isActive('/pharmacy-admin/dashboard') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/dashboard">
                   <i className="fa-solid fa-shapes"></i>
-                  <span>Dashboard</span>
+                  <span>{t('pharmacyAdmin.nav.dashboard')}</span>
                   <div className="menu-indicator"></div>
                 </Link>
               </li>
               <li className={isActive('/pharmacy-admin/orders') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/orders">
                   <i className="fa-solid fa-shopping-bag"></i>
-                  <span>Orders</span>
+                  <span>{t('pharmacyAdmin.nav.orders')}</span>
                   {pendingOrdersCount > 0 && <small className="unread-msg veterinary-badge">{pendingOrdersCount}</small>}
                   <div className="menu-indicator"></div>
                 </Link>
@@ -302,14 +304,14 @@ const Sidebar = ({ userType = 'patient' }) => {
               <li className={isActive('/pharmacy-admin/products') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/products">
                   <i className="fa-solid fa-box"></i>
-                  <span>Products</span>
+                  <span>{t('pharmacyAdmin.nav.products')}</span>
                   <div className="menu-indicator"></div>
                 </Link>
               </li>
               {role === 'PET_STORE' && <li className={isActive('/pharmacy-admin/prescription-requests') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/prescription-requests">
                   <i className="fa-solid fa-file-prescription"></i>
-                  <span>Prescriptions</span>
+                  <span>{t('pharmacyAdmin.nav.prescriptions')}</span>
                   {pendingPrescriptionCount > 0 && <small className="unread-msg veterinary-badge">{pendingPrescriptionCount}</small>}
                   <div className="menu-indicator"></div>
                 </Link>
@@ -317,7 +319,7 @@ const Sidebar = ({ userType = 'patient' }) => {
               <li className={isActive('/pharmacy-admin/payouts') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/payouts">
                   <i className="fa-solid fa-money-bill-1"></i>
-                  <span>Payouts</span>
+                  <span>{t('pharmacyAdmin.nav.payouts')}</span>
                   {pendingPayoutsCount > 0 && <small className="unread-msg veterinary-badge">{pendingPayoutsCount}</small>}
                   <div className="menu-indicator"></div>
                 </Link>
@@ -325,14 +327,14 @@ const Sidebar = ({ userType = 'patient' }) => {
               {role === 'PET_STORE' && <li className={isActive('/pharmacy-admin/subscription') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/subscription">
                   <i className="fa-solid fa-crown"></i>
-                  <span>Subscription</span>
+                  <span>{t('pharmacyAdmin.nav.subscription')}</span>
                   <div className="menu-indicator"></div>
                 </Link>
               </li>}
               <li className={isActive('/pharmacy-admin/admin-chat') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/admin-chat">
                   <i className="fa-solid fa-headset"></i>
-                  <span>Admin Messages</span>
+                  <span>{t('pharmacyAdmin.nav.adminMessages')}</span>
                   {unreadAdminMessages > 0 && <small className="unread-msg veterinary-badge">{unreadAdminMessages}</small>}
                   <div className="menu-indicator"></div>
                 </Link>
@@ -340,14 +342,14 @@ const Sidebar = ({ userType = 'patient' }) => {
               <li className={isActive('/pharmacy-admin/profile') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/profile">
                   <i className="fa-solid fa-user-pen"></i>
-                  <span>Profile</span>
+                  <span>{t('pharmacyAdmin.nav.profile')}</span>
                   <div className="menu-indicator"></div>
                 </Link>
               </li>
               <li className={isActive('/pharmacy-admin/change-password') ? 'active' : ''}>
                 <Link to="/pharmacy-admin/change-password">
                   <i className="fa-solid fa-key"></i>
-                  <span>Change Password</span>
+                  <span>{t('pharmacyAdmin.nav.changePassword')}</span>
                   <div className="menu-indicator"></div>
                 </Link>
               </li>

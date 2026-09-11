@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { useBlogPosts } from '../../queries/blogQueries'
 import { useDeleteBlogPost } from '../../mutations/blogMutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const DoctorBlogList = () => {
   const { user } = useAuth()
+  const { language, t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState('')
   const [filter, setFilter] = useState('all')
   const [page, setPage] = useState(1)
@@ -40,13 +42,13 @@ const DoctorBlogList = () => {
 
   const handleDelete = async (id, title) => {
     if (!id) return
-    if (!window.confirm(`Are you sure you want to delete "${title || 'this post'}"?`)) return
+    if (!window.confirm(t('doctorRemaining.blog.deleteConfirm', { title: title || t('doctorRemaining.blog.deleteFallback') }))) return
 
     try {
       await deleteBlog.mutateAsync(id)
-      toast.success('Blog post deleted successfully')
+      toast.success(t('doctorRemaining.blog.deleted'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to delete blog post')
+      toast.error(err?.message || t('doctorRemaining.blog.deleteFailed'))
     }
   }
 
@@ -64,12 +66,12 @@ const DoctorBlogList = () => {
             <div className="dashboard-header">
               <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
-                  <h3>Blog Posts</h3>
-                  <p className="text-muted mb-0">Create and manage your blog posts</p>
+                  <h3>{t('doctorRemaining.blog.title')}</h3>
+                  <p className="text-muted mb-0">{t('doctorRemaining.blog.subtitle')}</p>
                 </div>
                 <Link to="/doctor/blog/create" className="btn btn-primary">
                   <i className="fa fa-plus me-2" style={{ fontSize: '14px', display: 'inline-block', lineHeight: '1', visibility: 'visible', opacity: 1 }}></i>
-                  Create Post
+                  {t('doctorRemaining.blog.create')}
                 </Link>
               </div>
             </div>
@@ -81,7 +83,7 @@ const DoctorBlogList = () => {
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Search by title or content..."
+                      placeholder={t('doctorRemaining.blog.searchPlaceholder')}
                       value={searchQuery}
                       onChange={(e) => {
                         setSearchQuery(e.target.value)
@@ -98,15 +100,15 @@ const DoctorBlogList = () => {
                         setPage(1)
                       }}
                     >
-                      <option value="all">All</option>
-                      <option value="published">Published</option>
-                      <option value="draft">Draft</option>
+                      <option value="all">{t('doctorRemaining.blog.all')}</option>
+                      <option value="published">{t('doctorRemaining.blog.published')}</option>
+                      <option value="draft">{t('doctorRemaining.blog.draft')}</option>
                     </select>
                   </div>
                   <div className="col-md-3 text-md-end">
                     <Link to="/doctor/dashboard" className="btn btn-outline-secondary">
                       <i className="fe fe-arrow-left me-2"></i>
-                      Dashboard
+                      {t('doctorRemaining.blog.dashboard')}
                     </Link>
                   </div>
                 </div>
@@ -117,7 +119,7 @@ const DoctorBlogList = () => {
               <div className="card">
                 <div className="card-body text-center py-5">
                   <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">{t('doctorRemaining.blog.loading')}</span>
                   </div>
                 </div>
               </div>
@@ -125,10 +127,10 @@ const DoctorBlogList = () => {
               <div className="card">
                 <div className="card-body text-center py-5">
                   <i className="fe fe-file-text" style={{ fontSize: '64px', color: '#dee2e6' }}></i>
-                  <h5 className="mt-3">No blog posts found</h5>
-                  <p className="text-muted">Create your first post to get started.</p>
+                  <h5 className="mt-3">{t('doctorRemaining.blog.empty')}</h5>
+                  <p className="text-muted">{t('doctorRemaining.blog.emptyHint')}</p>
                   <Link to="/doctor/blog/create" className="btn btn-primary mt-3">
-                    Create Blog Post
+                    {t('doctorRemaining.blog.createBlog')}
                   </Link>
                 </div>
               </div>
@@ -138,7 +140,7 @@ const DoctorBlogList = () => {
                   const cover = blog.coverImage || blog.featuredImage
                   const coverUrl = getImageUrl(cover)
                   const statusBadge = blog.isPublished ? 'badge-success' : 'badge-warning'
-                  const statusLabel = blog.isPublished ? 'Published' : 'Draft'
+                  const statusLabel = blog.isPublished ? t('doctorRemaining.blog.published') : t('doctorRemaining.blog.draft')
 
                   return (
                     <div key={blog._id} className="col-md-6 col-lg-4 mb-4">
@@ -160,7 +162,7 @@ const DoctorBlogList = () => {
                               <Link
                                 to={`/doctor/blog/edit/${blog._id}`}
                                 className="btn btn-sm btn-outline-primary"
-                                title="Edit"
+                                title={t('doctorRemaining.blog.edit')}
                                 style={{
                                   display: 'inline-flex',
                                   alignItems: 'center',
@@ -178,7 +180,7 @@ const DoctorBlogList = () => {
                                 className="btn btn-sm btn-outline-danger"
                                 onClick={() => handleDelete(blog._id, blog.title)}
                                 disabled={deleteBlog.isPending}
-                                title="Delete"
+                                title={t('doctorRemaining.blog.delete')}
                                 style={{
                                   display: 'inline-flex',
                                   alignItems: 'center',
@@ -198,7 +200,7 @@ const DoctorBlogList = () => {
                             <Link to={`/doctor/blog/${blog._id}`}>{blog.title}</Link>
                           </h5>
                           <p className="text-muted small mb-3">
-                            {blog.publishedAt ? new Date(blog.publishedAt).toLocaleDateString() : blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : '—'}
+                            {blog.publishedAt ? new Date(blog.publishedAt).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB') : blog.createdAt ? new Date(blog.createdAt).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB') : '—'}
                           </p>
 
                           {Array.isArray(blog.tags) && blog.tags.length > 0 && (
@@ -213,7 +215,7 @@ const DoctorBlogList = () => {
 
                           <div className="mt-auto">
                             <Link to={`/doctor/blog/${blog._id}`} className="btn btn-outline-secondary w-100">
-                              View Details
+                              {t('doctorRemaining.blog.viewDetails')}
                             </Link>
                           </div>
                         </div>
@@ -234,11 +236,11 @@ const DoctorBlogList = () => {
                         onClick={() => handlePageChange(page - 1)}
                         disabled={page === 1}
                       >
-                        Previous
+                        {t('doctorRemaining.blog.previous')}
                       </button>
                     </li>
                     <li className="page-item disabled">
-                      <span className="page-link">Page {page} of {pagination.pages}</span>
+                      <span className="page-link">{t('doctorRemaining.blog.pageOf', { page, pages: pagination.pages })}</span>
                     </li>
                     <li className={`page-item ${page === pagination.pages ? 'disabled' : ''}`}>
                       <button
@@ -246,7 +248,7 @@ const DoctorBlogList = () => {
                         onClick={() => handlePageChange(page + 1)}
                         disabled={page === pagination.pages}
                       >
-                        Next
+                        {t('doctorRemaining.blog.next')}
                       </button>
                     </li>
                   </ul>

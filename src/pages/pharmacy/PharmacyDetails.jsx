@@ -4,8 +4,10 @@ import Breadcrumb from '../../components/common/Breadcrumb'
 import { usePetStore } from '../../queries/petStoreQueries'
 import { useProducts } from '../../queries/productQueries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const PharmacyDetails = () => {
+  const { t } = useLanguage()
   const [searchParams] = useSearchParams()
   const petStoreId = searchParams.get('id')
 
@@ -27,20 +29,20 @@ const PharmacyDetails = () => {
   }, [productsQuery.data])
 
   const formatAddress = (address) => {
-    if (!address) return 'Address not available'
+    if (!address) return t('shop.addressUnavailable')
     const parts = [address.line1, address.line2, address.city, address.state, address.country, address.zip].filter(Boolean)
-    return parts.join(', ') || 'Address not available'
+    return parts.join(', ') || t('shop.addressUnavailable')
   }
 
   if (storeQuery.isLoading) {
     return (
       <>
-        <Breadcrumb title="Pharmacy" li1="Pharmacy Details" li2="Loading..." />
+        <Breadcrumb title={t('shop.pharmacy')} li1={t('shop.pharmacy')} li2={t('shop.loading')} />
         <div className="content">
           <div className="container">
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">{t('shop.loading')}</span>
               </div>
             </div>
           </div>
@@ -52,13 +54,13 @@ const PharmacyDetails = () => {
   if (storeQuery.isError || !store) {
     return (
       <>
-        <Breadcrumb title="Pharmacy" li1="Pharmacy Details" li2="Not Found" />
+        <Breadcrumb title={t('shop.pharmacy')} li1={t('shop.pharmacy')} li2={t('common.notFound', 'Not found')} />
         <div className="content">
           <div className="container">
             <div className="alert alert-danger">
-              <h5>Pharmacy Not Found</h5>
-              <p>The pharmacy you're looking for doesn't exist.</p>
-              <Link to="/pharmacy-search" className="btn btn-primary">Browse Pharmacies</Link>
+              <h5>{t('shop.pharmacy')} {t('common.notFound', 'Not found')}</h5>
+              <p>{t('shop.noResults')}</p>
+              <Link to="/pharmacy-search" className="btn btn-primary">{t('shop.pharmacies')}</Link>
             </div>
           </div>
         </div>
@@ -68,12 +70,12 @@ const PharmacyDetails = () => {
 
   const storeLogo = getImageUrl(store?.logo || owner?.profileImage) || '/assets/img/medical-img1.jpg'
   const storeAddress = formatAddress(store?.address)
-  const storePhone = store?.phone || owner?.phone || 'Phone not available'
-  const storeKind = String(store?.kind || '').toUpperCase() === 'PARAPHARMACY' ? 'Parapharmacy' : 'Pharmacy'
+  const storePhone = store?.phone || owner?.phone || t('shop.phoneUnavailable')
+  const storeKind = String(store?.kind || '').toUpperCase() === 'PARAPHARMACY' ? t('shop.parapharmacy') : t('shop.pharmacy')
 
   return (
     <>
-      <Breadcrumb title="Pharmacy" li1="Pharmacy Details" li2={store?.name || 'Pharmacy'} />
+      <Breadcrumb title={t('shop.pharmacy')} li1={storeKind} li2={store?.name || storeKind} />
       <div className="content pharmacy-details-mobile">
         <div className="container">
           <div className="card pharmacy-details-hero-card">
@@ -111,11 +113,11 @@ const PharmacyDetails = () => {
                 <div className="doc-info-right d-flex align-items-center justify-content-center">
                   <div className="clinic-booking">
                     <Link to={`/product-all?sellerId=${ownerId || ''}`} className="view-pro-btn">
-                      Browse Products
+                      {t('shop.browseProducts')}
                     </Link>
                     {store?.phone && (
                       <a className="apt-btn" href={`tel:${store.phone}`}>
-                        Call Now
+                        {t('shop.callNow')}
                       </a>
                     )}
                   </div>
@@ -129,13 +131,13 @@ const PharmacyDetails = () => {
               <nav className="user-tabs mb-4">
                 <ul className="nav nav-tabs nav-tabs-bottom nav-justified pharmacy-details-tabs">
                   <li className="nav-item">
-                    <a className="nav-link active" href="#pharmacy_overview" data-bs-toggle="tab">Overview</a>
+                    <a className="nav-link active" href="#pharmacy_overview" data-bs-toggle="tab">{t('patient.reports.overview')}</a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="#pharmacy_locations" data-bs-toggle="tab">Locations</a>
+                    <a className="nav-link" href="#pharmacy_locations" data-bs-toggle="tab">{t('shop.locationCity')}</a>
                   </li>
                   <li className="nav-item">
-                    <a className="nav-link" href="#pharmacy_products" data-bs-toggle="tab">Products</a>
+                    <a className="nav-link" href="#pharmacy_products" data-bs-toggle="tab">{t('shop.products')}</a>
                   </li>
                 </ul>
               </nav>
@@ -145,11 +147,9 @@ const PharmacyDetails = () => {
                   <div className="row pharmacy-details-products-grid">
                     <div className="col-md-9">
                       <div className="widget about-widget">
-                        <h4 className="widget-title">About Pharmacy</h4>
+                        <h4 className="widget-title">{t('publicPages.about.title')} {storeKind}</h4>
                         <p>
-                          {store?.name} is a registered pharmacy providing quality healthcare products and services.
-                          {store?.address?.city ? ` Located in ${store.address.city}, ` : ' '}
-                          we offer a wide range of products for pets.
+                          {t('shop.pharmacy')} {store?.name} · {storeAddress}
                         </p>
                       </div>
                     </div>
@@ -160,7 +160,7 @@ const PharmacyDetails = () => {
                   <div className="row">
                     <div className="col-md-12">
                       <div className="widget locations-widget">
-                        <h4 className="widget-title">Location Details</h4>
+                        <h4 className="widget-title">{t('shop.locationCity')}</h4>
                         <p>{storeAddress}</p>
                       </div>
                     </div>
@@ -170,9 +170,9 @@ const PharmacyDetails = () => {
                 <div role="tabpanel" id="pharmacy_products" className="tab-pane fade">
                   <div className="row">
                     {productsQuery.isLoading ? (
-                      <div className="col-12 text-center py-4 text-muted">Loading products…</div>
+                      <div className="col-12 text-center py-4 text-muted">{t('shop.loading')}</div>
                     ) : products.length === 0 ? (
-                      <div className="col-12 text-center py-4 text-muted">No products found.</div>
+                      <div className="col-12 text-center py-4 text-muted">{t('shop.noProducts')}</div>
                     ) : (
                       products.map((p) => {
                         const img = getImageUrl(p?.images?.[0]) || '/assets/img/products/product.jpg'
@@ -206,7 +206,7 @@ const PharmacyDetails = () => {
                   </div>
                   <div className="mt-2">
                     <Link to={`/product-all?sellerId=${ownerId || ''}`} className="btn btn-outline-primary">
-                      View All Products
+                      {t('shop.allProducts')}
                     </Link>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 import { useBlogPost } from '../../queries/blogQueries'
 import { useCreateBlogPost, useUpdateBlogPost, useUploadBlogCoverImage } from '../../mutations/blogMutations'
@@ -31,6 +32,7 @@ const contentHasText = (value) => String(value || '')
 const DoctorBlogCreateEdit = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   const isEdit = Boolean(id)
 
@@ -86,13 +88,13 @@ const DoctorBlogCreateEdit = () => {
       const res = await uploadMutation.mutateAsync(formData)
       const url = res?.data?.url || res?.data?.data?.url
       if (!url) {
-        toast.error('Upload failed')
+        toast.error(t('doctorRemaining.blog.uploadFailed'))
         return
       }
       setCoverImage(url)
-      toast.success('Image uploaded')
+      toast.success(t('doctorRemaining.blog.imageUploaded'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to upload image')
+      toast.error(err?.message || t('doctorRemaining.blog.imageUploadFailed'))
     }
   }
 
@@ -102,12 +104,12 @@ const DoctorBlogCreateEdit = () => {
     e.preventDefault()
 
     if (!title.trim()) {
-      toast.error('Title is required')
+      toast.error(t('doctorRemaining.blog.titleRequired'))
       return
     }
 
     if (!contentHasText(content)) {
-      toast.error('Content is required')
+      toast.error(t('doctorRemaining.blog.contentRequired'))
       return
     }
 
@@ -128,14 +130,14 @@ const DoctorBlogCreateEdit = () => {
     try {
       if (isEdit) {
         await updateMutation.mutateAsync({ blogPostId: id, data })
-        toast.success('Blog post updated successfully')
+        toast.success(t('doctorRemaining.blog.saved'))
       } else {
         await createMutation.mutateAsync(data)
-        toast.success('Blog post created successfully')
+        toast.success(t('doctorRemaining.blog.createdSuccess'))
       }
       navigate('/doctor/blog')
     } catch (err) {
-      toast.error(err?.message || 'Failed to save blog post')
+      toast.error(err?.message || t('doctorRemaining.blog.saveFailed'))
     }
   }
 
@@ -148,12 +150,12 @@ const DoctorBlogCreateEdit = () => {
             <div className="dashboard-header">
               <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
                 <div>
-                  <h3>{isEdit ? 'Edit Blog Post' : 'Create Blog Post'}</h3>
-                  <p className="text-muted mb-0">{isEdit ? 'Update your post details' : 'Write a new post for your audience'}</p>
+                  <h3>{isEdit ? t('doctorRemaining.blog.editTitle') : t('doctorRemaining.blog.createTitle')}</h3>
+                  <p className="text-muted mb-0">{isEdit ? t('doctorRemaining.blog.editSubtitle') : t('doctorRemaining.blog.createSubtitle')}</p>
                 </div>
                 <Link to="/doctor/blog" className="btn btn-outline-secondary">
                   <i className="fe fe-arrow-left me-2"></i>
-                  Back to List
+                  {t('doctorRemaining.blog.backToList')}
                 </Link>
               </div>
             </div>
@@ -162,7 +164,7 @@ const DoctorBlogCreateEdit = () => {
               <div className="card">
                 <div className="card-body text-center py-5">
                   <div className="spinner-border" role="status">
-                    <span className="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">{t('doctorRemaining.blog.loading')}</span>
                   </div>
                 </div>
               </div>
@@ -173,7 +175,7 @@ const DoctorBlogCreateEdit = () => {
                     <div className="row">
                       <div className="col-md-8">
                         <div className="mb-3">
-                          <label className="form-label">Title</label>
+                          <label className="form-label">{t('doctorRemaining.blog.titleLabel')}</label>
                           <input
                             type="text"
                             className="form-control"
@@ -184,7 +186,7 @@ const DoctorBlogCreateEdit = () => {
                         </div>
 
                         <div className="mb-3">
-                          <label className="form-label">Slug</label>
+                          <label className="form-label">{t('doctorRemaining.blog.slug')}</label>
                           <input
                             type="text"
                             className="form-control"
@@ -195,7 +197,7 @@ const DoctorBlogCreateEdit = () => {
                         </div>
 
                         <div className="mb-3">
-                          <label className="form-label">Content</label>
+                          <label className="form-label">{t('doctorRemaining.blog.content')}</label>
                           <RichTextEditor
                             value={content}
                             onChange={setContent}
@@ -204,7 +206,7 @@ const DoctorBlogCreateEdit = () => {
                         </div>
 
                         <div className="mb-3">
-                          <label className="form-label">Tags (comma separated)</label>
+                          <label className="form-label">{t('doctorRemaining.blog.tags')}</label>
                           <input
                             type="text"
                             className="form-control"
@@ -217,20 +219,20 @@ const DoctorBlogCreateEdit = () => {
 
                       <div className="col-md-4">
                         <div className="mb-3">
-                          <label className="form-label">Status</label>
+                          <label className="form-label">{t('doctorRemaining.blog.status')}</label>
                           <select
                             className="form-control"
                             value={isPublished ? 'published' : 'draft'}
                             onChange={(e) => setIsPublished(e.target.value === 'published')}
                             disabled={isSubmitting}
                           >
-                            <option value="draft">Draft</option>
-                            <option value="published">Published</option>
+                            <option value="draft">{t('doctorRemaining.blog.draft')}</option>
+                            <option value="published">{t('doctorRemaining.blog.published')}</option>
                           </select>
                         </div>
 
                         <div className="mb-3">
-                          <label className="form-label">Cover Image</label>
+                          <label className="form-label">{t('doctorRemaining.blog.coverImage')}</label>
                           <input
                             type="file"
                             className="form-control"
@@ -239,7 +241,7 @@ const DoctorBlogCreateEdit = () => {
                             disabled={isSubmitting || uploadMutation.isPending}
                           />
                           {uploadMutation.isPending && (
-                            <div className="small text-muted mt-2">Uploading...</div>
+                            <div className="small text-muted mt-2">{t('doctorRemaining.blog.uploading')}</div>
                           )}
                         </div>
 
@@ -247,7 +249,7 @@ const DoctorBlogCreateEdit = () => {
                           <div className="mb-3">
                             <img
                               src={previewUrl}
-                              alt="Cover Preview"
+                              alt={t('doctorRemaining.blog.coverPreview')}
                               className="img-fluid rounded"
                               style={{ maxHeight: '220px', objectFit: 'cover' }}
                             />
@@ -256,11 +258,11 @@ const DoctorBlogCreateEdit = () => {
 
                         <div className="d-grid gap-2">
                           <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                            {isSubmitting ? 'Saving...' : isEdit ? 'Update Post' : 'Create Post'}
+                            {isSubmitting ? t('doctorRemaining.blog.saving') : isEdit ? t('doctorRemaining.blog.update') : t('doctorRemaining.blog.saveCreate')}
                           </button>
                           {isEdit && payload?._id && (
                             <Link to={`/doctor/blog/${payload._id}`} className="btn btn-outline-secondary">
-                              View Details
+                              {t('doctorRemaining.blog.view')}
                             </Link>
                           )}
                         </div>

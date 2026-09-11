@@ -6,6 +6,7 @@ import { StreamCall, StreamTheme, StreamVideo } from '@stream-io/video-react-sdk
 import * as videoApi from '../../api/video'
 import { useVideoCall } from '../../hooks/useVideoCall'
 import WhatsAppVideoCall from './WhatsAppVideoCall'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const ACCEPTANCE_POLL_INTERVAL_MS = 1_000
 const MAX_CONSECUTIVE_SESSION_ERRORS = 3
@@ -33,6 +34,7 @@ const sessionFromPayload = (payload, fallbackStatus) => {
 }
 
 const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallback }) => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
@@ -68,7 +70,7 @@ const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallb
       if (cancelled) return null
       const nextSession = sessionFromPayload(payload, fallbackStatus)
       if (!nextSession) {
-        throw new Error('The video service did not return a call session. Please try again.')
+        throw new Error(t('videoCall.sessionError'))
       }
 
       acceptedSessionPayloadRef.current = payload
@@ -126,7 +128,7 @@ const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallb
         } catch (startError) {
           // An existing ACTIVE session must never be silently reset. A page
           // refresh or a second device simply rejoins the same protected call.
-          const message = startError?.response?.data?.message || startError?.message || ''
+        const message = startError?.response?.data?.message || startError?.message || ''
           if (mode !== 'caller' || !/already active/i.test(message)) throw startError
           payload = await getSession({ silent: true })
         }
@@ -150,7 +152,7 @@ const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallb
           await joinAcceptedCall(payload)
         }
       } catch (err) {
-        const message = err?.response?.data?.message || err?.message || 'Unable to prepare the video call'
+        const message = err?.response?.data?.message || err?.message || t('videoCall.unable')
         if (!cancelled) setSetupError(message)
       }
     }
@@ -158,7 +160,7 @@ const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallb
     return () => {
       cancelled = true
     }
-  }, [appointmentId, getSession, joinActiveCall, mode, prepareOutgoingCall, startCall])
+  }, [appointmentId, getSession, joinActiveCall, mode, prepareOutgoingCall, startCall, t])
 
   useEffect(() => {
     if (!['DECLINED', 'MISSED', 'ENDED'].includes(session?.status)) return
@@ -169,18 +171,18 @@ const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallb
     try {
       if (session?._id) await videoApi.endVideoSession(session._id)
     } catch (err) {
-      toast.warning(err?.response?.data?.message || err?.message || 'The call closed locally, but its status could not be updated yet.')
+      toast.warning(err?.response?.data?.message || err?.message || t('videoCall.unable'))
     }
     await endCall()
     navigate(backPath)
   }
 
   if (!appointmentId) {
-    return <CallNotice title="Missing appointment" message="No appointment was supplied for this video call." onBack={() => navigate(backPath)} />
+    return <CallNotice title={t('videoCall.missing')} message={t('videoCall.missingMessage')} onBack={() => navigate(backPath)} t={t} />
   }
 
   if (setupError || error) {
-    return <CallNotice title="Video call unavailable" message={setupError || error} onBack={() => navigate(backPath)} />
+    return <CallNotice title={t('videoCall.unable')} message={setupError || error} onBack={() => navigate(backPath)} t={t} />
   }
 
   if (client && call) {
@@ -207,42 +209,43 @@ const AppointmentVideoCallRoom = ({ backPath, localRole, remoteRole, remoteFallb
   if (missingRingingSupport) {
     return (
       <CallNotice
-        title="Video-call update required"
-        message="The connected server did not create a ringing call. Deploy the current VeterinaryBackend before trying the call again."
+        title={t('videoCall.updateRequired')}
+        message={t('videoCall.updateMessage')}
         onBack={() => navigate(backPath)}
+        t={t}
       />
     )
   }
   if (ended) {
-    return <CallNotice title="Call ended" message="The other participant is no longer available for this call." onBack={() => navigate(backPath)} />
+    return <CallNotice title={t('videoCall.ended')} message={t('videoCall.endedMessage')} onBack={() => navigate(backPath)} t={t} />
   }
 
   return (
     <div style={waitingStyle}>
       <div style={waitingCardStyle}>
-        <div className="spinner-border text-primary mb-3" role="status"><span className="visually-hidden">Loading</span></div>
+        <div className="spinner-border text-primary mb-3" role="status"><span className="visually-hidden">{t('videoCall.loading')}</span></div>
         <h4 style={{ marginBottom: 8 }}>
-          {isRinging ? `Calling ${remoteRole}…` : isJoining ? 'Joining video call…' : 'Starting video call…'}
+          {isRinging ? t('videoCall.calling', { role: remoteRole }) : isJoining ? t('videoCall.joining') : t('videoCall.starting')}
         </h4>
         <p style={{ color: '#68717d', marginBottom: 22 }}>
           {isRinging
-            ? `Waiting for the ${remoteRole.toLowerCase()} to accept.`
+            ? t('videoCall.waiting', { role: remoteRole.toLowerCase() })
             : isJoining
-              ? 'Connecting securely to the call…'
-              : 'Creating your secure call…'}
+              ? t('videoCall.connecting')
+              : t('videoCall.creating')}
         </p>
-        <button className="btn btn-danger rounded-pill px-4" onClick={leave} disabled={loading}>Cancel call</button>
+        <button className="btn btn-danger rounded-pill px-4" onClick={leave} disabled={loading}>{t('videoCall.cancel')}</button>
       </div>
     </div>
   )
 }
 
-const CallNotice = ({ title, message, onBack }) => (
+const CallNotice = ({ title, message, onBack, t }) => (
   <div style={waitingStyle}>
     <div style={waitingCardStyle}>
       <h4>{title}</h4>
       <p style={{ color: '#68717d', margin: '12px 0 22px' }}>{message}</p>
-      <button className="btn btn-primary rounded-pill px-4" onClick={onBack}>Back to appointments</button>
+      <button className="btn btn-primary rounded-pill px-4" onClick={onBack}>{t('videoCall.back')}</button>
     </div>
   </div>
 )

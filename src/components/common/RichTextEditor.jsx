@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const RichTextEditor = ({ value, onChange, disabled = false }) => {
+  const { t } = useLanguage()
   const editorRef = useRef(null)
   const selectionRef = useRef(null)
 
@@ -41,7 +43,7 @@ const RichTextEditor = ({ value, onChange, disabled = false }) => {
   }
 
   const createLink = () => {
-    const url = window.prompt('Enter the link URL (https://...)')
+    const url = window.prompt(t('richText.linkPrompt'))
     if (!url) return
     applyCommand('createLink', url.trim())
   }
@@ -62,47 +64,47 @@ const RichTextEditor = ({ value, onChange, disabled = false }) => {
 
   return (
     <div className="border rounded overflow-hidden bg-white">
-      <div className="d-flex flex-wrap gap-1 p-2 border-bottom bg-light" role="toolbar" aria-label="Post formatting tools">
-        {button('B', null, 'bold', 'Bold')}
-        {button('I', null, 'italic', 'Italic')}
-        {button('U', null, 'underline', 'Underline')}
+      <div className="d-flex flex-wrap gap-1 p-2 border-bottom bg-light" role="toolbar" aria-label={t('richText.toolbar')}>
+        {button('B', null, 'bold', t('richText.bold'))}
+        {button('I', null, 'italic', t('richText.italic'))}
+        {button('U', null, 'underline', t('richText.underline'))}
         <span className="border-start mx-1" />
         <select
           className="form-select form-select-sm"
           style={{ width: 142 }}
           defaultValue="p"
           disabled={disabled}
-          aria-label="Text style"
+          aria-label={t('richText.textStyle')}
           onMouseDown={rememberSelection}
           onChange={(event) => {
             applyCommand('formatBlock', event.target.value)
             event.target.value = 'p'
           }}
         >
-          <option value="p">Paragraph</option>
-          <option value="h1">Heading 1</option>
-          <option value="h2">Heading 2</option>
-          <option value="h3">Heading 3</option>
-          <option value="h4">Heading 4</option>
-          <option value="blockquote">Quote</option>
+          <option value="p">{t('richText.paragraph')}</option>
+          <option value="h1">{t('richText.heading1')}</option>
+          <option value="h2">{t('richText.heading2')}</option>
+          <option value="h3">{t('richText.heading3')}</option>
+          <option value="h4">{t('richText.heading4')}</option>
+          <option value="blockquote">{t('richText.quote')}</option>
         </select>
         <span className="border-start mx-1" />
-        {button('', 'fa-solid fa-list-ul', 'insertUnorderedList', 'Bulleted list')}
-        {button('', 'fa-solid fa-list-ol', 'insertOrderedList', 'Numbered list')}
+        {button('', 'fa-solid fa-list-ul', 'insertUnorderedList', t('richText.bulleted'))}
+        {button('', 'fa-solid fa-list-ol', 'insertOrderedList', t('richText.numbered'))}
         <button
           type="button"
           className="btn btn-sm btn-light border"
-          title="Insert link"
-          aria-label="Insert link"
+          title={t('richText.insertLink')}
+          aria-label={t('richText.insertLink')}
           disabled={disabled}
           onMouseDown={(event) => event.preventDefault()}
           onClick={createLink}
         >
           <i className="fa-solid fa-link" aria-hidden="true" />
         </button>
-        {button('', 'fa-solid fa-rotate-left', 'undo', 'Undo')}
-        {button('', 'fa-solid fa-rotate-right', 'redo', 'Redo')}
-        {button('', 'fa-solid fa-eraser', 'removeFormat', 'Clear formatting')}
+        {button('', 'fa-solid fa-rotate-left', 'undo', t('richText.undo'))}
+        {button('', 'fa-solid fa-rotate-right', 'redo', t('richText.redo'))}
+        {button('', 'fa-solid fa-eraser', 'removeFormat', t('richText.clearFormatting'))}
       </div>
       <div
         ref={editorRef}
@@ -110,8 +112,8 @@ const RichTextEditor = ({ value, onChange, disabled = false }) => {
         suppressContentEditableWarning
         role="textbox"
         aria-multiline="true"
-        aria-label="Post content editor"
-        data-placeholder="Write your post content here..."
+        aria-label={t('richText.editor')}
+        data-placeholder={t('richText.placeholder')}
         onInput={() => {
           rememberSelection()
           emitValue()
@@ -120,7 +122,7 @@ const RichTextEditor = ({ value, onChange, disabled = false }) => {
         onMouseUp={rememberSelection}
         style={{ minHeight: 340, padding: '16px', outline: 'none', lineHeight: 1.7, cursor: disabled ? 'not-allowed' : 'text' }}
       />
-      <div className="px-3 py-2 border-top text-muted small">Use the toolbar to format headings, text, lists, quotes, and links.</div>
+      <div className="px-3 py-2 border-top text-muted small">{t('richText.hint')}</div>
     </div>
   )
 }

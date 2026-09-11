@@ -1,9 +1,11 @@
 import Breadcrumb from '../../components/common/Breadcrumb'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const PaymentSuccess = () => {
+  const { t } = useLanguage()
   return (
     <>
-      <Breadcrumb title="Pharmacy" li1="Payment" li2="Payment" />
+      <Breadcrumb title={t('shop.pharmacy')} li1={t('booking.payment')} li2={t('booking.payment')} />
       <div className="content success-page-cont">
         <div className="container">
           <div className="row justify-content-center">
@@ -12,8 +14,8 @@ const PaymentSuccess = () => {
                 <div className="card-body">
                   <div className="success-cont">
                     <i className="fas fa-check"></i>
-                    <h3>Payment Successfully!</h3>
-                    <p className="mb-0">Product ID: 245468</p>
+                    <h3>{t('shop.paymentSuccess')}</h3>
+                    <p className="mb-0">{t('shop.product')} ID: 245468</p>
                   </div>
                 </div>
               </div>

@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 import { useUpcomingVaccinations, useVaccinations, useVaccines } from '../../queries'
 import { useDeleteVaccination, useUpdateVaccination } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const DoctorVaccinations = () => {
+  const { t, language } = useLanguage()
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
 
@@ -49,7 +51,7 @@ const DoctorVaccinations = () => {
     if (!d) return '—'
     const dt = new Date(d)
     if (Number.isNaN(dt.getTime())) return '—'
-    return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    return dt.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
   }
 
   const filteredVaccinations = useMemo(() => {
@@ -96,12 +98,12 @@ const DoctorVaccinations = () => {
     const vaccinationType = selectedVaccine?.name || editForm.vaccinationType
 
     if (!String(vaccinationType || '').trim()) {
-      toast.error('Vaccine/type is required')
+      toast.error(t('doctorVaccinations.vaccineRequired'))
       return
     }
 
     if (!editForm.vaccinationDate) {
-      toast.error('Vaccination date is required')
+      toast.error(t('doctorVaccinations.dateRequired'))
       return
     }
 
@@ -117,21 +119,21 @@ const DoctorVaccinations = () => {
           notes: editForm.notes || null,
         },
       })
-      toast.success('Vaccination updated')
+      toast.success(t('doctorVaccinations.updated'))
       setShowEditModal(false)
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to update vaccination')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorVaccinations.updateFailed'))
     }
   }
 
   const handleDelete = async (id) => {
-    const ok = window.confirm('Delete this vaccination record?')
+    const ok = window.confirm(t('doctorVaccinations.deleteConfirm'))
     if (!ok) return
     try {
       await deleteVaccination.mutateAsync(id)
-      toast.success('Vaccination deleted')
+      toast.success(t('doctorVaccinations.deleted'))
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to delete vaccination')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorVaccinations.deleteFailed'))
     }
   }
 
@@ -146,9 +148,9 @@ const DoctorVaccinations = () => {
               <div className="veterinary-dashboard-header">
                 <h2 className="dashboard-title">
                   <i className="fa-solid fa-syringe me-3"></i>
-                  Vaccinations
+                  {t('doctorVaccinations.title')}
                 </h2>
-                <p className="dashboard-subtitle">View and update vaccinations you have recorded</p>
+                <p className="dashboard-subtitle">{t('doctorVaccinations.subtitle')}</p>
               </div>
             </div>
           </div>
@@ -162,7 +164,7 @@ const DoctorVaccinations = () => {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Search vaccinations..."
+                        placeholder={t('doctorVaccinations.searchPlaceholder')}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                       />
@@ -179,15 +181,15 @@ const DoctorVaccinations = () => {
               <div className="col-12">
                 <div className="dashboard-card veterinary-card">
                   <div className="dashboard-card-body">
-                    <h5 className="mb-2">Upcoming (Next 30 days)</h5>
+                    <h5 className="mb-2">{t('doctorVaccinations.upcoming')}</h5>
                     <div className="table-responsive">
                       <table className="table table-center mb-0 veterinary-table vaccination-mobile-table">
                         <thead>
                           <tr>
-                            <th>Pet</th>
-                            <th>Vaccine</th>
-                            <th>Due</th>
-                            <th>Owner</th>
+                            <th>{t('doctorVaccinations.pet')}</th>
+                            <th>{t('doctorVaccinations.vaccine')}</th>
+                            <th>{t('doctorVaccinations.due')}</th>
+                            <th>{t('doctorVaccinations.owner')}</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -197,7 +199,7 @@ const DoctorVaccinations = () => {
                                 <span className="badge veterinary-badge">
                                   <img
                                     src={getImageUrl(v.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
-                                    alt="Pet"
+                                    alt={t('doctorVaccinations.pet')}
                                     className="avatar avatar-xs me-1"
                                   />
                                   {v.petId?.name || '—'}
@@ -226,24 +228,24 @@ const DoctorVaccinations = () => {
                       <table className="table table-center mb-0 veterinary-table vaccination-mobile-table">
                         <thead>
                           <tr>
-                            <th>ID</th>
-                            <th>Pet</th>
-                            <th>Vaccine</th>
-                            <th>Date</th>
-                            <th>Next Due</th>
-                            <th>Owner</th>
-                            <th>Certificate</th>
-                            <th>Action</th>
+                            <th>{t('doctorVaccinations.id')}</th>
+                            <th>{t('doctorVaccinations.pet')}</th>
+                            <th>{t('doctorVaccinations.vaccine')}</th>
+                            <th>{t('doctorVaccinations.date')}</th>
+                            <th>{t('doctorVaccinations.nextDue')}</th>
+                            <th>{t('doctorVaccinations.owner')}</th>
+                            <th>{t('doctorVaccinations.certificate')}</th>
+                            <th>{t('doctorVaccinations.action')}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {isLoading ? (
                             <tr>
-                              <td colSpan={8} className="text-center py-4">Loading...</td>
+                              <td colSpan={8} className="text-center py-4">{t('doctorVaccinations.loading')}</td>
                             </tr>
                           ) : filteredVaccinations.length === 0 ? (
                             <tr>
-                              <td colSpan={8} className="text-center py-4">No vaccinations found</td>
+                              <td colSpan={8} className="text-center py-4">{t('doctorVaccinations.empty')}</td>
                             </tr>
                           ) : (
                             filteredVaccinations.map((v) => (
@@ -257,7 +259,7 @@ const DoctorVaccinations = () => {
                                   <span className="badge veterinary-badge">
                                     <img
                                       src={getImageUrl(v.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
-                                      alt="Pet"
+                                    alt={t('doctorVaccinations.pet')}
                                       className="avatar avatar-xs me-1"
                                     />
                                     {v.petId?.name || '—'}
@@ -269,20 +271,20 @@ const DoctorVaccinations = () => {
                                 <td data-label="Owner">{v.petOwnerId?.name || v.petOwnerId?.fullName || '—'}</td>
                                 <td data-label="Certificate">
                                   {v.certificateUrl ? (
-                                    <a href={getImageUrl(v.certificateUrl) || '#'} target="_blank" rel="noreferrer" className="link-primary">View</a>
+                                    <a href={getImageUrl(v.certificateUrl) || '#'} target="_blank" rel="noreferrer" className="link-primary">{t('doctorVaccinations.certificateView')}</a>
                                   ) : (
                                     '—'
                                   )}
                                 </td>
                                 <td data-label="Actions">
                                   <div className="action-item veterinary-actions">
-                                    <a href="#" className="veterinary-action-btn" title="View" onClick={(e) => { e.preventDefault(); setViewVaccination(v) }}>
+                                    <a href="#" className="veterinary-action-btn" title={t('doctorVaccinations.view')} aria-label={t('doctorVaccinations.view')} onClick={(e) => { e.preventDefault(); setViewVaccination(v) }}>
                                       <i className="fa-solid fa-eye"></i>
                                     </a>
-                                    <a href="#" className="veterinary-action-btn" title="Edit" onClick={(e) => { e.preventDefault(); openEdit(v) }}>
+                                    <a href="#" className="veterinary-action-btn" title={t('doctorVaccinations.edit')} aria-label={t('doctorVaccinations.edit')} onClick={(e) => { e.preventDefault(); openEdit(v) }}>
                                       <i className="fa-solid fa-pen"></i>
                                     </a>
-                                    <a href="#" className="veterinary-action-btn text-danger" title="Delete" onClick={(e) => { e.preventDefault(); handleDelete(v._id) }}>
+                                    <a href="#" className="veterinary-action-btn text-danger" title={t('doctorVaccinations.delete')} aria-label={t('doctorVaccinations.delete')} onClick={(e) => { e.preventDefault(); handleDelete(v._id) }}>
                                       <i className="fa-solid fa-trash"></i>
                                     </a>
                                   </div>
@@ -300,7 +302,7 @@ const DoctorVaccinations = () => {
                       <ul>
                         <li>
                           <a href="#" className={`page-link veterinary-page-link prev ${page <= 1 ? 'disabled' : ''}`} onClick={handlePrevPage}>
-                            <i className="fa-solid fa-chevron-left me-1"></i>Prev
+                            <i className="fa-solid fa-chevron-left me-1"></i>{t('doctorVaccinations.previous')}
                           </a>
                         </li>
                         <li>
@@ -310,7 +312,7 @@ const DoctorVaccinations = () => {
                         </li>
                         <li>
                           <a href="#" className={`page-link veterinary-page-link next ${page >= pagination.pages ? 'disabled' : ''}`} onClick={handleNextPage}>
-                            Next<i className="fa-solid fa-chevron-right ms-1"></i>
+                            {t('doctorVaccinations.next')}<i className="fa-solid fa-chevron-right ms-1"></i>
                           </a>
                         </li>
                       </ul>
@@ -330,21 +332,21 @@ const DoctorVaccinations = () => {
             <div className="modal-dialog modal-dialog-centered modal-lg" onClick={(e) => e.stopPropagation()}>
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">{viewVaccination.vaccineId?.name || viewVaccination.vaccinationType || 'Vaccination'}</h5>
-                  <button type="button" className="btn-close" onClick={() => setViewVaccination(null)}></button>
+                  <h5 className="modal-title">{viewVaccination.vaccineId?.name || viewVaccination.vaccinationType || t('doctorVaccinations.vaccination')}</h5>
+                  <button type="button" className="btn-close" onClick={() => setViewVaccination(null)} aria-label={t('doctorVaccinations.close')}></button>
                 </div>
                 <div className="modal-body">
                   <div className="row">
-                    <div className="col-md-6 mb-2"><strong>Pet:</strong> {viewVaccination.petId?.name || '—'}</div>
-                    <div className="col-md-6 mb-2"><strong>Owner:</strong> {viewVaccination.petOwnerId?.name || viewVaccination.petOwnerId?.fullName || '—'}</div>
-                    <div className="col-md-6 mb-2"><strong>Date:</strong> {formatDate(viewVaccination.vaccinationDate)}</div>
-                    <div className="col-md-6 mb-2"><strong>Next Due:</strong> {formatDate(viewVaccination.nextDueDate)}</div>
-                    <div className="col-md-6 mb-2"><strong>Batch:</strong> {viewVaccination.batchNumber || '—'}</div>
-                    <div className="col-md-6 mb-2"><strong>Appointment:</strong> {viewVaccination.relatedAppointmentId ? String(viewVaccination.relatedAppointmentId).slice(-6).toUpperCase() : '—'}</div>
-                    <div className="col-12 mb-2"><strong>Notes:</strong> {viewVaccination.notes || '—'}</div>
+                    <div className="col-md-6 mb-2"><strong>{t('doctorVaccinations.pet')}:</strong> {viewVaccination.petId?.name || '—'}</div>
+                    <div className="col-md-6 mb-2"><strong>{t('doctorVaccinations.owner')}:</strong> {viewVaccination.petOwnerId?.name || viewVaccination.petOwnerId?.fullName || '—'}</div>
+                    <div className="col-md-6 mb-2"><strong>{t('doctorVaccinations.date')}:</strong> {formatDate(viewVaccination.vaccinationDate)}</div>
+                    <div className="col-md-6 mb-2"><strong>{t('doctorVaccinations.nextDue')}:</strong> {formatDate(viewVaccination.nextDueDate)}</div>
+                    <div className="col-md-6 mb-2"><strong>{t('doctorVaccinations.batchNumber')}:</strong> {viewVaccination.batchNumber || '—'}</div>
+                    <div className="col-md-6 mb-2"><strong>{t('doctorVaccinations.appointment')}:</strong> {viewVaccination.relatedAppointmentId ? String(viewVaccination.relatedAppointmentId).slice(-6).toUpperCase() : '—'}</div>
+                    <div className="col-12 mb-2"><strong>{t('doctorVaccinations.notes')}:</strong> {viewVaccination.notes || '—'}</div>
                     {viewVaccination.certificateUrl && (
                       <div className="col-12 mt-2">
-                        <a className="btn btn-sm btn-primary" href={getImageUrl(viewVaccination.certificateUrl)} target="_blank" rel="noreferrer">Open Certificate</a>
+                        <a className="btn btn-sm btn-primary" href={getImageUrl(viewVaccination.certificateUrl)} target="_blank" rel="noreferrer">{t('doctorVaccinations.openCertificate')}</a>
                       </div>
                     )}
                   </div>
@@ -362,15 +364,15 @@ const DoctorVaccinations = () => {
             <div className="modal-dialog modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Edit Vaccination</h5>
-                  <button type="button" className="btn-close" onClick={() => setShowEditModal(false)} disabled={isSaving}></button>
+                  <h5 className="modal-title">{t('doctorVaccinations.editTitle')}</h5>
+                  <button type="button" className="btn-close" onClick={() => setShowEditModal(false)} disabled={isSaving} aria-label={t('doctorVaccinations.close')}></button>
                 </div>
                 <form onSubmit={handleEditSubmit}>
                   <div className="modal-body">
                     <div className="mb-3">
-                      <label className="form-label">Vaccine</label>
+                      <label className="form-label">{t('doctorVaccinations.vaccine')}</label>
                       <select className="form-select" value={editForm.vaccineId} onChange={(e) => setEditForm((p) => ({ ...p, vaccineId: e.target.value }))}>
-                        <option value="">Select vaccine</option>
+                        <option value="">{t('doctorVaccinations.selectVaccine')}</option>
                         {Array.isArray(vaccines) && vaccines.map((v) => (
                           <option key={v._id} value={v._id}>{v.name}</option>
                         ))}
@@ -378,29 +380,29 @@ const DoctorVaccinations = () => {
                     </div>
                     <div className="row">
                       <div className="col-md-6 mb-3">
-                        <label className="form-label">Vaccination Date</label>
+                        <label className="form-label">{t('doctorVaccinations.vaccinationDate')}</label>
                         <input type="date" className="form-control" value={editForm.vaccinationDate} onChange={(e) => setEditForm((p) => ({ ...p, vaccinationDate: e.target.value }))} />
                       </div>
                       <div className="col-md-6 mb-3">
-                        <label className="form-label">Next Due Date</label>
+                        <label className="form-label">{t('doctorVaccinations.nextDueDate')}</label>
                         <input type="date" className="form-control" value={editForm.nextDueDate} onChange={(e) => setEditForm((p) => ({ ...p, nextDueDate: e.target.value }))} />
                       </div>
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Batch Number</label>
+                      <label className="form-label">{t('doctorVaccinations.batchNumber')}</label>
                       <input type="text" className="form-control" value={editForm.batchNumber} onChange={(e) => setEditForm((p) => ({ ...p, batchNumber: e.target.value }))} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Notes</label>
+                      <label className="form-label">{t('doctorVaccinations.notes')}</label>
                       <textarea className="form-control" rows={3} value={editForm.notes} onChange={(e) => setEditForm((p) => ({ ...p, notes: e.target.value }))}></textarea>
                     </div>
                   </div>
                   <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)} disabled={isSaving}>
-                      Cancel
+                      {t('doctorVaccinations.cancel')}
                     </button>
                     <button type="submit" className="btn btn-primary" disabled={isSaving}>
-                      {isSaving ? 'Saving...' : 'Save Changes'}
+                      {isSaving ? t('doctorClinicHours.loading') : t('doctorVaccinations.save')}
                     </button>
                   </div>
                 </form>

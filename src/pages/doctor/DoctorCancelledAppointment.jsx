@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const DoctorCancelledAppointment = () => {
+  const { t } = useLanguage()
   return (
     <>
       <div className="dashboard-header">
         <div className="header-back">
           <Link to="/appointments" className="back-arrow"><i className="fa-solid fa-arrow-left"></i></Link>
-          <h3>Appointment Details</h3>
+          <h3>{t('doctorLegacyDetails.appointmentDetails')}</h3>
         </div>
       </div>
       <div className="appointment-details-wrap">
@@ -16,7 +18,7 @@ const DoctorCancelledAppointment = () => {
             <li>
               <div className="patinet-information">
                 <a href="#">
-                  <img src="/public/assets/img/doctors-dashboard/profile-02.jpg" alt="User Image" />
+                  <img src="/public/assets/img/doctors-dashboard/profile-02.jpg" alt={t('doctorLegacyDetails.userImage')} />
                 </a>
                 <div className="patient-info">
                   <p>#Apt0001</p>
@@ -32,25 +34,25 @@ const DoctorCancelledAppointment = () => {
             </li>
             <li className="appointment-info">
               <div className="person-info">
-                <p>Pet owner</p>
+                <p>{t('doctorLegacyDetails.petOwner')}</p>
                 <ul className="d-flex apponitment-types">
                   <li>Andrew</li>
                 </ul>
               </div>
               <div className="person-info">
-                <p>Type of Appointment</p>
+                <p>{t('doctorLegacyDetails.typeOfAppointment')}</p>
                 <ul className="d-flex apponitment-types">
-                  <li><i className="fa-solid fa-video text-indigo"></i>Video Call</li>
+                  <li><i className="fa-solid fa-video text-indigo"></i>{t('doctorLegacy.videoCall')}</li>
                 </ul>
               </div>
             </li>
             <li className="appointment-action">
               <div className="detail-badge-info">
-                <span className="badge bg-red me-2">Cancelled</span>
-                <a href="#reject_reason" className="reject-popup" data-bs-toggle="modal">Reason</a>
+                <span className="badge bg-red me-2">{t('doctorLegacyDetails.cancelled')}</span>
+                <a href="#reject_reason" className="reject-popup" data-bs-toggle="modal">{t('doctorLegacyDetails.reason')}</a>
               </div>
               <div className="consult-fees">
-                <h6>Consultation Fees : $200</h6>
+                <h6>{t('doctorLegacyDetails.consultationFees')} : $200</h6>
               </div>
               <ul>
                 <li>
@@ -64,17 +66,17 @@ const DoctorCancelledAppointment = () => {
           </ul>
           <ul className="detail-card-bottom-info">
             <li>
-              <h6>Appointment Date & Time</h6>
+              <h6>{t('doctorLegacyDetails.appointmentDateTime')}</h6>
               <span>22 Jul 2023 - 12:00 pm</span>
             </li>
             <li>
-              <h6>Visit Type</h6>
-              <span>General</span>
+              <h6>{t('doctorLegacyDetails.visitType')}</h6>
+              <span>{t('doctorLegacyDetails.general')}</span>
             </li>
             <li>
               <div className="detail-badge-info">
-                <span className="badge bg-soft-red me-2">Status : Reschedule</span>
-                <a href="#" className="reschedule-btn btn-primary-border">Reschedule Appointment</a>
+                <span className="badge bg-soft-red me-2">{t('doctorLegacy.status')} : {t('doctorLegacyDetails.reschedule')}</span>
+                <a href="#" className="reschedule-btn btn-primary-border">{t('doctorLegacyDetails.reschedule')}</a>
               </div>
             </li>
           </ul>
@@ -82,14 +84,14 @@ const DoctorCancelledAppointment = () => {
         {/* /Appointment Detail Card */}
 
         <div className="recent-appointments">
-          <h5 className="head-text">Recent Appointments</h5>
+          <h5 className="head-text">{t('doctorLegacyDetails.recentAppointments')}</h5>
           {/* Appointment List */}
           <div className="appointment-wrap">
             <ul>
               <li>
                 <div className="patinet-information">
                   <a href="#">
-                    <img src="/public/assets/img/doctors-dashboard/profile-01.jpg" alt="User Image" />
+                    <img src="/public/assets/img/doctors-dashboard/profile-01.jpg" alt={t('doctorLegacyDetails.userImage')} />
                   </a>
                   <div className="patient-info">
                     <p>#Apt0001</p>
@@ -100,8 +102,8 @@ const DoctorCancelledAppointment = () => {
               <li className="appointment-info">
                 <p><i className="fa-solid fa-clock"></i>11 Nov 2024 10.45 AM</p>
                 <ul className="d-flex apponitment-types">
-                  <li>General Visit</li>
-                  <li>Chat</li>
+                  <li>{t('doctorLegacy.generalVisit')}</li>
+                  <li>{t('doctorLegacy.chat')}</li>
                 </ul>
               </li>
               <li className="mail-info-patient">
@@ -126,7 +128,7 @@ const DoctorCancelledAppointment = () => {
               <li>
                 <div className="patinet-information">
                   <a href="#">
-                    <img src="/public/assets/img/doctors-dashboard/profile-03.jpg" alt="User Image" />
+                    <img src="/public/assets/img/doctors-dashboard/profile-03.jpg" alt={t('doctorLegacyDetails.userImage')} />
                   </a>
                   <div className="patient-info">
                     <p>#Apt0003</p>
@@ -137,8 +139,8 @@ const DoctorCancelledAppointment = () => {
               <li className="appointment-info">
                 <p><i className="fa-solid fa-clock"></i>27 Oct 2024 09.30 AM</p>
                 <ul className="d-flex apponitment-types">
-                  <li>General Visit</li>
-                  <li>Video Call</li>
+                  <li>{t('doctorLegacy.generalVisit')}</li>
+                  <li>{t('doctorLegacy.videoCall')}</li>
                 </ul>
               </li>
               <li className="mail-info-patient">

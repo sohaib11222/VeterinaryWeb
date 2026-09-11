@@ -3,14 +3,16 @@ import Breadcrumb from '../../components/common/Breadcrumb'
 import { toast } from 'react-toastify'
 import { useCart } from '../../contexts/CartContext'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const Cart = () => {
+  const { t } = useLanguage()
   const { cartItems, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart()
 
   const handleQuantityChange = (cartItemId, newQuantity) => {
     if (newQuantity < 1) {
       removeFromCart(cartItemId)
-      toast.info('Item removed from cart')
+      toast.info(t('shop.itemRemoved', { name: t('shop.product') }))
     } else {
       updateQuantity(cartItemId, newQuantity)
     }
@@ -18,7 +20,7 @@ const Cart = () => {
 
   const handleRemoveItem = (cartItemId, productName) => {
     removeFromCart(cartItemId)
-    toast.info(`${productName} removed from cart`)
+    toast.info(t('shop.itemRemoved', { name: productName }))
   }
 
   const subtotal = getCartTotal()
@@ -26,15 +28,15 @@ const Cart = () => {
 
   return (
     <>
-      <Breadcrumb title="Pharmacy" li1="Cart" li2="Shopping Cart" />
+      <Breadcrumb title={t('shop.pharmacy')} li1={t('shop.cart')} li2={t('shop.cart')} />
       <div className="content">
         <div className="container">
           {cartItems.length === 0 ? (
             <div className="text-center py-5">
-              <h4>Your cart is empty</h4>
-              <p className="text-muted mb-4">Add some products to your cart to continue shopping.</p>
+              <h4>{t('shop.cartEmpty')}</h4>
+              <p className="text-muted mb-4">{t('shop.cartEmptyHint')}</p>
               <Link to="/product-all" className="btn btn-primary">
-                Browse Products
+                {t('shop.browseProducts')}
               </Link>
             </div>
           ) : (
@@ -45,12 +47,12 @@ const Cart = () => {
                     <table className="table table-hover table-center mb-0">
                       <thead>
                         <tr>
-                          <th>Product</th>
+                          <th>{t('shop.product')}</th>
                           <th>SKU</th>
-                          <th>Price</th>
-                          <th className="text-center">Quantity</th>
-                          <th>Total</th>
-                          <th>Action</th>
+                          <th>{t('shop.price')}</th>
+                          <th className="text-center">{t('shop.quantity')}</th>
+                          <th>{t('shop.total')}</th>
+                          <th>{t('shop.action')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -74,7 +76,7 @@ const Cart = () => {
                               <Link to={`/product-description?id=${item._id}`}>{item.name}</Link>
                               {item.variantName && <div className="text-muted small">{item.variantName}</div>}
                             </td>
-                            <td>{item.sku || 'N/A'}</td>
+                            <td>{item.sku || '—'}</td>
                             <td>€{Number(item.price || 0).toFixed(2)}</td>
                             <td className="text-center">
                               <div className="input-group1 cart-qty-stepper">
@@ -136,13 +138,13 @@ const Cart = () => {
                       type="button"
                       className="btn btn-outline-danger"
                       onClick={() => {
-                        if (window.confirm('Are you sure you want to clear your cart?')) {
+                        if (window.confirm(t('shop.clearCartConfirm'))) {
                           clearCart()
-                          toast.info('Cart cleared')
+                          toast.info(t('shop.cartCleared'))
                         }
                       }}
                     >
-                      Clear Cart
+                      {t('shop.clearCart')}
                     </button>
                   </div>
                 </div>
@@ -150,18 +152,18 @@ const Cart = () => {
                   <div className="booking-total">
                     <ul className="booking-total-list">
                       <li>
-                        <span>Subtotal</span>
+                        <span>{t('shop.subtotal')}</span>
                         <span className="total-cost">€{subtotal.toFixed(2)}</span>
                       </li>
                       <li>
-                        <span>Total</span>
+                        <span>{t('shop.total')}</span>
                         <span className="total-cost">€{total.toFixed(2)}</span>
                       </li>
                     </ul>
                   </div>
                   <div className="submit-section">
                     <Link to="/product-checkout" className="btn btn-primary submit-btn w-100">
-                      Proceed to Checkout
+                      {t('shop.proceedCheckout')}
                     </Link>
                   </div>
                 </div>

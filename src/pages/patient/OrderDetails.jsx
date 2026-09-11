@@ -6,10 +6,12 @@ import { useOrder } from '../../queries/orderQueries'
 import { useCancelOrder, usePayForOrder } from '../../mutations/orderMutations'
 import { getImageUrl } from '../../utils/apiConfig'
 import { deliveryStatusBadgeClass, formatDeliveryStatus } from '../../utils/deliveryMonitoring'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const OrderDetails = () => {
   const { orderId } = useParams()
   const navigate = useNavigate()
+  const { language, t } = useLanguage()
 
   const orderQuery = useOrder(orderId)
   const payMutation = usePayForOrder()
@@ -23,7 +25,7 @@ const OrderDetails = () => {
   const formatDate = (dateString) => {
     if (!dateString) return '—'
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-GB', {
+    return date.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -43,17 +45,21 @@ const OrderDetails = () => {
       REFUNDED: 'badge-secondary',
       PENDING: 'badge-secondary',
     }
-    return <span className={`badge ${badges[s] || 'badge-secondary'}`}>{s || '—'}</span>
+    const label = {
+      DELIVERED: t('patient.delivered'), SHIPPED: t('patient.shipped'), PROCESSING: t('patient.processing', 'Processing'), CONFIRMED: t('patient.appointment.confirmed'),
+      CANCELLED: t('patient.cancelled'), REFUNDED: t('patient.refunded'), PENDING: t('patient.pending'),
+    }[s] || s || '—'
+    return <span className={`badge ${badges[s] || 'badge-secondary'}`}>{label}</span>
   }
 
   const onPay = async () => {
     if (!order) return
     try {
       await payMutation.mutateAsync({ orderId: order._id, data: { paymentMethod: 'STRIPE' } })
-      toast.success('Payment successful')
+      toast.success(t('patient.paymentSuccessful'))
       orderQuery.refetch()
     } catch (error) {
-      toast.error(error?.message || 'Payment failed')
+      toast.error(error?.message || t('patient.paymentFailed'))
     }
   }
 
@@ -61,11 +67,11 @@ const OrderDetails = () => {
     if (!order) return
     try {
       await cancelMutation.mutateAsync(order._id)
-      toast.success('Order cancelled')
+      toast.success(t('patient.orderCancelled'))
       setShowCancelConfirm(false)
       navigate('/order-history')
     } catch (error) {
-      toast.error(error?.message || 'Cancel failed')
+      toast.error(error?.message || t('patient.cancelFailed'))
     }
   }
 
@@ -75,9 +81,9 @@ const OrderDetails = () => {
         <div className="container">
           <div className="text-center py-5">
             <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
+              <span className="visually-hidden">{t('patient.order.loadingDetails')}</span>
             </div>
-            <p className="mt-3">Loading order details...</p>
+            <p className="mt-3">{t('patient.order.loadingDetails')}</p>
           </div>
         </div>
       </div>
@@ -90,10 +96,10 @@ const OrderDetails = () => {
         <div className="container">
           <div className="text-center py-5">
             <i className="fe fe-alert-circle" style={{ fontSize: '64px', color: '#dc3545' }}></i>
-            <h5 className="mt-3">Error Loading Order</h5>
-            <p className="text-muted">{orderQuery.error?.message || 'Failed to load order details'}</p>
+            <h5 className="mt-3">{t('patient.order.loadError')}</h5>
+            <p className="text-muted">{orderQuery.error?.message || t('patient.order.failedLoad')}</p>
             <button className="btn btn-primary mt-3" onClick={() => orderQuery.refetch()}>
-              Retry
+              {t('patient.order.retry')}
             </button>
           </div>
         </div>
@@ -115,10 +121,10 @@ const OrderDetails = () => {
     <div className="content">
       <div className="container">
         <div className="dashboard-header d-flex justify-content-between align-items-center">
-          <h3>Order Details</h3>
+          <h3>{t('patient.order.details')}</h3>
           <Link to="/order-history" className="btn btn-outline-primary btn-sm">
             <i className="fe fe-arrow-left me-2"></i>
-            Back to Orders
+            {t('patient.order.backToOrders')}
           </Link>
         </div>
 
@@ -126,13 +132,13 @@ const OrderDetails = () => {
           <div className="card-body">
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                <p className="text-muted mb-1">Order Number</p>
+                <p className="text-muted mb-1">{t('patient.order.orderNumber')}</p>
                 <h4 className="mb-0">#{orderNo}</h4>
-                <p className="text-muted small mb-0 mt-2">Order Date: {formatDate(order?.createdAt)}</p>
+                <p className="text-muted small mb-0 mt-2">{t('patient.order.orderDate')}: {formatDate(order?.createdAt)}</p>
               </div>
               <div className="text-end">
                 {getStatusBadge(status)}
-                <p className="text-muted small mb-0 mt-2">Payment: {paymentStatus || '—'}</p>
+                <p className="text-muted small mb-0 mt-2">{t('patient.order.payment')}: {getStatusBadge(paymentStatus)}</p>
               </div>
             </div>
           </div>
@@ -141,38 +147,38 @@ const OrderDetails = () => {
         {paymentStatus === 'UNPAID' && !shippingSet && (
           <div className="alert alert-info mb-4">
             <i className="fe fe-info me-2"></i>
-            Waiting for pharmacy owner to set shipping fee. You will be able to pay once the shipping fee is set.
+            {t('patient.order.waitingForShippingFee')}
           </div>
         )}
 
         {paymentStatus === 'UNPAID' && shippingSet && (
           <div className="alert alert-warning mb-4">
             <i className="fe fe-alert-circle me-2"></i>
-            Shipping fee has been set. Please complete payment to confirm your order.
+            {t('patient.order.shippingFeeSet')}
           </div>
         )}
 
         {paymentStatus === 'PAID' && (
           <div className="alert alert-success mb-4">
             <i className="fe fe-check-circle me-2"></i>
-            Payment completed. Your order is being processed.
+            {t('patient.order.paymentCompleted')}
           </div>
         )}
 
         {order?.expectedDeliveryDate && (
           <div className="card mb-4 border-primary">
             <div className="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <h4 className="card-title mb-0">Delivery Commitment</h4>
+              <h4 className="card-title mb-0">{t('patient.order.deliveryCommitment')}</h4>
               <span className={`badge ${deliveryStatusBadgeClass(order?.deliveryStatus)}`}>
                 {formatDeliveryStatus(order?.deliveryStatus, order?.daysLate)}
               </span>
             </div>
             <div className="card-body">
-              <p className="mb-2"><strong>Estimated Delivery: 2–5 Days</strong></p>
-              <p className="mb-2">Pharmacy commitment: <strong>{order?.promisedDeliveryDays} Days</strong></p>
-              <p className="mb-0">Expected Delivery Date: <strong>{new Date(order.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</strong></p>
+              <p className="mb-2"><strong>{t('patient.order.estimatedDelivery')}</strong></p>
+              <p className="mb-2">{t('patient.order.pharmacyCommitment')}: <strong>{order?.promisedDeliveryDays} {language === 'it' ? 'giorni' : 'days'}</strong></p>
+              <p className="mb-0">{t('patient.order.expectedDeliveryDate')}: <strong>{new Date(order.expectedDeliveryDate).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}</strong></p>
               {order?.deliveryStatus === 'LATE' && order?.daysLate ? (
-                <p className="text-danger small mb-0 mt-2">This order is currently {order.daysLate} day{Number(order.daysLate) === 1 ? '' : 's'} late.</p>
+                <p className="text-danger small mb-0 mt-2">{t('patient.order.currentlyLate', { days: order.daysLate, suffix: Number(order.daysLate) === 1 ? (language === 'it' ? 'o' : '') : (language === 'it' ? 'i' : 's') })}</p>
               ) : null}
             </div>
           </div>
@@ -180,7 +186,7 @@ const OrderDetails = () => {
 
         <div className="card mb-4">
           <div className="card-header">
-            <h4 className="card-title mb-0">Order Items</h4>
+            <h4 className="card-title mb-0">{t('patient.order.orderItems')}</h4>
           </div>
           <div className="card-body">
             {(order?.items || []).map((item, index) => {
@@ -191,7 +197,7 @@ const OrderDetails = () => {
                 <div key={item?._id || index} className="d-flex align-items-center mb-3 pb-3 border-bottom">
                   <img
                     src={img}
-                    alt={p?.name || 'product'}
+                    alt={p?.name || t('patient.order.product')}
                     className="img-fluid"
                     style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', marginRight: '15px' }}
                     onError={(e) => {
@@ -199,9 +205,9 @@ const OrderDetails = () => {
                     }}
                   />
                   <div className="flex-grow-1">
-                    <h5 className="mb-1">{p?.name || 'Product'}</h5>
-                    <p className="text-muted mb-1">Quantity: {item?.quantity || 0}</p>
-                    <p className="text-muted mb-0">€{Number(itemPrice || 0).toFixed(2)} each</p>
+                    <h5 className="mb-1">{p?.name || t('patient.order.product')}</h5>
+                    <p className="text-muted mb-1">{t('patient.order.quantity')}: {item?.quantity || 0}</p>
+                    <p className="text-muted mb-0">€{Number(itemPrice || 0).toFixed(2)} {t('patient.order.each')}</p>
                   </div>
                   <div>
                     <h5 className="mb-0">€{Number(item?.total || 0).toFixed(2)}</h5>
@@ -215,7 +221,7 @@ const OrderDetails = () => {
         {order?.shippingAddress && (order.shippingAddress.line1 || order.shippingAddress.city) && (
           <div className="card mb-4">
             <div className="card-header">
-              <h4 className="card-title mb-0">Shipping Address</h4>
+              <h4 className="card-title mb-0">{t('patient.order.shippingAddress')}</h4>
             </div>
             <div className="card-body">
               <p className="mb-1">{order.shippingAddress?.line1}</p>
@@ -230,20 +236,20 @@ const OrderDetails = () => {
 
         <div className="card mb-4">
           <div className="card-header">
-            <h4 className="card-title mb-0">Order Summary</h4>
+            <h4 className="card-title mb-0">{t('patient.order.orderSummary')}</h4>
           </div>
           <div className="card-body">
             <div className="d-flex justify-content-between mb-2">
-              <span>Subtotal</span>
+              <span>{t('patient.order.subtotal')}</span>
               <span>€{Number(order?.subtotal || 0).toFixed(2)}</span>
             </div>
             <div className="d-flex justify-content-between mb-2">
-              <span>Shipping</span>
+              <span>{t('patient.order.shipping')}</span>
               <span>€{Number(order?.shipping || 0).toFixed(2)}</span>
             </div>
             <hr />
             <div className="d-flex justify-content-between">
-              <strong>Total</strong>
+              <strong>{t('patient.total')}</strong>
               <strong>€{Number(order?.total || 0).toFixed(2)}</strong>
             </div>
           </div>
@@ -255,12 +261,12 @@ const OrderDetails = () => {
               <div className="d-flex gap-2 flex-wrap">
                 {canPay && (
                   <button className="btn btn-primary" onClick={onPay} disabled={payMutation.isPending}>
-                    {payMutation.isPending ? 'Processing...' : `Pay €${Number(order?.total || 0).toFixed(2)}`}
+                    {payMutation.isPending ? t('patient.order.processing') : t('patient.order.payAmount', { amount: `€${Number(order?.total || 0).toFixed(2)}` })}
                   </button>
                 )}
                 {canCancel && (
                   <button className="btn btn-danger" onClick={() => setShowCancelConfirm(true)} disabled={cancelMutation.isPending}>
-                    Cancel Order
+                    {t('patient.cancelOrder')}
                   </button>
                 )}
               </div>
@@ -274,19 +280,19 @@ const OrderDetails = () => {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Cancel Order</h5>
+                <h5 className="modal-title">{t('patient.cancelOrder')}</h5>
                 <button type="button" className="btn-close" onClick={() => setShowCancelConfirm(false)}></button>
               </div>
               <div className="modal-body">
-                <p>Are you sure you want to cancel order #{orderNo}?</p>
-                <p className="text-muted">This action cannot be undone.</p>
+                <p>{t('patient.cancelThisOrder')} #{orderNo}?</p>
+                <p className="text-muted">{t('patient.order.cannotUndo')}</p>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCancelConfirm(false)}>
-                  No, Keep Order
+                  {t('patient.order.keepOrder')}
                 </button>
                 <button type="button" className="btn btn-danger" onClick={onCancel} disabled={cancelMutation.isPending}>
-                  {cancelMutation.isPending ? 'Cancelling...' : 'Yes, Cancel Order'}
+                  {cancelMutation.isPending ? t('patient.appointment.cancelling') : t('patient.order.confirmCancel')}
                 </button>
               </div>
             </div>

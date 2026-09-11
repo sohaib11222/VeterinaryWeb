@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useAppointment, useConversations, useMessages, useUnreadChatCount } from '../../queries'
 import { useGetOrCreateConversation, useMarkConversationRead, useSendMessage, useUploadChatFiles } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const isPetSitterConversation = (conversation) => conversation?.conversationType === 'PET_SITTER_PET_OWNER'
 
@@ -17,6 +18,7 @@ const getConversationParticipant = (conversation) => {
 
 const Chat = () => {
   const { user } = useAuth()
+  const { t: translate } = useLanguage()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -186,17 +188,17 @@ const Chat = () => {
     if (sendMessage.isPending || uploadingFiles) return
 
     if (isConversationCompleted) {
-      toast.info('This chat has been marked as completed by the veterinarian.')
+      toast.info(translate('patient.chat.completed'))
       return
     }
 
     const text = newMessage.trim()
     if (!text && !pendingFiles.length) {
-      toast.error('Please enter a message or select a file')
+      toast.error(translate('patient.chat.enterMessage'))
       return
     }
     if (!selectedConversationId || !selectedConversation) {
-      toast.error('Please select a chat first')
+      toast.error(translate('patient.chat.chooseChat'))
       return
     }
 
@@ -207,11 +209,11 @@ const Chat = () => {
     const aptId = selectedConversation?.appointmentId && (typeof selectedConversation.appointmentId === 'object' ? selectedConversation.appointmentId._id : selectedConversation.appointmentId)
 
     if (petSitterChat && (!petSitterId || !ownerId)) {
-      toast.error('Invalid Pet Sitter conversation details')
+      toast.error(translate('patient.chat.invalidPetSitter', 'Invalid Pet Sitter conversation details'))
       return
     }
     if (!petSitterChat && (!vetId || !ownerId || !aptId)) {
-      toast.error('Invalid conversation details')
+      toast.error(translate('patient.chat.invalidConversation', 'Invalid conversation details'))
       return
     }
 
@@ -251,7 +253,7 @@ const Chat = () => {
       setUploadProgress(0)
       scrollToBottom()
     } catch (err) {
-      toast.error(err?.message || 'Failed to send message')
+      toast.error(err?.message || translate('patient.chat.sendFailed'))
     } finally {
       setUploadingFiles(false)
       setUploadProgress(0)
@@ -312,7 +314,7 @@ const Chat = () => {
 
   const handleFileSelect = (e) => {
     if (isConversationCompleted) {
-      toast.info('This chat has been marked as completed by the veterinarian.')
+      toast.info(translate('patient.chat.completed'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
@@ -321,7 +323,7 @@ const Chat = () => {
     if (files.length === 0) return
 
     if (pendingFiles.length + files.length > 10) {
-      toast.error('You can send up to 10 files at once.')
+      toast.error(translate('patient.chat.fileLimit'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
@@ -329,13 +331,13 @@ const Chat = () => {
     const maxSize = 50 * 1024 * 1024
     const oversizedFiles = files.filter((f) => f.size > maxSize)
     if (oversizedFiles.length > 0) {
-      toast.error('Some files are too large. Maximum size is 50MB.')
+      toast.error(translate('patient.chat.fileSize'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
     if (!selectedConversationId || !selectedConversation) {
-      toast.error('Please select a chat first')
+      toast.error(translate('patient.chat.chooseChat'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
@@ -365,7 +367,7 @@ const Chat = () => {
           : await getOrCreateConversation.mutateAsync({ petSitterId: petSitterIdFromUrl, petOwnerId: currentUserId })
         const payload = response?.data ?? response
         const conversation = payload?.data ?? payload
-        if (!conversation?._id) throw new Error('Unable to prepare the Pet Sitter conversation')
+        if (!conversation?._id) throw new Error(translate('patient.chat.openPetSitterFailed'))
         didAutoOpenPetSitterRef.current = true
         setSelectedConversationId(conversation._id)
         setIsMobileConversationOpen(true)
@@ -376,7 +378,7 @@ const Chat = () => {
           return next
         })
       } catch (error) {
-        toast.error(error?.message || 'Unable to open Pet Sitter chat')
+        toast.error(error?.message || translate('patient.chat.openPetSitterFailed', 'Unable to open Pet Sitter chat'))
       }
     }
 
@@ -912,9 +914,9 @@ const Chat = () => {
                 <div className="chat-list-header">
                   <div className="d-flex align-items-center justify-content-between mb-3">
                     <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate('/patient-appointments')}>
-                      <i className="fa-solid fa-chevron-left me-1"></i> Back
+                      <i className="fa-solid fa-chevron-left me-1"></i> {translate('patient.back')}
                     </button>
-                    <h4 className="mb-0">All Chats</h4>
+                    <h4 className="mb-0">{translate('patient.chat.allChats')}</h4>
                   </div>
                   <div className="chat-search-box">
                     <span className="form-control-feedback">
@@ -922,7 +924,7 @@ const Chat = () => {
                     </span>
                     <input
                       type="text"
-                      placeholder="Search"
+                      placeholder={translate('patient.chat.search')}
                       className="form-control"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -933,16 +935,16 @@ const Chat = () => {
                   {/* Pinned Chat Section */}
                   <div className="pinned-chat-section">
                     <div className="section-header">
-                      <h6>Pinned Chat</h6>
+                      <h6>{translate('patient.chat.pinned')}</h6>
                     </div>
                     {conversationsLoading ? (
-                      <div className="text-center py-3 text-muted">Loading...</div>
+                      <div className="text-center py-3 text-muted">{translate('common.loading')}</div>
                     ) : pinnedConversations.length === 0 ? (
-                      <div className="text-center py-3 text-muted">No chats</div>
+                      <div className="text-center py-3 text-muted">{translate('patient.chat.noChats')}</div>
                     ) : (
                       pinnedConversations.map((c) => {
                         const participant = getConversationParticipant(c)
-                        const name = participant?.name || participant?.fullName || participant?.email || (isPetSitterConversation(c) ? 'Pet Sitter' : 'Veterinarian')
+                        const name = participant?.name || participant?.fullName || participant?.email || (isPetSitterConversation(c) ? translate('patient.chat.petSitter') : translate('patient.appointment.veterinarian'))
                         const avatar = getImageUrl(participant?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
                         const preview = c?.lastMessage?.message || c?.lastMessage?.fileName || '—'
                         const time = formatConversationTime(c)
@@ -987,7 +989,7 @@ const Chat = () => {
                                   )}
                                 </div>
                               </div>
-                              <p className="chat-item-message">{isPetSitterConversation(c) ? 'Pet Sitter · ' : ''}{preview}</p>
+                              <p className="chat-item-message">{isPetSitterConversation(c) ? translate('patient.chat.petSitterPrefix') : ''}{preview}</p>
                             </div>
                           </a>
                         )
@@ -998,16 +1000,16 @@ const Chat = () => {
                   {/* Recent Chat Section */}
                   <div className="recent-chat-section">
                     <div className="section-header">
-                      <h6>Recent Chat</h6>
+                      <h6>{translate('patient.chat.recent')}</h6>
                     </div>
                     {conversationsLoading ? (
-                      <div className="text-center py-3 text-muted">Loading...</div>
+                      <div className="text-center py-3 text-muted">{translate('common.loading')}</div>
                     ) : recentConversations.length === 0 ? (
-                      <div className="text-center py-3 text-muted">No more chats</div>
+                      <div className="text-center py-3 text-muted">{translate('patient.chat.noMoreChats')}</div>
                     ) : (
                       recentConversations.map((c) => {
                         const participant = getConversationParticipant(c)
-                        const name = participant?.name || participant?.fullName || participant?.email || (isPetSitterConversation(c) ? 'Pet Sitter' : 'Veterinarian')
+                        const name = participant?.name || participant?.fullName || participant?.email || (isPetSitterConversation(c) ? translate('patient.chat.petSitter') : translate('patient.appointment.veterinarian'))
                         const avatar = getImageUrl(participant?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
                         const preview = c?.lastMessage?.message || c?.lastMessage?.fileName || '—'
                         const time = formatConversationTime(c)
@@ -1052,7 +1054,7 @@ const Chat = () => {
                                   )}
                                 </div>
                               </div>
-                              <p className="chat-item-message">{isPetSitterConversation(c) ? 'Pet Sitter · ' : ''}{preview}</p>
+                              <p className="chat-item-message">{isPetSitterConversation(c) ? translate('patient.chat.petSitterPrefix') : ''}{preview}</p>
                             </div>
                           </a>
                         )
@@ -1071,7 +1073,7 @@ const Chat = () => {
                         type="button"
                         className="chat-mobile-back-button"
                         onClick={() => setIsMobileConversationOpen(false)}
-                        aria-label="Back to chats"
+                        aria-label={translate('patient.chat.allChats')}
                       >
                         <i className="fa-solid fa-arrow-left"></i>
                       </button>
@@ -1082,7 +1084,7 @@ const Chat = () => {
                               getImageUrl(getConversationParticipant(selectedConversation)?.profileImage) ||
                               '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
                             }
-                            alt="User"
+                            alt={translate('common.profileSettings')}
                           />
                         </div>
                         <div className="chat-details-user-info">
@@ -1090,16 +1092,16 @@ const Chat = () => {
                             {getConversationParticipant(selectedConversation)?.name ||
                               getConversationParticipant(selectedConversation)?.fullName ||
                               getConversationParticipant(selectedConversation)?.email ||
-                              (isPetSitterConversation(selectedConversation) ? 'Pet Sitter' : 'Veterinarian')}
+                              (isPetSitterConversation(selectedConversation) ? translate('patient.chat.petSitter') : translate('patient.appointment.veterinarian'))}
                           </h5>
-                          {isPetSitterConversation(selectedConversation) && <span className="badge bg-primary-subtle text-primary">Pet Sitter · Direct chat</span>}
+                          {isPetSitterConversation(selectedConversation) && <span className="badge bg-primary-subtle text-primary">{translate('patient.chat.petSitter')} · {translate('patient.chat.directChat')}</span>}
                         </div>
                       </div>
                       <div className="chat-details-actions">
-                        <button type="button" title="Search">
+                        <button type="button" title={translate('patient.chat.searchMessages')}>
                           <i className="fa-solid fa-magnifying-glass"></i>
                         </button>
-                        <button type="button" title="More options">
+                        <button type="button" title={translate('patient.chat.moreOptions')}>
                           <i className="fa-solid fa-ellipsis-vertical"></i>
                         </button>
                       </div>
@@ -1107,21 +1109,21 @@ const Chat = () => {
 
                     {isConversationCompleted && (
                       <div className="alert alert-secondary rounded-0 mb-0 py-2 px-3" role="status">
-                        This chat was marked as completed by the veterinarian. Messages and attachments are now read-only.
+                        {translate('patient.chat.completedReadonly')}
                       </div>
                     )}
 
                     <div className="chat-messages-area" ref={messagesContainerRef}>
                       {messagesLoading ? (
-                        <div className="text-center py-3 text-muted">Loading...</div>
+                        <div className="text-center py-3 text-muted">{translate('common.loading')}</div>
                       ) : messages.length === 0 ? (
-                        <div className="text-center py-3 text-muted">No messages yet</div>
+                        <div className="text-center py-3 text-muted">{translate('patient.chat.noMessages')}</div>
                       ) : (
                         messages.map((m) => {
                           const sender = m?.senderId
                           const senderId = sender?._id
                           const isOutgoing = currentUserId && senderId && String(senderId) === String(currentUserId)
-                          const senderName = sender?.name || sender?.fullName || sender?.email || 'User'
+                          const senderName = sender?.name || sender?.fullName || sender?.email || translate('patient.petOwner')
                           const senderAvatar = getImageUrl(sender?.profileImage) || (isOutgoing ? currentUserImage : '/assets/img/doctors-dashboard/doctor-profile-img.jpg')
                           const t = m?.createdAt ? new Date(m.createdAt) : null
                           const time = t && !Number.isNaN(t.getTime()) ? t.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : ''
@@ -1195,7 +1197,7 @@ const Chat = () => {
                               <div className="text-truncate">{file.name}</div>
                               <span className="text-muted">{formatFileSize(file.size)}</span>
                             </div>
-                            <button type="button" className="btn btn-sm btn-light" onClick={() => removePendingFile(index)} aria-label={`Remove ${file.name}`} title="Remove file"><i className="fa-solid fa-xmark" /></button>
+                            <button type="button" className="btn btn-sm btn-light" onClick={() => removePendingFile(index)} aria-label={`${translate('patient.chat.removeFile')} ${file.name}`} title={translate('patient.chat.removeFile')}><i className="fa-solid fa-xmark" /></button>
                           </div>
                         ))}
                       </div>
@@ -1206,7 +1208,7 @@ const Chat = () => {
                       <div className="chat-input-actions">
                         <button
                           type="button"
-                          title="Attach"
+                          title={translate('patient.chat.attach')}
                           onClick={() => fileInputRef.current?.click()}
                           disabled={uploadingFiles || sendMessage.isPending || isConversationCompleted}
                         >
@@ -1224,7 +1226,7 @@ const Chat = () => {
                       <input
                         type="text"
                         className="chat-input-field"
-                        placeholder={isConversationCompleted ? 'This chat has been marked as completed' : 'Type your message here...'}
+                        placeholder={isConversationCompleted ? translate('patient.chat.completed') : translate('patient.chat.enterMessage')}
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyDown={handleMessageKeyDown}
@@ -1233,18 +1235,18 @@ const Chat = () => {
                       <button
                         type="button"
                         className="chat-send-button"
-                        title="Send"
+                        title={translate('patient.chat.send')}
                         onClick={handleSend}
                         disabled={(!newMessage.trim() && !pendingFiles.length) || sendMessage.isPending || uploadingFiles || isConversationCompleted}
                       >
                         <i className="fa-solid fa-paper-plane"></i>
                       </button>
-                      {uploadingFiles && <span className="chat-upload-status">Uploading {uploadProgress}%</span>}
+                      {uploadingFiles && <span className="chat-upload-status">{translate('common.uploading', 'Uploading')} {uploadProgress}%</span>}
                     </div>
                   </>
                 ) : (
                   <div className="d-flex align-items-center justify-content-center h-100 text-muted flex-column gap-2">
-                    {appointmentIdFromUrl && !conversationIdFromUrl ? <><i className="fa-solid fa-spinner fa-spin" />Opening chat…</> : 'Select a conversation'}
+                    {appointmentIdFromUrl && !conversationIdFromUrl ? <><i className="fa-solid fa-spinner fa-spin" />{translate('patient.chat.opening')}</> : translate('patient.chat.selectConversation')}
                   </div>
                 )}
               </div>

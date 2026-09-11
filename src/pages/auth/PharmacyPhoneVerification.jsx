@@ -5,10 +5,12 @@ import { toast } from 'react-toastify'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 import InternationalPhoneInput, { isE164Phone } from '../../components/common/InternationalPhoneInput'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const PharmacyPhoneVerification = () => {
   const navigate = useNavigate()
   const { user, updateUser } = useAuth()
+  const { t } = useLanguage()
 
   const [phone, setPhone] = useState(user?.phone || '')
   const [code, setCode] = useState('')
@@ -19,7 +21,7 @@ const PharmacyPhoneVerification = () => {
   const role = String(user?.role || '').toUpperCase()
   const isVeterinarian = role === 'VETERINARIAN'
   const nextPath = isVeterinarian ? '/doctor-verification-upload' : '/pet-store-verification-upload'
-  const accountLabel = isVeterinarian ? 'Veterinarian' : 'Pharmacy or Parapharmacy'
+  const accountLabel = isVeterinarian ? t('nav.doctors') : `${t('auth.pharmacy.pharmacy')} / ${t('auth.pharmacy.parapharmacy')}`
 
   useEffect(() => {
     if (!user) {
@@ -40,15 +42,15 @@ const PharmacyPhoneVerification = () => {
   const handleResend = async () => {
     if (!user) return
     if (!isE164Phone(phoneTrimmed)) {
-      toast.error('Enter a valid international phone number')
+      toast.error(t('auth.verification.invalidPhone'))
       return
     }
     setSending(true)
     try {
       await api.post(API_ROUTES.AUTH.SEND_PHONE_OTP, phoneTrimmed ? { phone: phoneTrimmed } : {})
-      toast.success('Verification code sent to your phone')
+      toast.success(t('auth.verification.sendAgain'))
     } catch (error) {
-      toast.error(error?.data?.message || error?.message || 'Failed to send verification code')
+      toast.error(error?.data?.message || error?.message || t('auth.verification.invalidCode'))
     } finally {
       setSending(false)
     }
@@ -58,11 +60,11 @@ const PharmacyPhoneVerification = () => {
     e.preventDefault()
 
     if (!code.trim()) {
-      toast.error('Please enter the verification code')
+      toast.error(t('auth.verifyEmail.codeRequired'))
       return
     }
     if (!isE164Phone(phoneTrimmed)) {
-      toast.error('Enter a valid international phone number')
+      toast.error(t('auth.verification.invalidPhone'))
       return
     }
 
@@ -81,10 +83,10 @@ const PharmacyPhoneVerification = () => {
         updateUser({ isPhoneVerified: true })
       }
 
-      toast.success('Phone verified successfully')
+      toast.success(t('auth.verification.phoneSuccess'))
       navigate(nextPath)
     } catch (error) {
-      toast.error(error?.data?.message || error?.message || 'Invalid verification code')
+      toast.error(error?.data?.message || error?.message || t('auth.verification.invalidCode'))
     } finally {
       setVerifying(false)
     }
@@ -92,36 +94,36 @@ const PharmacyPhoneVerification = () => {
 
   return (
     <div className="auth-pharmacy-flow">
-      <div className="auth-pharmacy-flow__steps" aria-label="Registration progress">
-        <span className="is-complete"><i className="fa-solid fa-check"></i><b>Account</b></span>
-        <span className="is-active"><i className="fa-solid fa-mobile-screen-button"></i><b>Phone verification</b></span>
-        <span><i className="fa-solid fa-file-shield"></i><b>Documents</b></span>
-        <span><i className="fa-solid fa-circle-check"></i><b>Approval</b></span>
+      <div className="auth-pharmacy-flow__steps" aria-label={t('auth.authLayout.featuresAria')}>
+        <span className="is-complete"><i className="fa-solid fa-check"></i><b>{t('auth.verification.account')}</b></span>
+        <span className="is-active"><i className="fa-solid fa-mobile-screen-button"></i><b>{t('auth.verification.phone')}</b></span>
+        <span><i className="fa-solid fa-file-shield"></i><b>{t('auth.verification.documents')}</b></span>
+        <span><i className="fa-solid fa-circle-check"></i><b>{t('auth.verification.approval')}</b></span>
       </div>
       <div className="auth-pharmacy-flow__panel">
         <div className="auth-pharmacy-flow__header">
           <div className="logo-icon"><i className="fa-solid fa-mobile-screen-button" /></div>
-          <div><h3>Verify your phone number</h3><p>Enter the verification code sent to your phone to continue with your {accountLabel} application.</p></div>
+          <div><h3>{t('auth.verification.phoneTitle')}</h3><p>{t('auth.verification.phoneDescription', { account: accountLabel })}</p></div>
         </div>
         <form onSubmit={handleVerify} className="row g-3 mt-1">
           <div className="col-md-7">
-            <label className="form-label">Phone number</label>
+            <label className="form-label">{t('auth.verification.phoneNumber')}</label>
             <InternationalPhoneInput value={phone} onChange={setPhone} disabled={sending || verifying} />
-            <small className="text-muted d-block mt-1">We use the selected country code when sending your verification code.</small>
+            <small className="text-muted d-block mt-1">{t('auth.verification.codeHint')}</small>
           </div>
           <div className="col-md-5">
-            <label className="form-label">Verification code</label>
-            <input type="text" className="form-control" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} placeholder="Enter code" maxLength={10} inputMode="numeric" autoComplete="one-time-code" />
+            <label className="form-label">{t('auth.verification.code')}</label>
+            <input type="text" className="form-control" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} placeholder={t('auth.verification.enterCode')} maxLength={10} inputMode="numeric" autoComplete="one-time-code" />
           </div>
           <div className="col-md-7 d-flex align-items-center">
-            <button type="button" className="btn btn-link px-0" onClick={handleResend} disabled={sending}>{sending ? 'Sending a new code…' : 'Didn’t receive a code? Resend'}</button>
+            <button type="button" className="btn btn-link px-0" onClick={handleResend} disabled={sending}>{sending ? t('auth.verification.sending') : t('auth.verification.sendAgain')}</button>
           </div>
           <div className="col-md-5 d-grid">
-            <button className="btn btn-primary-gradient" type="submit" disabled={verifying}>{verifying ? 'Verifying…' : 'Verify & continue'} <i className="fa-solid fa-arrow-right ms-2" /></button>
+            <button className="btn btn-primary-gradient" type="submit" disabled={verifying}>{verifying ? t('auth.verification.verifying') : t('auth.verification.verifyContinue')} <i className="fa-solid fa-arrow-right ms-2" /></button>
           </div>
         </form>
       </div>
-      <div className="text-center mt-3"><Link to="/login" className="text-muted">Back to login</Link></div>
+      <div className="text-center mt-3"><Link to="/login" className="text-muted">{t('auth.verification.backToLogin')}</Link></div>
     </div>
   )
 }

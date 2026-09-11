@@ -2,6 +2,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useState, useEffect, useMemo } from 'react'
 import { useCart } from '../../contexts/CartContext'
+import { useLanguage } from '../../contexts/LanguageContext'
+import LanguageToggle from './LanguageToggle'
 import { getImageUrl } from '../../utils/apiConfig'
 import { useUserById } from '../../queries/userQueries'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
@@ -16,7 +18,7 @@ const Header = () => {
   const { getCartItemCount } = useCart()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [openMobileSubmenu, setOpenMobileSubmenu] = useState(null)
-  const [hasGoogleTranslateBanner, setHasGoogleTranslateBanner] = useState(false)
+  const { t } = useLanguage()
   const role = user?.role
   const userId = user?.id || user?._id
 
@@ -75,59 +77,6 @@ const Header = () => {
     logout()
     navigate('/login')
   }
-
-  useEffect(() => {
-    const checkGoogleTranslateBanner = () => {
-      const bannerFrame = document.querySelector('.goog-te-banner-frame')
-      const skiptranslate = document.querySelector('.skiptranslate')
-      const bodyTop = document.body.classList.contains('top')
-
-      const bodyStyle = window.getComputedStyle(document.body)
-      const bodyTopValue = bodyStyle.top
-      const bodyPaddingTop = bodyStyle.paddingTop
-
-      const bannerVisible =
-        bannerFrame &&
-        window.getComputedStyle(bannerFrame).display !== 'none' &&
-        bannerFrame.offsetHeight > 0
-
-      const hasBanner = !!(
-        (bannerFrame && bannerVisible) ||
-        (skiptranslate && window.getComputedStyle(skiptranslate).display !== 'none') ||
-        bodyTop ||
-        (bodyTopValue && bodyTopValue !== '0px' && bodyTopValue !== 'auto') ||
-        (bodyPaddingTop && parseFloat(bodyPaddingTop) > 0)
-      )
-
-      setHasGoogleTranslateBanner(hasBanner)
-    }
-
-    const initialTimeout = setTimeout(checkGoogleTranslateBanner, 100)
-
-    const observer = new MutationObserver(() => {
-      checkGoogleTranslateBanner()
-    })
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['class', 'style'],
-    })
-
-    const interval = setInterval(checkGoogleTranslateBanner, 300)
-
-    window.addEventListener('scroll', checkGoogleTranslateBanner, { passive: true })
-    window.addEventListener('resize', checkGoogleTranslateBanner)
-
-    return () => {
-      clearTimeout(initialTimeout)
-      observer.disconnect()
-      clearInterval(interval)
-      window.removeEventListener('scroll', checkGoogleTranslateBanner)
-      window.removeEventListener('resize', checkGoogleTranslateBanner)
-    }
-  }, [])
 
   useEffect(() => {
     if (typeof document === 'undefined') return
@@ -237,10 +186,6 @@ const Header = () => {
         <>
           <div
             className="top-header"
-            style={{
-              marginTop: hasGoogleTranslateBanner ? '42px' : '0',
-              transition: 'margin-top 0.3s ease',
-            }}
           >
             <div className="container">
               <div className="row align-items-center">
@@ -263,9 +208,9 @@ const Header = () => {
                       <li>
                         <div className="btn log-register">
                           <Link to="/login" className="me-1">
-                            <span><i className="feather-user"></i></span> Sign In
+                            <span><i className="feather-user"></i></span> {t('common.signIn')}
                           </Link> /
-                          <Link to="/register" className="ms-1">Sign Up</Link>
+                          <Link to="/register" className="ms-1">{t('common.signUp')}</Link>
                         </div>
                       </li>
                     </ul>
@@ -346,10 +291,6 @@ const Header = () => {
       {/* Main Header */}
       <header
         className={`${getHeaderClass()} ${isMenuOpen ? 'menu-opened' : ''}`}
-        style={{
-          marginTop: hasGoogleTranslateBanner ? '42px' : '0',
-          transition: 'margin-top 0.3s ease',
-        }}
       >
         <div className="container">
           <nav className="navbar navbar-expand-lg header-nav">
@@ -402,7 +343,7 @@ const Header = () => {
               <ul className="main-nav">
                 {/* Home Menu */}
                 <li className={isActive('/') || location.pathname === '/index' ? 'active' : ''}>
-                  <Link to="/"><span className="notranslate" translate="no">Home</span></Link>
+                  <Link to="/"><span>{t('common.home')}</span></Link>
                 </li>
 
                 {/* Doctors Menu - only for veterinarians (or public when not logged in) */}
@@ -413,7 +354,7 @@ const Header = () => {
                       onClick={toggleMobileSubmenu('doctors')}
                       aria-expanded={openMobileSubmenu === 'doctors'}
                     >
-                      Doctors <i className="fas fa-chevron-down"></i>
+                      {t('nav.doctors')} <i className="fas fa-chevron-down"></i>
                     </a>
                     <ul
                       className="submenu"
@@ -421,26 +362,26 @@ const Header = () => {
                     >
                       {role === ROLES.VETERINARIAN && (
                         <>
-                          <li><Link to="/doctor/dashboard">Doctor Dashboard</Link></li>
-                          <li><Link to="/appointments">Appointments</Link></li>
-                          <li><Link to="/available-timings">Available Timing</Link></li>
-                          <li><Link to="/my-patients">My Pets</Link></li>
-                          <li><Link to="/chat-doctor">Chat</Link></li>
-                          <li><Link to="/invoices">Invoices</Link></li>
-                          <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
-                          <li><Link to="/reviews">Reviews</Link></li>
+                          <li><Link to="/doctor/dashboard">{t('nav.doctorDashboard')}</Link></li>
+                          <li><Link to="/appointments">{t('nav.appointments')}</Link></li>
+                          <li><Link to="/available-timings">{t('nav.availableTiming')}</Link></li>
+                          <li><Link to="/my-patients">{t('nav.myPets')}</Link></li>
+                          <li><Link to="/chat-doctor">{t('nav.chat')}</Link></li>
+                          <li><Link to="/invoices">{t('nav.invoices')}</Link></li>
+                          <li><Link to="/doctor-profile-settings">{t('nav.profileSettings')}</Link></li>
+                          <li><Link to="/reviews">{t('nav.reviews')}</Link></li>
                         </>
                       )}
                       {!user && (
                         <>
-                          <li><Link to="/doctor/dashboard">Doctor Dashboard</Link></li>
-                          <li><Link to="/appointments">Appointments</Link></li>
-                          <li><Link to="/available-timings">Available Timing</Link></li>
-                          <li><Link to="/my-patients">My Pets</Link></li>
-                          <li><Link to="/chat-doctor">Chat</Link></li>
-                          <li><Link to="/doctor-profile-settings">Profile Settings</Link></li>
-                          <li><Link to="/reviews">Reviews</Link></li>
-                          <li><Link to="/doctor-register">Doctor Register</Link></li>
+                          <li><Link to="/doctor/dashboard">{t('nav.doctorDashboard')}</Link></li>
+                          <li><Link to="/appointments">{t('nav.appointments')}</Link></li>
+                          <li><Link to="/available-timings">{t('nav.availableTiming')}</Link></li>
+                          <li><Link to="/my-patients">{t('nav.myPets')}</Link></li>
+                          <li><Link to="/chat-doctor">{t('nav.chat')}</Link></li>
+                          <li><Link to="/doctor-profile-settings">{t('nav.profileSettings')}</Link></li>
+                          <li><Link to="/reviews">{t('nav.reviews')}</Link></li>
+                          <li><Link to="/doctor-register">{t('nav.doctorRegister')}</Link></li>
                         </>
                       )}
                     </ul>
@@ -455,30 +396,30 @@ const Header = () => {
                       onClick={toggleMobileSubmenu('patients')}
                       aria-expanded={openMobileSubmenu === 'patients'}
                     >
-                      My Pets <i className="fas fa-chevron-down"></i>
+                      {t('nav.patients')} <i className="fas fa-chevron-down"></i>
                     </a>
                     <ul
                       className="submenu"
                       style={{ display: openMobileSubmenu === 'patients' ? 'block' : undefined }}
                     >
-                      <li><Link to="/patient/dashboard">My Pet Dashboard</Link></li>
+                      <li><Link to="/patient/dashboard">{t('nav.myPetDashboard')}</Link></li>
 
                       <li>
-                        <Link to="/search">Search Doctor</Link>
+                        <Link to="/search">{t('nav.searchDoctor')}</Link>
                         {/* <ul className="submenu inner-submenu">
                         <li><Link to="/search">Search Doctor 1</Link></li>
                         <li><Link to="/search-2">Search Doctor 2</Link></li>
                       </ul> */}
                       </li>
-                      <li><Link to="/pet-sitters">Find Pet Sitters</Link></li>
+                      <li><Link to="/pet-sitters">{t('nav.findPetSitters')}</Link></li>
 
 
                       {/* <li><Link to="/checkout">Checkout</Link></li>
                     <li><Link to="/booking-success">Booking Success</Link></li> */}
-                      <li><Link to="/favourites">Favourites</Link></li>
-                      <li><Link to="/chat">Chat</Link></li>
-                      <li><Link to="/profile-settings">Profile Settings</Link></li>
-                      <li><Link to="/change-password">Change Password</Link></li>
+                      <li><Link to="/favourites">{t('nav.favourites')}</Link></li>
+                      <li><Link to="/chat">{t('nav.chat')}</Link></li>
+                      <li><Link to="/profile-settings">{t('common.profileSettings')}</Link></li>
+                      <li><Link to="/change-password">{t('common.changePassword')}</Link></li>
                     </ul>
                   </li>
                 )}
@@ -491,20 +432,20 @@ const Header = () => {
                       onClick={toggleMobileSubmenu('pharmacy')}
                       aria-expanded={openMobileSubmenu === 'pharmacy'}
                     >
-                      Pharmacy <i className="fas fa-chevron-down"></i>
+                      {t('nav.pharmacy')} <i className="fas fa-chevron-down"></i>
                     </a>
                     <ul
                       className="submenu"
                       style={{ display: openMobileSubmenu === 'pharmacy' ? 'block' : undefined }}
                     >
 
-                      <li><Link to="/pharmacy-search">Pharmacies</Link></li>
-                      <li><Link to="/product-all">Products</Link></li>
-                      <li><Link to="/cart">Cart</Link></li>
+                      <li><Link to="/pharmacy-search">{t('nav.pharmacies')}</Link></li>
+                      <li><Link to="/product-all">{t('nav.products')}</Link></li>
+                      <li><Link to="/cart">{t('nav.cart')}</Link></li>
                       {(role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && (
                         <li>
                           <Link to="/pharmacy-admin/dashboard">
-                            {role === ROLES.PARAPHARMACY ? 'Parapharmacy Dashboard' : 'Pharmacy Dashboard'}
+                            {role === ROLES.PARAPHARMACY ? t('nav.parapharmacyDashboard') : t('nav.pharmacyDashboard')}
                           </Link>
                         </li>
                       )}
@@ -515,12 +456,12 @@ const Header = () => {
 
                 {/* About Us */}
                 <li className={isActive('/about-us') ? 'active' : ''}>
-                  <Link to="/about-us">About Us</Link>
+                  <Link to="/about-us">{t('nav.aboutUs')}</Link>
                 </li>
 
                 {/* Contact Us */}
                 <li className={isActive('/contact-us') ? 'active' : ''}>
-                  <Link to="/contact-us">Contact Us</Link>
+                  <Link to="/contact-us">{t('nav.contactUs')}</Link>
                 </li>
                 {user && (
                   <li className="mobile-menu-signout">
@@ -532,25 +473,34 @@ const Header = () => {
                       }}
                     >
                       <i className="isax isax-logout" aria-hidden="true"></i>
-                      Sign Out
+                      {t('common.signOut')}
                     </button>
                   </li>
                 )}
-                {!user && <li><Link to="/pet-sitter/register">Become a Pet Sitter</Link></li>}
+                {!user && <li><Link to="/pet-sitter/register">{t('nav.becomePetSitter')}</Link></li>}
+                <li className="mobile-language-toggle">
+                  <LanguageToggle />
+                </li>
               </ul>
             </div>
 
             {/* Right Side Navigation */}
             {!user ? (
               <ul className="nav header-navbar-rht">
+                <li className="nav-item">
+                  <LanguageToggle />
+                </li>
                 <li>
                   <Link to="/register" className="btn btn-md btn-primary-gradient d-inline-flex align-items-center rounded-pill">
-                    <i className="isax isax-lock-1 me-1"></i>Sign Up
+                    <i className="isax isax-lock-1 me-1"></i>{t('common.signUp')}
                   </Link>
                 </li>
               </ul>
             ) : (
               <ul className="nav header-navbar-rht">
+                <li className="nav-item">
+                  <LanguageToggle />
+                </li>
                 {role === ROLES.PET_OWNER && (
                   <li className="nav-item">
                     <Link to="/cart" className="nav-link position-relative" title="Cart">
@@ -580,7 +530,7 @@ const Header = () => {
                     href="javascript:void(0);"
                     onClick={handleLogout}
                   >
-                    <i className="isax isax-logout me-1"></i>Sign Out
+                    <i className="isax isax-logout me-1"></i>{t('common.signOut')}
                   </a>
                 </li>
                 {/* <li className="header-theme noti-nav">
@@ -639,15 +589,15 @@ const Header = () => {
                         <p className="text-muted mb-0">{user.role || 'User'}</p>
                       </div>
                     </div>
-                    {role === ROLES.VETERINARIAN && <Link className="dropdown-item" to="/doctor/dashboard">Dashboard</Link>}
-                    {role === ROLES.PET_OWNER && <Link className="dropdown-item" to="/patient/dashboard">My Pet Dashboard</Link>}
-                    {role === ROLES.ADMIN && <Link className="dropdown-item" to="/admin/index_admin">Dashboard</Link>}
-                    {role === ROLES.PET_SITTER && <Link className="dropdown-item" to="/pet-sitter/dashboard">Pet Sitter Dashboard</Link>}
-                    {role === ROLES.PET_SITTER && <Link className="dropdown-item" to="/pet-sitter/profile">My Profile</Link>}
-                    {(role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && <Link className="dropdown-item" to="/pharmacy-admin/dashboard">Pharmacy Dashboard</Link>}
-                    {role === ROLES.VETERINARIAN && <Link className="dropdown-item" to="/doctor-profile-settings">Profile Settings</Link>}
-                    {(role === ROLES.PET_OWNER || role === ROLES.ADMIN || role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && <Link className="dropdown-item" to="/profile-settings">Profile Settings</Link>}
-                    <a className="dropdown-item" href="javascript:void(0);" onClick={handleLogout}>Logout</a>
+                    {role === ROLES.VETERINARIAN && <Link className="dropdown-item" to="/doctor/dashboard">{t('nav.doctorDashboard')}</Link>}
+                    {role === ROLES.PET_OWNER && <Link className="dropdown-item" to="/patient/dashboard">{t('nav.myPetDashboard')}</Link>}
+                    {role === ROLES.ADMIN && <Link className="dropdown-item" to="/admin/index_admin">{t('common.home')}</Link>}
+                    {role === ROLES.PET_SITTER && <Link className="dropdown-item" to="/pet-sitter/dashboard">{t('nav.becomePetSitter')}</Link>}
+                    {role === ROLES.PET_SITTER && <Link className="dropdown-item" to="/pet-sitter/profile">{t('nav.myPets')}</Link>}
+                    {(role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && <Link className="dropdown-item" to="/pharmacy-admin/dashboard">{role === ROLES.PARAPHARMACY ? t('nav.parapharmacyDashboard') : t('nav.pharmacyDashboard')}</Link>}
+                    {role === ROLES.VETERINARIAN && <Link className="dropdown-item" to="/doctor-profile-settings">{t('common.profileSettings')}</Link>}
+                    {(role === ROLES.PET_OWNER || role === ROLES.ADMIN || role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && <Link className="dropdown-item" to="/profile-settings">{t('common.profileSettings')}</Link>}
+                    <a className="dropdown-item" href="javascript:void(0);" onClick={handleLogout}>{t('common.logout')}</a>
                   </div>
                 </li>
               </ul>

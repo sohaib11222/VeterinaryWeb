@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useBalance, useWithdrawalRequests } from '../../queries/balanceQueries'
 import { useRequestWithdrawal } from '../../mutations/balanceMutations'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const normalizeListPayload = (payload) => {
   const outer = payload?.data ?? payload
@@ -17,6 +18,7 @@ const normalizeListPayload = (payload) => {
 }
 
 const PharmacyAdminPayouts = () => {
+  const { t, language } = useLanguage()
   const balanceQuery = useBalance()
   const requestsQuery = useWithdrawalRequests()
   const requestWithdrawal = useRequestWithdrawal()
@@ -40,12 +42,12 @@ const PharmacyAdminPayouts = () => {
     e.preventDefault()
     const n = Number(amount)
     if (!Number.isFinite(n) || n <= 0) {
-      toast.error('Enter a valid amount')
+      toast.error(t('pharmacyAdmin.payouts.enterAmount'))
       return
     }
     const normalizedStripeAccountId = stripeAccountId.trim()
     if (!/^acct_[A-Za-z0-9]+$/.test(normalizedStripeAccountId)) {
-      toast.error('Enter a valid Stripe Connected Account ID (acct_...)')
+      toast.error(t('pharmacyAdmin.payouts.validStripe'))
       return
     }
 
@@ -56,19 +58,19 @@ const PharmacyAdminPayouts = () => {
         stripeAccountId: normalizedStripeAccountId,
         paymentDetails: paymentDetails.trim(),
       })
-      toast.success('Withdrawal request submitted')
+      toast.success(t('pharmacyAdmin.payouts.submitted'))
       setAmount('')
       setStripeAccountId('')
       setPaymentDetails('')
     } catch (error) {
-      toast.error(error?.message || 'Failed to request withdrawal')
+      toast.error(error?.message || t('pharmacyAdmin.payouts.failedSubmit'))
     }
   }
 
   return (
     <div>
       <div className="page-header">
-        <h3 className="page-title">Payouts</h3>
+        <h3 className="page-title">{t('pharmacyAdmin.payouts.title')}</h3>
       </div>
 
       <div className="card">
@@ -76,15 +78,15 @@ const PharmacyAdminPayouts = () => {
           {balanceQuery.isLoading ? (
             <div className="text-center py-2">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('pharmacyAdmin.payouts.loading')}</span>
               </div>
             </div>
           ) : balanceQuery.isError ? (
-            <div className="alert alert-danger">{balanceQuery.error?.message || 'Failed to load balance'}</div>
+            <div className="alert alert-danger">{balanceQuery.error?.message || t('pharmacyAdmin.payouts.failedBalance')}</div>
           ) : (
             <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
               <div>
-                <div className="text-muted">Available Balance</div>
+                <div className="text-muted">{t('pharmacyAdmin.payouts.availableBalance')}</div>
                 <h4 className="mb-0">{typeof balance === 'number' ? balance.toFixed(2) : balance}</h4>
               </div>
             </div>
@@ -94,14 +96,14 @@ const PharmacyAdminPayouts = () => {
 
       <div className="card">
         <div className="card-body">
-          <h5 className="mb-3">Request Withdrawal</h5>
+          <h5 className="mb-3">{t('pharmacyAdmin.payouts.requestWithdrawal')}</h5>
           <p className="text-muted mb-3">
-            Payouts are sent to your Stripe Connect account. Your Stripe secret key is never requested or stored here.
+            {t('pharmacyAdmin.payouts.description')}
           </p>
           <form onSubmit={submit}>
             <div className="row">
               <div className="col-lg-3 mb-3">
-                <label className="form-label">Amount</label>
+                <label className="form-label">{t('pharmacyAdmin.payouts.amount')}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -111,11 +113,11 @@ const PharmacyAdminPayouts = () => {
                 />
               </div>
               <div className="col-lg-3 mb-3">
-                <label className="form-label">Payment Method</label>
-                <div className="form-control bg-light" aria-label="Payment method">Stripe</div>
+                <label className="form-label">{t('pharmacyAdmin.payouts.paymentMethod')}</label>
+                <div className="form-control bg-light" aria-label={t('pharmacyAdmin.payouts.paymentMethod')}>Stripe</div>
               </div>
               <div className="col-lg-3 mb-3">
-                <label className="form-label" htmlFor="stripe-account-id">Stripe Connected Account ID</label>
+                <label className="form-label" htmlFor="stripe-account-id">{t('pharmacyAdmin.payouts.stripeAccount')}</label>
                 <input
                   id="stripe-account-id"
                   className="form-control"
@@ -127,18 +129,18 @@ const PharmacyAdminPayouts = () => {
                 />
               </div>
               <div className="col-lg-3 mb-3">
-                <label className="form-label" htmlFor="stripe-payout-note">Payout note <span className="text-muted">(optional)</span></label>
+                <label className="form-label" htmlFor="stripe-payout-note">{t('pharmacyAdmin.payouts.payoutNote')} <span className="text-muted">{t('pharmacyAdmin.payouts.optional')}</span></label>
                 <input
                   id="stripe-payout-note"
                   className="form-control"
-                  placeholder="Reference for the admin"
+                  placeholder={t('pharmacyAdmin.payouts.reference')}
                   value={paymentDetails}
                   onChange={(e) => setPaymentDetails(e.target.value)}
                 />
               </div>
               <div className="col-12">
                 <button type="submit" className="btn btn-primary" disabled={requestWithdrawal.isPending}>
-                  {requestWithdrawal.isPending ? 'Submitting...' : 'Submit Request'}
+                  {requestWithdrawal.isPending ? t('pharmacyAdmin.payouts.submitting') : t('pharmacyAdmin.payouts.submit')}
                 </button>
               </div>
             </div>
@@ -148,29 +150,29 @@ const PharmacyAdminPayouts = () => {
 
       <div className="card">
         <div className="card-body">
-          <h5 className="mb-3">Withdrawal Requests</h5>
+          <h5 className="mb-3">{t('pharmacyAdmin.payouts.requests')}</h5>
 
           {requestsQuery.isLoading ? (
             <div className="text-center py-4">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('pharmacyAdmin.payouts.loading')}</span>
               </div>
             </div>
           ) : requestsQuery.isError ? (
-            <div className="alert alert-danger">{requestsQuery.error?.message || 'Failed to load requests'}</div>
+            <div className="alert alert-danger">{requestsQuery.error?.message || t('pharmacyAdmin.payouts.failedRequests')}</div>
           ) : requests.length === 0 ? (
-            <div className="alert alert-info mb-0">No withdrawal requests yet.</div>
+            <div className="alert alert-info mb-0">{t('pharmacyAdmin.payouts.empty')}</div>
           ) : (
             <div className="table-responsive">
               <table className="table table-hover mb-0">
                 <thead>
                   <tr>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Method</th>
-                    <th>Net Payout</th>
-                    <th>Stripe Transfer</th>
-                    <th>Requested</th>
+                    <th>{t('pharmacyAdmin.payouts.amount')}</th>
+                    <th>{t('pharmacyAdmin.payouts.status')}</th>
+                    <th>{t('pharmacyAdmin.payouts.method')}</th>
+                    <th>{t('pharmacyAdmin.payouts.netPayout')}</th>
+                    <th>{t('pharmacyAdmin.payouts.stripeTransfer')}</th>
+                    <th>{t('pharmacyAdmin.payouts.requested')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -179,7 +181,7 @@ const PharmacyAdminPayouts = () => {
                     const amt = r?.amount
                     const status = r?.status
                     const method = r?.paymentMethod === 'STRIPE' ? 'Stripe' : r?.paymentMethod
-                    const createdAt = r?.createdAt ? new Date(r.createdAt).toLocaleString() : '—'
+                    const createdAt = r?.createdAt ? new Date(r.createdAt).toLocaleString(language === 'it' ? 'it-IT' : 'en-GB') : '—'
                     return (
                       <tr key={id}>
                         <td>{typeof amt === 'number' ? amt.toFixed(2) : amt}</td>

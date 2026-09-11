@@ -5,11 +5,13 @@ import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useSpecializations } from '../../queries/specializationQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const DoctorSpecialities = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const { data: profileResponse, isLoading: profileLoading } = useVeterinarianProfile()
@@ -89,7 +91,7 @@ const DoctorSpecialities = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!selectedSpecializationCode) {
-      toast.error('Please select a specialization')
+      toast.error(t('doctorRemaining.specialties.selectRequired'))
       return
     }
 
@@ -101,7 +103,7 @@ const DoctorSpecialities = () => {
       }))
       .filter((s) => s.name)
     if (validServices.length === 0) {
-      toast.error('Please add at least one service with a name')
+      toast.error(t('doctorRemaining.specialties.serviceRequired'))
       return
     }
     try {
@@ -110,7 +112,7 @@ const DoctorSpecialities = () => {
         specializations: [selectedSpecializationCode],
         services: validServices,
       })
-      toast.success('Specialties & services updated successfully')
+      toast.success(t('doctorRemaining.specialties.updated'))
 
       const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
       const nextProfile = refreshed?.data ?? refreshed
@@ -122,7 +124,7 @@ const DoctorSpecialities = () => {
         }
       }
     } catch (err) {
-      const message = err?.response?.data?.message || err?.message || 'Failed to update'
+      const message = err?.response?.data?.message || err?.message || t('doctorRemaining.specialties.updateFailed')
       toast.error(message)
     }
   }
@@ -134,7 +136,7 @@ const DoctorSpecialities = () => {
         style={{ minHeight: '60vh' }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('doctorRemaining.profile.loading')}</span>
         </div>
       </div>
     )
@@ -153,10 +155,10 @@ const DoctorSpecialities = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-stethoscope me-3"></i>
-                    Veterinary Services
+                    {t('doctorRemaining.specialties.title')}
                   </h2>
                   <p className="dashboard-subtitle">
-                    Manage your veterinary specialties and service offerings
+                    {t('doctorRemaining.specialties.subtitle')}
                   </p>
                 </div>
               </div>
@@ -173,7 +175,7 @@ const DoctorSpecialities = () => {
                         <div className="col-12 d-flex justify-content-between align-items-center">
                           <h5 className="card-title mb-0">
                             <i className="fa-solid fa-list me-2"></i>
-                            Specialties & Services
+                            {t('doctorRemaining.specialties.section')}
                           </h5>
                         </div>
                       </div>
@@ -186,7 +188,7 @@ const DoctorSpecialities = () => {
                                 <div className="form-wrap">
                                   <label className="col-form-label">
                                     <i className="fa-solid fa-stethoscope me-2"></i>
-                                    Specialty <span className="text-danger">*</span>
+                                    {t('doctorRemaining.specialties.specialty')} <span className="text-danger">*</span>
                                   </label>
                                   <select
                                     className="form-select veterinary-input"
@@ -194,7 +196,7 @@ const DoctorSpecialities = () => {
                                     onChange={handleSpecializationChange}
                                     required
                                   >
-                                    <option value="">Select specialization</option>
+                                    <option value="">{t('doctorRemaining.specialties.selectSpecialty')}</option>
                                     {specializationsList.map((spec) => {
                                       // Prefer explicit enum code from backend; otherwise derive from name/slug
                                       const derivedCodeFromName =
@@ -212,7 +214,7 @@ const DoctorSpecialities = () => {
                                   </select>
                                   {specializationsList.length === 0 && (
                                     <p className="text-muted small mt-1 mb-0">
-                                      No specializations available. Contact admin to add specializations.
+                                      {t('doctorRemaining.specialties.noneAvailable')}
                                     </p>
                                   )}
                                 </div>
@@ -225,7 +227,7 @@ const DoctorSpecialities = () => {
                                   <div className="col-12">
                                     <h6 className="mb-0">
                                       <i className="fa-solid fa-paw me-2"></i>
-                                      Services
+                                        {t('doctorRemaining.specialties.services')}
                                     </h6>
                                   </div>
                                 </div>
@@ -233,19 +235,19 @@ const DoctorSpecialities = () => {
                                   <div key={index} className="row align-items-end mb-3">
                                     <div className="col-md-4">
                                       <div className="form-wrap">
-                                        <label className="col-form-label">Service name</label>
+                                        <label className="col-form-label">{t('doctorRemaining.specialties.serviceName')}</label>
                                         <input
                                           type="text"
                                           className="form-control veterinary-input"
                                           value={service.name}
                                           onChange={(e) => handleServiceChange(index, 'name', e.target.value)}
-                                          placeholder="e.g. General Checkup"
+                                          placeholder={t('doctorRemaining.specialties.servicePlaceholder')}
                                         />
                                       </div>
                                     </div>
                                     <div className="col-md-2">
                                       <div className="form-wrap">
-                                        <label className="col-form-label">Price (€)</label>
+                                        <label className="col-form-label">{t('doctorRemaining.specialties.price')}</label>
                                         <input
                                           type="number"
                                           className="form-control veterinary-input"
@@ -259,13 +261,13 @@ const DoctorSpecialities = () => {
                                     </div>
                                     <div className="col-md-5">
                                       <div className="form-wrap">
-                                        <label className="col-form-label">Description</label>
+                                        <label className="col-form-label">{t('doctorRemaining.specialties.description')}</label>
                                         <input
                                           type="text"
                                           className="form-control veterinary-input"
                                           value={service.description}
                                           onChange={(e) => handleServiceChange(index, 'description', e.target.value)}
-                                          placeholder="Optional description"
+                                          placeholder={t('doctorRemaining.specialties.descriptionPlaceholder')}
                                         />
                                       </div>
                                     </div>
@@ -274,7 +276,7 @@ const DoctorSpecialities = () => {
                                         type="button"
                                         className="btn btn-outline-danger btn-sm"
                                         onClick={() => removeService(index)}
-                                        aria-label="Remove service"
+                                        aria-label={t('doctorRemaining.specialties.remove')}
                                       >
                                         <i className="fa-solid fa-trash"></i>
                                       </button>
@@ -288,7 +290,7 @@ const DoctorSpecialities = () => {
                                     onClick={addService}
                                   >
                                     <i className="fa-solid fa-plus me-1"></i>
-                                    Add service
+                                    {t('doctorRemaining.specialties.add')}
                                   </button>
                                 </div>
                               </>
@@ -304,7 +306,7 @@ const DoctorSpecialities = () => {
                           disabled={updateProfile.isPending || !selectedSpecializationCode}
                         >
                           <i className="fa-solid fa-save me-1"></i>
-                          {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+                          {updateProfile.isPending ? t('doctorRemaining.profile.saving') : t('doctorRemaining.profile.save')}
                         </button>
                       </div>
                     </form>

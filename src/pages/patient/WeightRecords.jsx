@@ -4,8 +4,10 @@ import { toast } from 'react-toastify'
 
 import { usePets, useWeightRecords } from '../../queries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const WeightRecords = () => {
+  const { t, language } = useLanguage()
   const navigate = useNavigate()
   const [selectedPetId, setSelectedPetId] = useState('')
   const [page, setPage] = useState(1)
@@ -33,7 +35,7 @@ const WeightRecords = () => {
     if (!d) return '—'
     const dt = new Date(d)
     if (Number.isNaN(dt.getTime())) return '—'
-    return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    return dt.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
   }
 
   const formatWeight = (w) => {
@@ -64,14 +66,14 @@ const WeightRecords = () => {
             <div className="veterinary-dashboard-header">
               <div className="d-flex align-items-center mb-3">
                 <button className="btn btn-outline-secondary me-3" onClick={() => navigate(-1)}>
-                  <i className="fa-solid fa-chevron-left me-1"></i> Back
+                  <i className="fa-solid fa-chevron-left me-1"></i> {t('patient.back')}
                 </button>
                 <h2 className="dashboard-title mb-0">
                   <i className="fa-solid fa-weight-scale me-3"></i>
-                  Weight Records
+                  {t('patient.weight.title')}
                 </h2>
               </div>
-              <p className="dashboard-subtitle">Track your pet's weight history recorded during appointments</p>
+              <p className="dashboard-subtitle">{t('patient.weight.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -83,7 +85,7 @@ const WeightRecords = () => {
                 <div className="d-flex justify-content-end align-items-center gap-2 flex-wrap">
                   <div className="input-block">
                     <select className="form-select" value={selectedPetId} onChange={handlePetChange}>
-                      <option value="">All Pets</option>
+                      <option value="">{t('patient.weight.allPets')}</option>
                       {pets.map((p) => (
                         <option key={p._id} value={p._id}>
                           {p.name}
@@ -101,22 +103,22 @@ const WeightRecords = () => {
           <div className="col-12">
             <div className="dashboard-card veterinary-card">
               <div className="dashboard-card-body">
-                <h5 className="mb-2">Latest Weight</h5>
+                <h5 className="mb-2">{t('patient.weight.latest')}</h5>
                 {latest ? (
                   <div className="d-flex align-items-center gap-3 flex-wrap">
                     <span className="badge veterinary-badge">
                       <img
                         src={getImageUrl(latest.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
-                        alt="Pet"
+                        alt={t('patient.weight.pet')}
                         className="avatar avatar-xs me-1"
                       />
-                      {latest.petId?.name || 'Pet'}
+                      {latest.petId?.name || t('patient.weight.pet')}
                     </span>
                     <span><strong>{formatWeight(latest.weight)}</strong></span>
                     <span className="text-muted">{formatDate(latest.date)}</span>
                   </div>
                 ) : (
-                  <div className="text-muted">No weight records yet</div>
+                  <div className="text-muted">{t('patient.weight.noRecordsYet')}</div>
                 )}
               </div>
             </div>
@@ -132,43 +134,43 @@ const WeightRecords = () => {
                     <table className="table table-center mb-0 veterinary-table weight-records-mobile-table">
                       <thead>
                         <tr>
-                          <th>ID</th>
-                          <th>Pet</th>
-                          <th>Weight</th>
-                          <th>Date</th>
-                          <th>Recorded By</th>
-                          <th>Appointment</th>
-                          <th>Notes</th>
+                          <th>{t('patient.weight.id')}</th>
+                          <th>{t('patient.weight.pet')}</th>
+                          <th>{t('patient.weight.weight')}</th>
+                          <th>{t('patient.weight.date')}</th>
+                          <th>{t('patient.weight.recordedBy')}</th>
+                          <th>{t('patient.weight.appointment')}</th>
+                          <th>{t('patient.weight.notes')}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {isLoading ? (
                           <tr>
-                            <td colSpan={7} className="text-center py-4">Loading...</td>
+                            <td colSpan={7} className="text-center py-4">{t('common.loading')}</td>
                           </tr>
                         ) : records.length === 0 ? (
                           <tr>
-                            <td colSpan={7} className="text-center py-4">No weight records found</td>
+                            <td colSpan={7} className="text-center py-4">{t('patient.weight.noRecords')}</td>
                           </tr>
                         ) : (
                           records.map((r) => (
                             <tr key={r._id}>
-                              <td data-label="Record">#{String(r._id).slice(-6).toUpperCase()}</td>
-                              <td data-label="Pet">
+                              <td data-label={t('patient.weight.id')}>#{String(r._id).slice(-6).toUpperCase()}</td>
+                              <td data-label={t('patient.weight.pet')}>
                                 <span className="badge veterinary-badge">
                                   <img
                                     src={getImageUrl(r.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
-                                    alt="Pet"
+                                    alt={t('patient.weight.pet')}
                                     className="avatar avatar-xs me-1"
                                   />
                                   {r.petId?.name || '—'}
                                 </span>
                               </td>
-                              <td data-label="Weight">{formatWeight(r.weight)}</td>
-                              <td data-label="Date">{formatDate(r.date)}</td>
-                              <td data-label="Recorded by">{r.recordedBy?.name || '—'}</td>
-                              <td data-label="Appointment">{r.relatedAppointmentId ? String(r.relatedAppointmentId).slice(-6).toUpperCase() : '—'}</td>
-                              <td data-label="Notes">{r.notes || '—'}</td>
+                              <td data-label={t('patient.weight.weight')}>{formatWeight(r.weight)}</td>
+                              <td data-label={t('patient.weight.date')}>{formatDate(r.date)}</td>
+                              <td data-label={t('patient.weight.recordedBy')}>{r.recordedBy?.name || '—'}</td>
+                              <td data-label={t('patient.weight.appointment')}>{r.relatedAppointmentId ? String(r.relatedAppointmentId).slice(-6).toUpperCase() : '—'}</td>
+                              <td data-label={t('patient.weight.notes')}>{r.notes || '—'}</td>
                             </tr>
                           ))
                         )}
@@ -182,7 +184,7 @@ const WeightRecords = () => {
                     <ul>
                       <li>
                         <a href="#" className={`page-link veterinary-page-link prev ${page <= 1 ? 'disabled' : ''}`} onClick={handlePrevPage}>
-                          <i className="fa-solid fa-chevron-left me-1"></i>Prev
+                          <i className="fa-solid fa-chevron-left me-1"></i>{t('patient.previous')}
                         </a>
                       </li>
                       <li>
@@ -192,7 +194,7 @@ const WeightRecords = () => {
                       </li>
                       <li>
                         <a href="#" className={`page-link veterinary-page-link next ${page >= pagination.pages ? 'disabled' : ''}`} onClick={handleNextPage}>
-                          Next<i className="fa-solid fa-chevron-right ms-1"></i>
+                          {t('patient.next')}<i className="fa-solid fa-chevron-right ms-1"></i>
                         </a>
                       </li>
                     </ul>

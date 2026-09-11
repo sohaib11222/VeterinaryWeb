@@ -3,8 +3,10 @@ import { toast } from 'react-toastify'
 
 import { useNotifications } from '../../queries/notificationQueries'
 import { useMarkAllNotificationsRead, useMarkNotificationRead } from '../../mutations/notificationMutations'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const PatientNotifications = () => {
+  const { t } = useLanguage()
   const [filter, setFilter] = useState('all')
 
   const params = useMemo(() => {
@@ -33,17 +35,28 @@ const PatientNotifications = () => {
   )
 
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return 'Just now'
+    if (!dateString) return t('patient.notificationText.justNow')
     const date = new Date(dateString)
     const now = new Date()
     const diffInSeconds = Math.floor((now - date) / 1000)
 
-    if (diffInSeconds < 60) return 'Just now'
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`
+    if (diffInSeconds < 60) return t('patient.notificationText.justNow')
+    if (diffInSeconds < 3600) return t('patient.notificationText.minutesAgo', { count: Math.floor(diffInSeconds / 60) })
+    if (diffInSeconds < 86400) return t('patient.notificationText.hoursAgo', { count: Math.floor(diffInSeconds / 3600) })
+    if (diffInSeconds < 604800) return t('patient.notificationText.daysAgo', { count: Math.floor(diffInSeconds / 86400) })
 
-    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+    return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+  }
+
+  const localizeNotificationText = (value) => {
+    const normalized = String(value || '').trim().toLowerCase()
+    if (normalized === 'appointment ready') return t('patient.notificationText.appointmentReady')
+    if (normalized === 'review call') return t('patient.notificationText.reviewCall')
+    if (normalized === 'prescription approved') return t('patient.notificationText.prescriptionApproved')
+    if (normalized === 'prescription rejected') return t('patient.notificationText.prescriptionRejected')
+    if (normalized === 'order update') return t('patient.notificationText.orderUpdate')
+    const starts = normalized.match(/^appointment starts in (\d+) minutes?$/)
+    return starts ? t('patient.notificationText.appointmentStarts', { minutes: starts[1] }) : value
   }
 
   const getNotificationIcon = (type) => {
@@ -95,32 +108,32 @@ const PatientNotifications = () => {
     if (!notificationId) return
     try {
       await markReadMutation.mutateAsync(notificationId)
-      toast.success('Notification marked as read')
+      toast.success(t('patient.notificationMarked'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to mark notification as read')
+      toast.error(err?.message || t('common.unableUpdate', 'Failed to mark notification as read'))
     }
   }
 
   const handleMarkAllAsRead = async () => {
     try {
       await markAllReadMutation.mutateAsync()
-      toast.success('All notifications marked as read')
+      toast.success(t('patient.allNotificationsMarked'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to mark all notifications as read')
+      toast.error(err?.message || t('common.unableUpdate', 'Failed to mark all notifications as read'))
     }
   }
 
   return (
     <>
       <div className="dashboard-header">
-        <h3>Notifications</h3>
+        <h3>{t('patient.notificationsTitle')}</h3>
         {unreadCount > 0 && (
           <button
             className="btn btn-sm btn-primary"
             onClick={handleMarkAllAsRead}
             disabled={markAllReadMutation.isPending}
           >
-            {markAllReadMutation.isPending ? 'Marking...' : 'Mark All as Read'}
+            {markAllReadMutation.isPending ? t('patient.marking') : t('patient.markAllAsRead')}
           </button>
         )}
       </div>
@@ -134,7 +147,7 @@ const PatientNotifications = () => {
                   className={`nav-link ${filter === 'all' ? 'active' : ''}`}
                   onClick={() => setFilter('all')}
                 >
-                  All
+                  {t('patient.all')}
                 </button>
               </li>
               <li className="nav-item">
@@ -142,7 +155,7 @@ const PatientNotifications = () => {
                   className={`nav-link ${filter === 'unread' ? 'active' : ''}`}
                   onClick={() => setFilter('unread')}
                 >
-                  Unread {unreadCount > 0 && <span className="badge bg-danger">{unreadCount}</span>}
+                  {t('patient.unread')} {unreadCount > 0 && <span className="badge bg-danger">{unreadCount}</span>}
                 </button>
               </li>
               <li className="nav-item">
@@ -150,7 +163,7 @@ const PatientNotifications = () => {
                   className={`nav-link ${filter === 'read' ? 'active' : ''}`}
                   onClick={() => setFilter('read')}
                 >
-                  Read
+                  {t('patient.read')}
                 </button>
               </li>
             </ul>
@@ -159,12 +172,12 @@ const PatientNotifications = () => {
           {isLoading ? (
             <div className="text-center py-5">
               <div className="spinner-border" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('patient.loadingNotifications')}</span>
               </div>
             </div>
           ) : notifications.length === 0 ? (
             <div className="text-center py-5">
-              <p className="text-muted">No notifications found</p>
+              <p className="text-muted">{t('patient.noNotifications')}</p>
             </div>
           ) : (
             <div className="notification-list">
@@ -177,8 +190,8 @@ const PatientNotifications = () => {
                     <i className={getNotificationIcon(notification.type)}></i>
                   </div>
                   <div className="notification-content">
-                    <h5>{notification.title}</h5>
-                    <p>{notification.body}</p>
+                    <h5>{localizeNotificationText(notification.title)}</h5>
+                    <p>{localizeNotificationText(notification.body)}</p>
                     <span className="notification-time">{formatTimeAgo(notification.createdAt)}</span>
                   </div>
                   <div className="notification-action">
@@ -187,7 +200,7 @@ const PatientNotifications = () => {
                         className="btn btn-sm btn-link text-primary"
                         onClick={() => handleMarkAsRead(notification._id)}
                         disabled={markReadMutation.isPending}
-                        title="Mark as read"
+                        title={t('patient.markAsRead')}
                       >
                         <i className="isax isax-tick-circle"></i>
                       </button>

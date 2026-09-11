@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const ProfileIncompleteModal = ({ show, onClose }) => {
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   const handleGoToProfile = () => {
     navigate('/doctor-profile-settings')
@@ -43,57 +45,57 @@ const ProfileIncompleteModal = ({ show, onClose }) => {
             <div className="modal-header">
               <h5 className="modal-title">
                 <i className="fa-solid fa-exclamation-triangle text-warning me-2"></i>
-                Profile Incomplete
+                {t('doctorModals.profileIncomplete')}
               </h5>
               <button
                 type="button"
                 className="btn-close"
                 onClick={onClose}
-                aria-label="Close"
+                aria-label={t('doctorModals.close')}
               ></button>
             </div>
             <div className="modal-body">
               <div className="text-center mb-4">
                 <i className="fa-solid fa-user-circle" style={{ fontSize: '64px', color: '#ffc107' }}></i>
               </div>
-              <h6 className="text-center mb-3">Your veterinary profile is not complete</h6>
+              <h6 className="text-center mb-3">{t('doctorModals.profileNotComplete')}</h6>
               <p className="text-muted text-center mb-4">
-                To start accepting appointments, please complete your profile by filling in the required information.
+                {t('doctorModals.profileDescription')}
               </p>
               <ul className="list-unstyled mb-4">
                 <li className="mb-2">
                   <i className="fa-solid fa-check-circle text-success me-2"></i>
-                  <strong>Title/Designation</strong>
+                  <strong>{t('doctorModals.titleDesignation')}</strong>
                 </li>
                 <li className="mb-2">
                   <i className="fa-solid fa-check-circle text-success me-2"></i>
-                  <strong>Biography</strong>
+                  <strong>{t('doctorModals.biography')}</strong>
                 </li>
                 <li className="mb-2">
                   <i className="fa-solid fa-check-circle text-success me-2"></i>
-                  <strong>Specialization</strong>
+                  <strong>{t('doctorModals.specialization')}</strong>
                 </li>
                 <li className="mb-2">
                   <i className="fa-solid fa-check-circle text-success me-2"></i>
-                  <strong>At least one Clinic</strong>
+                  <strong>{t('doctorModals.clinic')}</strong>
                 </li>
                 <li className="mb-2">
                   <i className="fa-solid fa-check-circle text-success me-2"></i>
-                  <strong>At least one Service</strong>
+                  <strong>{t('doctorModals.service')}</strong>
                 </li>
               </ul>
               <div className="alert alert-warning mb-0">
                 <i className="fa-solid fa-info-circle me-2"></i>
-                <strong>Note:</strong> You cannot receive appointments until your profile is complete.
+                <strong>{t('doctorModals.note')}</strong> {t('doctorModals.cannotReceive')}
               </div>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>
-                Close
+                {t('doctorModals.close')}
               </button>
               <button type="button" className="btn btn-primary" onClick={handleGoToProfile}>
                 <i className="fa-solid fa-user-edit me-2"></i>
-                Complete Profile Now
+                {t('doctorModals.completeNow')}
               </button>
             </div>
           </div>

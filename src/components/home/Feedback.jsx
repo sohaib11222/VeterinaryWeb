@@ -6,10 +6,12 @@ import {
 } from "../../assets/images";
 import { usePublicReviews } from "../../queries/reviewQueries";
 import { getImageUrl } from "../../utils/apiConfig";
+import { useLanguage } from "../../contexts/LanguageContext";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
 const Feedback = () => {
+  const { t } = useLanguage();
   //Aos
 
   useEffect(() => {
@@ -60,7 +62,7 @@ const Feedback = () => {
         const petOwner = r?.petOwnerId;
         const vet = r?.veterinarianId;
         const name = petOwner?.name || petOwner?.fullName || "Pet Owner";
-        const location = vet?.name ? `Reviewed ${vet.name}` : "Verified review";
+        const location = vet?.name ? `${t('home.verifiedReview')}: ${vet.name}` : t('home.verifiedReview');
         const avatar = getImageUrl(petOwner?.profileImage) || "/assets/img/patients/patient.jpg";
         const rating = Number(r?.rating || 0);
         const text = String(r?.reviewText || "").trim();
@@ -70,10 +72,10 @@ const Feedback = () => {
           location,
           avatar,
           rating,
-          text: text || "Great experience.",
+          text: text || t('home.greatExperience'),
         };
       });
-  }, [reviews]);
+  }, [reviews, t]);
 
   const renderStars = (rating) => {
     const r = Math.max(0, Math.min(5, Number(rating) || 0));
@@ -117,11 +119,11 @@ const Feedback = () => {
               <div className="section-header-fourteen service-inner-fourteen">
                 <div className="service-inner-fourteen">
                   <div className="service-inner-fourteen-two">
-                    <h3>CLIENT REVIEWS</h3>
+                    <h3>{t('home.reviewsEyebrow')}</h3>
                   </div>
                 </div>
-                <h2>Testimonials</h2>
-                <p>What our customers says about us</p>
+                <h2>{t('home.testimonials')}</h2>
+                <p>{t('home.reviewDescription')}</p>
               </div>
               <Owlcarousel
                 key={`testimonials-${testimonialCards.length}`}
@@ -132,21 +134,21 @@ const Feedback = () => {
                 {error ? (
                   <div className="card feedback-card">
                     <div className="card-body feedback-card-body text-center py-5 text-danger">
-                      Failed to load reviews
+                      {t('home.failedReviews')}
                     </div>
                   </div>
                 ) : isLoading ? (
                   <div className="card feedback-card">
                     <div className="card-body feedback-card-body text-center py-5">
                       <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
+                        <span className="visually-hidden">{t('common.loading')}</span>
                       </div>
                     </div>
                   </div>
                 ) : testimonialCards.length === 0 ? (
                   <div className="card feedback-card">
                     <div className="card-body feedback-card-body text-center py-5 text-muted">
-                      No reviews yet.
+                      {t('home.noReviews')}
                     </div>
                   </div>
                 ) : (

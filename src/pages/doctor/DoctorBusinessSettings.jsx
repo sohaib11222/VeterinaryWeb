@@ -4,6 +4,7 @@ import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 import { getNextTabPath } from '../../utils/profileSettingsTabs'
@@ -11,6 +12,7 @@ import { getNextTabPath } from '../../utils/profileSettingsTabs'
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 const DoctorBusinessSettings = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const { data, isLoading } = useVeterinarianProfile()
@@ -72,13 +74,13 @@ const DoctorBusinessSettings = () => {
           endTime: businessHours[day].endTime,
         }))
 
-      let clinics = initialClinics.length > 0 ? [...initialClinics] : [{ name: 'Main Clinic', timings: [] }]
+      let clinics = initialClinics.length > 0 ? [...initialClinics] : [{ name: t('doctorRemaining.business.mainClinic'), timings: [] }]
       clinics = clinics.map((clinic, idx) =>
         idx === 0 ? { ...clinic, timings } : clinic
       )
 
       await updateProfile.mutateAsync({ clinics })
-      toast.success('Business hours updated successfully')
+      toast.success(t('doctorRemaining.business.updated'))
 
       const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
       const nextProfile = refreshed?.data ?? refreshed
@@ -91,7 +93,7 @@ const DoctorBusinessSettings = () => {
       }
     } catch (err) {
       const message =
-        err?.response?.data?.message || err?.message || 'Failed to update business hours'
+        err?.response?.data?.message || err?.message || t('doctorRemaining.business.updateFailed')
       toast.error(message)
     }
   }
@@ -107,7 +109,7 @@ const DoctorBusinessSettings = () => {
         style={{ minHeight: '60vh' }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('doctorRemaining.profile.loading')}</span>
         </div>
       </div>
     )
@@ -127,10 +129,10 @@ const DoctorBusinessSettings = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-clock me-3"></i>
-                    Veterinary Clinic Hours
+                    {t('doctorRemaining.business.title')}
                   </h2>
                   <p className="dashboard-subtitle">
-                    Manage your veterinary clinic operating hours and availability
+                    {t('doctorRemaining.business.subtitle')}
                   </p>
                 </div>
               </div>
@@ -146,7 +148,7 @@ const DoctorBusinessSettings = () => {
                       <div className="business-wrap veterinary-business-wrap">
                         <h4>
                           <i className="fa-solid fa-calendar-week me-2"></i>
-                          Select Clinic Days
+                          {t('doctorRemaining.business.selectDays')}
                         </h4>
                         <ul className="business-nav veterinary-day-nav">
                           {days.map((day) => {
@@ -166,7 +168,7 @@ const DoctorBusinessSettings = () => {
                                   }}
                                 >
                                   <i className="fa-solid fa-calendar-day me-1"></i>
-                                  {day}
+                                  {t(`doctorClinicHours.days.${dayId}`)}
                                 </a>
                               </li>
                             )
@@ -198,7 +200,7 @@ const DoctorBusinessSettings = () => {
                                     <div className="form-wrap">
                                       <label className="col-form-label">
                                         <i className="fa-solid fa-clock me-2"></i>
-                                        Opening Time <span className="text-danger">*</span>
+                                        {t('doctorRemaining.business.opening')} <span className="text-danger">*</span>
                                       </label>
                                       <div className="form-icon">
                                         <input
@@ -219,7 +221,7 @@ const DoctorBusinessSettings = () => {
                                     <div className="form-wrap">
                                       <label className="col-form-label">
                                         <i className="fa-solid fa-clock me-2"></i>
-                                        Closing Time <span className="text-danger">*</span>
+                                        {t('doctorRemaining.business.closing')} <span className="text-danger">*</span>
                                       </label>
                                       <div className="form-icon">
                                         <input
@@ -250,7 +252,7 @@ const DoctorBusinessSettings = () => {
                           disabled={updateProfile.isPending}
                         >
                           <i className="fa-solid fa-save me-1"></i>
-                          {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+                          {updateProfile.isPending ? t('doctorRemaining.business.saving') : t('doctorRemaining.business.save')}
                         </button>
                       </div>
                     </form>

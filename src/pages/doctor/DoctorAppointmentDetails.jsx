@@ -10,8 +10,10 @@ import {
   useCompleteAppointment,
   useUpdateAppointmentStatus,
 } from '../../mutations/appointmentMutations'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const DoctorAppointmentDetails = () => {
+  const { t, language } = useLanguage()
   const [searchParams] = useSearchParams()
   const appointmentId = searchParams.get('id')
   const { data: appointmentResponse, isLoading, refetch } = useAppointment(appointmentId)
@@ -53,10 +55,10 @@ const DoctorAppointmentDetails = () => {
     getImageUrl(pet?.image) ||
     getImageUrl(pet?.profileImage) ||
     '/assets/img/doctors-dashboard/profile-02.jpg'
-  const dateStr = appointment?.appointmentDate ? new Date(appointment.appointmentDate).toLocaleDateString() : ''
+  const dateStr = appointment?.appointmentDate ? new Date(appointment.appointmentDate).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB') : ''
   const timeStr = appointment?.appointmentTime || ''
   const status = String(appointment?.status || '').toUpperCase()
-  const statusLabel = status || 'PENDING'
+  const statusLabel = t(`doctorAppointments.${({ CONFIRMED: 'statusConfirmed', PENDING: 'statusPending', PENDING_PAYMENT: 'statusPendingPayment', COMPLETED: 'statusCompleted', CANCELLED: 'statusCancelled', REJECTED: 'statusRejected', NO_SHOW: 'statusNoShow', RESCHEDULED: 'statusRescheduled' })[status] || 'statusPending'}`)
   const consultationFee = useMemo(() => {
     const rawValue = appointment?.consultationFee
     if (rawValue === null || rawValue === undefined || rawValue === '') return null
@@ -85,10 +87,10 @@ const DoctorAppointmentDetails = () => {
   const handleAccept = async () => {
     try {
       await acceptAppointment.mutateAsync(appointmentId)
-      toast.success('Appointment accepted')
+      toast.success(t('doctorAppointmentDetails.accepted'))
       refetch()
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to accept appointment')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorAppointmentDetails.acceptFailed'))
     }
   }
 
@@ -98,11 +100,11 @@ const DoctorAppointmentDetails = () => {
         appointmentId,
         data: { reason: rejectReason || undefined },
       })
-      toast.success('Appointment rejected')
+      toast.success(t('doctorAppointmentDetails.rejected'))
       setShowRejectModal(false)
       refetch()
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to reject appointment')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorAppointmentDetails.rejectFailed'))
     }
   }
 
@@ -128,7 +130,7 @@ const DoctorAppointmentDetails = () => {
       const weightValue = Number(weightDraft.value)
       const hasWeight = Number.isFinite(weightValue) && weightDraft.value !== ''
       if (hasWeight && weightValue <= 0) {
-        toast.error('Weight must be greater than 0')
+        toast.error(t('doctorAppointmentDetails.weightInvalid'))
         return
       }
 
@@ -148,11 +150,11 @@ const DoctorAppointmentDetails = () => {
         },
       })
 
-      toast.success('Appointment marked as completed')
+      toast.success(t('doctorAppointmentDetails.completed'))
       setShowCompleteModal(false)
       refetch()
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to complete appointment')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorAppointmentDetails.completeFailed'))
     }
   }
 
@@ -162,10 +164,10 @@ const DoctorAppointmentDetails = () => {
         appointmentId,
         data: { status: 'NO_SHOW' },
       })
-      toast.success('Appointment marked as no-show')
+      toast.success(t('doctorAppointmentDetails.noShow'))
       refetch()
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to mark as no-show')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorAppointmentDetails.noShowFailed'))
     }
   }
 
@@ -175,8 +177,8 @@ const DoctorAppointmentDetails = () => {
     <>
       <div className="dashboard-header">
         <div className="header-back">
-          <Link to="/appointments" className="back-arrow"><i className="fa-solid fa-arrow-left"></i></Link>
-          <h3>Appointment Details</h3>
+          <Link to="/appointments" className="back-arrow" aria-label={t('doctorAppointmentDetails.back')} title={t('doctorAppointmentDetails.back')}><i className="fa-solid fa-arrow-left"></i></Link>
+          <h3>{t('doctorAppointmentDetails.title')}</h3>
         </div>
       </div>
       <div className="appointment-details-wrap">
@@ -185,13 +187,13 @@ const DoctorAppointmentDetails = () => {
           {isLoading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('doctorAppointmentDetails.loading')}</span>
               </div>
             </div>
           ) : !appointmentId || !appointment ? (
             <div className="text-center py-5">
-              <h5>Appointment not found</h5>
-              <p className="text-muted">Please go back to appointments and select one.</p>
+              <h5>{t('doctorAppointmentDetails.notFound')}</h5>
+              <p className="text-muted">{t('doctorAppointmentDetails.notFoundHint')}</p>
             </div>
           ) : (
             <>
@@ -211,7 +213,7 @@ const DoctorAppointmentDetails = () => {
                       >
                         <img
                           src={patientImage}
-                          alt="Pet"
+                          alt={t('doctorAppointmentDetails.pet')}
                           style={{
                             width: '100%',
                             height: '100%',
@@ -228,10 +230,10 @@ const DoctorAppointmentDetails = () => {
                     <div className="patient-info">
                       <p>{appointment.appointmentNumber || appointment._id}</p>
                       <h6>
-                        <a href="#">{pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : 'Pet'}</a>
-                        {status === 'PENDING' && <span className="badge new-tag ms-2">New</span>}
+                        <a href="#">{pet.name ? `${pet.name}${pet.breed ? ` (${pet.breed})` : ''}` : t('doctorAppointmentDetails.pet')}</a>
+                        {status === 'PENDING' && <span className="badge new-tag ms-2">{t('doctorAppointmentDetails.new')}</span>}
                       </h6>
-                      <p className="text-muted mb-1">Owner: {owner.name || owner.fullName || 'Pet Owner'}</p>
+                      <p className="text-muted mb-1">{t('doctorAppointmentDetails.owner')}: {owner.name || owner.fullName || t('doctorAppointmentDetails.owner')}</p>
                       <div className="mail-info-patient">
                         <ul>
                           <li><i className="fa-solid fa-envelope"></i>{owner.email || '—'}</li>
@@ -243,13 +245,13 @@ const DoctorAppointmentDetails = () => {
                 </li>
                 <li className="appointment-info">
                   <div className="person-info">
-                    <p>Type of Appointment</p>
+                    <p>{t('doctorAppointmentDetails.typeOfAppointment')}</p>
                     <ul className="d-flex apponitment-types">
                       <li>
                         {appointment.bookingType === 'ONLINE' ? (
-                          <><i className="fa-solid fa-video text-indigo"></i>Video Call</>
+                          <><i className="fa-solid fa-video text-indigo"></i>{t('doctorAppointmentDetails.videoCall')}</>
                         ) : (
-                          <><i className="fa-solid fa-hospital text-green"></i>Clinic Visit</>
+                          <><i className="fa-solid fa-hospital text-green"></i>{t('doctorAppointmentDetails.clinicVisit')}</>
                         )}
                       </li>
                     </ul>
@@ -260,11 +262,11 @@ const DoctorAppointmentDetails = () => {
                     <span className={`badge ${getStatusBadgeClass(status)}`}>{statusLabel}</span>
                   </div>
                   <div className="consult-fees">
-                    <h6>Consultation Fee: {consultationFee === null ? '—' : `€${consultationFee.toFixed(2)}`}</h6>
+                    <h6>{t('doctorAppointmentDetails.consultationFee')}: {consultationFee === null ? '—' : `€${consultationFee.toFixed(2)}`}</h6>
                   </div>
                   <ul>
                     <li>
-                      <Link to={appointmentId ? `/chat-doctor?appointmentId=${appointmentId}` : '/chat-doctor'}>
+                      <Link to={appointmentId ? `/chat-doctor?appointmentId=${appointmentId}` : '/chat-doctor'} aria-label={t('doctorAppointments.openChat')} title={t('doctorAppointments.openChat')}>
                         <i className="fa-solid fa-comments"></i>
                       </Link>
                     </li>
@@ -273,22 +275,22 @@ const DoctorAppointmentDetails = () => {
               </ul>
               <ul className="detail-card-bottom-info">
                 <li>
-                  <h6>Appointment Date & Time</h6>
+                  <h6>{t('doctorAppointmentDetails.dateTime')}</h6>
                   <span>{dateStr} {timeStr}</span>
                 </li>
                 <li>
-                  <h6>Visit Reason</h6>
-                  <span>{appointment.reason || 'Consultation'}</span>
+                  <h6>{t('doctorAppointmentDetails.visitReason')}</h6>
+                  <span>{appointment.reason || t('doctorAppointmentDetails.consultation')}</span>
                 </li>
                 {appointment.petSymptoms && (
                   <li>
-                    <h6>Pet Symptoms</h6>
+                    <h6>{t('doctorAppointmentDetails.petSymptoms')}</h6>
                     <span>{appointment.petSymptoms}</span>
                   </li>
                 )}
                 {appointment.notes && (
                   <li>
-                    <h6>Notes</h6>
+                    <h6>{t('doctorAppointmentDetails.notes')}</h6>
                     <span>{appointment.notes}</span>
                   </li>
                 )}
@@ -303,7 +305,7 @@ const DoctorAppointmentDetails = () => {
                       onClick={handleAccept}
                       disabled={isProcessing}
                     >
-                      {acceptAppointment.isPending ? 'Accepting...' : 'Accept Appointment'}
+                       {acceptAppointment.isPending ? t('doctorAppointmentDetails.accepting') : t('doctorAppointmentDetails.accept')}
                     </button>
                   )}
                   {canReject && (
@@ -312,7 +314,7 @@ const DoctorAppointmentDetails = () => {
                       onClick={() => setShowRejectModal(true)}
                       disabled={isProcessing}
                     >
-                      Reject Appointment
+                       {t('doctorAppointmentDetails.reject')}
                     </button>
                   )}
                   {canComplete && (
@@ -321,7 +323,7 @@ const DoctorAppointmentDetails = () => {
                       onClick={openCompleteModal}
                       disabled={isProcessing}
                     >
-                      {completeAppointment.isPending ? 'Completing...' : 'Mark as Completed'}
+                       {completeAppointment.isPending ? t('doctorAppointmentDetails.completing') : t('doctorAppointmentDetails.markCompleted')}
                     </button>
                   )}
                   {canMarkNoShow && (
@@ -330,18 +332,18 @@ const DoctorAppointmentDetails = () => {
                       onClick={handleNoShow}
                       disabled={isProcessing}
                     >
-                      {updateStatus.isPending ? 'Updating...' : 'Mark as No-Show'}
+                       {updateStatus.isPending ? t('doctorAppointmentDetails.updating') : t('doctorAppointmentDetails.markNoShow')}
                     </button>
                   )}
                   {appointment.bookingType === 'ONLINE' && status === 'CONFIRMED' && (
                     <Link to={`/doctor/video-call?appointmentId=${appointmentId}`} className="btn btn-info">
-                      <i className="fa-solid fa-video me-2"></i>Start Video Session
+                       <i className="fa-solid fa-video me-2"></i>{t('doctorAppointmentDetails.startVideo')}
                     </Link>
                   )}
 
                   {canPrescription && (
                     <Link to={`/doctor/prescription?appointmentId=${appointmentId}`} className="btn btn-outline-primary">
-                      Prescription
+                       {t('doctorAppointmentDetails.prescription')}
                     </Link>
                   )}
                 </div>
@@ -358,25 +360,26 @@ const DoctorAppointmentDetails = () => {
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Reject Appointment</h5>
-                <button type="button" className="btn-close" onClick={() => setShowRejectModal(false)}></button>
+                <h5 className="modal-title">{t('doctorAppointmentDetails.rejectModalTitle')}</h5>
+                <button type="button" className="btn-close" onClick={() => setShowRejectModal(false)} aria-label={t('doctorAppointmentDetails.close')}></button>
               </div>
               <div className="modal-body">
-                <p>Are you sure you want to reject this appointment?</p>
+                <p>{t('doctorAppointmentDetails.rejectConfirm')}</p>
                 <div className="mb-3">
-                  <label className="form-label">Reason for rejection (optional)</label>
+                  <label className="form-label" htmlFor="doctor-reject-reason">{t('doctorAppointmentDetails.reasonOptional')}</label>
                   <textarea
+                    id="doctor-reject-reason"
                     className="form-control"
                     rows="3"
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    placeholder="Enter reason..."
+                    placeholder={t('doctorAppointmentDetails.reasonPlaceholder')}
                   />
                 </div>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowRejectModal(false)}>
-                  Cancel
+                  {t('doctorAppointmentDetails.cancel')}
                 </button>
                 <button
                   type="button"
@@ -384,7 +387,7 @@ const DoctorAppointmentDetails = () => {
                   onClick={handleReject}
                   disabled={rejectAppointment.isPending}
                 >
-                  {rejectAppointment.isPending ? 'Rejecting...' : 'Reject Appointment'}
+                  {rejectAppointment.isPending ? t('doctorAppointmentDetails.rejecting') : t('doctorAppointmentDetails.rejectAction')}
                 </button>
               </div>
             </div>
@@ -397,21 +400,22 @@ const DoctorAppointmentDetails = () => {
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Complete Appointment & Record Vaccinations</h5>
-                <button type="button" className="btn-close" onClick={() => setShowCompleteModal(false)} disabled={completeAppointment.isPending}></button>
+                <h5 className="modal-title">{t('doctorAppointmentDetails.completeModalTitle')}</h5>
+                <button type="button" className="btn-close" onClick={() => setShowCompleteModal(false)} disabled={completeAppointment.isPending} aria-label={t('doctorAppointmentDetails.close')}></button>
               </div>
               <div className="modal-body">
                 <div className="mb-3">
-                  <h6 className="mb-2">Weight</h6>
+                  <h6 className="mb-2">{t('doctorAppointmentDetails.weight')}</h6>
                   {latestWeightRecord?.weight?.value !== undefined && latestWeightRecord?.weight?.value !== null && (
                     <div className="text-muted mb-2">
-                      Last recorded: {latestWeightRecord.weight.value}{latestWeightRecord.weight.unit || 'kg'}
+                      {t('doctorAppointmentDetails.lastRecorded')} {latestWeightRecord.weight.value}{latestWeightRecord.weight.unit || 'kg'}
                     </div>
                   )}
                   <div className="row g-2 align-items-end">
                     <div className="col-md-4">
-                      <label className="form-label">Value</label>
+                      <label className="form-label" htmlFor="doctor-weight-value">{t('doctorAppointmentDetails.value')}</label>
                       <input
+                        id="doctor-weight-value"
                         type="number"
                         className="form-control"
                         value={weightDraft.value}
@@ -421,8 +425,9 @@ const DoctorAppointmentDetails = () => {
                       />
                     </div>
                     <div className="col-md-3">
-                      <label className="form-label">Unit</label>
+                      <label className="form-label" htmlFor="doctor-weight-unit">{t('doctorAppointmentDetails.unit')}</label>
                       <select
+                        id="doctor-weight-unit"
                         className="form-select"
                         value={weightDraft.unit}
                         onChange={(e) => setWeightDraft((p) => ({ ...p, unit: e.target.value }))}
@@ -432,8 +437,9 @@ const DoctorAppointmentDetails = () => {
                       </select>
                     </div>
                     <div className="col-md-5">
-                      <label className="form-label">Notes</label>
+                      <label className="form-label" htmlFor="doctor-weight-notes">{t('doctorAppointmentDetails.weightNotes')}</label>
                       <input
+                        id="doctor-weight-notes"
                         type="text"
                         className="form-control"
                         value={weightDraft.notes}
@@ -443,16 +449,16 @@ const DoctorAppointmentDetails = () => {
                   </div>
                 </div>
 
-                <h6 className="mb-2">Vaccinations</h6>
+                <h6 className="mb-2">{t('doctorAppointmentDetails.vaccinations')}</h6>
                 <div className="table-responsive">
                   <table className="table table-sm">
                     <thead>
                       <tr>
-                        <th>Vaccine</th>
-                        <th>Date</th>
-                        <th>Next Due</th>
-                        <th>Batch</th>
-                        <th>Notes</th>
+                        <th>{t('doctorAppointmentDetails.vaccine')}</th>
+                        <th>{t('doctorAppointmentDetails.date')}</th>
+                        <th>{t('doctorAppointmentDetails.nextDue')}</th>
+                        <th>{t('doctorAppointmentDetails.batch')}</th>
+                        <th>{t('doctorAppointmentDetails.weightNotes')}</th>
                         <th></th>
                       </tr>
                     </thead>
@@ -467,7 +473,7 @@ const DoctorAppointmentDetails = () => {
                                 setVaccinationsDraft((prev) => prev.map((p, i) => (i === idx ? { ...p, vaccineId: e.target.value } : p)))
                               }
                             >
-                              <option value="">Select vaccine</option>
+                              <option value="">{t('doctorAppointmentDetails.selectVaccine')}</option>
                               {Array.isArray(vaccines) && vaccines.map((v) => (
                                 <option key={v._id} value={v._id}>{v.name}</option>
                               ))}
@@ -520,7 +526,7 @@ const DoctorAppointmentDetails = () => {
                               onClick={() => setVaccinationsDraft((prev) => prev.filter((_, i) => i !== idx))}
                               disabled={vaccinationsDraft.length <= 1 || completeAppointment.isPending}
                             >
-                              Remove
+                              {t('doctorAppointmentDetails.remove')}
                             </button>
                           </td>
                         </tr>
@@ -535,15 +541,15 @@ const DoctorAppointmentDetails = () => {
                   onClick={() => setVaccinationsDraft((prev) => [...prev, { vaccineId: '', vaccinationDate: new Date().toISOString().slice(0, 10), nextDueDate: '', batchNumber: '', notes: '' }])}
                   disabled={completeAppointment.isPending}
                 >
-                  Add Another Vaccine
+                  {t('doctorAppointmentDetails.addAnotherVaccine')}
                 </button>
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCompleteModal(false)} disabled={completeAppointment.isPending}>
-                  Cancel
+                  {t('doctorAppointmentDetails.cancel')}
                 </button>
                 <button type="button" className="btn btn-primary" onClick={handleCompleteSubmit} disabled={completeAppointment.isPending}>
-                  {completeAppointment.isPending ? 'Completing...' : 'Complete Appointment'}
+                  {completeAppointment.isPending ? t('doctorAppointmentDetails.completing') : t('doctorAppointmentDetails.completeAppointment')}
                 </button>
               </div>
             </div>

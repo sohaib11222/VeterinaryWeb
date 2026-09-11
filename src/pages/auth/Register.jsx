@@ -5,31 +5,20 @@ import { yupResolver } from '@hookform/resolvers/yup'
 import * as yup from 'yup'
 import { useAuth } from '../../contexts/AuthContext'
 import { toast } from 'react-toastify'
-
-const schema = yup.object({
-  name: yup
-    .string()
-    .min(2, 'Name must be at least 2 characters')
-    .max(50, 'Name must be less than 50 characters')
-    .required('Name is required'),
-  email: yup.string().email('Invalid email').required('Email is required'),
-  phone: yup
-    .string()
-    .required('Phone is required'),
-  password: yup
-    .string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
-  password_confirmation: yup
-    .string()
-    .oneOf([yup.ref('password')], 'Passwords must match')
-    .required('Confirm password is required'),
-})
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const Register = () => {
   const navigate = useNavigate()
   const { register: registerUser } = useAuth()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(false)
+  const schema = yup.object({
+    name: yup.string().min(2, t('auth.register.nameRequired')).max(50, t('auth.register.nameRequired')).required(t('auth.register.nameRequired')),
+    email: yup.string().email(t('auth.register.validEmail')).required(t('auth.register.emailRequired')),
+    phone: yup.string().required(t('auth.register.phoneRequired')),
+    password: yup.string().min(6, t('auth.register.passwordMin')).required(t('auth.register.passwordRequired')),
+    password_confirmation: yup.string().oneOf([yup.ref('password')], t('auth.register.passwordMatch')).required(t('auth.register.confirmRequired')),
+  })
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
@@ -46,14 +35,14 @@ const Register = () => {
       }
       const response = await registerUser(payload, 'patient')
       if (response?.requiresEmailVerification) {
-        toast.success('Verification code sent to your email address.')
+        toast.success(t('auth.verifyEmail.resend'))
         navigate(`/verify-email?email=${encodeURIComponent(response.email || data.email)}`, {
           state: { email: response.email || data.email },
         })
         return
       }
 
-      toast.success('Registration successful!')
+      toast.success(t('auth.register.success'))
 
       const role = response?.user?.role
       if (role === 'VETERINARIAN') {
@@ -67,7 +56,7 @@ const Register = () => {
         navigate('/patient/dashboard')
       }
     } catch (error) {
-      toast.error(error?.message || 'Registration failed')
+      toast.error(error?.message || t('auth.register.emailRequired'))
     } finally {
       setLoading(false)
     }
@@ -86,69 +75,69 @@ const Register = () => {
                       <i className="fa-solid fa-heart-pulse"></i>
                     </div>
                     <h3 className="account-title veterinary-register-title">
-                      <i className="fa-solid fa-heart-pulse me-2"></i>Join MyPetPlus
+                      <i className="fa-solid fa-heart-pulse me-2"></i>{t('auth.register.title')}
                     </h3>
                     <p className="account-subtitle veterinary-register-subtitle">
-                      Create your pet health account
+                      {t('auth.register.subtitle')}
                     </p>
                   </div>
                   <form className="auth-form-grid" onSubmit={handleSubmit(onSubmit)}>
                     <div className="form-group veterinary-form-group">
                       <label className="veterinary-form-label">
-                        <i className="fa-solid fa-user me-2"></i>Full Name
+                        <i className="fa-solid fa-user me-2"></i>{t('auth.register.name')}
                       </label>
                       <input
                         type="text"
                         className={`form-control veterinary-form-control ${errors.name ? 'is-invalid' : ''}`}
-                        placeholder="Enter your full name"
+                        placeholder={t('auth.register.namePlaceholder')}
                         {...register('name')}
                       />
                       {errors.name && <div className="invalid-feedback veterinary-error-feedback">{errors.name.message}</div>}
                     </div>
                     <div className="form-group veterinary-form-group">
                       <label className="veterinary-form-label">
-                        <i className="fa-solid fa-envelope me-2"></i>Email Address
+                        <i className="fa-solid fa-envelope me-2"></i>{t('auth.register.email')}
                       </label>
                       <input
                         type="email"
                         className={`form-control veterinary-form-control ${errors.email ? 'is-invalid' : ''}`}
-                        placeholder="Enter your email address"
+                        placeholder={t('auth.register.emailPlaceholder')}
                         {...register('email')}
                       />
                       {errors.email && <div className="invalid-feedback veterinary-error-feedback">{errors.email.message}</div>}
                     </div>
                     <div className="form-group veterinary-form-group auth-form-grid__full">
                       <label className="veterinary-form-label">
-                        <i className="fa-solid fa-phone me-2"></i>Phone Number
+                        <i className="fa-solid fa-phone me-2"></i>{t('auth.register.phone')}
                       </label>
                       <input
                         type="tel"
                         className={`form-control veterinary-form-control ${errors.phone ? 'is-invalid' : ''}`}
-                        placeholder="Enter your phone number"
+                        placeholder={t('auth.register.phonePlaceholder')}
                         {...register('phone')}
                       />
                       {errors.phone && <div className="invalid-feedback veterinary-error-feedback">{errors.phone.message}</div>}
                     </div>
                     <div className="form-group veterinary-form-group">
                       <label className="veterinary-form-label">
-                        <i className="fa-solid fa-lock me-2"></i>Password
+                        <i className="fa-solid fa-lock me-2"></i>{t('auth.register.password')}
                       </label>
                       <input
                         type="password"
                         className={`form-control veterinary-form-control ${errors.password ? 'is-invalid' : ''}`}
-                        placeholder="Create a secure password"
+                        placeholder={t('auth.register.passwordPlaceholder')}
                         {...register('password')}
                       />
                       {errors.password && <div className="invalid-feedback veterinary-error-feedback">{errors.password.message}</div>}
                     </div>
                     <div className="form-group veterinary-form-group">
                       <label className="veterinary-form-label">
-                        <i className="fa-solid fa-lock me-2"></i>Confirm Password
+                        <i className="fa-solid fa-lock me-2"></i>{t('auth.register.confirmPassword')}
                       </label>
                       <input
                         type="password"
                         className={`form-control veterinary-form-control ${errors.password_confirmation ? 'is-invalid' : ''}`}
-                        placeholder="Confirm your password"
+                        placeholder={t('auth.register.confirmPasswordPlaceholder')}
                         {...register('password_confirmation')}
                       />
                       {errors.password_confirmation && <div className="invalid-feedback veterinary-error-feedback">{errors.password_confirmation.message}</div>}
@@ -159,10 +148,10 @@ const Register = () => {
                         {loading ? (
                           <>
                             <i className="fa-solid fa-spinner fa-spin me-2"></i>
-                            Creating Account...
+                            {t('auth.register.submitting')}
                           </>
                         ) : (
-                          'Create MyPetPlus Account'
+                          t('auth.register.submit')
                         )}
                       </button>
                     </div>
@@ -174,28 +163,28 @@ const Register = () => {
                     </div>
                     <div className="auth-role-options auth-form-grid__full">
                       <Link to="/doctor-register" className="btn veterinary-btn-outline-primary account-btn veterinary-doctor-register-btn">
-                        <i className="fa-solid fa-user-doctor me-2"></i>Veterinarian
+                        <i className="fa-solid fa-user-doctor me-2"></i>{t('nav.doctors')}
                       </Link>
                       <Link to="/pharmacy-register?type=pet_store" className="btn veterinary-btn-outline-primary account-btn veterinary-doctor-register-btn">
-                        <i className="fa-solid fa-pills me-2"></i>Pharmacy
+                        <i className="fa-solid fa-pills me-2"></i>{t('nav.pharmacy')}
                       </Link>
                       <Link to="/pharmacy-register?type=parapharmacy" className="btn veterinary-btn-outline-primary account-btn veterinary-doctor-register-btn">
                         <i className="fa-solid fa-prescription-bottle-medical me-2"></i>Parapharmacy
                       </Link>
                       <Link to="/pet-sitter/register" className="btn veterinary-btn-outline-primary account-btn veterinary-doctor-register-btn">
-                        <i className="fa-solid fa-paw me-2"></i>Pet Sitter
+                        <i className="fa-solid fa-paw me-2"></i>{t('nav.becomePetSitter')}
                       </Link>
                     </div>
                     <div className="account-footer veterinary-register-footer">
                       <p className="veterinary-footer-text">
                         <i className="fa-solid fa-sign-in-alt me-2"></i>
-                        Already have an account? <Link to="/login" className="veterinary-login-link">Login to MyPetPlus</Link>
+                        {t('auth.register.alreadyHave')} <Link to="/login" className="veterinary-login-link">{t('auth.register.login')}</Link>
                       </p>
                       <div className="veterinary-register-features mt-3">
                         <div className="row text-center">
                           <div className="col-4">
                             <i className="fa-solid fa-shield-halved text-success mb-2"></i>
-                            <p className="small mb-0">Secure</p>
+                            <p className="small mb-0">{t('auth.secureByDesign')}</p>
                           </div>
                           <div className="col-4">
                             <i className="fa-solid fa-stethoscope mb-2"></i>

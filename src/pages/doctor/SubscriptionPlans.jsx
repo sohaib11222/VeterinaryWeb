@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 import { useMySubscription, useSubscriptionPlans } from '../../queries'
 import { usePurchaseSubscriptionPlan } from '../../mutations'
 
 const SubscriptionPlans = () => {
+  const { language, t } = useLanguage()
   const [selectedPlan, setSelectedPlan] = useState(null)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
 
@@ -47,11 +49,11 @@ const SubscriptionPlans = () => {
     if (!selectedPlan?._id) return
     try {
       await purchase.mutateAsync({ planId: selectedPlan._id })
-      toast.success('Subscription updated')
+      toast.success(t('doctorRemaining.subscription.updated'))
       setShowPaymentModal(false)
       setSelectedPlan(null)
     } catch (err) {
-      toast.error(err?.message || 'Failed to purchase subscription')
+      toast.error(err?.message || t('doctorRemaining.subscription.purchaseFailed'))
     }
   }
 
@@ -69,9 +71,9 @@ const SubscriptionPlans = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-paw me-3"></i>
-                    Veterinary Subscription Plans
+                    {t('doctorRemaining.subscription.title')}
                   </h2>
-                  <p className="dashboard-subtitle">Choose a plan that best fits your veterinary practice needs</p>
+                  <p className="dashboard-subtitle">{t('doctorRemaining.subscription.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -82,24 +84,24 @@ const SubscriptionPlans = () => {
                 <div className="d-flex align-items-center justify-content-between">
                   <div>
                     <h5 className="mb-1">
-                      Current Plan: {hasActiveSubscription ? (mySubscription?.subscriptionPlan?.name || '—') : 'No active plan'}
+                      {t('doctorRemaining.subscription.currentPlan')}: {hasActiveSubscription ? (mySubscription?.subscriptionPlan?.name || '—') : t('doctorRemaining.subscription.noActive')}
                     </h5>
                     <p className="text-muted mb-0">
-                      {hasActiveSubscription && expiresAt ? `Renews on: ${new Date(expiresAt).toLocaleDateString()}` : 'Subscribe to unlock booking & chat'}
+                      {hasActiveSubscription && expiresAt ? t('doctorRemaining.subscription.renewsOn', { date: new Date(expiresAt).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB') }) : t('doctorRemaining.subscription.unlock')}
                     </p>
                     {hasActiveSubscription && usage && remaining && (
                       <p className="text-muted mb-0 mt-2">
-                        Usage:
+                        {t('doctorRemaining.subscription.usage')}:
                         {' '}
-                        Private {usage.privateConsultations} / {remaining.privateConsultations === null ? 'Unlimited' : usage.privateConsultations + (remaining.privateConsultations || 0)}
-                        , Video {usage.videoConsultations} / {remaining.videoConsultations === null ? 'Unlimited' : usage.videoConsultations + (remaining.videoConsultations || 0)}
-                        , Chat {usage.chatSessions} / {remaining.chatSessions === null ? 'Unlimited' : usage.chatSessions + (remaining.chatSessions || 0)}
+                        {t('doctorRemaining.subscription.private')} {usage.privateConsultations} / {remaining.privateConsultations === null ? t('doctorRemaining.subscription.unlimited') : usage.privateConsultations + (remaining.privateConsultations || 0)}
+                        , {t('doctorRemaining.subscription.video')} {usage.videoConsultations} / {remaining.videoConsultations === null ? t('doctorRemaining.subscription.unlimited') : usage.videoConsultations + (remaining.videoConsultations || 0)}
+                        , {t('doctorRemaining.subscription.chat')} {usage.chatSessions} / {remaining.chatSessions === null ? t('doctorRemaining.subscription.unlimited') : usage.chatSessions + (remaining.chatSessions || 0)}
                       </p>
                     )}
                   </div>
                   <div>
                     <span className={`badge ${hasActiveSubscription ? 'bg-success' : 'bg-secondary'}`}>
-                      {hasActiveSubscription ? 'Active' : 'Inactive'}
+                      {hasActiveSubscription ? t('doctorRemaining.subscription.active') : t('doctorRemaining.subscription.inactive')}
                     </span>
                   </div>
                 </div>
@@ -109,7 +111,7 @@ const SubscriptionPlans = () => {
             {/* Subscription Plans */}
             <div className="row">
               {plansLoading ? (
-                <div className="col-12 text-center py-5 text-muted">Loading plans...</div>
+                <div className="col-12 text-center py-5 text-muted">{t('doctorRemaining.subscription.loading')}</div>
               ) : (
                 plans.map((plan) => {
                   const isCurrent = currentPlanId && String(plan._id) === String(currentPlanId)
@@ -119,22 +121,22 @@ const SubscriptionPlans = () => {
                       <div className={`card veterinary-subscription-card ${popular ? 'popular-plan' : ''} ${isCurrent ? 'current-plan' : ''}`}>
                         {popular && (
                           <div className="popular-badge">
-                            <span className="badge bg-primary">Most Popular</span>
+                            <span className="badge bg-primary">{t('doctorRemaining.subscription.mostPopular')}</span>
                           </div>
                         )}
                         {isCurrent && (
                           <div className="current-badge">
-                            <span className="badge bg-success">Current Plan</span>
+                            <span className="badge bg-success">{t('doctorRemaining.subscription.current')}</span>
                           </div>
                         )}
                         <div className="card-body text-center">
                           <h4 className="mb-3">
                             <i className="fa-solid fa-paw me-2"></i>
-                            {plan?.name} PLAN
+                            {plan?.name} {t('doctorRemaining.subscription.planSuffix')}
                           </h4>
                           <div className="pricing mb-4">
                             <h2 className="mb-0">€{plan?.price}</h2>
-                            <p className="text-muted">per month</p>
+                            <p className="text-muted">{t('doctorRemaining.subscription.perMonth')}</p>
                           </div>
                           <ul className="list-unstyled plan-features mb-4">
                             {(plan?.features || []).map((feature, index) => (
@@ -146,14 +148,14 @@ const SubscriptionPlans = () => {
                           </ul>
                           {isCurrent ? (
                             <button type="button" className="btn veterinary-btn-secondary w-100" disabled>
-                              Current Plan
+                              {t('doctorRemaining.subscription.current')}
                             </button>
                           ) : (
                             <button
                               className={`btn w-100 veterinary-btn-primary ${popular ? '' : 'veterinary-btn-outline'}`}
                               onClick={() => handleUpgrade(plan)}
                             >
-                              Choose Plan
+                              {t('doctorRemaining.subscription.choose')}
                             </button>
                           )}
                         </div>
@@ -182,7 +184,7 @@ const SubscriptionPlans = () => {
                     <div className="modal-header">
                       <h5 className="modal-title">
                         <i className="fa-solid fa-paw me-2"></i>
-                        Upgrade Veterinary Subscription
+                        {t('doctorRemaining.subscription.upgradeTitle')}
                       </h5>
                       <button
                         type="button"
@@ -194,17 +196,17 @@ const SubscriptionPlans = () => {
                       <div className="mb-3">
                         <h6>
                           <i className="fa-solid fa-box me-2"></i>
-                          Selected Plan: {selectedPlan?.name} PLAN
+                          {t('doctorRemaining.subscription.selectedPlan')}: {selectedPlan?.name} {t('doctorRemaining.subscription.planSuffix')}
                         </h6>
                         <p className="text-muted">
                           <i className="fa-solid fa-dollar-sign me-2"></i>
-                          Price: €{selectedPlan?.price} per month
+                          {t('doctorRemaining.subscription.price')}: €{selectedPlan?.price} {t('doctorRemaining.subscription.perMonth')}
                         </p>
                       </div>
                       <div className="payment-methods mb-3">
                         <h6 className="mb-3">
                           <i className="fa-solid fa-credit-card me-2"></i>
-                          Payment Method
+                          {t('doctorRemaining.subscription.paymentMethod')}
                         </h6>
                         <div className="form-check mb-2">
                           <input
@@ -225,7 +227,7 @@ const SubscriptionPlans = () => {
                           />
                           <label className="form-check-label" htmlFor="paypal">
                             <i className="fa-solid fa-dollar-sign me-2"></i>
-                            Stripe
+                            {t('doctorRemaining.subscription.stripe')}
                           </label>
                         </div>
                         <div className="form-check">
@@ -246,7 +248,7 @@ const SubscriptionPlans = () => {
                         className="btn veterinary-btn-secondary"
                         onClick={() => setShowPaymentModal(false)}
                       >
-                        Cancel
+                        {t('doctorRemaining.subscription.cancel')}
                       </button>
                       <button
                         type="button"
@@ -255,7 +257,7 @@ const SubscriptionPlans = () => {
                         disabled={purchase.isPending}
                       >
                         <i className="fa-solid fa-lock me-2"></i>
-                        {purchase.isPending ? 'Processing...' : 'Pay Now'}
+                        {purchase.isPending ? t('doctorRemaining.subscription.processing') : t('doctorRemaining.subscription.payNow')}
                       </button>
                     </div>
                   </div>
@@ -271,10 +273,9 @@ const SubscriptionPlans = () => {
                   <i className="fa-solid fa-info-circle"></i>
                 </div>
                 <div className="flex-grow-1 ms-3">
-                  <h6 className="alert-heading">Veterinary Subscription Information</h6>
+                  <h6 className="alert-heading">{t('doctorRemaining.subscription.infoTitle')}</h6>
                   <p className="mb-0 small">
-                    You can upgrade or downgrade your veterinary care plan at any time. Changes will be reflected immediately, 
-                    and billing will be prorated. Cancel anytime with no long-term commitment for your pet practice.
+                    {t('doctorRemaining.subscription.infoText')}
                   </p>
                 </div>
               </div>

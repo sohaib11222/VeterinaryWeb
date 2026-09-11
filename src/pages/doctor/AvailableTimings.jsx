@@ -6,12 +6,14 @@ import {
   useUpdateAppointmentDuration,
 } from '../../mutations/scheduleMutations'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 const formatTime = (value) => value
 
 const AvailableTimings = () => {
+  const { t } = useLanguage()
   const { data: schedule, isLoading } = useWeeklySchedule()
   const updateDurationMutation = useUpdateAppointmentDuration()
   const addSlotMutation = useAddTimeSlot()
@@ -22,6 +24,7 @@ const AvailableTimings = () => {
   const [modalEnd, setModalEnd] = useState('09:30')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [duration, setDuration] = useState(30)
+  const dayLabel = (day) => t(`doctorClinicHours.days.${day.toLowerCase()}`)
 
   const getDaySchedule = (dayOfWeek) => {
     const days = schedule?.data?.days || schedule?.days || []
@@ -34,8 +37,8 @@ const AvailableTimings = () => {
       return (
         <div className="no-slots veterinary-no-slots">
           <i className="fa-solid fa-calendar-xmark fa-2x text-muted mb-2"></i>
-          <p>No Slots Available</p>
-          <small className="text-muted">Click &quot;Add Slots&quot; to create time slots</small>
+          <p>{t('doctorClinicHours.noSlots')}</p>
+          <small className="text-muted">{t('doctorClinicHours.addSlotsHint')}</small>
         </div>
       )
     }
@@ -49,7 +52,7 @@ const AvailableTimings = () => {
               {slot.startTime} - {slot.endTime}
             </span>
             {!slot.isAvailable && (
-              <span className="slot-type text-danger ms-2">Unavailable</span>
+              <span className="slot-type text-danger ms-2">{t('doctorClinicHours.unavailable')}</span>
             )}
             <button
               type="button"
@@ -58,7 +61,7 @@ const AvailableTimings = () => {
               disabled={deleteSlotMutation.isLoading}
             >
               <i className="fa-solid fa-trash me-1"></i>
-              Delete
+              {t('doctorClinicHours.delete')}
             </button>
           </li>
         ))}
@@ -81,28 +84,28 @@ const AvailableTimings = () => {
           isAvailable: true,
         },
       })
-      toast.success('Time slot added')
+      toast.success(t('doctorClinicHours.timeSlotAdded'))
       setIsModalOpen(false)
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Failed to add time slot')
+      toast.error(err?.response?.data?.message || t('doctorClinicHours.addSlotFailed'))
     }
   }
 
   const handleDeleteSlot = async (dayOfWeek, slotId) => {
     try {
       await deleteSlotMutation.mutateAsync({ dayOfWeek, slotId })
-      toast.success('Time slot deleted')
+      toast.success(t('doctorClinicHours.timeSlotDeleted'))
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Failed to delete time slot')
+      toast.error(err?.response?.data?.message || t('doctorClinicHours.deleteSlotFailed'))
     }
   }
 
   const handleUpdateDuration = async () => {
     try {
       await updateDurationMutation.mutateAsync(Number(duration))
-      toast.success('Appointment duration updated')
+      toast.success(t('doctorClinicHours.durationUpdated'))
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Failed to update duration')
+      toast.error(err?.response?.data?.message || t('doctorClinicHours.durationFailed'))
     }
   }
 
@@ -110,7 +113,7 @@ const AvailableTimings = () => {
     return (
       <div className="content veterinary-dashboard d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('doctorClinicHours.loading')}</span>
         </div>
       </div>
     )
@@ -132,9 +135,9 @@ const AvailableTimings = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-calendar-day me-3"></i>
-                    Clinic Hours
+                    {t('doctorClinicHours.title')}
                   </h2>
-                  <p className="dashboard-subtitle">Manage your veterinary clinic availability and appointment slots</p>
+                  <p className="dashboard-subtitle">{t('doctorClinicHours.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -147,12 +150,12 @@ const AvailableTimings = () => {
                     <ul className="nav available-nav">
                       <li className="nav-item" role="presentation">
                         <a className="nav-link veterinary-tab active" href="#" data-bs-toggle="tab" data-bs-target="#general-availability">
-                          <i className="fa-solid fa-clock me-2"></i>General Availability
+                          <i className="fa-solid fa-clock me-2"></i>{t('doctorClinicHours.generalAvailability')}
                         </a>
                       </li>
                       <li className="nav-item" role="presentation">
                         <a className="nav-link veterinary-tab" href="#" data-bs-toggle="tab" data-bs-target="#clinic-availability">
-                          <i className="fa-solid fa-clinic-medical me-2"></i>Clinic Availability
+                          <i className="fa-solid fa-clinic-medical me-2"></i>{t('doctorClinicHours.clinicAvailability')}
                         </a>
                       </li>
                     </ul>
@@ -169,49 +172,49 @@ const AvailableTimings = () => {
                     <div className="card-header veterinary-card-header">
                       <h3>
                         <i className="fa-solid fa-calendar-check me-2"></i>
-                        Select Available Slots
+                        {t('doctorClinicHours.selectAvailableSlots')}
                       </h3>
                     </div>
 
                     <div className="available-tab">
                       <label className="form-label">
                         <i className="fa-solid fa-calendar-days me-2"></i>
-                        Select Available Days
+                        {t('doctorClinicHours.selectAvailableDays')}
                       </label>
                       <ul className="nav veterinary-day-nav">
                         <li>
                           <a href="#" className="active" data-bs-toggle="tab" data-bs-target="#monday">
-                            <i className="fa-solid fa-calendar me-1"></i>Monday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Monday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#tuesday">
-                            <i className="fa-solid fa-calendar me-1"></i>Tuesday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Tuesday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#wednesday">
-                            <i className="fa-solid fa-calendar me-1"></i>Wednesday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Wednesday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#thursday">
-                            <i className="fa-solid fa-calendar me-1"></i>Thursday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Thursday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#friday">
-                            <i className="fa-solid fa-calendar me-1"></i>Friday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Friday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#saturday">
-                            <i className="fa-solid fa-calendar me-1"></i>Saturday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Saturday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#sunday">
-                            <i className="fa-solid fa-calendar me-1"></i>Sunday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Sunday')}
                           </a>
                         </li>
                       </ul>
@@ -224,7 +227,7 @@ const AvailableTimings = () => {
                           <div className="slot-header">
                             <h5>
                               <i className="fa-solid fa-calendar-day me-2"></i>
-                              Monday
+                              {dayLabel('Monday')}
                             </h5>
                             <ul>
                               <li>
@@ -236,7 +239,7 @@ const AvailableTimings = () => {
                                     openAddSlotModal('Monday')
                                   }}
                                 >
-                                  <i className="fa-solid fa-plus"></i> Add Slots
+                                  <i className="fa-solid fa-plus"></i> {t('doctorClinicHours.addSlots')}
                                 </a>
                               </li>
                             </ul>
@@ -251,7 +254,7 @@ const AvailableTimings = () => {
                           <div className="slot-header">
                             <h5>
                               <i className="fa-solid fa-calendar-day me-2"></i>
-                              Tuesday
+                              {dayLabel('Tuesday')}
                             </h5>
                             <ul>
                               <li>
@@ -263,7 +266,7 @@ const AvailableTimings = () => {
                                     openAddSlotModal('Tuesday')
                                   }}
                                 >
-                                  <i className="fa-solid fa-plus"></i> Add Slots
+                                  <i className="fa-solid fa-plus"></i> {t('doctorClinicHours.addSlots')}
                                 </a>
                               </li>
                             </ul>
@@ -278,7 +281,7 @@ const AvailableTimings = () => {
                           <div className="slot-header">
                             <h5>
                               <i className="fa-solid fa-calendar-day me-2"></i>
-                              Wednesday
+                              {dayLabel('Wednesday')}
                             </h5>
                             <ul>
                               <li>
@@ -290,7 +293,7 @@ const AvailableTimings = () => {
                                     openAddSlotModal('Wednesday')
                                   }}
                                 >
-                                  <i className="fa-solid fa-plus"></i> Add Slots
+                                  <i className="fa-solid fa-plus"></i> {t('doctorClinicHours.addSlots')}
                                 </a>
                               </li>
                             </ul>
@@ -305,7 +308,7 @@ const AvailableTimings = () => {
                           <div className="slot-header">
                             <h5>
                               <i className="fa-solid fa-calendar-day me-2"></i>
-                              Thursday
+                              {dayLabel('Thursday')}
                             </h5>
                             <ul>
                               <li>
@@ -317,7 +320,7 @@ const AvailableTimings = () => {
                                     openAddSlotModal('Thursday')
                                   }}
                                 >
-                                  <i className="fa-solid fa-plus"></i> Add Slots
+                                  <i className="fa-solid fa-plus"></i> {t('doctorClinicHours.addSlots')}
                                 </a>
                               </li>
                             </ul>
@@ -332,7 +335,7 @@ const AvailableTimings = () => {
                           <div className="slot-header">
                             <h5>
                               <i className="fa-solid fa-calendar-day me-2"></i>
-                              Friday
+                              {dayLabel('Friday')}
                             </h5>
                             <ul>
                               <li>
@@ -344,7 +347,7 @@ const AvailableTimings = () => {
                                     openAddSlotModal('Friday')
                                   }}
                                 >
-                                  <i className="fa-solid fa-plus"></i> Add Slots
+                                  <i className="fa-solid fa-plus"></i> {t('doctorClinicHours.addSlots')}
                                 </a>
                               </li>
                             </ul>
@@ -359,7 +362,7 @@ const AvailableTimings = () => {
                           <div className="slot-header">
                             <h5>
                               <i className="fa-solid fa-calendar-day me-2"></i>
-                              Saturday
+                              {dayLabel('Saturday')}
                             </h5>
                             <ul>
                               <li>
@@ -371,7 +374,7 @@ const AvailableTimings = () => {
                                     openAddSlotModal('Saturday')
                                   }}
                                 >
-                                  <i className="fa-solid fa-plus"></i> Add Slots
+                                  <i className="fa-solid fa-plus"></i> {t('doctorClinicHours.addSlots')}
                                 </a>
                               </li>
                             </ul>
@@ -386,7 +389,7 @@ const AvailableTimings = () => {
                           <div className="slot-header">
                             <h5>
                               <i className="fa-solid fa-calendar-day me-2"></i>
-                              Sunday
+                              {dayLabel('Sunday')}
                             </h5>
                             <ul>
                               <li>
@@ -398,7 +401,7 @@ const AvailableTimings = () => {
                                     openAddSlotModal('Sunday')
                                   }}
                                 >
-                                  <i className="fa-solid fa-plus"></i> Add Slots
+                                  <i className="fa-solid fa-plus"></i> {t('doctorClinicHours.addSlots')}
                                 </a>
                               </li>
                             </ul>
@@ -411,7 +414,7 @@ const AvailableTimings = () => {
                     <div className="form-wrap veterinary-form-wrap">
                       <label className="col-form-label">
                         <i className="fa-solid fa-clock me-2"></i>
-                        Appointment Duration (minutes)
+                        {t('doctorClinicHours.appointmentDuration')}
                       </label>
                       <div className="d-flex align-items-center gap-3">
                         <select
@@ -421,7 +424,7 @@ const AvailableTimings = () => {
                         >
                           {[15, 30, 45, 60].map((d) => (
                             <option key={d} value={d}>
-                              {d} minutes
+                              {t('doctorClinicHours.minutes', { count: d })}
                             </option>
                           ))}
                         </select>
@@ -431,10 +434,10 @@ const AvailableTimings = () => {
                           onClick={handleUpdateDuration}
                           disabled={updateDurationMutation.isLoading}
                         >
-                          <i className="fa-solid fa-save me-1"></i>Update Duration
+                          <i className="fa-solid fa-save me-1"></i>{t('doctorClinicHours.updateDuration')}
                         </button>
                         <small className="text-muted">
-                          Current: {currentDuration} minutes per appointment
+                          {t('doctorClinicHours.currentDuration', { count: currentDuration })}
                         </small>
                       </div>
                     </div>
@@ -449,13 +452,13 @@ const AvailableTimings = () => {
                     <div className="clinic-wrap veterinary-clinic-wrap">
                       <h5>
                         <i className="fa-solid fa-clinic-medical me-2"></i>
-                        Select Veterinary Clinic
+                        {t('doctorClinicHours.selectClinic')}
                       </h5>
                       <div className="row">
                         <div className="col-md-6">
                           <select className="select-img veterinary-select">
-                            <option data-image="assets/img/doctors-dashboard/clinic-01.jpg">🐾 MyPetPlus Veterinary Clinic</option>
-                            <option data-image="assets/img/doctors-dashboard/clinic-02.jpg">🏥 Animal Medical Center</option>
+                            <option data-image="assets/img/doctors-dashboard/clinic-01.jpg">🐾 {t('doctorCommon.clinicOne')}</option>
+                            <option data-image="assets/img/doctors-dashboard/clinic-02.jpg">🏥 {t('doctorCommon.clinicTwo')}</option>
                           </select>
                         </div>
                       </div>
@@ -464,49 +467,49 @@ const AvailableTimings = () => {
                     <div className="card-header veterinary-card-header">
                       <h3>
                         <i className="fa-solid fa-calendar-check me-2"></i>
-                        Select Available Slots
+                        {t('doctorClinicHours.selectAvailableSlots')}
                       </h3>
                     </div>
 
                     <div className="available-tab">
                       <label className="form-label">
                         <i className="fa-solid fa-calendar-days me-2"></i>
-                        Select Available Days
+                        {t('doctorClinicHours.selectAvailableDays')}
                       </label>
                       <ul className="nav veterinary-day-nav">
                         <li>
                           <a href="#" className="active" data-bs-toggle="tab" data-bs-target="#monday-slot">
-                            <i className="fa-solid fa-calendar me-1"></i>Monday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Monday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#tuesday-slot">
-                            <i className="fa-solid fa-calendar me-1"></i>Tuesday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Tuesday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#wednesday-slot">
-                            <i className="fa-solid fa-calendar me-1"></i>Wednesday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Wednesday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#thursday-slot">
-                            <i className="fa-solid fa-calendar me-1"></i>Thursday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Thursday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#friday-slot">
-                            <i className="fa-solid fa-calendar me-1"></i>Friday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Friday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#saturday-slot">
-                            <i className="fa-solid fa-calendar me-1"></i>Saturday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Saturday')}
                           </a>
                         </li>
                         <li>
                           <a href="#" data-bs-toggle="tab" data-bs-target="#sunday-slot">
-                            <i className="fa-solid fa-calendar me-1"></i>Sunday
+                            <i className="fa-solid fa-calendar me-1"></i>{dayLabel('Sunday')}
                           </a>
                         </li>
                       </ul>
@@ -519,7 +522,7 @@ const AvailableTimings = () => {
                           <div className="slot-header">
                             <h5>
                               <i className="fa-solid fa-calendar-day me-2"></i>
-                              Monday
+                              {dayLabel('Monday')}
                             </h5>
                             <ul>
                               <li>
@@ -531,7 +534,7 @@ const AvailableTimings = () => {
                                     openAddSlotModal('Monday')
                                   }}
                                 >
-                                  <i className="fa-solid fa-plus"></i> Add Slots
+                                  <i className="fa-solid fa-plus"></i> {t('doctorClinicHours.addSlots')}
                                 </a>
                               </li>
                             </ul>
@@ -546,7 +549,7 @@ const AvailableTimings = () => {
                           <div className="slot-header">
                             <h5>
                               <i className="fa-solid fa-calendar-day me-2"></i>
-                              Tuesday
+                              {dayLabel('Tuesday')}
                             </h5>
                             <ul>
                               <li>
@@ -558,7 +561,7 @@ const AvailableTimings = () => {
                                     openAddSlotModal('Tuesday')
                                   }}
                                 >
-                                  <i className="fa-solid fa-plus"></i> Add Slots
+                                  <i className="fa-solid fa-plus"></i> {t('doctorClinicHours.addSlots')}
                                 </a>
                               </li>
                             </ul>
@@ -585,19 +588,19 @@ const AvailableTimings = () => {
                 <div className="modal-header">
                   <h5 className="modal-title">
                     <i className="fa-solid fa-clock me-2"></i>
-                    Add Time Slot - {modalDay}
+                    {t('doctorClinicHours.addTimeSlot', { day: dayLabel(modalDay) })}
                   </h5>
                   <button
                     type="button"
                     className="btn-close"
                     onClick={() => setIsModalOpen(false)}
-                    aria-label="Close"
+                    aria-label={t('doctorClinicHours.close')}
                   ></button>
                 </div>
                 <div className="modal-body">
                   <div className="row">
                     <div className="col-md-6">
-                      <label className="form-label">Start Time</label>
+                      <label className="form-label">{t('doctorClinicHours.startTime')}</label>
                       <input
                         type="time"
                         className="form-control"
@@ -606,7 +609,7 @@ const AvailableTimings = () => {
                       />
                     </div>
                     <div className="col-md-6">
-                      <label className="form-label">End Time</label>
+                      <label className="form-label">{t('doctorClinicHours.endTime')}</label>
                       <input
                         type="time"
                         className="form-control"
@@ -623,7 +626,7 @@ const AvailableTimings = () => {
                     onClick={() => setIsModalOpen(false)}
                   >
                     <i className="fa-solid fa-times me-1"></i>
-                    Cancel
+                    {t('doctorClinicHours.cancel')}
                   </button>
                   <button
                     type="button"
@@ -632,7 +635,7 @@ const AvailableTimings = () => {
                     disabled={addSlotMutation.isLoading}
                   >
                     <i className="fa-solid fa-save me-1"></i>
-                    Save Slot
+                    {t('doctorClinicHours.saveSlot')}
                   </button>
                 </div>
               </div>

@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const ForgotPassword = () => {
   const navigate = useNavigate()
+  const { t } = useLanguage()
   const [step, setStep] = useState(1)
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
@@ -16,7 +18,7 @@ const ForgotPassword = () => {
   const requestCode = async (event) => {
     event.preventDefault()
     if (!email.trim()) {
-      toast.error('Enter your registered email address')
+      toast.error(t('auth.forgotPassword.emailRequired'))
       return
     }
 
@@ -24,9 +26,9 @@ const ForgotPassword = () => {
     try {
       await api.post(API_ROUTES.AUTH.FORGOT_PASSWORD, { email: email.trim() })
       setStep(2)
-      toast.success('If this email is registered, a verification code has been sent.')
+      toast.success(t('auth.forgotPassword.codeSent', { email: email.trim() }))
     } catch (error) {
-      toast.error(error?.message || 'Unable to send the verification code')
+      toast.error(error?.message || t('auth.forgotPassword.sending'))
     } finally {
       setLoading(false)
     }
@@ -35,7 +37,7 @@ const ForgotPassword = () => {
   const verifyCode = async (event) => {
     event.preventDefault()
     if (!/^\d{6}$/.test(code.trim())) {
-      toast.error('Enter the 6-digit verification code from your email')
+      toast.error(t('auth.forgotPassword.codeRequired'))
       return
     }
 
@@ -43,9 +45,9 @@ const ForgotPassword = () => {
     try {
       await api.post(API_ROUTES.AUTH.VERIFY_RESET_CODE, { email: email.trim(), code: code.trim() })
       setStep(3)
-      toast.success('Email verification complete. Set your new password below.')
+      toast.success(t('auth.verifyEmail.success'))
     } catch (error) {
-      toast.error(error?.message || 'The verification code is invalid or expired')
+      toast.error(error?.message || t('auth.verifyEmail.codeRequired'))
     } finally {
       setLoading(false)
     }
@@ -54,11 +56,11 @@ const ForgotPassword = () => {
   const resetPassword = async (event) => {
     event.preventDefault()
     if (newPassword.length < 8) {
-      toast.error('Your new password must be at least 8 characters long')
+      toast.error(t('auth.forgotPassword.passwordMin'))
       return
     }
     if (newPassword !== confirmPassword) {
-      toast.error('New password and confirmation do not match')
+      toast.error(t('auth.forgotPassword.passwordMatch'))
       return
     }
 
@@ -69,10 +71,10 @@ const ForgotPassword = () => {
         code: code.trim(),
         newPassword,
       })
-      toast.success('Password reset successfully. You can now sign in.')
+      toast.success(t('auth.forgotPassword.resetSuccess'))
       navigate('/login')
     } catch (error) {
-      toast.error(error?.message || 'Unable to reset your password')
+      toast.error(error?.message || t('auth.forgotPassword.resetting'))
     } finally {
       setLoading(false)
     }
@@ -91,22 +93,22 @@ const ForgotPassword = () => {
                 <div className="col-md-12 col-lg-6 login-right">
                   <div className="login-header">
                     <div className="logo-icon"><i className="fa-solid fa-key" /></div>
-                    <h3>{step === 1 ? 'Reset your password' : step === 2 ? 'Verify your email' : 'Set a new password'}</h3>
+                    <h3>{step === 1 ? t('auth.forgotPassword.title') : step === 2 ? t('auth.verifyEmail.title') : t('auth.forgotPassword.newPassword')}</h3>
                     <p>
-                      {step === 1 && 'Enter your registered email address and we will send a verification code.'}
-                      {step === 2 && `Enter the 6-digit code sent to ${email}.`}
-                      {step === 3 && 'Choose a secure new password for your MyPetPlus account.'}
+                      {step === 1 && t('auth.forgotPassword.subtitle')}
+                      {step === 2 && t('auth.forgotPassword.codePlaceholder')}
+                      {step === 3 && t('auth.register.passwordPlaceholder')}
                     </p>
                   </div>
 
                   {step === 1 && (
                     <form onSubmit={requestCode}>
                       <div className="mb-3">
-                        <label className="form-label"><i className="fa-solid fa-envelope me-2" />Email address</label>
+                        <label className="form-label"><i className="fa-solid fa-envelope me-2" />{t('auth.forgotPassword.email')}</label>
                         <input className="form-control" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
                       </div>
                       <button className="btn btn-primary-gradient w-100" type="submit" disabled={loading}>
-                        <i className="fa-solid fa-paper-plane me-2" />{loading ? 'Sending…' : 'Send verification code'}
+                        <i className="fa-solid fa-paper-plane me-2" />{loading ? t('auth.forgotPassword.sending') : t('auth.forgotPassword.sendCode')}
                       </button>
                     </form>
                   )}
@@ -114,35 +116,35 @@ const ForgotPassword = () => {
                   {step === 2 && (
                     <form onSubmit={verifyCode}>
                       <div className="mb-3">
-                        <label className="form-label">Verification code</label>
-                        <input className="form-control" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength="6" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Enter 6-digit code" required />
-                        <small className="text-muted">The code expires after 10 minutes.</small>
+                        <label className="form-label">{t('auth.forgotPassword.code')}</label>
+                        <input className="form-control" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength="6" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={t('auth.forgotPassword.codePlaceholder')} required />
+                        <small className="text-muted">{t('auth.verifyEmail.codePlaceholder')}</small>
                       </div>
                       <button className="btn btn-primary-gradient w-100" type="submit" disabled={loading}>
-                        {loading ? 'Verifying…' : 'Verify code'}
+                        {loading ? t('auth.forgotPassword.verifying') : t('auth.forgotPassword.verifyCode')}
                       </button>
-                      <button type="button" className="btn btn-link w-100 mt-2" onClick={() => setStep(1)} disabled={loading}>Use a different email</button>
+                      <button type="button" className="btn btn-link w-100 mt-2" onClick={() => setStep(1)} disabled={loading}>{t('auth.forgotPassword.emailPlaceholder')}</button>
                     </form>
                   )}
 
                   {step === 3 && (
                     <form onSubmit={resetPassword}>
                       <div className="mb-3">
-                        <label className="form-label">New password</label>
-                        <input className="form-control" type="password" autoComplete="new-password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} minLength="8" required />
+                        <label className="form-label">{t('auth.forgotPassword.newPassword')}</label>
+                        <input className="form-control" type="password" autoComplete="new-password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} minLength="8" placeholder={t('auth.forgotPassword.newPasswordPlaceholder')} required />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label">Confirm new password</label>
-                        <input className="form-control" type="password" autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} minLength="8" required />
+                        <label className="form-label">{t('auth.forgotPassword.confirmPassword')}</label>
+                        <input className="form-control" type="password" autoComplete="new-password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} minLength="8" placeholder={t('auth.forgotPassword.confirmPasswordPlaceholder')} required />
                       </div>
                       <button className="btn btn-primary-gradient w-100" type="submit" disabled={loading}>
-                        {loading ? 'Saving…' : 'Reset password'}
+                        {loading ? t('auth.forgotPassword.resetting') : t('auth.forgotPassword.resetPassword')}
                       </button>
                     </form>
                   )}
 
                   <div className="account-signup mt-3">
-                    <p>Remember your password? <Link to="/login">Sign In</Link></p>
+                    <p>{t('auth.login.password')}? <Link to="/login">{t('common.signIn')}</Link></p>
                   </div>
                 </div>
               </div>

@@ -5,8 +5,10 @@ import { toast } from 'react-toastify'
 import { usePets } from '../../queries'
 import { useDeletePet } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const Dependent = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
 
@@ -36,14 +38,14 @@ const Dependent = () => {
   const deletePet = useDeletePet()
 
   const handleDelete = async (pet) => {
-    const ok = window.confirm(`Delete pet "${pet?.name || ''}"?`)
+    const ok = window.confirm(t('patient.pets.deleteConfirm', { name: pet?.name || '' }))
     if (!ok) return
 
     try {
       await deletePet.mutateAsync(pet._id)
-      toast.success('Pet deleted')
+      toast.success(t('patient.pets.deleted'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to delete pet')
+      toast.error(err?.message || t('patient.pets.deleteFailed'))
     }
   }
 
@@ -56,7 +58,7 @@ const Dependent = () => {
           </div>
           <div className="col-lg-12 col-xl-12">
             <div className="dashboard-header">
-              <h3>My Pets</h3>
+              <h3>{t('patient.pets.title')}</h3>
             </div>
 
             <div className="dashboard-header border-0 m-0">
@@ -66,7 +68,7 @@ const Dependent = () => {
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Search pets"
+                      placeholder={t('patient.pets.search')}
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                     />
@@ -79,28 +81,28 @@ const Dependent = () => {
                 className="btn btn-md btn-primary-gradient rounded-pill"
                 onClick={() => navigate('/add-dependent')}
               >
-                Add Pet
+                {t('patient.pets.add')}
               </button>
             </div>
 
             {isLoading ? (
-              <div className="text-center py-4">Loading...</div>
+              <div className="text-center py-4">{t('patient.pets.loading')}</div>
             ) : filteredPets.length === 0 ? (
-              <div className="text-center py-4">No pets found</div>
+              <div className="text-center py-4">{t('patient.pets.noPets')}</div>
             ) : (
               filteredPets.map((pet) => {
                 const img = getImageUrl(pet?.photo) || '/assets/img/dependent/dependent-01.jpg'
                 const ageLabel =
                   pet?.age === null || pet?.age === undefined
                     ? '—'
-                    : `${pet.age} months`
+                    : t('patient.pets.months', { count: pet.age })
 
                 return (
                   <div key={pet._id} className="dependent-wrap">
                     <div className="dependent-info">
                       <div className="patinet-information">
                         <Link to="#" onClick={(e) => e.preventDefault()}>
-                          <img src={img} alt="Pet" />
+                          <img src={img} alt={t('patient.pets.pet')} />
                         </Link>
                         <div className="patient-info">
                           <h5>{pet?.name}</h5>
@@ -112,7 +114,7 @@ const Dependent = () => {
                         </div>
                       </div>
                       <div className="blood-info">
-                        <p>Breed</p>
+                        <p>{t('patient.pets.breed')}</p>
                         <h6>{pet?.breed || '—'}</h6>
                       </div>
                     </div>

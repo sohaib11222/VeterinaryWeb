@@ -9,8 +9,10 @@ import Footer from '../components/common/Footer'
 import Breadcrumb from '../components/common/Breadcrumb'
 import IncomingCallNotifier from '../components/video/IncomingCallNotifier'
 import '../assets/css/dashboard-drawer.css'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const DashboardLayout = ({ children, breadcrumb }) => {
+  const { t } = useLanguage()
   const location = useLocation()
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [isCompactLayout, setIsCompactLayout] = useState(() => (
@@ -33,6 +35,15 @@ const DashboardLayout = ({ children, breadcrumb }) => {
                         location.pathname === '/doctor-request' ||
                         location.pathname === '/chat-doctor' ||
                         location.pathname === '/doctor/prescription' ||
+                        location.pathname === '/doctor-change-password' ||
+                        location.pathname === '/doctor-profile-settings' ||
+                        location.pathname === '/doctor-specialities' ||
+                        location.pathname === '/doctor-experience-settings' ||
+                        location.pathname === '/doctor-education-settings' ||
+                        location.pathname === '/doctor-awards-settings' ||
+                        location.pathname === '/doctor-insurance-settings' ||
+                        location.pathname === '/doctor-clinics-settings' ||
+                        location.pathname === '/doctor-business-settings' ||
                         location.pathname === '/social-media'
   const isPatientRoute = location.pathname.startsWith('/patient') ||
                         location.pathname === '/patient-appointments' ||
@@ -55,8 +66,9 @@ const DashboardLayout = ({ children, breadcrumb }) => {
   const isAdminRoute = location.pathname.startsWith('/admin')
   const isPharmacyAdminRoute = location.pathname.startsWith('/pharmacy-admin')
   const isPetSitterRoute = location.pathname.startsWith('/pet-sitter') || location.pathname === '/pet-sitter-chat'
-  const isChatRoute = location.pathname === '/chat' || location.pathname === '/chat-doctor' || location.pathname === '/doctor/admin-chat' || location.pathname === '/pharmacy-admin/admin-chat'
+  const isChatRoute = location.pathname === '/chat' || location.pathname === '/chat-doctor' || location.pathname === '/doctor/admin-chat' || location.pathname === '/pharmacy-admin/admin-chat' || location.pathname === '/pet-sitter/chats'
   const showSidebar = !isChatRoute && (isDoctorRoute || isPatientRoute || isPharmacyAdminRoute || isAdminRoute || isPetSitterRoute)
+  const showBreadcrumb = !isChatRoute
 
   useEffect(() => {
     setIsSidebarOpen(false)
@@ -107,7 +119,7 @@ const DashboardLayout = ({ children, breadcrumb }) => {
       className={mobile
         ? 'dashboard-mobile-drawer'
         : 'col-lg-4 col-xl-3 theiaStickySidebar dashboard-sidebar-column'}
-      aria-label="Dashboard navigation"
+      aria-label={t('common.dashboardNavigation', 'Dashboard navigation')}
       onClick={closeSidebarAfterNavigation}
     >
       {mobile && (
@@ -115,7 +127,7 @@ const DashboardLayout = ({ children, breadcrumb }) => {
           type="button"
           className="dashboard-mobile-menu-close"
           onClick={() => setIsSidebarOpen(false)}
-          aria-label="Close dashboard menu"
+          aria-label={t('common.closeMenu', 'Close dashboard menu')}
         >
           <i className="fa-solid fa-xmark" aria-hidden="true" />
         </button>
@@ -127,8 +139,12 @@ const DashboardLayout = ({ children, breadcrumb }) => {
   return (
     <div className="main-wrapper">
       <Header />
-      {breadcrumb && <Breadcrumb {...breadcrumb} />}
-      <div className="content">
+      {showBreadcrumb && (
+        <div className="dashboard-breadcrumb-host">
+          <Breadcrumb {...(breadcrumb || {})} />
+        </div>
+      )}
+      <div className={`content ${showBreadcrumb ? 'dashboard-content-with-breadcrumb' : ''}`}>
         {isChatRoute ? (
           children
         ) : (
@@ -142,7 +158,7 @@ const DashboardLayout = ({ children, breadcrumb }) => {
                 aria-controls="dashboard-navigation"
               >
                 <i className="fa-solid fa-bars" aria-hidden="true" />
-                <span>Menu</span>
+                <span>{t('common.menu', 'Menu')}</span>
               </button>
             )}
             <div className="row">
@@ -163,7 +179,7 @@ const DashboardLayout = ({ children, breadcrumb }) => {
           <button
             type="button"
             className="dashboard-sidebar-overlay is-open"
-            aria-label="Close dashboard menu"
+            aria-label={t('common.closeMenu', 'Close dashboard menu')}
             onClick={() => setIsSidebarOpen(false)}
           />
           {renderSidebar(true)}

@@ -4,8 +4,10 @@ import { toast } from 'react-toastify'
 
 import { useEligibleRescheduleAppointments } from '../../queries'
 import { useCreateRescheduleRequest } from '../../mutations/scheduleMutations'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const RequestReschedule = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const appointmentIdFromUrl = searchParams.get('appointmentId')
@@ -39,12 +41,12 @@ const RequestReschedule = () => {
     e.preventDefault()
 
     if (!selectedAppointmentId) {
-      toast.error('Please select an appointment')
+      toast.error(t('patient.reschedule.chooseAppointment'))
       return
     }
 
     if (String(reason || '').trim().length < 10) {
-      toast.error('Reason must be at least 10 characters')
+      toast.error(t('patient.reschedule.reasonMin'))
       return
     }
 
@@ -57,10 +59,10 @@ const RequestReschedule = () => {
 
     try {
       await createRequest.mutateAsync(payload)
-      toast.success('Reschedule request submitted successfully')
+      toast.success(t('patient.reschedule.requestSuccess'))
       navigate('/patient/reschedule-requests')
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to submit reschedule request')
+      toast.error(err?.response?.data?.message || err?.message || t('patient.reschedule.requestFailed'))
     }
   }
 
@@ -74,7 +76,7 @@ const RequestReschedule = () => {
             <Link to="/patient-appointments" className="back-arrow">
               <i className="fa-solid fa-arrow-left"></i>
             </Link>
-            <h3>Request Reschedule</h3>
+            <h3>{t('patient.reschedule.request')}</h3>
           </div>
         </div>
 
@@ -83,30 +85,30 @@ const RequestReschedule = () => {
             {eligibleQuery.isLoading ? (
               <div className="text-center py-4">
                 <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
+                  <span className="visually-hidden">{t('common.loading')}</span>
                 </div>
               </div>
             ) : eligibleQuery.isError ? (
               <div className="alert alert-danger">
-                {eligibleQuery.error?.message || 'Failed to load eligible appointments'}
+                {eligibleQuery.error?.message || t('patient.reschedule.failedLoadEligible')}
               </div>
             ) : eligibleAppointments.length === 0 ? (
               <div className="alert alert-info mb-0">
-                No appointments are eligible for reschedule.
+                {t('patient.reschedule.noEligible')}
               </div>
             ) : (
               <form onSubmit={submit}>
                 <div className="row">
                   <div className="col-md-6 mb-3">
                     <label className="form-label">
-                      Select Missed Appointment <span className="text-danger">*</span>
+                      {t('patient.reschedule.selectAppointment')} <span className="text-danger">*</span>
                     </label>
                     <select
                       className="form-select"
                       value={selectedAppointmentId}
                       onChange={(e) => setSelectedAppointmentId(e.target.value)}
                     >
-                      <option value="">Select appointment</option>
+                      <option value="">{t('patient.reschedule.selectAppointmentPlaceholder')}</option>
                       {eligibleAppointments.map((a) => {
                         const dateStr = a?.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString() : '—'
                         const timeStr = a?.appointmentTime || '—'
@@ -114,7 +116,7 @@ const RequestReschedule = () => {
                           a?.veterinarianId?.name ||
                           a?.veterinarianId?.fullName ||
                           a?.veterinarianId?.email ||
-                          'Veterinarian'
+                          t('patient.appointment.veterinarian')
                         return (
                           <option key={a?._id} value={a?._id}>
                             {vetName} - {dateStr} {timeStr}
@@ -124,13 +126,13 @@ const RequestReschedule = () => {
                     </select>
                     {selectedAppointment?.appointmentNumber && (
                       <small className="text-muted d-block mt-1">
-                        Appointment: {selectedAppointment.appointmentNumber}
+                        {t('patient.appointment.details')}: {selectedAppointment.appointmentNumber}
                       </small>
                     )}
                   </div>
 
                   <div className="col-md-6 mb-3">
-                    <label className="form-label">Preferred New Date (optional)</label>
+                    <label className="form-label">{t('patient.reschedule.preferredDate')}</label>
                     <input
                       type="date"
                       className="form-control"
@@ -141,7 +143,7 @@ const RequestReschedule = () => {
                   </div>
 
                   <div className="col-md-6 mb-3">
-                    <label className="form-label">Preferred New Time (optional)</label>
+                    <label className="form-label">{t('patient.reschedule.preferredTime')}</label>
                     <input
                       type="time"
                       className="form-control"
@@ -152,21 +154,21 @@ const RequestReschedule = () => {
 
                   <div className="col-12 mb-3">
                     <label className="form-label">
-                      Reason <span className="text-danger">*</span>
+                      {t('patient.reschedule.reason')} <span className="text-danger">*</span>
                     </label>
                     <textarea
                       className="form-control"
                       rows={4}
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
-                      placeholder="Explain why you missed the appointment (min 10 characters)"
+                      placeholder={t('patient.reschedule.reasonPlaceholder')}
                     />
                     <small className="text-muted">{String(reason || '').length}/500</small>
                   </div>
 
                   <div className="col-12">
                     <div className="alert alert-warning">
-                      After approval, you may need to pay a reschedule fee to confirm the new appointment.
+                      {t('patient.reschedule.feeNotice')}
                     </div>
                   </div>
 
@@ -176,7 +178,7 @@ const RequestReschedule = () => {
                       className="btn btn-primary"
                       disabled={createRequest.isPending}
                     >
-                      {createRequest.isPending ? 'Submitting...' : 'Submit Request'}
+                      {createRequest.isPending ? t('patient.reschedule.submitting') : t('patient.reschedule.submit')}
                     </button>
                   </div>
                 </div>

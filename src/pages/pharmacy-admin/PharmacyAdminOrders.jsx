@@ -9,6 +9,7 @@ import {
   formatDeliveryStatus,
 } from '../../utils/deliveryMonitoring'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const normalizeListPayload = (payload) => {
   const outer = payload?.data ?? payload
@@ -26,6 +27,7 @@ const normalizeListPayload = (payload) => {
 const STATUS_OPTIONS = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED']
 
 const PharmacyAdminOrders = () => {
+  const { t, language } = useLanguage()
   const location = useLocation()
   const searchParams = useMemo(() => new URLSearchParams(location.search), [location.search])
 
@@ -58,9 +60,9 @@ const PharmacyAdminOrders = () => {
   const setOrderStatus = async (orderId, status) => {
     try {
       await updateStatus.mutateAsync({ orderId, data: { status } })
-      toast.success('Order updated')
+      toast.success(t('pharmacyAdmin.orders.orderUpdated'))
     } catch (error) {
-      toast.error(error?.message || 'Failed to update order')
+      toast.error(error?.message || t('pharmacyAdmin.orders.updateFailed'))
     }
   }
 
@@ -81,55 +83,55 @@ const PharmacyAdminOrders = () => {
 
     const fee = Number(shippingFee)
     if (!Number.isFinite(fee) || fee < 0) {
-      toast.error('Please enter a valid shipping fee (non-negative number)')
+      toast.error(t('pharmacyAdmin.orders.validShippingFee'))
       return
     }
     const selectedDeliveryDays = Number(deliveryDays)
     if (!DELIVERY_DAY_OPTIONS.includes(selectedDeliveryDays)) {
-      toast.error('Please select an expected delivery time between 2 and 5 days')
+      toast.error(t('pharmacyAdmin.orders.validDeliveryTime'))
       return
     }
 
     const id = selectedOrderForShipping?._id || selectedOrderForShipping?.id
     try {
       await updateShippingFee.mutateAsync({ orderId: id, shippingFee: fee, deliveryDays: selectedDeliveryDays })
-      toast.success('Shipping fee and delivery commitment sent')
+      toast.success(t('pharmacyAdmin.orders.shippingSent'))
       setShowShippingModal(false)
       setSelectedOrderForShipping(null)
       setShippingFee('')
       setDeliveryDays('')
     } catch (error) {
-      toast.error(error?.message || 'Failed to update shipping fee')
+      toast.error(error?.message || t('pharmacyAdmin.orders.shippingFailed'))
     }
   }
 
   return (
     <div className="pharmacy-admin-orders-mobile">
       <div className="page-header">
-        <h3 className="page-title">Orders</h3>
+        <h3 className="page-title">{t('pharmacyAdmin.orders.title')}</h3>
       </div>
 
       <div className="card">
         <div className="card-body">
           <div className="row pharmacy-order-filters">
             <div className="col-md-4 mb-3">
-              <label className="form-label">Status</label>
+              <label className="form-label">{t('pharmacyAdmin.orders.status')}</label>
               <select className="form-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                <option value="">All</option>
+                <option value="">{t('pharmacyAdmin.orders.all')}</option>
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>
-                    {s}
+                    {t(`pharmacyAdmin.dashboard.${s.toLowerCase()}`) || s}
                   </option>
                 ))}
               </select>
             </div>
             <div className="col-md-4 mb-3">
-              <label className="form-label">Payment</label>
+              <label className="form-label">{t('pharmacyAdmin.orders.payment')}</label>
               <select className="form-select" value={paymentFilter} onChange={(e) => setPaymentFilter(e.target.value)}>
-                <option value="">All</option>
-                <option value="PAID">Paid</option>
-                <option value="UNPAID">Unpaid</option>
-                <option value="REFUNDED">Refunded</option>
+                <option value="">{t('pharmacyAdmin.orders.all')}</option>
+                <option value="PAID">{t('pharmacyAdmin.orders.paid')}</option>
+                <option value="UNPAID">{t('pharmacyAdmin.orders.unpaid')}</option>
+                <option value="REFUNDED">{t('pharmacyAdmin.orders.refunded')}</option>
               </select>
             </div>
           </div>
@@ -137,27 +139,27 @@ const PharmacyAdminOrders = () => {
           {ordersQuery.isLoading ? (
             <div className="text-center py-4">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('pharmacyAdmin.orders.loading')}</span>
               </div>
             </div>
           ) : ordersQuery.isError ? (
             <div className="alert alert-danger">{ordersQuery.error?.message || 'Failed to load orders'}</div>
           ) : orders.length === 0 ? (
-            <div className="alert alert-info mb-0">No orders found.</div>
+            <div className="alert alert-info mb-0">{t('pharmacyAdmin.orders.empty')}</div>
           ) : (
             <div className="table-responsive">
               <table className="table table-hover mb-0 pharmacy-admin-orders-table">
                 <thead>
                   <tr>
-                    <th>Order</th>
-                    <th>Customer</th>
-                    <th>Total</th>
-                    <th>Shipping</th>
-                    <th>Payment</th>
-                    <th>Status</th>
-                    <th>Expected Delivery</th>
-                    <th>Delivery Monitoring</th>
-                    <th style={{ width: 300 }}>Actions</th>
+                    <th>{t('pharmacyAdmin.orders.order')}</th>
+                    <th>{t('pharmacyAdmin.orders.customer')}</th>
+                    <th>{t('pharmacyAdmin.orders.total')}</th>
+                    <th>{t('pharmacyAdmin.orders.shipping')}</th>
+                    <th>{t('pharmacyAdmin.orders.payment')}</th>
+                    <th>{t('pharmacyAdmin.orders.status')}</th>
+                    <th>{t('pharmacyAdmin.orders.expectedDelivery')}</th>
+                    <th>{t('pharmacyAdmin.orders.deliveryMonitoring')}</th>
+                    <th style={{ width: 300 }}>{t('pharmacyAdmin.orders.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -168,7 +170,7 @@ const PharmacyAdminOrders = () => {
                     const total = o?.total ?? o?.finalTotal ?? o?.initialTotal
                     const finalShipping = o?.finalShipping
                     const shippingDisplay = finalShipping === null || finalShipping === undefined
-                      ? 'Waiting'
+                      ? t('pharmacyAdmin.orders.awaitingDelivery')
                       : (typeof finalShipping === 'number' ? finalShipping.toFixed(2) : finalShipping)
                     const paymentStatus = o?.paymentStatus || '—'
                     const status = o?.status || '—'
@@ -182,22 +184,22 @@ const PharmacyAdminOrders = () => {
 
                     return (
                       <tr key={id}>
-                        <td data-label="Order">{orderNo}</td>
-                        <td data-label="Customer">{customer}</td>
-                        <td data-label="Total">{typeof total === 'number' ? total.toFixed(2) : total}</td>
-                        <td data-label="Shipping">{shippingDisplay}</td>
-                        <td data-label="Payment">{paymentStatus}</td>
-                        <td data-label="Status">{status}</td>
-                        <td data-label="Expected Delivery">{expectedDelivery}</td>
-                        <td data-label="Delivery Monitoring">
+                        <td data-label={t('pharmacyAdmin.orders.order')}>{orderNo}</td>
+                        <td data-label={t('pharmacyAdmin.orders.customer')}>{customer}</td>
+                        <td data-label={t('pharmacyAdmin.orders.total')}>{typeof total === 'number' ? total.toFixed(2) : total}</td>
+                        <td data-label={t('pharmacyAdmin.orders.shipping')}>{shippingDisplay}</td>
+                        <td data-label={t('pharmacyAdmin.orders.payment')}>{paymentStatus === 'PAID' ? t('pharmacyAdmin.orders.paid') : paymentStatus === 'UNPAID' ? t('pharmacyAdmin.orders.unpaid') : paymentStatus === 'REFUNDED' ? t('pharmacyAdmin.orders.refunded') : paymentStatus}</td>
+                        <td data-label={t('pharmacyAdmin.orders.status')}>{t(`pharmacyAdmin.dashboard.${String(status).toLowerCase()}`) || status}</td>
+                        <td data-label={t('pharmacyAdmin.orders.expectedDelivery')}>{expectedDelivery}</td>
+                        <td data-label={t('pharmacyAdmin.orders.deliveryMonitoring')}>
                           {o?.expectedDeliveryDate ? (
                             <span className={`badge ${deliveryStatusBadgeClass(o?.deliveryStatus)}`}>{deliveryStatus}</span>
-                          ) : <span className="badge badge-secondary">Awaiting Delivery</span>}
+                          ) : <span className="badge badge-secondary">{t('pharmacyAdmin.orders.awaitingDelivery')}</span>}
                         </td>
-                        <td data-label="Actions">
+                        <td data-label={t('pharmacyAdmin.orders.actions')}>
                           <div className="d-flex gap-2 align-items-center pharmacy-order-actions">
                             <Link to={`/pharmacy-admin/orders/${id}`} className="btn btn-sm btn-outline-secondary">
-                              View
+                              {t('pharmacyAdmin.products.view')}
                             </Link>
                             <button
                               type="button"
@@ -205,20 +207,20 @@ const PharmacyAdminOrders = () => {
                               onClick={() => openShippingModal(o)}
                               disabled={updateShippingFee.isPending || isPaid}
                             >
-                              Set Shipping
+                              {t('pharmacyAdmin.orders.setShippingFee')}
                             </button>
                             <select
                               className="form-select form-select-sm"
                               value={status}
                               onChange={(e) => setOrderStatus(id, e.target.value)}
                               disabled={updateStatus.isPending}
-                              title={!isPaid ? 'Only CANCELLED is allowed before payment' : undefined}
+                              title={!isPaid ? t('pharmacyAdmin.orders.onlyCancelled') : undefined}
                             >
                               {STATUS_OPTIONS.map((s) => {
                                 const optionDisabled = !isPaid && s !== 'CANCELLED' && s !== normalizedStatus
                                 return (
                                   <option key={s} value={s} disabled={optionDisabled}>
-                                    {s}
+                                    {t(`pharmacyAdmin.dashboard.${s.toLowerCase()}`) || s}
                                   </option>
                                 )
                               })}
@@ -241,7 +243,7 @@ const PharmacyAdminOrders = () => {
             <div className="modal-dialog" role="document">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Set Shipping Fee</h5>
+                  <h5 className="modal-title">{t('pharmacyAdmin.orders.setShippingFee')}</h5>
                   <button
                     type="button"
                     className="btn-close"
@@ -255,7 +257,7 @@ const PharmacyAdminOrders = () => {
                 </div>
                 <div className="modal-body">
                   <div className="mb-3">
-                    <label className="form-label">Shipping Fee (EUR)</label>
+                    <label className="form-label">{t('pharmacyAdmin.orders.shippingFee')}</label>
                     <input
                       type="number"
                       className="form-control"
@@ -266,16 +268,16 @@ const PharmacyAdminOrders = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Expected Delivery Time <span className="text-danger">*</span></label>
+                    <label className="form-label">{t('pharmacyAdmin.orders.expectedDeliveryTime')} <span className="text-danger">*</span></label>
                     <select
                       className="form-select"
                       value={deliveryDays}
                       onChange={(e) => setDeliveryDays(e.target.value)}
                       required
                     >
-                      <option value="">Select delivery time</option>
+                      <option value="">{t('pharmacyAdmin.orders.selectDeliveryTime')}</option>
                       {DELIVERY_DAY_OPTIONS.map((days) => (
-                        <option key={days} value={days}>{days} Days</option>
+                        <option key={days} value={days}>{t('pharmacyAdmin.orders.days', { count: days })}</option>
                       ))}
                     </select>
                     {calculateExpectedDeliveryPreview(deliveryDays) && (
@@ -283,7 +285,7 @@ const PharmacyAdminOrders = () => {
                         Expected delivery date: {calculateExpectedDeliveryPreview(deliveryDays).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })}
                       </small>
                     )}
-                    <small className="text-muted d-block mt-1">The date is calculated automatically when you send the payment request.</small>
+                    <small className="text-muted d-block mt-1">{t('pharmacyAdmin.orders.automaticDate')}</small>
                   </div>
                 </div>
                 <div className="modal-footer">
@@ -297,10 +299,10 @@ const PharmacyAdminOrders = () => {
                       setDeliveryDays('')
                     }}
                   >
-                    Cancel
+                    {t('pharmacyAdmin.orders.cancel')}
                   </button>
                   <button type="button" className="btn btn-primary" onClick={submitShippingFee} disabled={updateShippingFee.isPending}>
-                    {updateShippingFee.isPending ? 'Saving...' : 'Save'}
+                    {updateShippingFee.isPending ? t('pharmacyAdmin.orders.saving') : t('pharmacyAdmin.orders.save')}
                   </button>
                 </div>
               </div>

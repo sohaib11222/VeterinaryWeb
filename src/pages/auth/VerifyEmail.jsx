@@ -4,12 +4,14 @@ import { toast } from 'react-toastify'
 
 import { useAuth } from '../../contexts/AuthContext'
 import { resendEmailVerification, verifyEmail } from '../../api/auth'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const VerifyEmail = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const { setSession } = useAuth()
+  const { t } = useLanguage()
   const [email, setEmail] = useState(location.state?.email || searchParams.get('email') || '')
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
@@ -21,11 +23,11 @@ const VerifyEmail = () => {
     const normalizedCode = code.trim()
 
     if (!normalizedEmail) {
-      toast.error('Enter the email address used during registration')
+      toast.error(t('auth.forgotPassword.emailRequired'))
       return
     }
     if (!/^\d{6}$/.test(normalizedCode)) {
-      toast.error('Enter the 6-digit verification code from your email')
+      toast.error(t('auth.verifyEmail.codeRequired'))
       return
     }
 
@@ -33,11 +35,11 @@ const VerifyEmail = () => {
     try {
       const response = await verifyEmail(normalizedEmail, normalizedCode)
       setSession(response)
-      toast.success('Email verified. Your MyPetPlus account is ready.')
+      toast.success(t('auth.verifyEmail.success'))
       const verifiedRole = response?.user?.role || response?.data?.user?.role || location.state?.role || searchParams.get('role')
       navigate(verifiedRole === 'PET_SITTER' ? '/pet-sitter/dashboard' : '/patient/dashboard', { replace: true })
     } catch (error) {
-      toast.error(error?.message || 'The verification code is invalid or expired')
+      toast.error(error?.message || t('auth.verifyEmail.codeRequired'))
     } finally {
       setLoading(false)
     }
@@ -46,16 +48,16 @@ const VerifyEmail = () => {
   const handleResend = async () => {
     const normalizedEmail = email.trim().toLowerCase()
     if (!normalizedEmail) {
-      toast.error('Enter your registration email first')
+      toast.error(t('auth.forgotPassword.emailRequired'))
       return
     }
 
     setResending(true)
     try {
       await resendEmailVerification(normalizedEmail)
-      toast.success('A new verification code has been sent.')
+      toast.success(t('auth.verifyEmail.resend'))
     } catch (error) {
-      toast.error(error?.message || 'Unable to send a new verification code')
+      toast.error(error?.message || t('auth.verifyEmail.resending'))
     } finally {
       setResending(false)
     }
@@ -74,30 +76,30 @@ const VerifyEmail = () => {
                 <div className="col-md-12 col-lg-6 login-right">
                   <div className="login-header">
                     <div className="logo-icon"><i className="fa-solid fa-envelope-circle-check" /></div>
-                    <h3>Verify your email</h3>
-                    <p>Enter the code we sent to your email address to activate your MyPetPlus account.</p>
+                    <h3>{t('auth.verifyEmail.title')}</h3>
+                    <p>{t('auth.verifyEmail.subtitle')}</p>
                   </div>
 
                   <form onSubmit={handleSubmit}>
                     <div className="mb-3">
-                      <label className="form-label"><i className="fa-solid fa-envelope me-2" />Email address</label>
+                      <label className="form-label"><i className="fa-solid fa-envelope me-2" />{t('auth.forgotPassword.email')}</label>
                       <input className="form-control" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Verification code</label>
-                      <input className="form-control" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength="6" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="Enter 6-digit code" required />
-                      <small className="text-muted">The code expires after 10 minutes.</small>
+                      <label className="form-label">{t('auth.verifyEmail.code')}</label>
+                      <input className="form-control" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength="6" value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder={t('auth.verifyEmail.codePlaceholder')} required />
+                      <small className="text-muted">{t('auth.forgotPassword.codePlaceholder')}</small>
                     </div>
                     <button className="btn btn-primary-gradient w-100" type="submit" disabled={loading}>
-                      <i className="fa-solid fa-check me-2" />{loading ? 'Verifying…' : 'Verify email and continue'}
+                      <i className="fa-solid fa-check me-2" />{loading ? t('auth.verifyEmail.verifying') : t('auth.verifyEmail.verify')}
                     </button>
                     <button type="button" className="btn btn-link w-100 mt-2" onClick={handleResend} disabled={loading || resending}>
-                      {resending ? 'Sending…' : 'Resend verification code'}
+                      {resending ? t('auth.verifyEmail.resending') : t('auth.verifyEmail.resend')}
                     </button>
                   </form>
 
                   <div className="account-signup mt-3">
-                    <p>Already verified? <Link to="/login">Sign In</Link></p>
+                    <p>{t('auth.verifyEmail.success')} <Link to="/login">{t('common.signIn')}</Link></p>
                   </div>
                 </div>
               </div>

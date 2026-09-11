@@ -8,6 +8,7 @@ import { useRemoveFavorite } from '../../mutations/favoriteMutations'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || '').replace(/\/api\/?$/, '')
 
@@ -20,6 +21,7 @@ const normalizeImageUrl = (uri) => {
 }
 
 const Favourites = () => {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const [searchQuery, setSearchQuery] = useState('')
   const [page, setPage] = useState(1)
@@ -72,14 +74,14 @@ const Favourites = () => {
       const vetUser = fav.veterinarianId
       const vetUserId = vetUser && (typeof vetUser === 'object' ? vetUser._id : vetUser)
       const profile = vetUserId ? vetProfileByUserId[String(vetUserId)] : null
-      const name = vetUser?.fullName || vetUser?.name || 'Veterinarian'
+      const name = vetUser?.fullName || vetUser?.name || t('patient.appointment.veterinarian')
       const profileUser = profile?.userId
       const image =
         getImageUrl(vetUser?.profileImage) ||
         getImageUrl(profileUser?.profileImage) ||
         normalizeImageUrl(vetUser?.profileImage) ||
         '/assets/img/doctors/doctor-thumb-21.jpg'
-      const speciality = profile?.specializations?.[0]?.name || 'Veterinary'
+      const speciality = profile?.specializations?.[0]?.name || t('patient.appointment.veterinarian')
       const location = profile?.clinics?.[0]
         ? [profile.clinics[0].city, profile.clinics[0].state, profile.clinics[0].country].filter(Boolean).join(', ') || '—'
         : '—'
@@ -94,7 +96,7 @@ const Favourites = () => {
         rating,
       }
     })
-  }, [favorites, vetProfileByUserId])
+  }, [favorites, vetProfileByUserId, t])
 
   const filteredFavorites = useMemo(() => {
     if (!searchQuery.trim()) return favoritesWithDetails
@@ -110,8 +112,8 @@ const Favourites = () => {
   const handleRemoveFavorite = (e, favoriteId) => {
     e.preventDefault()
     removeFavorite.mutate(favoriteId, {
-      onSuccess: () => toast.success('Removed from favorites'),
-      onError: (err) => toast.error(err?.response?.data?.message || err?.message || 'Failed to remove'),
+      onSuccess: () => toast.success(t('patient.favourites.removed')),
+      onError: (err) => toast.error(err?.response?.data?.message || err?.message || t('patient.favourites.removeFailed')),
     })
   }
 
@@ -141,14 +143,14 @@ const Favourites = () => {
             <div className="col-lg-12 col-xl-12">
               <div className="veterinary-dashboard-header mb-4">
                 <h2 className="dashboard-title">
-                  <i className="fa-solid fa-heart me-3"></i>Favorite Veterinarians
+                  <i className="fa-solid fa-heart me-3"></i>{t('patient.favourites.title')}
                 </h2>
               </div>
               <div className="text-center py-5">
                 <div className="spinner-border text-primary" role="status">
-                  <span className="visually-hidden">Loading...</span>
+                  <span className="visually-hidden">{t('common.loading')}</span>
                 </div>
-                <p className="mt-3 text-muted">Loading favorites...</p>
+                <p className="mt-3 text-muted">{t('patient.favourites.loading')}</p>
               </div>
             </div>
           </div>
@@ -164,10 +166,10 @@ const Favourites = () => {
           <div className="row">
             <div className="col-lg-12 col-xl-12">
               <div className="alert alert-danger">
-                <h5>Error loading favorites</h5>
+                <h5>{t('patient.favourites.error')}</h5>
                 <p>{error?.response?.data?.message || error?.message || 'Please try again.'}</p>
                 <button className="btn veterinary-btn-primary mt-2" onClick={() => refetch()}>
-                  Retry
+                  {t('patient.favourites.retry')}
                 </button>
               </div>
             </div>
@@ -187,9 +189,9 @@ const Favourites = () => {
               <div className="col-12">
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
-                    <i className="fa-solid fa-heart me-3"></i>Favorite Veterinarians
+                    <i className="fa-solid fa-heart me-3"></i>{t('patient.favourites.title')}
                   </h2>
-                  <p className="dashboard-subtitle">Your trusted veterinary professionals for pet healthcare</p>
+                  <p className="dashboard-subtitle">{t('patient.favourites.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -204,7 +206,7 @@ const Favourites = () => {
                           <input
                             type="text"
                             className="form-control"
-                            placeholder="Search favorite veterinarians..."
+                            placeholder={t('patient.favourites.search')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                           />
@@ -226,10 +228,10 @@ const Favourites = () => {
                     className="fa-solid fa-heart"
                     style={{ fontSize: '64px', color: '#dee2e6', marginBottom: '16px' }}
                   />
-                  <h5>No favorites yet</h5>
-                  <p className="text-muted">Add veterinarians from the search page to see them here.</p>
+                  <h5>{t('patient.favourites.none')}</h5>
+                  <p className="text-muted">{t('patient.favourites.noneHint')}</p>
                   <Link to="/search" className="btn veterinary-btn-primary mt-3 rounded-pill">
-                    Find Veterinarians
+                    {t('patient.favourites.find')}
                   </Link>
                 </div>
               </div>
@@ -243,8 +245,8 @@ const Favourites = () => {
                           type="button"
                           className="fav-btn favourite-btn veterinary-fav-btn border-0 bg-transparent p-0"
                           onClick={(e) => handleRemoveFavorite(e, fav._id)}
-                          title="Remove from favorites"
-                          aria-label="Remove from favorites"
+                          title={t('patient.favourites.remove')}
+                          aria-label={t('patient.favourites.remove')}
                         >
                           <span className="favourite-icon favourite">
                             <i className="fa-solid fa-heart"></i>
@@ -254,7 +256,7 @@ const Favourites = () => {
                           <Link to={fav.vetUserId ? `/doctor-profile/${fav.vetUserId}` : '/doctor-profile'}>
                             <img
                               className="img-fluid veterinary-avatar"
-                              alt="Veterinarian"
+                              alt={t('patient.appointment.veterinarian')}
                               src={fav.image}
                               onError={(e) => {
                                 e.currentTarget.onerror = null
@@ -280,7 +282,7 @@ const Favourites = () => {
                           <ul className="available-info veterinary-available-info">
                             <li>
                               <i className="fa-solid fa-location-dot me-1"></i>
-                              <span>Location :</span> {fav.location}
+                              <span>{t('patient.favourites.location')}:</span> {fav.location}
                             </li>
                           </ul>
                         </div>
@@ -292,7 +294,7 @@ const Favourites = () => {
                               to={fav.vetUserId ? `/doctor-profile/${fav.vetUserId}` : '/doctor-profile'}
                               className="btn veterinary-btn-outline btn-md w-100 rounded-pill"
                             >
-                              View Profile
+                              {t('patient.favourites.viewProfile')}
                             </Link>
                           </div>
                           <div className="col-6">
@@ -300,7 +302,7 @@ const Favourites = () => {
                               to={fav.vetUserId ? `/booking?vet=${fav.vetUserId}` : '/booking'}
                               className="btn veterinary-btn-primary btn-md w-100 rounded-pill"
                             >
-                              Book Now
+                              {t('patient.favourites.bookNow')}
                             </Link>
                           </div>
                         </div>
@@ -319,7 +321,7 @@ const Favourites = () => {
                   onClick={handleLoadMore}
                   disabled={removeFavorite.isPending}
                 >
-                  <i className="fa-solid fa-plus me-2"></i>Load More
+                  <i className="fa-solid fa-plus me-2"></i>{t('patient.favourites.loadMore')}
                 </button>
               </div>
             )}

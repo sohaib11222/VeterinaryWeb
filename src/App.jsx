@@ -4,12 +4,12 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 import { AuthProvider } from './contexts/AuthContext'
+import { LanguageProvider } from './contexts/LanguageContext'
 import { CartProvider } from './contexts/CartContext'
 import MainLayout from './layouts/MainLayout'
 import AuthLayout from './layouts/AuthLayout'
 import DashboardLayout from './layouts/DashboardLayout'
 import ProtectedRoute from './components/common/ProtectedRoute'
-import GoogleTranslate from './components/common/GoogleTranslate'
 import LiveDataRefresh from './components/common/LiveDataRefresh'
 import PrescriptionApprovalNotifier from './components/pharmacy/PrescriptionApprovalNotifier'
 import AppointmentReminderNotifier from './components/appointments/AppointmentReminderNotifier'
@@ -145,7 +145,6 @@ import PetSitterAdminList from './pages/admin/PetSitterAdminList'
 import AdminSupportTickets from './pages/admin/AdminSupportTickets'
 
 // Pet Sitter pages
-import PetSitterList from './pages/pet-sitter/PetSitterList'
 import PetSitterProfile from './pages/pet-sitter/PetSitterProfile'
 import PetSitterDashboard from './pages/pet-sitter/PetSitterDashboard'
 import PetSitterProfileSettings from './pages/pet-sitter/PetSitterProfileSettings'
@@ -216,7 +215,8 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <BrowserRouter>
-            <Routes>
+            <LanguageProvider>
+              <Routes>
               {/* Public Home Pages */}
               <Route path="/" element={<Index />} />
               <Route path="/index" element={<Index />} />
@@ -239,11 +239,11 @@ function App() {
                 <Route path="/forgot-password" element={<AuthLayout><ForgotPassword /></AuthLayout>} />
                 <Route path="/verify-email" element={<AuthLayout><VerifyEmail /></AuthLayout>} />
                 <Route path="/pet-sitter/register" element={<AuthLayout><PetSitterRegister /></AuthLayout>} />
-                <Route path="/doctor-signup" element={<AuthLayout><DoctorSignup /></AuthLayout>} />
-                <Route path="/doctor-register" element={<AuthLayout><DoctorRegister /></AuthLayout>} />
-                <Route path="/doctor-register-step1" element={<AuthLayout><DoctorRegisterStep1 /></AuthLayout>} />
-                <Route path="/doctor-register-step2" element={<AuthLayout><DoctorRegisterStep2 /></AuthLayout>} />
-                <Route path="/doctor-register-step3" element={<AuthLayout><DoctorRegisterStep3 /></AuthLayout>} />
+                <Route path="/doctor-signup" element={<DoctorSignup />} />
+                <Route path="/doctor-register" element={<DoctorRegister />} />
+                <Route path="/doctor-register-step1" element={<DoctorRegisterStep1 />} />
+                <Route path="/doctor-register-step2" element={<DoctorRegisterStep2 />} />
+                <Route path="/doctor-register-step3" element={<DoctorRegisterStep3 />} />
                 <Route
                   path="/doctor-verification-upload"
                   element={
@@ -268,7 +268,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route path="/pharmacy-register" element={<AuthLayout><PharmacyRegister /></AuthLayout>} />
+                <Route path="/pharmacy-register" element={<PharmacyRegister />} />
                 <Route
                   path="/pharmacy-phone-verification"
                   element={
@@ -277,9 +277,9 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route path="/pharmacy-register-step1" element={<AuthLayout><PharmacyRegisterStep1 /></AuthLayout>} />
-                <Route path="/pharmacy-register-step2" element={<AuthLayout><PharmacyRegisterStep2 /></AuthLayout>} />
-                <Route path="/pharmacy-register-step3" element={<AuthLayout><PharmacyRegisterStep3 /></AuthLayout>} />
+                <Route path="/pharmacy-register-step1" element={<PharmacyRegisterStep1 />} />
+                <Route path="/pharmacy-register-step2" element={<PharmacyRegisterStep2 />} />
+                <Route path="/pharmacy-register-step3" element={<PharmacyRegisterStep3 />} />
                 <Route
                   path="/pet-store-verification-upload"
                   element={
@@ -632,7 +632,8 @@ function App() {
             <Route path="/admin/support-tickets" element={<ProtectedRoute role="ADMIN"><DashboardLayout breadcrumb={{ title: "Admin", li1: "Support", li2: "Support Tickets" }}><AdminSupportTickets /></DashboardLayout></ProtectedRoute>} />
 
             {/* Pet Sitter public discovery and role dashboard */}
-            <Route path="/pet-sitters" element={<MainLayout><PetSitterList /></MainLayout>} />
+            {/* Keep the legacy URL working while using the shared provider search. */}
+            <Route path="/pet-sitters" element={<Navigate to="/search?type=petSitters" replace />} />
             <Route path="/pet-sitters/:id" element={<MainLayout><PetSitterProfile /></MainLayout>} />
             <Route path="/pet-sitter-chat" element={<ProtectedRoute role="PET_OWNER"><LegacyPetSitterChatRedirect /></ProtectedRoute>} />
             <Route path="/pet-sitter/dashboard" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Dashboard", li2: "Overview" }}><PetSitterDashboard /></DashboardLayout></ProtectedRoute>} />
@@ -1088,11 +1089,11 @@ function App() {
             <Route path="/error-404" element={<Error404 />} />
             <Route path="/error-500" element={<Error500 />} />
             <Route path="*" element={<Error404 />} />
-            </Routes>
-            <PrescriptionApprovalNotifier />
-            <AppointmentReminderNotifier />
-            <GoogleTranslate />
-            <ToastContainer position="top-right" autoClose={3000} />
+              </Routes>
+              <PrescriptionApprovalNotifier />
+              <AppointmentReminderNotifier />
+              <ToastContainer position="top-right" autoClose={3000} />
+            </LanguageProvider>
           </BrowserRouter>
         </CartProvider>
       </AuthProvider>

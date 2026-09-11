@@ -1,19 +1,21 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const tabs = [
-  { to: '/doctor-profile-settings', icon: 'fa-user', label: 'Basic Details' },
-  { to: '/doctor-specialities', icon: 'fa-stethoscope', label: 'Specialties & Services' },
-  { to: '/doctor-experience-settings', icon: 'fa-briefcase', label: 'Experience' },
-  { to: '/doctor-education-settings', icon: 'fa-graduation-cap', label: 'Education' },
-  { to: '/doctor-awards-settings', icon: 'fa-award', label: 'Awards' },
-  { to: '/doctor-insurance-settings', icon: 'fa-shield-alt', label: 'Insurances' },
-  { to: '/doctor-clinics-settings', icon: 'fa-clinic-medical', label: 'Clinics' },
-  { to: '/doctor-business-settings', icon: 'fa-clock', label: 'Business Hours' },
-  { to: '/social-media', icon: 'fa-share-nodes', label: 'Social Media' },
+  { to: '/doctor-profile-settings', icon: 'fa-user', key: 'basic' },
+  { to: '/doctor-specialities', icon: 'fa-stethoscope', key: 'specialties' },
+  { to: '/doctor-experience-settings', icon: 'fa-briefcase', key: 'experience' },
+  { to: '/doctor-education-settings', icon: 'fa-graduation-cap', key: 'education' },
+  { to: '/doctor-awards-settings', icon: 'fa-award', key: 'awards' },
+  { to: '/doctor-insurance-settings', icon: 'fa-shield-alt', key: 'insurance' },
+  { to: '/doctor-clinics-settings', icon: 'fa-clinic-medical', key: 'clinics' },
+  { to: '/doctor-business-settings', icon: 'fa-clock', key: 'business' },
+  { to: '/social-media', icon: 'fa-share-nodes', key: 'social' },
 ]
 
 const DoctorProfileTabs = () => {
   const location = useLocation()
+  const { t } = useLanguage()
 
   const isActive = (path) =>
     location.pathname === path || location.pathname.startsWith(path + '/')
@@ -32,7 +34,7 @@ const DoctorProfileTabs = () => {
                       to={tab.to}
                     >
                       <i className={`fa-solid ${tab.icon} me-2`}></i>
-                      {tab.label}
+                      {t(`doctorRemaining.tabs.${tab.key}`)}
                     </Link>
                   </li>
                 ))}

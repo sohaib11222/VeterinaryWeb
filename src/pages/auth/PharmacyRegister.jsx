@@ -7,23 +7,24 @@ import * as yup from 'yup'
 import { toast } from 'react-toastify'
 import { useAuth } from '../../contexts/AuthContext'
 import InternationalPhoneInput, { isE164Phone } from '../../components/common/InternationalPhoneInput'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const pharmacyBannerImage = '/assets/img/pharmacyregister.jpg'
-
-const schema = yup.object({
-  name: yup.string().min(2, 'Name must be at least 2 characters').max(50, 'Name must be less than 50 characters').required('Name is required'),
-  email: yup.string().email('Invalid email').required('Email is required'),
-  phone: yup.string().test('e164-phone', 'Enter a valid international phone number', isE164Phone).required('Phone is required'),
-  password: yup.string().min(6, 'Password must be at least 6 characters').required('Password is required'),
-  password_confirmation: yup.string().oneOf([yup.ref('password')], 'Passwords must match').required('Confirm password is required'),
-})
 
 const PharmacyRegister = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { register: registerUser } = useAuth()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [accountType, setAccountType] = useState('pet_store')
+  const schema = yup.object({
+    name: yup.string().min(2, t('auth.register.nameRequired')).max(50, t('auth.register.nameRequired')).required(t('auth.register.nameRequired')),
+    email: yup.string().email(t('auth.register.validEmail')).required(t('auth.register.emailRequired')),
+    phone: yup.string().test('e164-phone', t('auth.verification.invalidPhone'), isE164Phone).required(t('auth.register.phoneRequired')),
+    password: yup.string().min(6, t('auth.register.passwordMin')).required(t('auth.register.passwordRequired')),
+    password_confirmation: yup.string().oneOf([yup.ref('password')], t('auth.register.passwordMatch')).required(t('auth.register.confirmRequired')),
+  })
 
   useEffect(() => {
     const sp = new URLSearchParams(location.search || '')
@@ -54,7 +55,7 @@ const PharmacyRegister = () => {
       }
 
       const response = await registerUser(payload, accountType)
-      toast.success('Registration successful!')
+      toast.success(t('auth.pharmacy.registrationSuccess'))
 
       const role = response?.user?.role
       const status = response?.user?.status
@@ -75,7 +76,7 @@ const PharmacyRegister = () => {
 
       navigate('/login')
     } catch (error) {
-      toast.error(error?.message || 'Registration failed')
+      toast.error(error?.message || t('auth.pharmacy.registrationFailed'))
     } finally {
       setLoading(false)
     }
@@ -104,46 +105,46 @@ const PharmacyRegister = () => {
                   <div className="col-md-12 col-lg-6 login-right">
                     <div className="login-header">
                       <div className="logo-icon"><i className="fa-solid fa-briefcase-medical" /></div>
-                      <h3>Join the pharmacy network</h3>
-                      <p>Set up a trusted pharmacy profile for connected veterinary care.</p>
-                      <Link to="/doctor-register" className="small">Are you a veterinarian?</Link>
+                      <h3>{t('auth.pharmacy.title')}</h3>
+                      <p>{t('auth.pharmacy.subtitle')}</p>
+                      <Link to="/doctor-register" className="small">{t('auth.pharmacy.veterinarianLink')}</Link>
                     </div>
                     <form className="auth-form-grid" onSubmit={handleSubmit(onSubmit)}>
                       <div className="mb-3 auth-form-grid__full">
-                        <label className="form-label"><i className="fa-solid fa-building-shield me-2" />Account Type</label>
+                        <label className="form-label"><i className="fa-solid fa-building-shield me-2" />{t('auth.pharmacy.accountType')}</label>
                         <select
                           className="form-select"
                           value={accountType}
                           onChange={(e) => setAccountType(e.target.value)}
                         >
-                          <option value="pet_store">Veterinary Pharmacy</option>
-                          <option value="parapharmacy">Veterinary Parapharmacy</option>
+                          <option value="pet_store">{t('auth.pharmacy.pharmacy')}</option>
+                          <option value="parapharmacy">{t('auth.pharmacy.parapharmacy')}</option>
                         </select>
                       </div>
                       <div className="mb-3">
-                        <label className="form-label"><i className="fa-solid fa-user-tag me-2" />Name</label>
+                        <label className="form-label"><i className="fa-solid fa-user-tag me-2" />{t('auth.pharmacy.name')}</label>
                         <input type="text" className="form-control" {...register('name')} />
                         {errors.name && <div className="text-danger small mt-1">{errors.name.message}</div>}
                       </div>
                       <div className="mb-3">
-                        <label className="form-label"><i className="fa-solid fa-envelope me-2" />Email</label>
+                        <label className="form-label"><i className="fa-solid fa-envelope me-2" />{t('auth.pharmacy.email')}</label>
                         <input type="email" className="form-control" {...register('email')} />
                         {errors.email && <div className="text-danger small mt-1">{errors.email.message}</div>}
                       </div>
                       <div className="mb-3 auth-form-grid__full">
-                        <label className="form-label"><i className="fa-solid fa-phone me-2" />Phone</label>
+                        <label className="form-label"><i className="fa-solid fa-phone me-2" />{t('auth.pharmacy.phone')}</label>
                         <input type="hidden" {...register('phone')} />
                         <InternationalPhoneInput
                           value={watch('phone') || ''}
                           onChange={(phone) => setValue('phone', phone, { shouldDirty: true, shouldValidate: true })}
                           invalid={Boolean(errors.phone)}
                         />
-                        <small className="text-muted d-block mt-1">Choose your country; we save the complete international number for OTP verification.</small>
+                        <small className="text-muted d-block mt-1">{t('auth.pharmacy.phoneHint')}</small>
                         {errors.phone && <div className="text-danger small mt-1">{errors.phone.message}</div>}
                       </div>
                       <div className="mb-3">
                         <div className="form-group-flex">
-                          <label className="form-label"><i className="fa-solid fa-lock me-2" />Create Password</label>
+                          <label className="form-label"><i className="fa-solid fa-lock me-2" />{t('auth.pharmacy.password')}</label>
                         </div>
                         <div className="pass-group">
                           <input type="password" className="form-control pass-input" {...register('password')} />
@@ -153,7 +154,7 @@ const PharmacyRegister = () => {
                       </div>
                       <div className="mb-3">
                         <div className="form-group-flex">
-                          <label className="form-label"><i className="fa-solid fa-lock me-2" />Confirm Password</label>
+                          <label className="form-label"><i className="fa-solid fa-lock me-2" />{t('auth.pharmacy.confirmPassword')}</label>
                         </div>
                         <div className="pass-group">
                           <input type="password" className="form-control pass-input" {...register('password_confirmation')} />
@@ -165,7 +166,7 @@ const PharmacyRegister = () => {
                       </div>
                       <div className="mb-3 auth-form-grid__full">
                         <button className="btn btn-primary-gradient w-100" type="submit" disabled={loading}>
-                          <><i className="fa-solid fa-arrow-right-to-bracket me-2" />{loading ? 'Creating secure profile...' : 'Create pharmacy profile'}</>
+                          <><i className="fa-solid fa-arrow-right-to-bracket me-2" />{loading ? t('auth.pharmacy.submitting') : t('auth.pharmacy.submit')}</>
                         </button>
                       </div>
                       <div className="login-or auth-form-grid__full">
@@ -175,7 +176,7 @@ const PharmacyRegister = () => {
                     
                       <div className="account-signup">
                         <p>
-                          Already have account? <Link to="/login">Sign In</Link>
+                          {t('auth.pharmacy.alreadyHave')} <Link to="/login">{t('common.signIn')}</Link>
                         </p>
                       </div>
                     </form>

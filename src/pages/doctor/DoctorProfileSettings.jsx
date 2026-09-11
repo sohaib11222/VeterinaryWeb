@@ -6,9 +6,11 @@ import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutati
 import { api } from '../../utils/api'
 import { API_ROUTES, getImageUrl } from '../../utils/apiConfig'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const DoctorProfileSettings = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const { data, isLoading } = useVeterinarianProfile()
@@ -90,16 +92,16 @@ const DoctorProfileSettings = () => {
       const res = await api.upload(API_ROUTES.UPLOAD.PROFILE, formData)
       const url = res?.data?.url || res?.url
       if (!url) {
-        throw new Error('Upload failed')
+        throw new Error(t('doctorRemaining.profile.uploadFailed'))
       }
 
       // Persist on User.profileImage
       await api.put(API_ROUTES.USERS.UPDATE_PROFILE, { profileImage: url })
 
       setProfileImageUrl(url)
-      toast.success('Profile image updated')
+      toast.success(t('doctorRemaining.profile.uploadSuccess'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to upload profile image')
+      toast.error(err?.message || t('doctorRemaining.profile.uploadFailed'))
     }
   }
 
@@ -124,7 +126,7 @@ const DoctorProfileSettings = () => {
           .filter(Boolean)
           .map((name) => ({ name })),
       })
-      toast.success('Profile updated successfully')
+      toast.success(t('doctorRemaining.profile.updated'))
 
       const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
       const nextProfile = refreshed?.data ?? refreshed
@@ -136,7 +138,7 @@ const DoctorProfileSettings = () => {
         }
       }
     } catch (err) {
-      toast.error(err?.message || 'Failed to update profile')
+      toast.error(err?.message || t('doctorRemaining.profile.updateFailed'))
     }
   }
 
@@ -144,7 +146,7 @@ const DoctorProfileSettings = () => {
     return (
       <div className="content veterinary-dashboard d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('doctorRemaining.profile.loading')}</span>
         </div>
       </div>
     )
@@ -164,9 +166,9 @@ const DoctorProfileSettings = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-user-cog me-3"></i>
-                    Profile Settings
+                    {t('doctorRemaining.profile.title')}
                   </h2>
-                  <p className="dashboard-subtitle">Manage your veterinary practice profile and professional information</p>
+                  <p className="dashboard-subtitle">{t('doctorRemaining.profile.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -184,7 +186,7 @@ const DoctorProfileSettings = () => {
                       <div className="setting-title">
                         <h5>
                           <i className="fa-solid fa-camera me-2"></i>
-                          Profile Image
+                          {t('doctorRemaining.profile.profileImage')}
                         </h5>
                       </div>
                       <div className="setting-card veterinary-setting-card">
@@ -193,18 +195,18 @@ const DoctorProfileSettings = () => {
                             {profileImageUrl ? (
                               <img
                                 src={getImageUrl(profileImageUrl) || profileImageUrl}
-                                alt="Profile"
+                                alt={t('doctorRemaining.profile.profileAlt')}
                                 className="img-fluid rounded-circle"
                               />
                             ) : (
                               <i className="fa-solid fa-camera"></i>
                             )}
                             <div className="avatar-overlay">
-                              <span>Upload Photo</span>
+                              <span>{t('doctorRemaining.profile.uploadPhoto')}</span>
                             </div>
                           </div>
                           <div className="upload-img">
-                            <h5>Professional Photo</h5>
+                            <h5>{t('doctorRemaining.profile.professionalPhoto')}</h5>
                             <div className="imgs-load d-flex align-items-center">
                               <input
                                 type="file"
@@ -214,7 +216,7 @@ const DoctorProfileSettings = () => {
                             </div>
                             <p className="form-text veterinary-form-text">
                               <i className="fa-solid fa-info-circle me-1"></i>
-                              Your image should be below 4MB, accepted formats: JPG, PNG, SVG
+                              {t('doctorRemaining.profile.imageHint')}
                             </p>
                           </div>
                         </div>
@@ -224,7 +226,7 @@ const DoctorProfileSettings = () => {
                       <div className="setting-title">
                         <h5>
                           <i className="fa-solid fa-info-circle me-2"></i>
-                          Basic Information
+                          {t('doctorRemaining.profile.basicInformation')}
                         </h5>
                       </div>
                       <div className="setting-card veterinary-setting-card">
@@ -233,13 +235,13 @@ const DoctorProfileSettings = () => {
                             <div className="form-wrap">
                               <label className="form-label">
                                 <i className="fa-solid fa-user me-2"></i>
-                                First Name <span className="text-danger">*</span>
+                                {t('doctorRemaining.profile.firstName')} <span className="text-danger">*</span>
                               </label>
                               <input
                                 type="text"
                                 className="form-control veterinary-input"
                                 name="firstName"
-                                placeholder="Enter your first name"
+                                placeholder={t('doctorRemaining.profile.firstName')}
                                 value={form.firstName}
                                 onChange={handleChange}
                               />
@@ -249,13 +251,13 @@ const DoctorProfileSettings = () => {
                             <div className="form-wrap">
                               <label className="form-label">
                                 <i className="fa-solid fa-user me-2"></i>
-                                Last Name <span className="text-danger">*</span>
+                                {t('doctorRemaining.profile.lastName')} <span className="text-danger">*</span>
                               </label>
                               <input
                                 type="text"
                                 className="form-control veterinary-input"
                                 name="lastName"
-                                placeholder="Enter your last name"
+                                placeholder={t('doctorRemaining.profile.lastName')}
                                 value={form.lastName}
                                 onChange={handleChange}
                               />
@@ -265,13 +267,13 @@ const DoctorProfileSettings = () => {
                             <div className="form-wrap">
                               <label className="form-label">
                                 <i className="fa-solid fa-id-badge me-2"></i>
-                                Display Name <span className="text-danger">*</span>
+                                {t('doctorRemaining.profile.displayName')} <span className="text-danger">*</span>
                               </label>
                               <input
                                 type="text"
                                 className="form-control veterinary-input"
                                 name="displayName"
-                                placeholder="How you want to be known"
+                                placeholder={t('doctorRemaining.profile.displayNamePlaceholder')}
                                 value={`${form.firstName} ${form.lastName}`.trim()}
                                 readOnly
                                 disabled
@@ -282,13 +284,13 @@ const DoctorProfileSettings = () => {
                             <div className="form-wrap">
                               <label className="form-label">
                                 <i className="fa-solid fa-stethoscope me-2"></i>
-                                Professional Title <span className="text-danger">*</span>
+                                {t('doctorRemaining.profile.professionalTitle')} <span className="text-danger">*</span>
                               </label>
                               <input
                                 type="text"
                                 className="form-control veterinary-input"
                                 name="title"
-                                placeholder="e.g., DVM, Veterinarian"
+                                placeholder={t('doctorRemaining.profile.professionalTitlePlaceholder')}
                                 value={form.title}
                                 onChange={handleChange}
                               />
@@ -298,12 +300,12 @@ const DoctorProfileSettings = () => {
                             <div className="form-wrap">
                               <label className="form-label">
                                 <i className="fa-solid fa-phone me-2"></i>
-                                Phone Number <span className="text-danger">*</span>
+                                {t('doctorRemaining.profile.phone')} <span className="text-danger">*</span>
                               </label>
                               <input
                                 type="text"
                                 className="form-control veterinary-input"
-                                placeholder="Enter your phone number"
+                                placeholder={t('doctorRemaining.profile.phone')}
                                 value={user.phone || ''}
                                 disabled
                               />
@@ -313,12 +315,12 @@ const DoctorProfileSettings = () => {
                             <div className="form-wrap">
                               <label className="form-label">
                                 <i className="fa-solid fa-envelope me-2"></i>
-                                Email Address <span className="text-danger">*</span>
+                                {t('doctorRemaining.profile.email')} <span className="text-danger">*</span>
                               </label>
                               <input
                                 type="text"
                                 className="form-control veterinary-input"
-                                placeholder="Enter your email"
+                                placeholder={t('doctorRemaining.profile.email')}
                                 value={user.email || ''}
                                 disabled
                               />
@@ -328,13 +330,13 @@ const DoctorProfileSettings = () => {
                             <div className="form-wrap">
                               <label className="form-label">
                                 <i className="fa-solid fa-file-alt me-2"></i>
-                                Biography
+                                {t('doctorRemaining.profile.biography')}
                               </label>
                               <textarea
                                 className="form-control veterinary-input"
                                 name="biography"
                                 rows="4"
-                                placeholder="Describe your veterinary background, expertise, and approach..."
+                                placeholder={t('doctorRemaining.profile.biographyPlaceholder')}
                                 value={form.biography}
                                 onChange={handleChange}
                               ></textarea>
@@ -347,7 +349,7 @@ const DoctorProfileSettings = () => {
                       <div className="setting-title">
                         <h5>
                           <i className="fa-solid fa-dollar-sign me-2"></i>
-                          Consultation Fees
+                          {t('doctorRemaining.profile.consultationFees')}
                         </h5>
                       </div>
                       <div className="setting-card veterinary-setting-card">
@@ -356,13 +358,13 @@ const DoctorProfileSettings = () => {
                             <div className="form-wrap">
                               <label className="form-label">
                                 <i className="fa-solid fa-clinic-medical me-2"></i>
-                                In-Clinic Consultation Fee
+                                {t('doctorRemaining.profile.clinicFee')}
                               </label>
                               <input
                                 type="number"
                                 className="form-control veterinary-input"
                                 name="clinicFee"
-                                placeholder="e.g., 50"
+                                placeholder={t('doctorRemaining.profile.feePlaceholder')}
                                 value={form.clinicFee}
                                 onChange={handleChange}
                               />
@@ -372,13 +374,13 @@ const DoctorProfileSettings = () => {
                             <div className="form-wrap">
                               <label className="form-label">
                                 <i className="fa-solid fa-video me-2"></i>
-                                Online Consultation Fee
+                                {t('doctorRemaining.profile.onlineFee')}
                               </label>
                               <input
                                 type="number"
                                 className="form-control veterinary-input"
                                 name="onlineFee"
-                                placeholder="e.g., 40"
+                                placeholder={t('doctorRemaining.profile.feePlaceholder')}
                                 value={form.onlineFee}
                                 onChange={handleChange}
                               />
@@ -391,7 +393,7 @@ const DoctorProfileSettings = () => {
                       <div className="setting-title">
                         <h5>
                           <i className="fa-solid fa-certificate me-2"></i>
-                          Professional Memberships
+                          {t('doctorRemaining.profile.memberships')}
                         </h5>
                       </div>
                       <div className="setting-card veterinary-setting-card">
@@ -401,12 +403,12 @@ const DoctorProfileSettings = () => {
                               <div className="form-wrap mb-0">
                                 <label className="form-label">
                                   <i className="fa-solid fa-award me-2"></i>
-                                  Organization
+                                  {t('doctorRemaining.profile.organization')}
                                 </label>
                                 <input
                                   type="text"
                                   className="form-control veterinary-input"
-                                  placeholder="e.g., AVMA"
+                                  placeholder={t('doctorRemaining.profile.organizationPlaceholder')}
                                   value={value}
                                   onChange={(e) => handleMembershipChange(index, e.target.value)}
                                 />
@@ -420,7 +422,7 @@ const DoctorProfileSettings = () => {
                                 onClick={() => removeMembershipRow(index)}
                               >
                                 <i className="fa-solid fa-trash me-1"></i>
-                                Remove
+                                {t('doctorRemaining.profile.remove')}
                               </button>
                             </div>
                           </div>
@@ -432,7 +434,7 @@ const DoctorProfileSettings = () => {
                             onClick={addMembershipRow}
                           >
                             <i className="fa-solid fa-plus me-1"></i>
-                            Add Membership
+                            {t('doctorRemaining.profile.addMembership')}
                           </button>
                         </div>
                       </div>
@@ -440,10 +442,10 @@ const DoctorProfileSettings = () => {
                       {/* Form Actions */}
                       <div className="modal-btn text-end">
                         <a href="#" className="btn veterinary-btn-secondary me-2">
-                          <i className="fa-solid fa-times me-1"></i>Cancel
+                          <i className="fa-solid fa-times me-1"></i>{t('doctorRemaining.profile.cancel')}
                         </a>
                         <button type="submit" className="btn veterinary-start-btn prime-btn">
-                          <i className="fa-solid fa-save me-1"></i>Save Changes
+                          <i className="fa-solid fa-save me-1"></i>{updateProfile.isPending ? t('doctorRemaining.profile.saving') : t('doctorRemaining.profile.save')}
                         </button>
                       </div>
                     </form>

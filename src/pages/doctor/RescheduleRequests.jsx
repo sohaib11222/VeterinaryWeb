@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 import { useRescheduleRequests } from '../../queries'
 import { useApproveRescheduleRequest, useRejectRescheduleRequest } from '../../mutations/scheduleMutations'
 
 const DoctorRescheduleRequests = () => {
+  const { t, language } = useLanguage()
   const requestsQuery = useRescheduleRequests({ status: 'PENDING' })
   const approve = useApproveRescheduleRequest()
   const reject = useRejectRescheduleRequest()
@@ -40,7 +42,7 @@ const DoctorRescheduleRequests = () => {
   const doApprove = async () => {
     if (!selected?._id) return
     if (!newDate || !newTime) {
-      toast.error('Please select new date and time')
+      toast.error(t('doctorReschedule.selectDateTime'))
       return
     }
 
@@ -56,29 +58,29 @@ const DoctorRescheduleRequests = () => {
 
     try {
       await approve.mutateAsync({ id: selected._id, data: payload })
-      toast.success('Reschedule request approved')
+      toast.success(t('doctorReschedule.approvedSuccess'))
       setShowApproveModal(false)
       setSelected(null)
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to approve request')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorReschedule.approveFailed'))
     }
   }
 
   const doReject = async () => {
     if (!selected?._id) return
     if (String(rejectionReason || '').trim().length < 10) {
-      toast.error('Rejection reason must be at least 10 characters')
+      toast.error(t('doctorReschedule.reasonMin'))
       return
     }
 
     try {
       await reject.mutateAsync({ id: selected._id, reason: String(rejectionReason).trim() })
-      toast.success('Reschedule request rejected')
+      toast.success(t('doctorReschedule.rejectedSuccess'))
       setShowRejectModal(false)
       setSelected(null)
       setRejectionReason('')
     } catch (err) {
-      toast.error(err?.response?.data?.message || err?.message || 'Failed to reject request')
+      toast.error(err?.response?.data?.message || err?.message || t('doctorReschedule.rejectFailed'))
     }
   }
 
@@ -87,27 +89,27 @@ const DoctorRescheduleRequests = () => {
   return (
     <div>
       <div className="page-header">
-        <h3 className="page-title">Reschedule Requests</h3>
+        <h3 className="page-title">{t('doctorReschedule.title')}</h3>
       </div>
 
       {requestsQuery.isLoading ? (
         <div className="card">
           <div className="card-body text-center py-5">
             <div className="spinner-border text-primary" role="status">
-              <span className="visually-hidden">Loading...</span>
+              <span className="visually-hidden">{t('doctorReschedule.loading')}</span>
             </div>
           </div>
         </div>
       ) : requestsQuery.isError ? (
         <div className="card">
           <div className="card-body">
-            <div className="alert alert-danger mb-0">{requestsQuery.error?.message || 'Failed to load requests'}</div>
+            <div className="alert alert-danger mb-0">{requestsQuery.error?.message || t('doctorReschedule.loadFailed')}</div>
           </div>
         </div>
       ) : requests.length === 0 ? (
         <div className="card">
           <div className="card-body">
-            <div className="alert alert-info mb-0">No pending reschedule requests.</div>
+            <div className="alert alert-info mb-0">{t('doctorReschedule.empty')}</div>
           </div>
         </div>
       ) : (
@@ -116,28 +118,28 @@ const DoctorRescheduleRequests = () => {
             const id = r?._id
             const ownerName = r?.petOwnerId?.name || r?.petOwnerId?.fullName || r?.petOwnerId?.email || 'Pet Owner'
             const original = r?.appointmentId
-            const originalLabel = original
-              ? `${new Date(original.appointmentDate).toLocaleDateString()} ${original.appointmentTime || ''}`
+              const originalLabel = original
+              ? `${new Date(original.appointmentDate).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB')} ${original.appointmentTime || ''}`
               : '—'
 
             return (
               <div key={id} className="col-md-6 mb-4">
                 <div className="card">
                   <div className="card-body">
-                    <h5 className="mb-2">Request from {ownerName}</h5>
-                    <div className="text-muted mb-2">Original: {originalLabel}</div>
+                    <h5 className="mb-2">{t('doctorReschedule.requestFrom', { owner: ownerName })}</h5>
+                    <div className="text-muted mb-2">{t('doctorReschedule.original')}: {originalLabel}</div>
                     <div className="mb-3">{r?.reason}</div>
 
                     {r?.preferredDate && (
                       <div className="text-muted">
-                        Preferred date: {new Date(r.preferredDate).toLocaleDateString()}
+                        {t('doctorReschedule.preferredDate')}: {new Date(r.preferredDate).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB')}
                       </div>
                     )}
-                    {r?.preferredTime && <div className="text-muted mb-3">Preferred time: {r.preferredTime}</div>}
+                    {r?.preferredTime && <div className="text-muted mb-3">{t('doctorReschedule.preferredTime')}: {r.preferredTime}</div>}
 
                     <div className="d-flex gap-2">
                       <button className="btn btn-success" onClick={() => openApprove(r)}>
-                        Approve
+                        {t('doctorReschedule.approve')}
                       </button>
                       <button
                         className="btn btn-danger"
@@ -147,7 +149,7 @@ const DoctorRescheduleRequests = () => {
                           setShowRejectModal(true)
                         }}
                       >
-                        Reject
+                        {t('doctorReschedule.reject')}
                       </button>
                     </div>
                   </div>
@@ -164,7 +166,7 @@ const DoctorRescheduleRequests = () => {
             <div className="modal-dialog modal-dialog-centered modal-lg">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Approve Reschedule Request</h5>
+                  <h5 className="modal-title">{t('doctorReschedule.approveTitle')}</h5>
                   <button
                     type="button"
                     className="btn-close"
@@ -173,20 +175,21 @@ const DoctorRescheduleRequests = () => {
                       setSelected(null)
                     }}
                     disabled={approve.isPending}
+                    aria-label={t('doctorReschedule.close')}
                   ></button>
                 </div>
                 <div className="modal-body">
                   <div className="row">
                     <div className="col-md-6 mb-3">
-                      <label className="form-label">New Date *</label>
+                      <label className="form-label">{t('doctorReschedule.newDate')}</label>
                       <input type="date" className="form-control" value={newDate} onChange={(e) => setNewDate(e.target.value)} min={minDate} />
                     </div>
                     <div className="col-md-6 mb-3">
-                      <label className="form-label">New Time *</label>
+                      <label className="form-label">{t('doctorReschedule.newTime')}</label>
                       <input type="time" className="form-control" value={newTime} onChange={(e) => setNewTime(e.target.value)} />
                     </div>
                     <div className="col-md-6 mb-3">
-                      <label className="form-label">Fee Percentage</label>
+                      <label className="form-label">{t('doctorReschedule.feePercentage')}</label>
                       <div className="input-group">
                         <input
                           type="number"
@@ -202,10 +205,10 @@ const DoctorRescheduleRequests = () => {
                         />
                         <span className="input-group-text">%</span>
                       </div>
-                      <small className="form-text text-muted">Set 0% to confirm the reschedule with no additional payment.</small>
+                      <small className="form-text text-muted">{t('doctorReschedule.noFeeHint')}</small>
                     </div>
                     <div className="col-md-6 mb-3">
-                      <label className="form-label">Or Fixed Fee (optional)</label>
+                      <label className="form-label">{t('doctorReschedule.fixedFee')}</label>
                       <input
                         type="number"
                         step="0.01"
@@ -219,7 +222,7 @@ const DoctorRescheduleRequests = () => {
                       />
                     </div>
                     <div className="col-12 mb-3">
-                      <label className="form-label">Notes (optional)</label>
+                      <label className="form-label">{t('doctorReschedule.notesOptional')}</label>
                       <textarea className="form-control" rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />
                     </div>
                   </div>
@@ -234,10 +237,10 @@ const DoctorRescheduleRequests = () => {
                     }}
                     disabled={approve.isPending}
                   >
-                    Cancel
+                    {t('doctorReschedule.cancel')}
                   </button>
                   <button type="button" className="btn btn-success" onClick={doApprove} disabled={approve.isPending}>
-                    {approve.isPending ? 'Approving...' : 'Approve'}
+                    {approve.isPending ? t('doctorReschedule.approving') : t('doctorReschedule.approve')}
                   </button>
                 </div>
               </div>
@@ -253,7 +256,7 @@ const DoctorRescheduleRequests = () => {
             <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Reject Reschedule Request</h5>
+                  <h5 className="modal-title">{t('doctorReschedule.rejectTitle')}</h5>
                   <button
                     type="button"
                     className="btn-close"
@@ -262,16 +265,17 @@ const DoctorRescheduleRequests = () => {
                       setSelected(null)
                     }}
                     disabled={reject.isPending}
+                    aria-label={t('doctorReschedule.close')}
                   ></button>
                 </div>
                 <div className="modal-body">
-                  <label className="form-label">Reason *</label>
+                  <label className="form-label">{t('doctorReschedule.reason')}</label>
                   <textarea
                     className="form-control"
                     rows={4}
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
-                    placeholder="Enter rejection reason (min 10 characters)"
+                    placeholder={t('doctorReschedule.reasonPlaceholder')}
                   />
                 </div>
                 <div className="modal-footer">
@@ -284,10 +288,10 @@ const DoctorRescheduleRequests = () => {
                     }}
                     disabled={reject.isPending}
                   >
-                    Cancel
+                    {t('doctorReschedule.cancel')}
                   </button>
                   <button type="button" className="btn btn-danger" onClick={doReject} disabled={reject.isPending}>
-                    {reject.isPending ? 'Rejecting...' : 'Reject'}
+                    {reject.isPending ? t('doctorReschedule.rejecting') : t('doctorReschedule.reject')}
                   </button>
                 </div>
               </div>

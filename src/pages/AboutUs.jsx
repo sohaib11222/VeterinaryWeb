@@ -4,6 +4,7 @@ import Breadcrumb from '../components/common/Breadcrumb'
 import { usePublicReviews } from '../queries/reviewQueries'
 import { useFooterOptions } from '../queries/footerOptionQueries'
 import { getImageUrl } from '../utils/apiConfig'
+import { useLanguage } from '../contexts/LanguageContext'
 
 const DEFAULT_CONTACT_OPTIONS = {
   address: '3556 Beech Street, USA',
@@ -11,62 +12,63 @@ const DEFAULT_CONTACT_OPTIONS = {
 }
 
 const AboutUs = () => {
+  const { t } = useLanguage()
   const whyChooseUs = [
     {
       id: 1,
       icon: '/assets/img/icons/choose-01.svg',
-      title: 'Experienced Veterinary Team',
-      description: 'From routine wellness checks to complex cases, our licensed veterinarians and technicians treat every pet with patience and expertise.'
+      title: t('publicPages.about.preventive'),
+      description: t('publicPages.about.intro1')
     },
     {
       id: 2,
       icon: '/assets/img/icons/choose-02.svg',
-      title: 'Modern Diagnostics & Care',
-      description: 'We use advanced diagnostics and evidence-based treatment plans to provide clear answers and effective care.'
+      title: t('publicPages.about.diagnostics'),
+      description: t('publicPages.about.intro2')
     },
     {
       id: 3,
       icon: '/assets/img/icons/choose-03.svg',
-      title: 'Compassionate, Pet-First Approach',
-      description: 'Your pet’s comfort matters. We explain options, respect your budget, and focus on long-term health.'
+      title: t('publicPages.about.compassionate'),
+      description: t('publicPages.about.intro1')
     },
     {
       id: 4,
       icon: '/assets/img/icons/choose-04.svg',
-      title: 'Easy Scheduling & Follow-ups',
-      description: 'Book appointments in minutes, keep records organized, and stay informed with reminders and updates.'
+      title: t('publicPages.about.scheduling'),
+      description: t('publicPages.about.intro2')
     }
   ]
 
   const faqs = [
     {
       id: 1,
-      question: 'Can I book an appointment online?',
-      answer: 'Yes. Use the search and booking flow to select a veterinarian, choose a date, and confirm your visit in a few steps.',
+      question: t('publicPages.about.faq1q'),
+      answer: t('publicPages.about.faq1a'),
       isOpen: true
     },
     {
       id: 2,
-      question: 'Do you offer preventive care and vaccinations?',
-      answer: 'We provide wellness exams, vaccination schedules, parasite prevention, nutrition guidance, and senior pet care tailored to your pet’s needs.',
+      question: t('publicPages.about.faq2q'),
+      answer: t('publicPages.about.faq2a'),
       isOpen: false
     },
     {
       id: 3,
-      question: 'What should I bring to my first visit?',
-      answer: 'Bring any previous medical records, vaccination history, current medications, and notes about symptoms or behavior changes.',
+      question: t('publicPages.about.faq3q'),
+      answer: t('publicPages.about.faq3a'),
       isOpen: false
     },
     {
       id: 4,
-      question: 'Do you treat both cats and dogs?',
-      answer: 'Yes. Our veterinarians provide care for cats and dogs, and we can recommend partners for specialized or exotic pet care when needed.',
+      question: t('publicPages.about.faq4q'),
+      answer: t('publicPages.about.faq4a'),
       isOpen: false
     },
     {
       id: 5,
-      question: 'How do follow-ups and prescriptions work?',
-      answer: 'After your visit, you can review care notes, prescriptions, and invoices in your dashboard. Refills and follow-ups are handled by your veterinarian.',
+      question: t('publicPages.about.faq5q'),
+      answer: t('publicPages.about.faq5a'),
       isOpen: false
     }
   ]
@@ -113,8 +115,8 @@ const AboutUs = () => {
       .map((r) => {
         const petOwner = r?.petOwnerId
         const vet = r?.veterinarianId
-        const name = petOwner?.name || petOwner?.fullName || 'Pet Owner'
-        const subtitle = vet?.name ? `Reviewed ${vet.name}` : 'Verified review'
+        const name = petOwner?.name || petOwner?.fullName || t('publicPages.aboutContent.petOwner')
+        const subtitle = vet?.name ? t('publicPages.aboutContent.reviewed', { name: vet.name }) : t('publicPages.aboutContent.verifiedReview')
         const avatar = getImageUrl(petOwner?.profileImage) || '/assets/img/patients/patient.jpg'
         const rating = Number(r?.rating || 0)
         const text = String(r?.reviewText || '').trim()
@@ -124,10 +126,10 @@ const AboutUs = () => {
           subtitle,
           avatar,
           rating,
-          text: text || 'Great experience.'
+          text: text || t('publicPages.aboutContent.greatExperience')
         }
       })
-  }, [testimonials])
+  }, [testimonials, t])
 
   const renderStars = (rating) => {
     const r = Math.max(0, Math.min(5, Number(rating) || 0))
@@ -146,7 +148,7 @@ const AboutUs = () => {
 
   return (
     <div className="content">
-      <Breadcrumb title="About Us" li1="About Us" li2="About Us" />
+      <Breadcrumb title={t('publicPages.about.title')} li1={t('publicPages.about.title')} li2={t('publicPages.about.title')} />
 
       {/* About Us */}
       <section className="about-section">
@@ -154,34 +156,30 @@ const AboutUs = () => {
           <div className="row align-items-start g-4">
             <div className="col-lg-6 col-md-12">
               <div className="section-inner-header about-inner-header">
-                <h6>About Veterinary Care</h6>
-                <h2>A modern veterinary experience built around your pet</h2>
+                <h6>{t('publicPages.about.eyebrow')}</h6>
+                <h2>{t('publicPages.about.heading')}</h2>
               </div>
               <div className="about-content">
                 <div className="about-content-details">
                   <p>
-                    Our mission is simple: deliver dependable, compassionate veterinary care while making
-                    it easier for pet parents to book appointments, manage records, and stay on top of
-                    follow-ups.
+                    {t('publicPages.about.intro1')}
                   </p>
                   <p>
-                    Whether you’re coming in for a routine wellness check or something urgent, we combine
-                    experienced clinicians with practical technology so you always know what’s happening
-                    and what to do next.
+                    {t('publicPages.about.intro2')}
                   </p>
                 </div>
                 <div className="about-inline-cards">
                   <div className="about-inline-card">
-                    <h5>Preventive Care</h5>
-                    <p>Wellness exams, vaccines, parasite prevention, nutrition.</p>
+                    <h5>{t('publicPages.about.preventive')}</h5>
+                    <p>{t('publicPages.aboutContent.preventiveDescription')}</p>
                   </div>
                   <div className="about-inline-card">
-                    <h5>Diagnostics</h5>
-                    <p>Clear answers with modern tools and transparent guidance.</p>
+                    <h5>{t('publicPages.about.diagnostics')}</h5>
+                    <p>{t('publicPages.aboutContent.diagnosticsDescription')}</p>
                   </div>
                   <div className="about-inline-card">
-                    <h5>Follow-ups</h5>
-                    <p>Prescriptions, invoices, and records organized in one place.</p>
+                    <h5>{t('publicPages.about.scheduling')}</h5>
+                    <p>{t('publicPages.aboutContent.schedulingDescription')}</p>
                   </div>
                 </div>
                 <div className="about-contact">
@@ -191,17 +189,17 @@ const AboutUs = () => {
                     </span>
                   </div>
                   <div className="about-contact-text">
-                    <p>Questions or urgent care?</p>
+                    <p>{t('publicPages.aboutContent.urgentQuestion')}</p>
                     <h4><a href={`tel:${contactOptions.phoneNumber}`}>{contactOptions.phoneNumber}</a></h4>
                     <p className="mb-0"><i className="fa-solid fa-location-dot me-1" aria-hidden="true"></i>{contactOptions.address}</p>
                   </div>
                 </div>
                 <div className="about-actions">
                   <Link to="/search" className="btn btn-primary me-2">
-                    Find a Veterinarian
+                    {t('publicPages.aboutContent.findVeterinarian')}
                   </Link>
                   <Link to="/contact-us" className="btn btn-outline-primary">
-                    Contact Us
+                    {t('publicPages.aboutContent.contactUs')}
                   </Link>
                 </div>
               </div>
@@ -230,7 +228,7 @@ const AboutUs = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="section-inner-header text-center">
-                <h2>Why Choose Us</h2>
+                <h2>{t('publicPages.aboutContent.whyChoose')}</h2>
               </div>
             </div>
           </div>
@@ -270,12 +268,9 @@ const AboutUs = () => {
             <div className="row align-items-end">
               <div className="col-lg-7 col-md-12">
                 <div className="section-inner-header way-inner-header mb-0">
-                  <h2>Care plans that fit your pet’s life</h2>
-                  <p>
-                    From puppies and kittens to senior pets, we’ll help you build a plan for wellness,
-                    prevention, and long-term comfort.
-                  </p>
-                  <Link to="/contact-us" className="btn btn-primary">Contact With Us</Link>
+                  <h2>{t('publicPages.aboutContent.carePlanTitle')}</h2>
+                  <p>{t('publicPages.aboutContent.carePlanBody')}</p>
+                  <Link to="/contact-us" className="btn btn-primary">{t('publicPages.aboutContent.contactWithUs')}</Link>
                 </div>
               </div>
               <div className="col-lg-5 col-md-12">
@@ -296,27 +291,24 @@ const AboutUs = () => {
             <div className="col-lg-4 col-md-12 d-flex">
               <div className="card about-highlight-card w-100">
                 <div className="card-body">
-                  <h3>Trusted by pet parents</h3>
-                  <p>
-                    We focus on clear communication and practical treatment plans so you can make
-                    confident decisions for your pet.
-                  </p>
+                  <h3>{t('publicPages.aboutContent.trusted')}</h3>
+                  <p>{t('publicPages.aboutContent.trustedDescription')}</p>
                   <div className="about-stat-row">
                     <div className="about-stat">
                       <h4>24/7</h4>
-                      <p>Support guidance</p>
+                      <p>{t('publicPages.aboutContent.supportGuidance')}</p>
                     </div>
                     <div className="about-stat">
-                      <h4>Fast</h4>
-                      <p>Online booking</p>
+                      <h4>{t('publicPages.aboutContent.fast')}</h4>
+                      <p>{t('publicPages.aboutContent.onlineBooking')}</p>
                     </div>
                     <div className="about-stat">
-                      <h4>Safe</h4>
-                      <p>Pet-first care</p>
+                      <h4>{t('publicPages.aboutContent.safe')}</h4>
+                      <p>{t('publicPages.aboutContent.petFirst')}</p>
                     </div>
                   </div>
                   <Link to="/search" className="btn btn-primary">
-                    Explore Veterinarians
+                    {t('publicPages.aboutContent.exploreVeterinarians')}
                   </Link>
                 </div>
               </div>
@@ -333,8 +325,8 @@ const AboutUs = () => {
                       loading="lazy"
                     />
                     <div className="card-body">
-                      <h5>Gentle handling</h5>
-                      <p>Low-stress visits designed to keep pets calm and comfortable.</p>
+                      <h5>{t('publicPages.aboutContent.gentleHandling')}</h5>
+                      <p>{t('publicPages.aboutContent.gentleDescription')}</p>
                     </div>
                   </div>
                 </div>
@@ -347,8 +339,8 @@ const AboutUs = () => {
                       loading="lazy"
                     />
                     <div className="card-body">
-                      <h5>Clear recommendations</h5>
-                      <p>We explain what we see, what it means, and what your options are.</p>
+                      <h5>{t('publicPages.aboutContent.clearRecommendations')}</h5>
+                      <p>{t('publicPages.aboutContent.clearRecommendationsDescription')}</p>
                     </div>
                   </div>
                 </div>
@@ -373,12 +365,12 @@ const AboutUs = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="section-inner-header testimonial-header text-center">
-                <h6>Testimonials</h6>
-                <h2>What Pet Parents Say</h2>
+                <h6>{t('publicPages.aboutContent.testimonials')}</h6>
+                <h2>{t('publicPages.aboutContent.testimonialsTitle')}</h2>
               </div>
 
               {reviewsError ? (
-                <div className="text-center py-5 text-danger">Failed to load testimonials</div>
+                <div className="text-center py-5 text-danger">{t('publicPages.aboutContent.testimonialsLoadFailed')}</div>
               ) : reviewsLoading ? (
                 <div className="text-center py-5">
                   <div className="spinner-border text-primary" role="status">
@@ -386,7 +378,7 @@ const AboutUs = () => {
                   </div>
                 </div>
               ) : testimonialCards.length === 0 ? (
-                <div className="text-center py-5 text-muted">No testimonials yet.</div>
+                <div className="text-center py-5 text-muted">{t('publicPages.aboutContent.testimonialsEmpty')}</div>
               ) : (
                 <div className="row g-4">
                   {testimonialCards.map((t) => (
@@ -429,8 +421,8 @@ const AboutUs = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="section-inner-header text-center">
-                <h6>Get Your Answer</h6>
-                <h2>Frequently Asked Questions</h2>
+                <h6>{t('publicPages.aboutContent.getAnswer')}</h6>
+                <h2>{t('publicPages.about.faqTitle')}</h2>
               </div>
             </div>
           </div>
@@ -444,7 +436,7 @@ const AboutUs = () => {
                   </div>
                   <div className="faq-patients-content">
                     <h4><span className="count-digit">5</span>k+</h4>
-                    <p>Happy Pets</p>
+                    <p>{t('publicPages.aboutContent.happyPets')}</p>
                   </div>
                 </div>
               </div>

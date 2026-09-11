@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const schema = yup.object({
   petStoreLicense: yup.mixed().required('Pet store license is required'),
@@ -27,6 +28,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024
 const PetStoreVerificationUpload = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState({})
 
@@ -68,10 +70,10 @@ const PetStoreVerificationUpload = () => {
         }
         await uploadDoc(file, doc.docType)
       }
-      toast.success('Verification documents uploaded successfully!')
+      toast.success(t('auth.verification.documentsSuccess'))
       navigate('/pending-approval')
     } catch (error) {
-      toast.error(error?.message || 'Failed to upload documents. Please try again.')
+      toast.error(error?.message || t('auth.verification.documentsFailed'))
     } finally {
       setLoading(false)
     }
@@ -79,16 +81,16 @@ const PetStoreVerificationUpload = () => {
 
   return (
     <div className="auth-pharmacy-flow auth-pharmacy-flow--documents">
-      <div className="auth-pharmacy-flow__steps" aria-label="Registration progress">
-        <span className="is-complete"><i className="fa-solid fa-check"></i><b>Account</b></span>
-        <span className="is-complete"><i className="fa-solid fa-check"></i><b>Phone verification</b></span>
-        <span className="is-active"><i className="fa-solid fa-file-shield"></i><b>Documents</b></span>
-        <span><i className="fa-solid fa-circle-check"></i><b>Approval</b></span>
+      <div className="auth-pharmacy-flow__steps" aria-label={t('auth.authLayout.featuresAria')}>
+        <span className="is-complete"><i className="fa-solid fa-check"></i><b>{t('auth.verification.account')}</b></span>
+        <span className="is-complete"><i className="fa-solid fa-check"></i><b>{t('auth.verification.phone')}</b></span>
+        <span className="is-active"><i className="fa-solid fa-file-shield"></i><b>{t('auth.verification.documents')}</b></span>
+        <span><i className="fa-solid fa-circle-check"></i><b>{t('auth.verification.approval')}</b></span>
       </div>
       <div className="auth-pharmacy-flow__panel">
         <div className="auth-pharmacy-flow__header">
           <div className="logo-icon"><i className="fa-solid fa-file-shield" /></div>
-          <div><h3>Verify your business</h3><p>Upload the required documents. They are reviewed by the MyPetPlus team before your account can be approved.</p></div>
+          <div><h3>{t('auth.verification.businessTitle')}</h3><p>{t('auth.pharmacy.subtitle')}</p></div>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
@@ -103,7 +105,7 @@ const PetStoreVerificationUpload = () => {
                     <div className="auth-document-card__help">{file?.name || doc.help}</div>
                     {errors?.[doc.key] && <div className="text-danger small mt-1">{errors[doc.key]?.message}</div>}
                   </div>
-                  <label htmlFor={doc.key} className="btn btn-sm btn-outline-primary mb-0">{file ? 'Replace' : 'Choose file'}</label>
+                  <label htmlFor={doc.key} className="btn btn-sm btn-outline-primary mb-0">{file ? t('common.save') : t('common.next')}</label>
                   <input type="file" id={doc.key} className="d-none" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => handleFileChange(doc.key, event)} />
                 </div>
               )
@@ -111,11 +113,11 @@ const PetStoreVerificationUpload = () => {
           </div>
           <div className="auth-document-footer mt-3">
             <div className="text-muted small"><i className="fa-solid fa-shield-halved me-2"></i>PDF, JPG, and PNG files up to 10 MB. Your documents are used only for account verification.</div>
-            <button type="submit" className="btn btn-primary-gradient" disabled={loading}>{loading ? 'Uploading documents…' : 'Submit for verification'} <i className="fa-solid fa-arrow-right ms-2" /></button>
+            <button type="submit" className="btn btn-primary-gradient" disabled={loading}>{loading ? t('auth.verification.sending') : t('auth.verification.verifyContinue')} <i className="fa-solid fa-arrow-right ms-2" /></button>
           </div>
         </form>
       </div>
-      <div className="text-center mt-3"><Link to="/pharmacy-phone-verification" className="text-muted">Back to phone verification</Link></div>
+      <div className="text-center mt-3"><Link to="/pharmacy-phone-verification" className="text-muted">{t('auth.verification.backToLogin')}</Link></div>
     </div>
   )
 }

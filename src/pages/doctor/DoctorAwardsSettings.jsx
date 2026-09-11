@@ -4,11 +4,13 @@ import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const DoctorAwardsSettings = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const { data, isLoading } = useVeterinarianProfile()
@@ -55,7 +57,7 @@ const DoctorAwardsSettings = () => {
         .filter((a) => a.title)
 
       await updateProfile.mutateAsync({ awards: cleaned })
-      toast.success('Awards updated successfully')
+      toast.success(t('doctorRemaining.awards.updated'))
 
       const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
       const nextProfile = refreshed?.data ?? refreshed
@@ -67,7 +69,7 @@ const DoctorAwardsSettings = () => {
         }
       }
     } catch (err) {
-      const message = err?.response?.data?.message || err?.message || 'Failed to update awards'
+      const message = err?.response?.data?.message || err?.message || t('doctorRemaining.awards.updateFailed')
       toast.error(message)
     }
   }
@@ -79,7 +81,7 @@ const DoctorAwardsSettings = () => {
         style={{ minHeight: '60vh' }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('doctorRemaining.profile.loading')}</span>
         </div>
       </div>
     )
@@ -99,10 +101,10 @@ const DoctorAwardsSettings = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-trophy me-3"></i>
-                    Veterinary Awards & Recognition
+                    {t('doctorRemaining.awards.title')}
                   </h2>
                   <p className="dashboard-subtitle">
-                    Manage your veterinary awards, certifications, and professional recognition
+                    {t('doctorRemaining.awards.subtitle')}
                   </p>
                 </div>
               </div>
@@ -119,7 +121,7 @@ const DoctorAwardsSettings = () => {
                         <div className="col-12 d-flex justify-content-between align-items-center">
                           <h5 className="card-title mb-0">
                             <i className="fa-solid fa-award me-2"></i>
-                            Professional Recognition
+                            {t('doctorRemaining.awards.section')}
                           </h5>
                           <button
                             type="button"
@@ -127,7 +129,7 @@ const DoctorAwardsSettings = () => {
                             onClick={addAward}
                           >
                             <i className="fa-solid fa-plus me-2"></i>
-                            Add New Award
+                            {t('doctorRemaining.awards.add')}
                           </button>
                         </div>
                       </div>
@@ -141,14 +143,14 @@ const DoctorAwardsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-trophy me-2"></i>
-                                      Award Name <span className="text-danger">*</span>
+                                      {t('doctorRemaining.awards.name')} <span className="text-danger">*</span>
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={award.title}
                                       onChange={(e) => handleChange(index, 'title', e.target.value)}
-                                      placeholder="e.g., Excellence in Veterinary Medicine"
+                                      placeholder={t('doctorRemaining.awards.namePlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -156,14 +158,14 @@ const DoctorAwardsSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-calendar-alt me-2"></i>
-                                      Award Year
+                                      {t('doctorRemaining.awards.year')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={award.year}
                                       onChange={(e) => handleChange(index, 'year', e.target.value)}
-                                      placeholder="e.g., 2023"
+                                      placeholder={t('doctorRemaining.awards.yearPlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -174,7 +176,7 @@ const DoctorAwardsSettings = () => {
                                     onClick={() => removeAward(index)}
                                   >
                                     <i className="fa-solid fa-trash me-1"></i>
-                                    Remove
+                                    {t('doctorRemaining.awards.remove')}
                                   </button>
                                 </div>
                               </div>
@@ -190,7 +192,7 @@ const DoctorAwardsSettings = () => {
                           disabled={updateProfile.isPending}
                         >
                           <i className="fa-solid fa-save me-1"></i>
-                          {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+                          {updateProfile.isPending ? t('doctorRemaining.awards.saving') : t('doctorRemaining.awards.save')}
                         </button>
                       </div>
                     </form>

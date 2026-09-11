@@ -93,9 +93,10 @@
 .auth-shell__assurances span { display: inline-flex; align-items: center; gap: 8px; }
 .auth-shell__assurances i { color: #8df2d4; }
 
-.auth-shell__main { display: flex; min-width: 0; align-items: center; justify-content: center; padding: 36px 42px; }
+.auth-shell__main { position: relative; display: flex; min-width: 0; align-items: center; justify-content: center; padding: 36px 42px; }
 .auth-shell__surface { width: min(100%, 940px); }
 .auth-shell__mobile-brand { display: none; }
+.auth-shell__language-toggle { position: absolute; top: 24px; right: 32px; z-index: 2; }
 
 /* Legacy auth templates share the same polished card without requiring a second form implementation. */
 .auth-shell .content,

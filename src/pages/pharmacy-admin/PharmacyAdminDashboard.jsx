@@ -8,14 +8,15 @@ import { useMyPetStoreSubscription, usePetStoreSetupStatus } from '../../queries
 import { usePharmacyPendingPrescriptionCount } from '../../queries/productPrescriptionRequestQueries'
 import PharmacySetupModal from '../../components/common/PharmacySetupModal'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const STATUS_PIPELINE = [
-  { key: 'PENDING', label: 'Pending', color: 'warning', icon: 'fa-hourglass-half' },
-  { key: 'CONFIRMED', label: 'Confirmed', color: 'info', icon: 'fa-circle-check' },
-  { key: 'PROCESSING', label: 'Processing', color: 'primary', icon: 'fa-cog' },
-  { key: 'SHIPPED', label: 'Shipped', color: 'secondary', icon: 'fa-truck' },
-  { key: 'DELIVERED', label: 'Delivered', color: 'success', icon: 'fa-box-open' },
-  { key: 'CANCELLED', label: 'Cancelled', color: 'danger', icon: 'fa-ban' },
+  { key: 'PENDING', label: 'pending', color: 'warning', icon: 'fa-hourglass-half' },
+  { key: 'CONFIRMED', label: 'confirmed', color: 'info', icon: 'fa-circle-check' },
+  { key: 'PROCESSING', label: 'processing', color: 'primary', icon: 'fa-cog' },
+  { key: 'SHIPPED', label: 'shipped', color: 'secondary', icon: 'fa-truck' },
+  { key: 'DELIVERED', label: 'delivered', color: 'success', icon: 'fa-box-open' },
+  { key: 'CANCELLED', label: 'cancelled', color: 'danger', icon: 'fa-ban' },
 ]
 
 const extractOrdersPayload = (payload) => {
@@ -35,6 +36,7 @@ const getTotal = (payload) => {
 }
 
 const PharmacyAdminDashboard = () => {
+  const { t, language } = useLanguage()
   const { user } = useAuth()
   const role = String(user?.role || '').toUpperCase()
 
@@ -73,9 +75,9 @@ const PharmacyAdminDashboard = () => {
   const setOrderStatus = async (orderId, status) => {
     try {
       await updateStatus.mutateAsync({ orderId, data: { status } })
-      toast.success('Order updated')
+      toast.success(t('pharmacyAdmin.dashboard.orderUpdated'))
     } catch (error) {
-      toast.error(error?.message || 'Failed to update order')
+      toast.error(error?.message || t('pharmacyAdmin.dashboard.updateFailed'))
     }
   }
 
@@ -89,9 +91,9 @@ const PharmacyAdminDashboard = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-paw me-3"></i>
-                    {role === 'PARAPHARMACY' ? 'Parapharmacy Dashboard' : 'Pharmacy Dashboard'}
+                    {role === 'PARAPHARMACY' ? t('pharmacyAdmin.dashboard.parapharmacyTitle') : t('pharmacyAdmin.dashboard.pharmacyTitle')}
                   </h2>
-                  <p className="dashboard-subtitle">Track orders, manage products and payouts</p>
+                  <p className="dashboard-subtitle">{t('pharmacyAdmin.dashboard.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -103,23 +105,23 @@ const PharmacyAdminDashboard = () => {
                     <div className="dashboard-card-body">
                       <div className="d-flex align-items-center justify-content-between flex-wrap" style={{ gap: 12 }}>
                         <div>
-                          <div className="fw-bold">Subscription</div>
+                          <div className="fw-bold">{t('pharmacyAdmin.dashboard.subscription')}</div>
                           {mySubQuery.isLoading ? (
-                            <div className="text-muted small">Loading subscription status…</div>
+                            <div className="text-muted small">{t('pharmacyAdmin.dashboard.loadingSubscription')}</div>
                           ) : mySubQuery.isError ? (
                             <div className="text-muted small">{mySubQuery.error?.message || 'Failed to load subscription'}</div>
                           ) : hasActiveSubscription ? (
-                            <div className="text-muted small">Your subscription is active.</div>
+                            <div className="text-muted small">{t('pharmacyAdmin.dashboard.activeSubscription')}</div>
                           ) : (
-                            <div className="text-muted small">Your subscription is inactive. Subscribe to manage products.</div>
+                            <div className="text-muted small">{t('pharmacyAdmin.dashboard.inactiveSubscription')}</div>
                           )}
                         </div>
                         <div className="d-flex align-items-center" style={{ gap: 8 }}>
                           <span className={`badge ${hasActiveSubscription ? 'bg-success' : 'bg-danger'}`}>
-                            {hasActiveSubscription ? 'Active' : 'Inactive'}
+                            {hasActiveSubscription ? t('pharmacyAdmin.dashboard.active') : t('pharmacyAdmin.dashboard.inactive')}
                           </span>
                           <Link to="/pharmacy-admin/subscription" className="btn veterinary-btn-primary btn-sm rounded-pill">
-                            Manage
+                            {t('pharmacyAdmin.dashboard.manage')}
                           </Link>
                         </div>
                       </div>
@@ -141,9 +143,9 @@ const PharmacyAdminDashboard = () => {
                     >
                       <div className="dashboard-widget-box veterinary-widget">
                         <div className="dashboard-content-info">
-                          <h6>{s.label}</h6>
+                          <h6>{t(`pharmacyAdmin.dashboard.${s.label}`)}</h6>
                           <h4>{q?.isLoading ? '—' : count}</h4>
-                          <span className={`text-${s.color}`}>View Orders</span>
+                          <span className={`text-${s.color}`}>{t('pharmacyAdmin.dashboard.viewOrders')}</span>
                         </div>
                         <div className="dashboard-widget-icon">
                           <span className="dash-icon-box">
@@ -164,37 +166,37 @@ const PharmacyAdminDashboard = () => {
                     <div className="header-title">
                       <h5>
                         <i className="fa-solid fa-shopping-bag me-2"></i>
-                        Recent Orders
+                        {t('pharmacyAdmin.dashboard.recentOrders')}
                       </h5>
                     </div>
                     <div className="card-view-link">
-                      <Link to="/pharmacy-admin/orders">View All</Link>
+                      <Link to="/pharmacy-admin/orders">{t('pharmacyAdmin.dashboard.viewAll')}</Link>
                     </div>
                   </div>
                   <div className="dashboard-card-body">
                     {recentOrdersQuery.isLoading ? (
                       <div className="text-center py-4">
                         <div className="spinner-border text-primary" role="status">
-                          <span className="visually-hidden">Loading...</span>
+                          <span className="visually-hidden">{t('pharmacyAdmin.dashboard.loading')}</span>
                         </div>
                       </div>
                     ) : recentOrdersQuery.isError ? (
-                      <div className="alert alert-danger">{recentOrdersQuery.error?.message || 'Failed to load orders'}</div>
+                      <div className="alert alert-danger">{recentOrdersQuery.error?.message || t('pharmacyAdmin.dashboard.loadFailed')}</div>
                     ) : orders.length === 0 ? (
-                      <div className="alert alert-info mb-0">No orders yet.</div>
+                      <div className="alert alert-info mb-0">{t('pharmacyAdmin.dashboard.noOrders')}</div>
                     ) : (
                       <div className="table-responsive">
                         <table className="table dashboard-table appoint-table veterinary-table mb-0 pharmacy-dashboard-orders-table">
                           <thead>
                             <tr>
-                              <th>Order</th>
-                              <th>Customer</th>
-                              <th>Total</th>
-                              <th>Payment</th>
-                              <th>Status</th>
-                              <th>Expected Delivery</th>
-                              <th>Delivery Monitoring</th>
-                              <th style={{ width: 220 }}>Update</th>
+                              <th>{t('pharmacyAdmin.dashboard.order')}</th>
+                              <th>{t('pharmacyAdmin.dashboard.customer')}</th>
+                              <th>{t('pharmacyAdmin.dashboard.total')}</th>
+                              <th>{t('pharmacyAdmin.dashboard.payment')}</th>
+                              <th>{t('pharmacyAdmin.dashboard.status')}</th>
+                              <th>{t('pharmacyAdmin.dashboard.expectedDelivery')}</th>
+                              <th>{t('pharmacyAdmin.dashboard.deliveryMonitoring')}</th>
+                              <th style={{ width: 220 }}>{t('pharmacyAdmin.dashboard.update')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -208,31 +210,31 @@ const PharmacyAdminDashboard = () => {
                               const isPaid = String(paymentStatus).toUpperCase() === 'PAID'
                               const normalizedStatus = String(status).toUpperCase()
                               const expectedDelivery = o?.expectedDeliveryDate
-                                ? new Date(o.expectedDeliveryDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+                                ? new Date(o.expectedDeliveryDate).toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
                                 : '—'
 
                               return (
                                 <tr key={id}>
-                                  <td data-label="Order">{orderNo}</td>
-                                  <td data-label="Customer">{customer}</td>
-                                  <td data-label="Total">{typeof total === 'number' ? total.toFixed(2) : total}</td>
-                                  <td data-label="Payment">{paymentStatus}</td>
-                                  <td data-label="Status">{status}</td>
-                                  <td data-label="Expected Delivery">{expectedDelivery}</td>
-                                  <td data-label="Delivery Monitoring">
+                                  <td data-label={t('pharmacyAdmin.dashboard.order')}>{orderNo}</td>
+                                  <td data-label={t('pharmacyAdmin.dashboard.customer')}>{customer}</td>
+                                  <td data-label={t('pharmacyAdmin.dashboard.total')}>{typeof total === 'number' ? total.toFixed(2) : total}</td>
+                                  <td data-label={t('pharmacyAdmin.dashboard.payment')}>{paymentStatus}</td>
+                                  <td data-label={t('pharmacyAdmin.dashboard.status')}>{status}</td>
+                                  <td data-label={t('pharmacyAdmin.dashboard.expectedDelivery')}>{expectedDelivery}</td>
+                                  <td data-label={t('pharmacyAdmin.dashboard.deliveryMonitoring')}>
                                     {o?.expectedDeliveryDate ? (
                                       <span className={`badge ${deliveryStatusBadgeClass(o?.deliveryStatus)}`}>
                                         {formatDeliveryStatus(o?.deliveryStatus, o?.daysLate)}
                                       </span>
-                                    ) : <span className="badge badge-secondary">Awaiting Delivery</span>}
+                                ) : <span className="badge badge-secondary">{t('pharmacyAdmin.dashboard.awaitingDelivery')}</span>}
                                   </td>
-                                  <td data-label="Update">
+                                  <td data-label={t('pharmacyAdmin.dashboard.update')}>
                                     <select
                                       className="form-select form-select-sm"
                                       value={status}
                                       onChange={(e) => setOrderStatus(id, e.target.value)}
                                       disabled={updateStatus.isPending}
-                                      title={!isPaid ? 'Only CANCELLED is allowed before payment' : undefined}
+                                      title={!isPaid ? t('pharmacyAdmin.dashboard.onlyCancelled') : undefined}
                                     >
                                       {['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'REFUNDED'].map((s) => (
                                         <option key={s} value={s} disabled={!isPaid && s !== 'CANCELLED' && s !== normalizedStatus}>
@@ -258,7 +260,7 @@ const PharmacyAdminDashboard = () => {
                     <div className="header-title">
                       <h5>
                         <i className="fa-solid fa-bolt me-2"></i>
-                        Quick Actions
+                        {t('pharmacyAdmin.dashboard.quickActions')}
                       </h5>
                     </div>
                   </div>
@@ -266,33 +268,33 @@ const PharmacyAdminDashboard = () => {
                     <div className="d-grid gap-2">
                       <Link to="/pharmacy-admin/orders" className="btn veterinary-btn-primary btn-md rounded-pill">
                         <i className="fa-solid fa-receipt me-2"></i>
-                        Manage Orders
+                        {t('pharmacyAdmin.dashboard.manageOrders')}
                       </Link>
                       <Link
                         to="/pharmacy-admin/products"
                         className="btn veterinary-btn-secondary btn-md rounded-pill"
                       >
                         <i className="fa-solid fa-box me-2"></i>
-                        Manage Products
+                        {t('pharmacyAdmin.dashboard.manageProducts')}
                       </Link>
                       {role === 'PET_STORE' && <Link to="/pharmacy-admin/prescription-requests" className="btn btn-outline-primary btn-md rounded-pill">
                         <i className="fa-solid fa-file-prescription me-2"></i>
-                        Prescription Requests {pendingPrescriptionCount > 0 ? `(${pendingPrescriptionCount})` : ''}
+                        {t('pharmacyAdmin.dashboard.prescriptionRequests')} {pendingPrescriptionCount > 0 ? `(${pendingPrescriptionCount})` : ''}
                       </Link>}
                       <Link to="/pharmacy-admin/payouts" className="btn btn-outline-primary btn-md rounded-pill">
                         <i className="fa-solid fa-money-bill-1 me-2"></i>
-                        Payouts
+                        {t('pharmacyAdmin.dashboard.payouts')}
                       </Link>
                       <Link to="/pharmacy-admin/profile" className="btn btn-outline-secondary btn-md rounded-pill">
                         <i className="fa-solid fa-user-pen me-2"></i>
-                        Profile
+                        {t('pharmacyAdmin.dashboard.profile')}
                       </Link>
                     </div>
 
                     <div className="mt-3">
                       <div className="alert alert-info mb-0">
-                        <div className="fw-bold mb-1">Attention Needed</div>
-                        <div className="text-muted small">Unpaid orders in recent list: {unpaidCount}</div>
+                        <div className="fw-bold mb-1">{t('pharmacyAdmin.dashboard.attention')}</div>
+                        <div className="text-muted small">{t('pharmacyAdmin.dashboard.unpaidRecent', { count: unpaidCount })}</div>
                       </div>
                     </div>
                   </div>

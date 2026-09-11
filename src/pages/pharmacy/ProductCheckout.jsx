@@ -6,6 +6,7 @@ import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useCreateOrder } from '../../mutations/orderMutations'
 import { useUserById } from '../../queries/userQueries'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const normalizeShippingAddress = (address = {}) => ({
   line1: String(address?.line1 || '').trim(),
@@ -21,6 +22,7 @@ const hasRequiredShippingAddress = (address) => Boolean(
 )
 
 const ProductCheckout = () => {
+  const { t } = useLanguage()
   const { cartItems, getCartTotal, clearCart } = useCart()
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -87,7 +89,7 @@ const ProductCheckout = () => {
 
   useEffect(() => {
     if (cartItems.length === 0) {
-      toast.warning('Your cart is empty')
+      toast.warning(t('shop.cartEmpty'))
       navigate('/product-all')
     }
   }, [cartItems, navigate])
@@ -104,12 +106,12 @@ const ProductCheckout = () => {
     e.preventDefault()
 
     if (!formData.termsAccepted) {
-      toast.error('Please accept the Terms & Conditions to continue')
+      toast.error(t('shop.acceptTerms'))
       return
     }
 
     if (!user) {
-      toast.error('Please login to complete checkout')
+      toast.error(t('shop.loginCheckout'))
       navigate('/login')
       return
     }
@@ -132,12 +134,12 @@ const ProductCheckout = () => {
       })
 
       if (!hasRequiredShippingAddress(shippingAddress)) {
-        toast.error('Please fill shipping address fields')
+        toast.error(t('shop.shippingRequired'))
         return
       }
     } else {
       if (!hasDefaultShippingAddress) {
-        toast.error('Please save a complete address in your profile or select a different shipping address')
+        toast.error(t('shop.profileAddressRequired'))
         return
       }
       shippingAddress = defaultShippingAddress
@@ -157,12 +159,12 @@ const ProductCheckout = () => {
 
       toast.success(
         createdOrders.length > 1
-          ? `Orders created successfully! (${createdOrders.length}) The pharmacy owner will set shipping, then you can pay.`
-          : 'Order created successfully! The pharmacy owner will set shipping, then you can pay.'
+          ? t('shop.ordersCreated', { count: createdOrders.length })
+          : t('shop.orderCreated')
       )
       navigate('/order-history')
     } catch (error) {
-      toast.error(error?.message || 'Failed to create order')
+      toast.error(error?.message || t('shop.orderFailed'))
     }
   }
 
@@ -172,41 +174,41 @@ const ProductCheckout = () => {
 
   return (
     <>
-      <Breadcrumb title="Pharmacy" li1="Checkout" li2="Checkout" />
+      <Breadcrumb title={t('shop.pharmacy')} li1={t('shop.checkout')} li2={t('shop.checkout')} />
       <div className="content">
         <div className="container">
           <div className="row">
             <div className="col-md-6 col-lg-7">
               <div className="card">
                 <div className="card-header">
-                  <h3 className="card-title">Billing details</h3>
+                  <h3 className="card-title">{t('shop.billingDetails')}</h3>
                 </div>
                 <div className="card-body">
                   <form onSubmit={handleSubmit}>
                     <div className="info-widget">
-                      <h4 className="card-title">Personal Information</h4>
+                      <h4 className="card-title">{t('shop.personalInformation')}</h4>
                       <div className="row">
                         <div className="col-md-6 col-sm-12">
                           <div className="mb-3 card-label">
-                            <label className="mb-2">First Name</label>
+                            <label className="mb-2">{t('shop.firstName')}</label>
                             <input className="form-control" type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} required />
                           </div>
                         </div>
                         <div className="col-md-6 col-sm-12">
                           <div className="mb-3 card-label">
-                            <label className="mb-2">Last Name</label>
+                            <label className="mb-2">{t('shop.lastName')}</label>
                             <input className="form-control" type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} required />
                           </div>
                         </div>
                         <div className="col-md-6 col-sm-12">
                           <div className="mb-3 card-label">
-                            <label className="mb-2">Email</label>
+                            <label className="mb-2">{t('shop.email')}</label>
                             <input className="form-control" type="email" name="email" value={formData.email} onChange={handleInputChange} required />
                           </div>
                         </div>
                         <div className="col-md-6 col-sm-12">
                           <div className="mb-3 card-label">
-                            <label className="mb-2">Phone</label>
+                            <label className="mb-2">{t('shop.phone')}</label>
                             <input className="form-control" type="text" name="phone" value={formData.phone} onChange={handleInputChange} required />
                           </div>
                         </div>
@@ -214,11 +216,11 @@ const ProductCheckout = () => {
                     </div>
 
                     <div className="info-widget">
-                      <h4 className="card-title">Shipping Details</h4>
+                      <h4 className="card-title">{t('shop.shippingDetails')}</h4>
                       <div className="terms-accept">
                         <div className="custom-checkbox">
                           <input type="checkbox" id="ship_different" name="shipToDifferentAddress" checked={formData.shipToDifferentAddress} onChange={handleInputChange} />
-                          <label htmlFor="ship_different">Ship to a different address?</label>
+                          <label htmlFor="ship_different">{t('shop.shipDifferent')}</label>
                         </div>
                       </div>
 
@@ -226,7 +228,7 @@ const ProductCheckout = () => {
                         <div className={`alert ${hasDefaultShippingAddress ? 'alert-light border' : 'alert-warning'} mt-3 mb-0`}>
                           {hasDefaultShippingAddress ? (
                             <>
-                              <strong>Saved delivery address</strong>
+                              <strong>{t('shop.savedAddress')}</strong>
                               <div className="mt-1">{defaultShippingAddress.line1}</div>
                               {defaultShippingAddress.line2 && <div>{defaultShippingAddress.line2}</div>}
                               <div>{defaultShippingAddress.city}, {defaultShippingAddress.state} {defaultShippingAddress.zip}</div>
@@ -234,8 +236,8 @@ const ProductCheckout = () => {
                             </>
                           ) : (
                             <>
-                              <strong>No complete saved address found.</strong>{' '}
-                              <Link to="/profile-settings">Add your address in Profile Settings</Link> or choose a different shipping address.
+                              <strong>{t('shop.noSavedAddress')}</strong>{' '}
+                              <Link to="/profile-settings">{t('shop.addAddress')}</Link>
                             </>
                           )}
                         </div>
@@ -244,46 +246,46 @@ const ProductCheckout = () => {
                       {formData.shipToDifferentAddress && (
                         <div className="row mt-3">
                           <div className="col-md-12 mb-3 card-label">
-                            <label className="ps-0 ms-0 mb-2">Address Line 1</label>
+                            <label className="ps-0 ms-0 mb-2">{t('shop.addressLine1')}</label>
                             <input className="form-control" type="text" name="shippingLine1" value={formData.shippingLine1} onChange={handleInputChange} />
                           </div>
                           <div className="col-md-12 mb-3 card-label">
-                            <label className="ps-0 ms-0 mb-2">Address Line 2 (Optional)</label>
+                            <label className="ps-0 ms-0 mb-2">{t('shop.addressLine2')}</label>
                             <input className="form-control" type="text" name="shippingLine2" value={formData.shippingLine2} onChange={handleInputChange} />
                           </div>
                           <div className="col-md-6 mb-3 card-label">
-                            <label className="ps-0 ms-0 mb-2">City</label>
+                            <label className="ps-0 ms-0 mb-2">{t('shop.city')}</label>
                             <input className="form-control" type="text" name="shippingCity" value={formData.shippingCity} onChange={handleInputChange} />
                           </div>
                           <div className="col-md-6 mb-3 card-label">
-                            <label className="ps-0 ms-0 mb-2">State</label>
+                            <label className="ps-0 ms-0 mb-2">{t('shop.state')}</label>
                             <input className="form-control" type="text" name="shippingState" value={formData.shippingState} onChange={handleInputChange} />
                           </div>
                           <div className="col-md-6 mb-3 card-label">
-                            <label className="ps-0 ms-0 mb-2">ZIP Code</label>
+                            <label className="ps-0 ms-0 mb-2">{t('shop.zip')}</label>
                             <input className="form-control" type="text" name="shippingZip" value={formData.shippingZip} onChange={handleInputChange} />
                           </div>
                           <div className="col-md-6 mb-3 card-label">
-                            <label className="ps-0 ms-0 mb-2">Country</label>
+                            <label className="ps-0 ms-0 mb-2">{t('shop.country')}</label>
                             <input className="form-control" type="text" name="shippingCountry" value={formData.shippingCountry} onChange={handleInputChange} />
                           </div>
                         </div>
                       )}
 
                       <div className="mb-3 card-label">
-                        <label className="ps-0 ms-0 mb-2">Order notes (Optional)</label>
+                        <label className="ps-0 ms-0 mb-2">{t('shop.orderNotes')}</label>
                         <textarea rows="5" className="form-control" name="orderNotes" value={formData.orderNotes} onChange={handleInputChange}></textarea>
                       </div>
                     </div>
 
                     <div className="payment-widget">
-                      <h4 className="card-title">Payment Method</h4>
+                      <h4 className="card-title">{t('shop.paymentMethod')}</h4>
 
                       <div className="payment-list">
                         <label className="payment-radio credit-card-option">
-                          <input type="radio" name="paymentMethod" value="DUMMY" checked readOnly />
+                          <input type="radio" name="paymentMethod" value="STRIPE" checked readOnly />
                           <span className="checkmark"></span>
-                          Dummy Payment
+                          {t('booking.stripe')}
                         </label>
                       </div>
 
@@ -291,14 +293,14 @@ const ProductCheckout = () => {
                         <div className="custom-checkbox">
                           <input type="checkbox" id="terms_accept1" name="termsAccepted" checked={formData.termsAccepted} onChange={handleInputChange} />
                           <label htmlFor="terms_accept1">
-                            I have read and accept <Link to="/terms-condition">Terms & Conditions</Link>
+                            {t('shop.termsAccept')} <Link to="/terms-condition">Terms &amp; Conditions</Link>
                           </label>
                         </div>
                       </div>
 
                       <div className="submit-section mt-4">
                         <button type="submit" className="btn btn-primary submit-btn" disabled={createOrderMutation.isPending}>
-                          {createOrderMutation.isPending ? 'Creating Order...' : 'Place Order'}
+                          {createOrderMutation.isPending ? t('shop.creatingOrder') : t('shop.placeOrder')}
                         </button>
                       </div>
                     </div>
@@ -310,15 +312,15 @@ const ProductCheckout = () => {
             <div className="col-md-6 col-lg-5 theiaStickySidebar">
               <div className="card booking-card">
                 <div className="card-header">
-                  <h3 className="card-title">Your Order</h3>
+                  <h3 className="card-title">{t('shop.order')}</h3>
                 </div>
                 <div className="card-body">
                   <div className="table-responsive">
                     <table className="table table-center mb-0">
                       <tbody>
                         <tr>
-                          <th>Product</th>
-                          <th className="text-end">Total</th>
+                          <th>{t('shop.product')}</th>
+                          <th className="text-end">{t('shop.total')}</th>
                         </tr>
                       </tbody>
                       <tbody>
@@ -339,16 +341,16 @@ const ProductCheckout = () => {
                     <div className="booking-item-wrap">
                       <ul className="booking-date d-block pb-0">
                         <li>
-                          Subtotal <span>€{subtotal.toFixed(2)}</span>
+                          {t('shop.subtotal')} <span>€{subtotal.toFixed(2)}</span>
                         </li>
                         <li>
-                          Shipping <span>€{shipping.toFixed(2)}</span>
+                          {t('shop.shippingDetails')} <span>€{shipping.toFixed(2)}</span>
                         </li>
                       </ul>
                       <div className="booking-total">
                         <ul className="booking-total-list">
                           <li>
-                            <span>Total</span>
+                            <span>{t('shop.total')}</span>
                             <span className="total-cost">€{total.toFixed(2)}</span>
                           </li>
                         </ul>

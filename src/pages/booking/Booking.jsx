@@ -5,8 +5,10 @@ import { toast } from 'react-toastify'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePets, useVeterinarianPublicProfile, useWeeklyAvailableSlotsForDate } from '../../queries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const Booking = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const { user } = useAuth()
   const [searchParams] = useSearchParams()
@@ -37,7 +39,7 @@ const Booking = () => {
     vetProfile?.userId?.name ||
     vetProfile?.userId?.fullName ||
     vetProfile?.name ||
-    'Veterinarian'
+    t('booking.veterinarian')
 
   const vetImage = getImageUrl(vetProfile?.userId?.profileImage) || getImageUrl(vetProfile?.profileImage) || '/assets/img/clients/client-15.jpg'
 
@@ -75,33 +77,33 @@ const Booking = () => {
     e.preventDefault()
 
     if (!veterinarianId) {
-      toast.error('Please select a veterinarian first')
+      toast.error(t('booking.vetRequired'))
       return
     }
 
     if (!user || !petOwnerId) {
-      toast.error('Please login to book an appointment')
+      toast.error(t('booking.loginRequired'))
       navigate('/login')
       return
     }
 
     if (!petId) {
-      toast.error('Please select a pet')
+      toast.error(t('booking.petRequired'))
       return
     }
 
     if (!appointmentDate) {
-      toast.error('Please select a date')
+      toast.error(t('booking.dateRequired'))
       return
     }
 
     if (!appointmentTime) {
-      toast.error('Please select a time slot')
+      toast.error(t('booking.timeRequired'))
       return
     }
 
     if (!reason.trim()) {
-      toast.error('Please enter a reason for the appointment')
+      toast.error(t('booking.reasonRequired'))
       return
     }
 
@@ -132,9 +134,9 @@ const Booking = () => {
           <div className="row">
             <div className="col-lg-9 mx-auto">
               <div className="alert alert-warning">
-                <h5>Veterinarian Required</h5>
-                <p>Please select a veterinarian from search to book an appointment.</p>
-                <Link className="btn btn-primary" to="/search">Browse Veterinarians</Link>
+                <h5>{t('booking.vetRequired')}</h5>
+                <p>{t('booking.vetRequired')}</p>
+                <Link className="btn btn-primary" to="/search">{t('booking.findVet')}</Link>
               </div>
             </div>
           </div>
@@ -154,7 +156,7 @@ const Booking = () => {
                   <div className="profile-step">
                     <span className="multi-steps">1</span>
                     <div className="step-section">
-                      <h6>Appointment</h6>
+                      <h6>{t('booking.booking')}</h6>
                     </div>
                   </div>
                 </li>
@@ -175,8 +177,8 @@ const Booking = () => {
                             }} />
                           </span>
                           <div>
-                            <h4 className="mb-1">{vetLoading ? 'Loading...' : vetName}</h4>
-                            <p className="text-indigo mb-0 fw-medium">Book a veterinary appointment</p>
+                            <h4 className="mb-1">{vetLoading ? t('booking.loading') : vetName}</h4>
+                            <p className="text-indigo mb-0 fw-medium">{t('booking.booking')}</p>
                           </div>
                         </div>
                       </div>
@@ -188,26 +190,26 @@ const Booking = () => {
                   <form onSubmit={handleSubmit}>
                     <div className="row">
                       <div className="col-md-6 mb-3">
-                        <label className="form-label">Appointment Type</label>
+                        <label className="form-label">{t('booking.type')}</label>
                         <select
                           className="form-select"
                           value={bookingType}
                           onChange={(e) => setBookingType(e.target.value)}
                         >
-                          <option value="VISIT">Clinic Visit</option>
-                          <option value="ONLINE">Online Consultation</option>
+                          <option value="VISIT">{t('booking.clinicVisit')}</option>
+                          <option value="ONLINE">{t('booking.onlineConsultation')}</option>
                         </select>
                       </div>
 
                       <div className="col-md-6 mb-3">
-                        <label className="form-label">Pet</label>
+                        <label className="form-label">{t('booking.pet')}</label>
                         <select
                           className="form-select"
                           value={petId}
                           onChange={(e) => setPetId(e.target.value)}
                           disabled={petsLoading}
                         >
-                          <option value="">Select Pet</option>
+                          <option value="">{t('booking.selectPet')}</option>
                           {pets.map((p) => (
                             <option key={p._id} value={p._id}>
                               {p.name}
@@ -216,22 +218,21 @@ const Booking = () => {
                         </select>
                         {!petsLoading && pets.length === 0 && (
                           <div className="form-text text-danger">
-                            You have no pets yet.{' '}
+                            {t('booking.noPets')}{' '}
                             <Link
                               to={`/add-dependent?returnTo=${encodeURIComponent(
                                 searchParams.toString() ? `/booking?${searchParams.toString()}` : '/booking'
                               )}`}
                               className="fw-semibold"
                             >
-                              Create a pet
+                              {t('booking.createPet')}
                             </Link>{' '}
-                            to continue with this booking.
                           </div>
                         )}
                       </div>
 
                       <div className="col-md-6 mb-3">
-                        <label className="form-label">Date</label>
+                        <label className="form-label">{t('booking.date')}</label>
                         <input
                           className="form-control"
                           type="date"
@@ -242,14 +243,14 @@ const Booking = () => {
                       </div>
 
                       <div className="col-md-6 mb-3">
-                        <label className="form-label">Time Slot</label>
+                        <label className="form-label">{t('booking.time')}</label>
                         <select
                           className="form-select"
                           value={appointmentTime}
                           onChange={(e) => setAppointmentTime(e.target.value)}
                           disabled={!appointmentDate || slotsLoading}
                         >
-                          <option value="">Select Time</option>
+                          <option value="">{t('booking.selectTime')}</option>
                           {availableSlots.map((s, idx) => (
                             <option key={`${s.startTime}-${idx}`} value={s.startTime}>
                               {s.startTime} - {s.endTime}
@@ -257,29 +258,29 @@ const Booking = () => {
                           ))}
                         </select>
                         {appointmentDate && !slotsLoading && availableSlots.length === 0 && (
-                          <div className="form-text text-muted">No slots available for this date.</div>
+                          <div className="form-text text-muted">{t('booking.noSlots')}</div>
                         )}
                       </div>
 
                       <div className="col-12 mb-3">
-                        <label className="form-label">Reason</label>
+                        <label className="form-label">{t('booking.reason')}</label>
                         <input
                           className="form-control"
                           type="text"
                           value={reason}
                           onChange={(e) => setReason(e.target.value)}
-                          placeholder="e.g. Vaccination, fever, checkup"
+                          placeholder={t('booking.reasonPlaceholder')}
                         />
                       </div>
 
                       <div className="col-12 mb-3">
-                        <label className="form-label">Pet Symptoms (optional)</label>
+                        <label className="form-label">{t('booking.symptoms')}</label>
                         <textarea
                           className="form-control"
                           rows="3"
                           value={petSymptoms}
                           onChange={(e) => setPetSymptoms(e.target.value)}
-                          placeholder="Describe symptoms..."
+                          placeholder={t('booking.symptomsPlaceholder')}
                         />
                       </div>
                     </div>
@@ -291,14 +292,14 @@ const Booking = () => {
                         onClick={() => navigate(-1)}
                       >
                         <i className="isax isax-arrow-left-2 me-1"></i>
-                        Back
+                        {t('booking.back')}
                       </button>
                       <button
                         type="submit"
                         className="btn btn-md btn-primary-gradient inline-flex align-items-center rounded-pill"
                         disabled={pets.length === 0}
                       >
-                        Proceed to Checkout
+                        {t('booking.proceedCheckout')}
                         <i className="isax isax-arrow-right-3 ms-1"></i>
                       </button>
                     </div>

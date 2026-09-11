@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const AddTimingsModal = ({ show, onClose }) => {
   const navigate = useNavigate()
+  const { t } = useLanguage()
 
   const handleGoToTimings = () => {
     navigate('/available-timings')
@@ -39,30 +41,30 @@ const AddTimingsModal = ({ show, onClose }) => {
             <div className="modal-header">
               <h5 className="modal-title">
                 <i className="fa-solid fa-calendar-day text-primary me-2"></i>
-                Add Available Timings
+                {t('doctorModals.addTimings')}
               </h5>
-              <button type="button" className="btn-close" onClick={onClose} aria-label="Close"></button>
+              <button type="button" className="btn-close" onClick={onClose} aria-label={t('doctorModals.close')}></button>
             </div>
             <div className="modal-body">
               <div className="text-center mb-4">
                 <i className="fa-solid fa-clock" style={{ fontSize: '64px', color: '#0d6efd' }}></i>
               </div>
-              <h6 className="text-center mb-3">Add at least one available time slot</h6>
+              <h6 className="text-center mb-3">{t('doctorModals.addTimingTitle')}</h6>
               <p className="text-muted text-center mb-4">
-                Before you can receive appointments, please add at least one available timing in your schedule.
+                {t('doctorModals.addTimingDescription')}
               </p>
               <div className="alert alert-info mb-0">
                 <i className="fa-solid fa-info-circle me-2"></i>
-                Tip: Add slots for at least one day (e.g., Monday 09:00 - 10:00).
+                <strong>{t('doctorModals.tip')}</strong> {t('doctorModals.timingExample')}
               </div>
             </div>
             <div className="modal-footer">
               <button type="button" className="btn btn-secondary" onClick={onClose}>
-                Close
+                {t('doctorModals.close')}
               </button>
               <button type="button" className="btn btn-primary" onClick={handleGoToTimings}>
                 <i className="fa-solid fa-calendar-plus me-2"></i>
-                Add Timings Now
+                {t('doctorModals.addTimingsNow')}
               </button>
             </div>
           </div>

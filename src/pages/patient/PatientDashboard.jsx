@@ -12,9 +12,11 @@ import {
 } from '../../queries'
 import { useFavorites } from '../../queries/favoriteQueries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const PatientDashboard = () => {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const petOwnerId = user?.id || user?._id
 
   const { data: dashboardRes, isLoading: dashboardLoading } = usePetOwnerDashboard()
@@ -156,9 +158,9 @@ const PatientDashboard = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-paw me-3"></i>
-                    Pet Dashboard
+                    {t('patient.dashboard')}
                   </h2>
-                  <p className="dashboard-subtitle">Manage your pets' health and veterinary appointments</p>
+                  <p className="dashboard-subtitle">{t('patient.dashboardSubtitle')}</p>
                 </div>
               </div>
             </div>
@@ -169,7 +171,7 @@ const PatientDashboard = () => {
                   <div className="col-12 col-sm-6 col-lg-3">
                     <div className="dashboard-widget-box veterinary-widget h-100">
                       <div className="dashboard-content-info">
-                        <h6>My Pets</h6>
+                        <h6>{t('patient.myPets')}</h6>
                         <h4>{dashboardLoading ? '—' : (dashboard?.petsCount ?? 0)}</h4>
                       </div>
                       <div className="dashboard-widget-icon">
@@ -180,7 +182,7 @@ const PatientDashboard = () => {
                   <div className="col-12 col-sm-6 col-lg-3">
                     <div className="dashboard-widget-box veterinary-widget h-100">
                       <div className="dashboard-content-info">
-                        <h6>Upcoming</h6>
+                        <h6>{t('patient.upcoming')}</h6>
                         <h4>{dashboardLoading ? '—' : (dashboard?.upcomingAppointments?.count ?? 0)}</h4>
                       </div>
                       <div className="dashboard-widget-icon">
@@ -191,7 +193,7 @@ const PatientDashboard = () => {
                   <div className="col-12 col-sm-6 col-lg-3">
                     <div className="dashboard-widget-box veterinary-widget h-100">
                       <div className="dashboard-content-info">
-                        <h6>Favorites</h6>
+                        <h6>{t('patient.favorites')}</h6>
                         <h4>{dashboardLoading ? '—' : (dashboard?.favoriteVeterinariansCount ?? 0)}</h4>
                       </div>
                       <div className="dashboard-widget-icon">
@@ -202,7 +204,7 @@ const PatientDashboard = () => {
                   <div className="col-12 col-sm-6 col-lg-3">
                     <div className="dashboard-widget-box veterinary-widget h-100">
                       <div className="dashboard-content-info">
-                        <h6>Unread Alerts</h6>
+                        <h6>{t('patient.unreadAlerts')}</h6>
                         <h4>{dashboardLoading ? '—' : (dashboard?.unreadNotificationsCount ?? 0)}</h4>
                       </div>
                       <div className="dashboard-widget-icon">
@@ -218,7 +220,7 @@ const PatientDashboard = () => {
               <div className="col-xl-6 d-flex">
                 <div className="favourites-dashboard w-100">
                   <div className="book-appointment-head veterinary-appointment-head">
-                    <h3><span><i className="fa-solid fa-calendar-plus me-2"></i>Book a new</span>Pet Appointment</h3>
+                    <h3><span><i className="fa-solid fa-calendar-plus me-2"></i>{t('patient.bookNew')}</span> {t('patient.petAppointment')}</h3>
                     <span className="add-icon"><Link to="/search"><i className="fa-solid fa-circle-plus"></i></Link></span>
                   </div>
                   <div className="dashboard-card w-100 veterinary-card">
@@ -226,24 +228,24 @@ const PatientDashboard = () => {
                       <div className="header-title">
                         <h5>
                           <i className="fa-solid fa-star me-2"></i>
-                          Favorite Veterinarians
+                          {t('patient.favoriteVeterinarians')}
                         </h5>
                       </div>
                       <div className="card-view-link">
-                        <Link to="/favourites">View All</Link>
+                        <Link to="/favourites">{t('patient.viewAll')}</Link>
                       </div>
                     </div>
                     <div className="dashboard-card-body">
                       {favoritesLoading ? (
                         <div className="text-center py-4">
                           <div className="spinner-border" role="status">
-                            <span className="visually-hidden">Loading...</span>
+                            <span className="visually-hidden">{t('common.loading')}</span>
                           </div>
                         </div>
                       ) : !favorites || favorites.length === 0 ? (
                         <div className="text-center py-4 text-muted">
-                          <p className="mb-0">No favorites yet</p>
-                          <small>Add veterinarians from search to see them here.</small>
+                          <p className="mb-0">{t('patient.noFavorites')}</p>
+                          <small>{t('patient.addFavorites')}</small>
                         </div>
                       ) : (
                         favorites.map((fav) => {
@@ -267,10 +269,10 @@ const PatientDashboard = () => {
                                 </Link>
                                 <div className="doctor-name-info">
                                   <h5><Link to={profileUrl}>{name}</Link></h5>
-                                  <span>Veterinarian</span>
+                                  <span>{t('patient.reports.doctor')}</span>
                                 </div>
                               </div>
-                              <Link to={profileUrl} className="cal-plus-icon" title="View profile">
+                              <Link to={profileUrl} className="cal-plus-icon" title={t('patient.viewDetails')}>
                                 <i className="fa-solid fa-calendar-plus"></i>
                               </Link>
                             </div>
@@ -288,24 +290,24 @@ const PatientDashboard = () => {
                     <div className="header-title">
                       <h5>
                         <i className="fa-solid fa-calendar-days me-2"></i>
-                        Upcoming Pet Appointments
+                        {t('patient.upcomingAppointments')}
                       </h5>
                     </div>
                     <div className="card-view-link">
-                      <Link to="/patient-appointments">View All</Link>
+                        <Link to="/patient-appointments">{t('patient.viewAll')}</Link>
                     </div>
                   </div>
                   <div className="dashboard-card-body">
                     {appointmentsLoading ? (
                       <div className="text-center py-4">
                         <div className="spinner-border" role="status">
-                          <span className="visually-hidden">Loading...</span>
+                          <span className="visually-hidden">{t('common.loading')}</span>
                         </div>
                       </div>
                     ) : upcomingAppointments.length === 0 ? (
                       <div className="text-center py-4 text-muted">
-                        <p className="mb-0">No upcoming appointments</p>
-                        <small>Book a new appointment to see it here.</small>
+                        <p className="mb-0">{t('patient.noUpcoming')}</p>
+                        <small>{t('patient.bookAppointment')}</small>
                       </div>
                     ) : (
                       <div className="apponiment-dates">
@@ -372,11 +374,11 @@ const PatientDashboard = () => {
                     <div className="header-title">
                       <h5>
                         <i className="fa-solid fa-bell me-2"></i>
-                        Pet Notifications
+                        {t('patient.reports.petNotifications')}
                       </h5>
                     </div>
                     <div className="card-view-link">
-                      <Link to="/patient-notifications">View All</Link>
+                      <Link to="/patient-notifications">{t('patient.viewAll')}</Link>
                     </div>
                   </div>
                   <div className="dashboard-card-body">
@@ -388,7 +390,7 @@ const PatientDashboard = () => {
                               <td>
                                 <div className="text-center py-4">
                                   <div className="spinner-border" role="status">
-                                    <span className="visually-hidden">Loading...</span>
+                                    <span className="visually-hidden">{t('common.loading')}</span>
                                   </div>
                                 </div>
                               </td>
@@ -397,7 +399,7 @@ const PatientDashboard = () => {
                             <tr>
                               <td>
                                 <div className="text-center py-4 text-muted">
-                                  <p className="mb-0">No notifications</p>
+                                  <p className="mb-0">{t('patient.reports.noNotifications')}</p>
                                 </div>
                               </td>
                             </tr>
@@ -431,32 +433,32 @@ const PatientDashboard = () => {
                     <div className="header-title">
                       <h5>
                         <i className="fa-solid fa-chart-line me-2"></i>
-                        Overview
+                        {t('patient.reports.overview')}
                       </h5>
                     </div>
                     <div className="card-view-link">
-                      <Link to="/patient-appointments">Appointments</Link>
+                      <Link to="/patient-appointments">{t('patient.reports.appointments')}</Link>
                     </div>
                   </div>
                   <div className="dashboard-card-body">
                     <div className="row g-3">
                       <div className="col-6">
                         <div className="p-3 border rounded-3 h-100">
-                          <div className="text-muted">Completed</div>
+                          <div className="text-muted">{t('patient.completed')}</div>
                           <div className="fs-4 fw-bold">{dashboardLoading ? '—' : (dashboard?.totalCompletedAppointments ?? 0)}</div>
                         </div>
                       </div>
                       <div className="col-6">
                         <div className="p-3 border rounded-3 h-100">
-                          <div className="text-muted">Vets Visited</div>
+                          <div className="text-muted">{t('patient.reports.vetsVisited')}</div>
                           <div className="fs-4 fw-bold">{dashboardLoading ? '—' : (dashboard?.totalVeterinariansVisited ?? 0)}</div>
                         </div>
                       </div>
                       <div className="col-12">
                         <div className="d-flex gap-2 flex-wrap">
-                          <Link to="/dependent" className="btn veterinary-btn-outline btn-md rounded-pill">My Pets</Link>
-                          <Link to="/search" className="btn veterinary-btn-primary btn-md rounded-pill">Book Appointment</Link>
-                          <Link to="/patient-notifications" className="btn veterinary-btn-secondary btn-md rounded-pill">Notifications</Link>
+                          <Link to="/dependent" className="btn veterinary-btn-outline btn-md rounded-pill">{t('patient.myPets')}</Link>
+                          <Link to="/search" className="btn veterinary-btn-primary btn-md rounded-pill">{t('patient.bookAppointment')}</Link>
+                          <Link to="/patient-notifications" className="btn veterinary-btn-secondary btn-md rounded-pill">{t('patient.notifications')}</Link>
                         </div>
                       </div>
                     </div>
@@ -469,7 +471,7 @@ const PatientDashboard = () => {
                 <div className="dashboard-card w-100">
                   <div className="dashboard-card-head">
                     <div className="header-title">
-                      <h5>Reports</h5>
+                      <h5>{t('patient.reports.title')}</h5>
                     </div>
                   </div>
                   <div className="dashboard-card-body">
@@ -477,16 +479,16 @@ const PatientDashboard = () => {
                       <nav className="patient-dash-tab border-0 pb-0">
                         <ul className="nav nav-tabs-bottom">
                           <li className="nav-item">
-                            <a className="nav-link active" href="#appoint-tab" data-bs-toggle="tab">Appointments</a>
+                            <a className="nav-link active" href="#appoint-tab" data-bs-toggle="tab">{t('patient.reports.appointments')}</a>
                           </li>
                           <li className="nav-item">
-                            <a className="nav-link" href="#medical-tab" data-bs-toggle="tab">Medical Records</a>
+                            <a className="nav-link" href="#medical-tab" data-bs-toggle="tab">{t('patient.medicalRecords')}</a>
                           </li>
                           <li className="nav-item">
-                            <a className="nav-link" href="#prsc-tab" data-bs-toggle="tab">Prescriptions</a>
+                            <a className="nav-link" href="#prsc-tab" data-bs-toggle="tab">{t('patient.reports.prescriptions')}</a>
                           </li>
                           <li className="nav-item">
-                            <a className="nav-link" href="#invoice-tab" data-bs-toggle="tab">Invoices</a>
+                            <a className="nav-link" href="#invoice-tab" data-bs-toggle="tab">{t('patient.invoices')}</a>
                           </li>
                         </ul>
                       </nav>
@@ -498,10 +500,10 @@ const PatientDashboard = () => {
                                 <thead>
                                   <tr>
                                     <th>ID</th>
-                                    <th>Doctor</th>
-                                    <th>Date</th>
-                                    <th>Type</th>
-                                    <th>Status</th>
+                                    <th>{t('patient.reports.doctor')}</th>
+                                    <th>{t('patient.reports.date')}</th>
+                                    <th>{t('patient.reports.type')}</th>
+                                    <th>{t('patient.status')}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -509,13 +511,13 @@ const PatientDashboard = () => {
                                     <tr>
                                       <td colSpan="5" className="text-center py-4">
                                         <div className="spinner-border" role="status">
-                                          <span className="visually-hidden">Loading...</span>
+                                          <span className="visually-hidden">{t('common.loading')}</span>
                                         </div>
                                       </td>
                                     </tr>
                                   ) : reportAppointments.length === 0 ? (
                                     <tr>
-                                      <td colSpan="5" className="text-center py-4 text-muted">No appointments found</td>
+                                      <td colSpan="5" className="text-center py-4 text-muted">{t('patient.reports.noAppointments')}</td>
                                     </tr>
                                   ) : (
                                     reportAppointments.map((a) => {
@@ -571,11 +573,11 @@ const PatientDashboard = () => {
                                 <thead>
                                   <tr>
                                     <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Date</th>
-                                    <th>Record For</th>
-                                    <th>Comments</th>
-                                    <th>Action</th>
+                                    <th>{t('patient.reports.name')}</th>
+                                    <th>{t('patient.reports.date')}</th>
+                                    <th>{t('patient.reports.recordFor')}</th>
+                                    <th>{t('patient.reports.comments')}</th>
+                                    <th>{t('patient.action')}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -583,13 +585,13 @@ const PatientDashboard = () => {
                                     <tr>
                                       <td colSpan="6" className="text-center py-4">
                                         <div className="spinner-border" role="status">
-                                          <span className="visually-hidden">Loading...</span>
+                                          <span className="visually-hidden">{t('common.loading')}</span>
                                         </div>
                                       </td>
                                     </tr>
                                   ) : medicalRecords.length === 0 ? (
                                     <tr>
-                                      <td colSpan="6" className="text-center py-4 text-muted">No medical records found</td>
+                                      <td colSpan="6" className="text-center py-4 text-muted">{t('patient.reports.noRecords')}</td>
                                     </tr>
                                   ) : (
                                     medicalRecords.slice(0, 5).map((r) => {
@@ -611,11 +613,11 @@ const PatientDashboard = () => {
                                           <td>{r?.description || '—'}</td>
                                           <td>
                                             <div className="action-item">
-                                              <Link to={recordUrl} title="View">
+                                              <Link to={recordUrl} title={t('patient.reports.view')}>
                                                 <i className="isax isax-link-2"></i>
                                               </Link>
                                               {fileUrl ? (
-                                                <a href={fileUrl} target="_blank" rel="noreferrer" title="Download">
+                                                <a href={fileUrl} target="_blank" rel="noreferrer" title={t('patient.reports.download')}>
                                                   <i className="isax isax-import"></i>
                                                 </a>
                                               ) : null}
@@ -637,10 +639,10 @@ const PatientDashboard = () => {
                                 <thead>
                                   <tr>
                                     <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Date</th>
-                                    <th>Prescriped By</th>
-                                    <th>Action</th>
+                                    <th>{t('patient.reports.name')}</th>
+                                    <th>{t('patient.reports.date')}</th>
+                                    <th>{t('patient.reports.prescribedBy')}</th>
+                                    <th>{t('patient.action')}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -648,13 +650,13 @@ const PatientDashboard = () => {
                                     <tr>
                                       <td colSpan="5" className="text-center py-4">
                                         <div className="spinner-border" role="status">
-                                          <span className="visually-hidden">Loading...</span>
+                                          <span className="visually-hidden">{t('common.loading')}</span>
                                         </div>
                                       </td>
                                     </tr>
                                   ) : prescriptions.length === 0 ? (
                                     <tr>
-                                      <td colSpan="5" className="text-center py-4 text-muted">No prescriptions found</td>
+                                      <td colSpan="5" className="text-center py-4 text-muted">{t('patient.reports.noPrescriptions')}</td>
                                     </tr>
                                   ) : (
                                     prescriptions.slice(0, 5).map((rx) => {
@@ -691,7 +693,7 @@ const PatientDashboard = () => {
                                           </td>
                                           <td>
                                             <div className="action-item">
-                                              <Link to={viewUrl} title="View">
+                                              <Link to={viewUrl} title={t('patient.reports.view')}>
                                                 <i className="isax isax-link-2"></i>
                                               </Link>
                                             </div>
@@ -712,11 +714,11 @@ const PatientDashboard = () => {
                                 <thead>
                                   <tr>
                                     <th>ID</th>
-                                    <th>Doctor</th>
-                                    <th>Appointment Date</th>
-                                    <th>Booked on</th>
-                                    <th>Amount</th>
-                                    <th>Action</th>
+                                    <th>{t('patient.reports.doctor')}</th>
+                                    <th>{t('patient.appointment.dateTime')}</th>
+                                    <th>{t('patient.orderedOn')}</th>
+                                    <th>{t('patient.amount')}</th>
+                                    <th>{t('patient.action')}</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -724,13 +726,13 @@ const PatientDashboard = () => {
                                     <tr>
                                       <td colSpan="6" className="text-center py-4">
                                         <div className="spinner-border" role="status">
-                                          <span className="visually-hidden">Loading...</span>
+                                          <span className="visually-hidden">{t('common.loading')}</span>
                                         </div>
                                       </td>
                                     </tr>
                                   ) : transactions.length === 0 ? (
                                     <tr>
-                                      <td colSpan="6" className="text-center py-4 text-muted">No invoices found</td>
+                                      <td colSpan="6" className="text-center py-4 text-muted">{t('patient.reports.noInvoices')}</td>
                                     </tr>
                                   ) : (
                                     transactions.slice(0, 5).map((txn) => {
@@ -764,7 +766,7 @@ const PatientDashboard = () => {
                                           <td>{formatCurrency(txn?.amount, txn?.currency)}</td>
                                           <td>
                                             <div className="action-item">
-                                              <Link to={detailsUrl} title="View">
+                                              <Link to={detailsUrl} title={t('patient.reports.view')}>
                                                 <i className="isax isax-link-2"></i>
                                               </Link>
                                             </div>

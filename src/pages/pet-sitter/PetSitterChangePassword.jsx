@@ -1,5 +1,9 @@
 import EmailVerifiedPasswordChangeForm from '../../components/auth/EmailVerifiedPasswordChangeForm'
+import { useLanguage } from '../../contexts/LanguageContext'
 
-const PetSitterChangePassword = () => <div className="content"><div className="container-fluid"><h3 className="mb-1"><i className="fa-solid fa-lock me-2" />Change Password</h3><p className="text-muted mb-4">Request a verification code, confirm it, then set a new password.</p><EmailVerifiedPasswordChangeForm accountLabel="Pet Sitter" /></div></div>
+const PetSitterChangePassword = () => {
+  const { t } = useLanguage()
+  return <div className="content"><div className="container-fluid"><h3 className="mb-1"><i className="fa-solid fa-lock me-2" />{t('auth.changePassword.title')}</h3><p className="text-muted mb-4">{t('auth.changePassword.securityNote', { account: t('petSitterPanel.nav.role') })}</p><EmailVerifiedPasswordChangeForm accountLabel={t('petSitterPanel.nav.role')} /></div></div>
+}
 
 export default PetSitterChangePassword

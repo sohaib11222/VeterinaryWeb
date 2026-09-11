@@ -9,8 +9,10 @@ import {
 } from "../../assets/images";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const Servicesection = () => {
+  const { t } = useLanguage();
   //Aos
 
   useEffect(() => {
@@ -30,11 +32,11 @@ const Servicesection = () => {
               <div className="section-header-fourteen service-inner-fourteen">
                 <div className="service-inner-fourteen">
                   <div className="service-inner-fourteen-two">
-                    <h3>OUR SERVICES</h3>
+                    <h3>{t('home.servicesEyebrow')}</h3>
                   </div>
                 </div>
-                <h2>What can We do</h2>
-                <p>Our Professional Services</p>
+                <h2>{t('home.whatWeCanDo')}</h2>
+                <p>{t('home.professionalServices')}</p>
               </div>
             </div>
           </div>
@@ -44,7 +46,7 @@ const Servicesection = () => {
                 <div className="service-icon">
                   <img src={injection} alt="" />
                 </div>
-                <h4>Vaccination</h4>
+                <h4>{t('home.vaccination')}</h4>
                 <p>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed.
                 </p>
@@ -55,7 +57,7 @@ const Servicesection = () => {
                 <div className="service-icon">
                   <img src={bottel} alt="" />
                 </div>
-                <h4>Pet Medicine</h4>
+                <h4>{t('home.petMedicine')}</h4>
                 <p>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed.
                 </p>
@@ -66,7 +68,7 @@ const Servicesection = () => {
                 <div className="service-icon">
                   <img src={bath_tub} alt="" />
                 </div>
-                <h4>Pet Grooming</h4>
+                <h4>{t('home.petGrooming')}</h4>
                 <p>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed.
                 </p>
@@ -77,7 +79,7 @@ const Servicesection = () => {
                 <div className="service-icon">
                   <img src={pet_doctor} alt="" />
                 </div>
-                <h4>Pet Care</h4>
+                <h4>{t('home.petCare')}</h4>
                 <p>
                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed.
                 </p>

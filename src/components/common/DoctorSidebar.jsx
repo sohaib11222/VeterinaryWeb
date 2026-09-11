@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { useUnreadChatCount } from '../../queries/chatQueries'
 import { useUnreadAnnouncementCount } from '../../queries/announcementQueries'
 import { useUnreadNotificationsCount } from '../../queries/notificationQueries'
@@ -14,6 +15,7 @@ import { getImageUrl } from '../../utils/apiConfig'
 
 const DoctorSidebar = () => {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const queryClient = useQueryClient()
   const { data: unreadRes } = useUnreadChatCount({ enabled: Boolean(user) })
   const unreadCount = unreadRes?.data?.unreadCount ?? 0
@@ -48,7 +50,7 @@ const DoctorSidebar = () => {
     return location.pathname === paths || location.pathname.startsWith(paths + '/')
   }
 
-  const displayName = vetUser?.fullName || vetUser?.name || user?.fullName || user?.name || 'Veterinarian'
+  const displayName = vetUser?.fullName || vetUser?.name || user?.fullName || user?.name || t('doctorPanel.veterinarian')
   const profileImage =
     getImageUrl(vetUser?.profileImage) ||
     getImageUrl(user?.profileImage) ||
@@ -70,9 +72,9 @@ const DoctorSidebar = () => {
       const isAvailableOnline = availability === 'available'
       await updateVetProfile.mutateAsync({ isAvailableOnline })
       queryClient.invalidateQueries({ queryKey: ['veterinarian', 'profile'] })
-      toast.success('Availability updated successfully')
+      toast.success(t('doctorDashboard.availabilityUpdated', 'Availability updated successfully'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to update availability')
+      toast.error(err?.message || t('doctorDashboard.availabilityFailed', 'Failed to update availability'))
     }
   }
 
@@ -81,10 +83,10 @@ const DoctorSidebar = () => {
       {/* Veterinary Profile Widget */}
       <div className="widget-profile veterinary-profile-widget">
         <div className="profile-info-widget">
-          <Link to="/doctor-profile-settings" className="booking-doc-img" aria-label="Open profile settings">
+          <Link to="/doctor-profile-settings" className="booking-doc-img" aria-label={t('doctorPanel.openProfileSettings')}>
             <img
               src={profileImage}
-              alt="Veterinarian Image"
+              alt={t('doctorPanel.veterinarianImage')}
               onError={(e) => {
                 e.currentTarget.onerror = null
                 e.currentTarget.src = '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
@@ -99,10 +101,10 @@ const DoctorSidebar = () => {
               <Link to="/doctor-profile">{displayName}</Link>
             </h3>
             <div className="patient-details">
-              <h5 className="mb-0">Veterinarian ID : {user?.id || user?._id || '—'}</h5>
+              <h5 className="mb-0">{t('doctorPanel.veterinarianId')} : {user?.id || user?._id || '—'}</h5>
             </div>
             <span className="badge veterinary-role-badge">
-              <i className="fa-solid fa-circle"></i>Veterinarian
+              <i className="fa-solid fa-circle"></i>{t('doctorPanel.veterinarian')}
             </span>
           </div>
         </div>
@@ -113,7 +115,7 @@ const DoctorSidebar = () => {
         <div className="input-block input-block-new">
           <label className="form-label">
             <i className="fa-solid fa-clock me-2"></i>
-            Availability <span className="text-danger">*</span>
+            {t('doctorPanel.availability')} <span className="text-danger">*</span>
           </label>
           <select
             className="select form-control veterinary-select"
@@ -121,8 +123,8 @@ const DoctorSidebar = () => {
             onChange={(e) => setAvailability(e.target.value)}
             disabled={updateVetProfile.isPending}
           >
-            <option value="available">I am Available Now</option>
-            <option value="not-available">Not Available</option>
+            <option value="available">{t('doctorPanel.availableNow')}</option>
+            <option value="not-available">{t('doctorPanel.notAvailable')}</option>
           </select>
           <button
             type="button"
@@ -131,7 +133,7 @@ const DoctorSidebar = () => {
             disabled={updateVetProfile.isPending}
             style={{ marginTop: '10px' }}
           >
-            {updateVetProfile.isPending ? 'Updating...' : 'Update'}
+            {updateVetProfile.isPending ? t('doctorPanel.updating') : t('doctorPanel.update')}
           </button>
         </div>
       </div>
@@ -143,14 +145,14 @@ const DoctorSidebar = () => {
             <li className={isActive('/doctor/dashboard') ? 'active' : ''}>
               <Link to="/doctor/dashboard">
                 <i className="fa-solid fa-shapes"></i>
-                <span>Dashboard</span>
+                <span>{t('doctorPanel.dashboard')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/doctor-request') ? 'active' : ''}>
               <Link to="/doctor-request">
                 <i className="fa-solid fa-calendar-check"></i>
-                <span>Pet Requests</span>
+                <span>{t('doctorPanel.petRequests')}</span>
                 {pendingCount > 0 && (
                   <small className="unread-msg veterinary-badge">{pendingCount}</small>
                 )}
@@ -159,28 +161,28 @@ const DoctorSidebar = () => {
             <li className={isActive(['/appointments', '/doctor-appointments-grid', '/doctor-appointment-details', '/doctor-upcoming-appointment', '/doctor-completed-appointment', '/doctor-cancelled-appointment', '/doctor-appointment-start']) ? 'active' : ''}>
               <Link to="/appointments">
                 <i className="fa-solid fa-calendar-days"></i>
-                <span>Pet Appointments</span>
+                <span>{t('doctorPanel.petAppointments')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/available-timings') ? 'active' : ''}>
               <Link to="/available-timings">
                 <i className="fa-solid fa-calendar-day"></i>
-                <span>Clinic Hours</span>
+                <span>{t('doctorPanel.clinicHours')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive(['/my-patients', '/patient-profile']) ? 'active' : ''}>
               <Link to="/my-patients">
                 <i className="fa-solid fa-dog"></i>
-                <span>My Pets</span>
+                <span>{t('doctorPanel.myPets')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/doctor/vaccinations') ? 'active' : ''}>
               <Link to="/doctor/vaccinations">
                 <i className="fa-solid fa-syringe"></i>
-                <span>Vaccinations</span>
+                <span>{t('doctorPanel.vaccinations')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
@@ -188,28 +190,28 @@ const DoctorSidebar = () => {
             <li className={isActive('/reviews') ? 'active' : ''}>
               <Link to="/reviews">
                 <i className="fas fa-star"></i>
-                <span>Pet Owner Reviews</span>
+                <span>{t('doctorPanel.petOwnerReviews')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/invoices') ? 'active' : ''}>
               <Link to="/invoices">
                 <i className="fa-solid fa-file-lines"></i>
-                <span>Invoices</span>
+                <span>{t('doctorPanel.invoices')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/doctor-payment') ? 'active' : ''}>
               <Link to="/doctor-payment">
                 <i className="fa-solid fa-money-bill-1"></i>
-                <span>Payment Settings</span>
+                <span>{t('doctorPanel.paymentSettings')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/doctor/reschedule-requests') ? 'active' : ''}>
               <Link to="/doctor/reschedule-requests">
                 <i className="fa-solid fa-calendar-days"></i>
-                <span>Reschedule Requests</span>
+                <span>{t('doctorPanel.rescheduleRequests')}</span>
                 {pendingRescheduleCount > 0 && (
                   <small className="unread-msg veterinary-badge">{pendingRescheduleCount}</small>
                 )}
@@ -219,7 +221,7 @@ const DoctorSidebar = () => {
             <li className={isActive('/chat-doctor') ? 'active' : ''}>
               <Link to="/chat-doctor">
                 <i className="fa-solid fa-comments"></i>
-                <span>Messages</span>
+                <span>{t('doctorPanel.messages')}</span>
                 {unreadCount > 0 && (
                   <small className="unread-msg veterinary-badge">{unreadCount}</small>
                 )}
@@ -228,13 +230,13 @@ const DoctorSidebar = () => {
             <li className={isActive('/doctor/admin-chat') ? 'active' : ''}>
               <Link to="/doctor/admin-chat">
                 <i className="fa-solid fa-headset"></i>
-                <span>Admin Messages</span>
+                <span>{t('doctorPanel.adminMessages')}</span>
               </Link>
             </li>
             <li className={isActive('/doctor/notifications') ? 'active' : ''}>
               <Link to="/doctor/notifications">
                 <i className="fa-solid fa-bell"></i>
-                <span>Notifications</span>
+                <span>{t('doctorPanel.notifications')}</span>
                 {unreadNotifications > 0 && (
                   <small className="unread-msg veterinary-badge">{unreadNotifications}</small>
                 )}
@@ -243,14 +245,14 @@ const DoctorSidebar = () => {
             <li className={isActive(['/doctor/blog', '/doctor/blog/create', '/doctor/blog/edit']) ? 'active' : ''}>
               <Link to="/doctor/blog">
                 <i className="fa-solid fa-blog"></i>
-                <span>Blog Posts</span>
+                <span>{t('doctorPanel.blogPosts')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/doctor/announcements') ? 'active' : ''}>
               <Link to="/doctor/announcements">
                 <i className="fa-solid fa-bullhorn"></i>
-                <span>Clinic Announcements</span>
+                <span>{t('doctorPanel.clinicAnnouncements')}</span>
                 {unreadAnnouncements > 0 && (
                   <small className="unread-msg veterinary-badge">{unreadAnnouncements}</small>
                 )}
@@ -259,14 +261,14 @@ const DoctorSidebar = () => {
             <li className={isActive('/doctor/subscription-plans') ? 'active' : ''}>
               <Link to="/doctor/subscription-plans">
                 <i className="fa-solid fa-crown"></i>
-                <span>Subscription</span>
+                <span>{t('doctorPanel.subscription')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive(['/doctor-profile-settings', '/doctor-experience-settings', '/doctor-education-settings', '/doctor-awards-settings', '/doctor-insurance-settings', '/doctor-clinics-settings', '/doctor-business-settings']) ? 'active' : ''}>
               <Link to="/doctor-profile-settings">
                 <i className="fa-solid fa-user-pen"></i>
-                <span>Profile Settings</span>
+                <span>{t('doctorPanel.profileSettings')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
@@ -280,14 +282,14 @@ const DoctorSidebar = () => {
             <li className={isActive('/doctor-change-password') ? 'active' : ''}>
               <Link to="/doctor-change-password">
                 <i className="fa-solid fa-key"></i>
-                <span>Change Password</span>
+                <span>{t('doctorPanel.changePassword')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className="logout-item">
               <Link to="/login">
                 <i className="fa-solid fa-sign-out-alt"></i>
-                <span>Logout</span>
+                <span>{t('doctorPanel.logout')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>

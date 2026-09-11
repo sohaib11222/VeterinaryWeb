@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const DoctorUpcomingAppointment = () => {
+  const { t } = useLanguage()
   return (
     <>
       <div className="dashboard-header">
         <div className="header-back">
           <Link to="/appointments" className="back-arrow"><i className="fa-solid fa-arrow-left"></i></Link>
-          <h3>Appointment Details</h3>
+          <h3>{t('doctorLegacyDetails.appointmentDetails')}</h3>
         </div>
       </div>
       <div className="appointment-details-wrap">
@@ -16,7 +18,7 @@ const DoctorUpcomingAppointment = () => {
             <li>
               <div className="patinet-information">
                 <a href="#">
-                  <img src="/public/assets/img/doctors-dashboard/profile-02.jpg" alt="User Image" />
+                  <img src="/public/assets/img/doctors-dashboard/profile-02.jpg" alt={t('doctorLegacyDetails.userImage')} />
                 </a>
                 <div className="patient-info">
                   <p>#Apt0001</p>
@@ -32,19 +34,19 @@ const DoctorUpcomingAppointment = () => {
             </li>
             <li className="appointment-info">
               <div className="person-info">
-                <p>Type of Appointment</p>
+                <p>{t('doctorLegacyDetails.typeOfAppointment')}</p>
                 <ul className="d-flex apponitment-types">
-                  <li><i className="fa-solid fa-hospital text-green"></i>Direct Visit</li>
+                  <li><i className="fa-solid fa-hospital text-green"></i>{t('doctorLegacyDetails.directVisit')}</li>
                 </ul>
               </div>
             </li>
             <li className="appointment-action">
               <div className="detail-badge-info">
-                <span className="badge bg-grey me-2">New Pet</span>
-                <span className="badge bg-yellow">Upcoming</span>
+                <span className="badge bg-grey me-2">{t('doctorLegacyDetails.new')} {t('doctorPets.pet')}</span>
+                <span className="badge bg-yellow">{t('doctorLegacyDetails.upcoming')}</span>
               </div>
               <div className="consult-fees">
-                <h6>Consultation Fees : $200</h6>
+                <h6>{t('doctorLegacyDetails.consultationFees')} : $200</h6>
               </div>
               <ul>
                 <li>
@@ -58,24 +60,24 @@ const DoctorUpcomingAppointment = () => {
           </ul>
           <ul className="detail-card-bottom-info">
             <li>
-              <h6>Appointment Date & Time</h6>
+              <h6>{t('doctorLegacyDetails.appointmentDateTime')}</h6>
               <span>22 Jul 2023 - 12:00 pm</span>
             </li>
             <li>
-              <h6>Clinic Location</h6>
+              <h6>{t('doctorLegacyDetails.clinicLocation')}</h6>
               <span>Adrian's Dentistry</span>
             </li>
             <li>
-              <h6>Location</h6>
+              <h6>{t('doctorLegacyDetails.location')}</h6>
               <span>Newyork, United States</span>
             </li>
             <li>
-              <h6>Visit Type</h6>
-              <span>General</span>
+              <h6>{t('doctorLegacyDetails.visitType')}</h6>
+              <span>{t('doctorLegacyDetails.general')}</span>
             </li>
             <li>
               <div className="start-btn">
-                <Link to="/doctor-appointment-start" className="btn btn-secondary">Start Session</Link>
+                <Link to="/doctor-appointment-start" className="btn btn-secondary">{t('doctorLegacyDetails.startSession')}</Link>
               </div>
             </li>
           </ul>
@@ -83,14 +85,14 @@ const DoctorUpcomingAppointment = () => {
         {/* /Appointment Detail Card */}
 
         <div className="recent-appointments">
-          <h5 className="head-text">Recent Appointments</h5>
+          <h5 className="head-text">{t('doctorLegacyDetails.recentAppointments')}</h5>
           {/* Appointment List */}
           <div className="appointment-wrap">
             <ul>
               <li>
                 <div className="patinet-information">
                   <a href="#">
-                    <img src="/public/assets/img/doctors-dashboard/profile-01.jpg" alt="User Image" />
+                    <img src="/public/assets/img/doctors-dashboard/profile-01.jpg" alt={t('doctorLegacyDetails.userImage')} />
                   </a>
                   <div className="patient-info">
                     <p>#Apt0001</p>
@@ -101,8 +103,8 @@ const DoctorUpcomingAppointment = () => {
               <li className="appointment-info">
                 <p><i className="fa-solid fa-clock"></i>11 Nov 2024 10.45 AM</p>
                 <ul className="d-flex apponitment-types">
-                  <li>General Visit</li>
-                  <li>Chat</li>
+                    <li>{t('doctorLegacy.generalVisit')}</li>
+                    <li>{t('doctorLegacy.chat')}</li>
                 </ul>
               </li>
               <li className="mail-info-patient">
@@ -127,7 +129,7 @@ const DoctorUpcomingAppointment = () => {
               <li>
                 <div className="patinet-information">
                   <a href="#">
-                    <img src="/public/assets/img/doctors-dashboard/profile-03.jpg" alt="User Image" />
+                    <img src="/public/assets/img/doctors-dashboard/profile-03.jpg" alt={t('doctorLegacyDetails.userImage')} />
                   </a>
                   <div className="patient-info">
                     <p>#Apt0003</p>
@@ -138,8 +140,8 @@ const DoctorUpcomingAppointment = () => {
               <li className="appointment-info">
                 <p><i className="fa-solid fa-clock"></i>27 Oct 2024 09.30 AM</p>
                 <ul className="d-flex apponitment-types">
-                  <li>General Visit</li>
-                  <li>Video Call</li>
+                    <li>{t('doctorLegacy.generalVisit')}</li>
+                    <li>{t('doctorLegacy.videoCall')}</li>
                 </ul>
               </li>
               <li className="mail-info-patient">

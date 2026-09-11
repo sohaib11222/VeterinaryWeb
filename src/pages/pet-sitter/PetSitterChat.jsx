@@ -7,6 +7,7 @@ import { useConversations, useMessages } from '../../queries/chatQueries'
 import { useGetOrCreateConversation, useMarkConversationRead, useSendMessage } from '../../mutations/chatMutations'
 import { useUploadChatFiles } from '../../mutations/uploadMutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const unwrap = (response) => {
   const first = response?.data ?? response ?? {}
@@ -41,6 +42,7 @@ const getMessageAttachments = (message) => {
 }
 
 const PetSitterChat = () => {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const [params] = useSearchParams()
   const requestedSitterId = params.get('petSitterId')
@@ -92,10 +94,10 @@ const PetSitterChat = () => {
       .mutateAsync({ petSitterId: requestedSitterId, petOwnerId: user?.id })
       .then((response) => {
         const conversation = unwrap(response)
-        if (!conversation?._id) throw new Error('Unable to prepare the Pet Sitter conversation')
+        if (!conversation?._id) throw new Error(t('patient.chat.invalidConversation'))
         setSelectedId(conversation._id)
       })
-      .catch((error) => toast.error(error?.message || 'Unable to open Pet Sitter chat'))
+      .catch((error) => toast.error(error?.message || t('patient.chat.openPetSitterFailed')))
   }, [conversations, conversationsQuery.isLoading, getOrCreate, isOwner, requestedSitterId, selectedId, user?.id])
 
   useEffect(() => {
@@ -119,13 +121,13 @@ const PetSitterChat = () => {
 
     const nextFiles = [...files, ...selectedFiles]
     if (nextFiles.length > 10) {
-      toast.error('You can attach up to 10 files at once.')
+      toast.error(t('petSitterPanel.chat.fileLimit'))
       return
     }
 
     const oversized = nextFiles.find((file) => file.size > 50 * 1024 * 1024)
     if (oversized) {
-      toast.error('Each attachment must be 50MB or smaller.')
+      toast.error(t('petSitterPanel.chat.fileSize'))
       return
     }
 
@@ -159,7 +161,7 @@ const PetSitterChat = () => {
         const uploadPayload = uploadResponse?.data?.data ?? uploadResponse?.data ?? uploadResponse
         const urls = uploadPayload?.urls || uploadResponse?.urls || []
         if (!Array.isArray(urls) || urls.length !== files.length) {
-          throw new Error('One or more files could not be uploaded')
+          throw new Error(t('petSitterPanel.chat.uploadFailed'))
         }
 
         attachments = files.map((file, index) => ({
@@ -184,7 +186,7 @@ const PetSitterChat = () => {
       setFiles([])
       setUploadProgress(0)
     } catch (error) {
-      toast.error(error?.message || 'Unable to send the message or attachment')
+      toast.error(error?.message || t('petSitterPanel.chat.sendFailed'))
     } finally {
       setUploadProgress(0)
     }
@@ -197,7 +199,7 @@ const PetSitterChat = () => {
           <div className="row g-0 h-100">
             <div className="col-md-4 col-xl-3 border-end">
               <div className="p-3 border-bottom">
-                <h5 className="mb-0">{isOwner ? 'Pet Sitter chats' : 'Pet Owner chats'}</h5>
+                <h5 className="mb-0">{isOwner ? t('petSitterPanel.chat.ownerTitle') : t('petSitterPanel.chat.sitterTitle')}</h5>
               </div>
               <div className="list-group list-group-flush">
                 {conversations.map((conversation) => {
@@ -219,9 +221,9 @@ const PetSitterChat = () => {
                           alt=""
                         />
                         <div className="text-start">
-                          <strong>{person?.fullName || person?.name || 'Conversation'}</strong>
+                          <strong>{person?.fullName || person?.name || t('petSitterPanel.chat.conversation')}</strong>
                           <div className="small text-muted">
-                            {conversation.unreadCount ? `${conversation.unreadCount} unread` : 'Pet Sitter chat'}
+                            {conversation.unreadCount ? t('petSitterPanel.chat.unread', { count: conversation.unreadCount }) : t('petSitterPanel.chat.sitterChat')}
                           </div>
                         </div>
                       </div>
@@ -229,7 +231,7 @@ const PetSitterChat = () => {
                   )
                 })}
               </div>
-              {!conversations.length && <p className="text-muted small p-3 mb-0">No conversations yet.</p>}
+              {!conversations.length && <p className="text-muted small p-3 mb-0">{t('petSitterPanel.chat.noConversations')}</p>}
             </div>
 
             <div className="col-md-8 col-xl-9 d-flex flex-column">
@@ -237,12 +239,12 @@ const PetSitterChat = () => {
                 {selected ? (
                   <>
                     <h5 className="mb-0">
-                      {getParticipant(selected, user?.role)?.fullName || getParticipant(selected, user?.role)?.name || 'Conversation'}
+                      {getParticipant(selected, user?.role)?.fullName || getParticipant(selected, user?.role)?.name || t('petSitterPanel.chat.conversation')}
                     </h5>
-                    <small className="text-muted">Direct Pet Sitter messaging · no appointment required</small>
+                    <small className="text-muted">{t('petSitterPanel.chat.directMessaging')}</small>
                   </>
                 ) : (
-                  <span className="text-muted">Select a conversation to start chatting</span>
+                  <span className="text-muted">{t('petSitterPanel.chat.selectConversation')}</span>
                 )}
               </div>
 
@@ -255,7 +257,7 @@ const PetSitterChat = () => {
                         {item.message && <div style={{ whiteSpace: 'pre-wrap' }}>{item.message}</div>}
                         {getMessageAttachments(item).map((attachment, index) => {
                           const url = getImageUrl(attachment.url || attachment.fileUrl)
-                          const name = attachment.name || attachment.fileName || 'Attachment'
+                          const name = attachment.name || attachment.fileName || t('doctorCommon.file')
                           if (isImageAttachment(attachment)) {
                             return <a href={url} target="_blank" rel="noreferrer" key={`${item._id}-${index}`}><img src={url} alt={name} style={{ display: 'block', maxWidth: 260, maxHeight: 220, objectFit: 'contain', borderRadius: 8, marginTop: 6 }} /></a>
                           }
@@ -265,13 +267,13 @@ const PetSitterChat = () => {
                     </div>
                   )
                 })}
-                {selected && !messages.length && <div className="text-center text-muted py-5">Start a direct conversation with this Pet Sitter.</div>}
+                {selected && !messages.length && <div className="text-center text-muted py-5">{t('petSitterPanel.chat.startConversation')}</div>}
               </div>
 
               {selected && (
                 <form onSubmit={send} className="p-3 border-top">
                   {files.length > 0 && (
-                    <div className="d-flex flex-wrap gap-2 mb-3" aria-label="Selected attachments">
+                    <div className="d-flex flex-wrap gap-2 mb-3" aria-label={t('petSitterPanel.chat.selectedAttachments')}>
                       {previewItems.map(({ file, url }, index) => (
                         <div className="border rounded p-2 d-flex align-items-center gap-2" style={{ maxWidth: 260 }} key={`${file.name}-${file.lastModified}-${index}`}>
                           {url ? <img src={url} alt={file.name} style={{ width: 52, height: 52, objectFit: 'cover', borderRadius: 6 }} /> : <i className="fa-solid fa-file-lines fa-2x text-secondary" />}
@@ -279,19 +281,19 @@ const PetSitterChat = () => {
                             <div className="text-truncate">{file.name}</div>
                             <span className="text-muted">{formatFileSize(file.size)}</span>
                           </div>
-                          <button type="button" className="btn btn-sm btn-light" onClick={() => removeFile(index)} aria-label={`Remove ${file.name}`} title="Remove file"><i className="fa-solid fa-xmark" /></button>
+                          <button type="button" className="btn btn-sm btn-light" onClick={() => removeFile(index)} aria-label={`${t('petSitterPanel.chat.remove')} ${file.name}`} title={t('petSitterPanel.chat.remove')}><i className="fa-solid fa-xmark" /></button>
                         </div>
                       ))}
                     </div>
                   )}
                   <div className="input-group">
-                    <input className="form-control" value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Write a message…" />
-                    <label className="btn btn-outline-secondary mb-0" title="Attach files">
+                    <input className="form-control" value={message} onChange={(event) => setMessage(event.target.value)} placeholder={t('petSitterPanel.chat.placeholder')} />
+                    <label className="btn btn-outline-secondary mb-0" title={t('petSitterPanel.chat.attach')}>
                       <i className="fa-solid fa-paperclip" />
                       <input ref={fileInputRef} type="file" hidden multiple accept="*/*" onChange={handleFileSelect} />
                     </label>
                     <button className="btn btn-primary" disabled={sendMessage.isPending || uploadChatFiles.isPending || (!message.trim() && !files.length)}>
-                      {uploadChatFiles.isPending ? `Uploading ${uploadProgress}%` : 'Send'}
+                      {uploadChatFiles.isPending ? t('petSitterPanel.chat.uploading', { progress: uploadProgress }) : t('petSitterPanel.chat.send')}
                     </button>
                   </div>
                 </form>

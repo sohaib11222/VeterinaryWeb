@@ -1,8 +1,10 @@
 import { Link, useSearchParams } from 'react-router-dom'
 import Breadcrumb from '../../components/common/Breadcrumb'
 import { useAppointment } from '../../queries'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const BookingSuccess = () => {
+  const { t } = useLanguage()
   const [searchParams] = useSearchParams()
   const appointmentId = searchParams.get('appointmentId')
   const { data: appointmentResponse } = useAppointment(appointmentId)
@@ -12,7 +14,7 @@ const BookingSuccess = () => {
     appointment?.veterinarianId?.name ||
     appointment?.veterinarianId?.fullName ||
     appointment?.veterinarianId?.email ||
-    'Veterinarian'
+    t('booking.veterinarian')
 
   const dateStr = appointment?.appointmentDate
     ? new Date(appointment.appointmentDate).toLocaleDateString()
@@ -21,7 +23,7 @@ const BookingSuccess = () => {
 
   return (
     <>
-      <Breadcrumb title="My Pet" li1="Booking" li2="Booking" />
+      <Breadcrumb title={t('booking.pet')} li1={t('booking.booking')} li2={t('booking.success')} />
       <div className="content success-page-cont">
         <div className="container">
           <div className="row justify-content-center">
@@ -30,17 +32,17 @@ const BookingSuccess = () => {
                 <div className="card-body">
                   <div className="success-cont">
                     <i className="fas fa-check"></i>
-                    <h3>Appointment booked Successfully!</h3>
+                    <h3>{t('booking.appointmentBooked')}</h3>
                     <p>
-                      Appointment booked with <strong>{vetName}</strong>
+                      {t('booking.bookedWith')} <strong>{vetName}</strong>
                       {dateStr && timeStr ? (
                         <>
-                          <br /> on <strong>{dateStr} {timeStr}</strong>
+                          <br /> {t('booking.on')} <strong>{dateStr} {timeStr}</strong>
                         </>
                       ) : null}
                     </p>
                     <Link to="/patient-appointments" className="btn btn-primary view-inv-btn">
-                      View Invoice
+                      {t('booking.viewInvoice')}
                     </Link>
                   </div>
                 </div>

@@ -1,10 +1,12 @@
 import { useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 import { useBlogPost } from '../../queries/blogQueries'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const DoctorBlogDetails = () => {
+  const { language, t } = useLanguage()
   const { id } = useParams()
 
   const { data: blogRes, isLoading } = useBlogPost(id)
@@ -15,7 +17,7 @@ const DoctorBlogDetails = () => {
   const formatDateTime = (date) => {
     if (!date) return '—'
     const d = new Date(date)
-    return d.toLocaleDateString('en-US', {
+    return d.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-US', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -33,7 +35,7 @@ const DoctorBlogDetails = () => {
             <div className="col-lg-12 col-xl-12">
               <div className="text-center py-5">
                 <div className="spinner-border" role="status">
-                  <span className="visually-hidden">Loading...</span>
+                  <span className="visually-hidden">{t('doctorRemaining.blog.loading')}</span>
                 </div>
               </div>
             </div>
@@ -53,10 +55,10 @@ const DoctorBlogDetails = () => {
               <div className="card">
                 <div className="card-body text-center py-5">
                   <i className="fe fe-alert-circle" style={{ fontSize: '64px', color: '#dee2e6' }}></i>
-                  <h5 className="mt-3">Blog post not found</h5>
-                  <p className="text-muted">The blog post you're looking for doesn't exist or has been deleted.</p>
+                  <h5 className="mt-3">{t('doctorRemaining.blog.notFound')}</h5>
+                  <p className="text-muted">{t('doctorRemaining.blog.notFoundHint')}</p>
                   <Link to="/doctor/blog" className="btn btn-primary mt-3">
-                    Back to Blog Posts
+                    {t('doctorRemaining.blog.backToBlog')}
                   </Link>
                 </div>
               </div>
@@ -81,11 +83,11 @@ const DoctorBlogDetails = () => {
             <div className="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
               <Link to="/doctor/blog" className="btn btn-outline-secondary">
                 <i className="fe fe-arrow-left me-2"></i>
-                Back to Blog Posts
+                {t('doctorRemaining.blog.backToBlog')}
               </Link>
               <Link to={`/doctor/blog/edit/${blog._id}`} className="btn btn-outline-primary">
                 <i className="fa fa-edit me-2" style={{ fontSize: '14px', display: 'inline-block', lineHeight: '1', visibility: 'visible', opacity: 1 }}></i>
-                Edit
+                {t('doctorRemaining.blog.edit')}
               </Link>
             </div>
 
@@ -108,7 +110,7 @@ const DoctorBlogDetails = () => {
                           <div className="d-flex align-items-center">
                             <img
                               src={authorImg}
-                              alt={author.fullName || author.name || 'Author'}
+                              alt={author.fullName || author.name || t('doctorRemaining.blog.author')}
                               className="rounded-circle me-2"
                               style={{ width: '32px', height: '32px', objectFit: 'cover' }}
                               onError={(e) => {
@@ -116,14 +118,14 @@ const DoctorBlogDetails = () => {
                                 e.currentTarget.src = '/assets/img/doctors/doctor-thumb-01.jpg'
                               }}
                             />
-                            <span>{author.fullName || author.name || 'Author'}</span>
+                            <span>{author.fullName || author.name || t('doctorRemaining.blog.author')}</span>
                           </div>
                         )}
                         <span>•</span>
                         <span>{formatDateTime(blog.publishedAt || blog.createdAt)}</span>
                         <span>•</span>
                         <span className={`badge ${blog.isPublished ? 'badge-success' : 'badge-warning'}`}>
-                          {blog.isPublished ? 'Published' : 'Draft'}
+                          {blog.isPublished ? t('doctorRemaining.blog.published') : t('doctorRemaining.blog.draft')}
                         </span>
                       </div>
                     </div>
@@ -147,17 +149,17 @@ const DoctorBlogDetails = () => {
                 <div className="mt-4 pt-4 border-top">
                   <div className="d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <div className="text-muted small">
-                      Created: {formatDateTime(blog.createdAt)}
+                      {t('doctorRemaining.blog.created')}: {formatDateTime(blog.createdAt)}
                       {blog.updatedAt && blog.updatedAt !== blog.createdAt && (
-                        <> • Updated: {formatDateTime(blog.updatedAt)}</>
+                        <> • {t('doctorRemaining.blog.updated')}: {formatDateTime(blog.updatedAt)}</>
                       )}
                     </div>
                     <div>
                       <Link to="/doctor/blog" className="btn btn-outline-secondary btn-sm me-2">
-                        Back to List
+                        {t('doctorRemaining.blog.backToList')}
                       </Link>
                       <Link to={`/doctor/blog/edit/${blog._id}`} className="btn btn-primary btn-sm">
-                        Edit Post
+                        {t('doctorRemaining.blog.editPost')}
                       </Link>
                     </div>
                   </div>

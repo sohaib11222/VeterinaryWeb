@@ -3,9 +3,11 @@ import { toast } from 'react-toastify'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [codeSent, setCodeSent] = useState(false)
   const [codeVerified, setCodeVerified] = useState(false)
   const [code, setCode] = useState('')
@@ -22,9 +24,9 @@ const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
       setCodeSent(true)
       setCodeVerified(false)
       setCode('')
-      toast.success(`A verification code has been sent to ${user?.email || 'your registered email address'}`)
+      toast.success(t('auth.changePassword.codeSent', { email: user?.email || t('auth.changePassword.fallbackEmail') }))
     } catch (error) {
-      toast.error(error?.message || 'Unable to send a verification code')
+      toast.error(error?.message || t('auth.changePassword.sendFailed'))
     } finally {
       setSending(false)
     }
@@ -33,7 +35,7 @@ const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
   const verifyCode = async (event) => {
     event.preventDefault()
     if (!/^\d{6}$/.test(code.trim())) {
-      toast.error('Enter the 6-digit verification code from your email')
+      toast.error(t('auth.changePassword.codeInvalid'))
       return
     }
 
@@ -41,10 +43,10 @@ const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
     try {
       await api.post(API_ROUTES.AUTH.VERIFY_CHANGE_PASSWORD_CODE, { code: code.trim() })
       setCodeVerified(true)
-      toast.success('Email verification complete. You can now choose a new password.')
+      toast.success(t('auth.changePassword.codeVerified'))
     } catch (error) {
       setCodeVerified(false)
-      toast.error(error?.message || 'The verification code is invalid or expired')
+      toast.error(error?.message || t('auth.changePassword.codeInvalidExpired'))
     } finally {
       setVerifying(false)
     }
@@ -53,11 +55,11 @@ const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
   const savePassword = async (event) => {
     event.preventDefault()
     if (newPassword.length < 8) {
-      toast.error('Your new password must be at least 8 characters long')
+      toast.error(t('auth.changePassword.passwordShort'))
       return
     }
     if (newPassword !== confirmPassword) {
-      toast.error('New password and confirmation do not match')
+      toast.error(t('auth.changePassword.passwordMismatch'))
       return
     }
 
@@ -67,14 +69,14 @@ const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
         code: code.trim(),
         newPassword,
       })
-      toast.success('Your password has been changed successfully')
+      toast.success(t('auth.changePassword.success'))
       setCode('')
       setNewPassword('')
       setConfirmPassword('')
       setCodeSent(false)
       setCodeVerified(false)
     } catch (error) {
-      toast.error(error?.message || 'Unable to change your password')
+      toast.error(error?.message || t('auth.changePassword.changeFailed'))
     } finally {
       setSaving(false)
     }
@@ -84,24 +86,24 @@ const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
     <div className="card">
       <div className="card-body">
         <div className="border-bottom pb-3 mb-4">
-          <h5 className="mb-1">Change Password</h5>
+          <h5 className="mb-1">{t('auth.changePassword.title')}</h5>
           <p className="text-muted mb-0">
-            For your security, we will verify the change through the registered email for this {accountLabel} account.
+            {t('auth.changePassword.securityNote', { account: accountLabel })}
           </p>
         </div>
 
         <div className="mb-4 p-3 rounded" style={{ background: '#f5f8fb' }}>
-          <div className="small text-muted mb-1">Registered email</div>
-          <strong>{user?.email || 'Your registered email address'}</strong>
+          <div className="small text-muted mb-1">{t('auth.changePassword.registeredEmail')}</div>
+          <strong>{user?.email || t('auth.changePassword.fallbackEmail')}</strong>
           <button type="button" className="btn btn-outline-primary btn-sm ms-3" onClick={requestCode} disabled={sending}>
-            {sending ? 'Sending…' : codeSent ? 'Resend code' : 'Send verification code'}
+            {sending ? t('auth.changePassword.sending') : codeSent ? t('auth.changePassword.resendCode') : t('auth.changePassword.sendCode')}
           </button>
         </div>
 
         {codeSent && !codeVerified && (
           <form onSubmit={verifyCode} className="col-md-6 px-0">
             <div className="mb-3">
-              <label className="form-label">Email verification code <span className="text-danger">*</span></label>
+              <label className="form-label">{t('auth.changePassword.codeLabel')} <span className="text-danger">*</span></label>
               <input
                 type="text"
                 inputMode="numeric"
@@ -110,13 +112,13 @@ const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
                 className="form-control"
                 value={code}
                 onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
-                placeholder="Enter the 6-digit code"
+                placeholder={t('auth.changePassword.codePlaceholder')}
                 required
               />
-              <small className="text-muted">The code expires after 10 minutes.</small>
+              <small className="text-muted">{t('auth.changePassword.expiry')}</small>
             </div>
             <button type="submit" className="btn btn-primary-gradient rounded-pill" disabled={verifying}>
-              {verifying ? 'Verifying…' : 'Verify code'}
+              {verifying ? t('auth.changePassword.verifying') : t('auth.changePassword.verifyCode')}
             </button>
           </form>
         )}
@@ -125,19 +127,19 @@ const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
           <form onSubmit={savePassword} className="row">
             <div className="col-md-6">
               <div className="mb-3">
-                <label className="form-label">New Password <span className="text-danger">*</span></label>
+                <label className="form-label">{t('auth.changePassword.newPassword')} <span className="text-danger">*</span></label>
                 <input
                   type="password"
                   autoComplete="new-password"
                   className="form-control"
                   value={newPassword}
                   onChange={(event) => setNewPassword(event.target.value)}
-                  placeholder="At least 8 characters"
+                  placeholder={t('auth.changePassword.newPasswordHint')}
                   required
                 />
               </div>
               <div className="mb-3">
-                <label className="form-label">Confirm New Password <span className="text-danger">*</span></label>
+                <label className="form-label">{t('auth.changePassword.confirmPassword')} <span className="text-danger">*</span></label>
                 <input
                   type="password"
                   autoComplete="new-password"
@@ -148,7 +150,7 @@ const EmailVerifiedPasswordChangeForm = ({ accountLabel = 'account' }) => {
                 />
               </div>
               <button type="submit" className="btn btn-primary-gradient rounded-pill" disabled={saving}>
-                {saving ? 'Saving…' : 'Save new password'}
+                {saving ? t('auth.changePassword.saving') : t('auth.changePassword.save')}
               </button>
             </div>
           </form>

@@ -5,9 +5,11 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useUserById } from '../../queries'
 import { useUpdateUserProfile, useUploadProfileImage } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const ProfileSettings = () => {
   const { user: authUser, updateUser } = useAuth()
+  const { t } = useLanguage()
   const userId = authUser?.id || authUser?._id
 
   const fileInputRef = useRef(null)
@@ -84,7 +86,7 @@ const ProfileSettings = () => {
       const res = await uploadProfileImage.mutateAsync(file)
       const url = res?.data?.url
       if (!url) {
-        toast.error('Upload failed')
+        toast.error(t('patient.settings.uploadFailed'))
         return
       }
 
@@ -99,9 +101,9 @@ const ProfileSettings = () => {
           profileImage: updated.profileImage,
         })
       }
-      toast.success('Profile image updated')
+      toast.success(t('patient.settings.imageUpdated'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to upload image')
+      toast.error(err?.message || t('patient.settings.imageUploadFailed'))
     } finally {
       // allow uploading same file again
       if (e?.target) e.target.value = ''
@@ -126,9 +128,9 @@ const ProfileSettings = () => {
           profileImage: updated.profileImage,
         })
       }
-      toast.success('Profile image removed')
+      toast.success(t('patient.settings.imageRemoved'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to remove image')
+      toast.error(err?.message || t('patient.settings.removeImageFailed'))
     }
   }
 
@@ -169,9 +171,9 @@ const ProfileSettings = () => {
         })
       }
 
-      toast.success('Profile updated successfully')
+      toast.success(t('patient.settings.profileUpdated'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to update profile')
+      toast.error(err?.message || t('patient.settings.updateFailed'))
     }
   }
 
@@ -191,9 +193,9 @@ const ProfileSettings = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-user-pen me-3"></i>
-                    Profile Settings
+                    {t('patient.settings.profile')}
                   </h2>
-                  <p className="dashboard-subtitle">Manage your personal information and pet owner details</p>
+                  <p className="dashboard-subtitle">{t('patient.settings.profileSubtitle')}</p>
                 </div>
               </div>
             </div>
@@ -207,12 +209,12 @@ const ProfileSettings = () => {
                       <ul className="nav nav-tabs-bottom" role="tablist">
                         <li className="nav-item" role="presentation">
                           <Link className="nav-link veterinary-nav-link active" to="/profile-settings">
-                            <i className="fa-solid fa-user me-2"></i>Account Settings
+                            <i className="fa-solid fa-user me-2"></i>{t('patient.settings.account')}
                           </Link>
                         </li>
                         <li className="nav-item" role="presentation">
                           <Link className="nav-link veterinary-nav-link" to="/change-password">
-                            <i className="fa-solid fa-lock me-2"></i>Change Password
+                            <i className="fa-solid fa-lock me-2"></i>{t('patient.settings.changePassword')}
                           </Link>
                         </li>
                       </ul>
@@ -229,7 +231,7 @@ const ProfileSettings = () => {
                     <div className="border-bottom pb-3 mb-4">
                       <h5 className="veterinary-section-title">
                         <i className="fa-solid fa-user-circle me-2"></i>
-                        Profile Settings
+                        {t('patient.settings.profile')}
                       </h5>
                     </div>
 
@@ -237,14 +239,14 @@ const ProfileSettings = () => {
                       <div className="setting-card veterinary-setting-card">
                         <label className="form-label veterinary-form-label mb-3">
                           <i className="fa-solid fa-camera me-2"></i>
-                          Profile Photo
+                          {t('patient.settings.photo')}
                         </label>
                         <div className="change-avatar img-upload veterinary-avatar-upload">
                           <div className="profile-img veterinary-profile-img">
                             {profileImageUrl ? (
                               <img
                                 src={profileImageUrl}
-                                alt="Profile"
+                                alt={t('patient.settings.profile')}
                                 style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover' }}
                               />
                             ) : (
@@ -260,7 +262,7 @@ const ProfileSettings = () => {
                                 disabled={uploadProfileImage.isPending || updateProfile.isPending}
                               >
                                 <i className="fa-solid fa-upload me-2"></i>
-                                Upload New
+                                {t('patient.settings.uploadNew')}
                               </button>
 
                               <input
@@ -272,12 +274,12 @@ const ProfileSettings = () => {
                                 style={{ display: 'none' }}
                               />
                               <a href="#" className="upload-remove veterinary-remove-btn" onClick={handleRemoveImage}>
-                                <i className="fa-solid fa-trash me-1"></i>Remove
+                                <i className="fa-solid fa-trash me-1"></i>{t('patient.settings.remove')}
                               </a>
                             </div>
                             <p className="veterinary-upload-info">
                               <i className="fa-solid fa-info-circle me-1"></i>
-                              Your Image should Below 4 MB, Accepted format jpg,png,svg
+                              {t('patient.settings.imageHint')}
                             </p>
                           </div>
                         </div>
@@ -289,22 +291,22 @@ const ProfileSettings = () => {
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-user me-1"></i>
-                                First Name <span className="text-danger">*</span>
+                                {t('patient.settings.firstName')} <span className="text-danger">*</span>
                               </label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Enter your name" value={form.name} onChange={onChange('name')} disabled={isLoading || updateProfile.isPending} />
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.enterName')} value={form.name} onChange={onChange('name')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                           <div className="col-lg-4 col-md-6">
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-user me-1"></i>
-                                Gender
+                                {t('patient.settings.gender')}
                               </label>
                               <select className="select veterinary-select" value={form.gender} onChange={onChange('gender')} disabled={isLoading || updateProfile.isPending}>
-                                <option value="">Select</option>
-                                <option value="MALE">Male</option>
-                                <option value="FEMALE">Female</option>
-                                <option value="OTHER">Other</option>
+                                <option value="">{t('patient.settings.select')}</option>
+                                <option value="MALE">{t('patient.settings.male')}</option>
+                                <option value="FEMALE">{t('patient.settings.female')}</option>
+                                <option value="OTHER">{t('patient.settings.other')}</option>
                               </select>
                             </div>
                           </div>
@@ -312,7 +314,7 @@ const ProfileSettings = () => {
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-calendar-days me-1"></i>
-                                Date of Birth
+                                {t('patient.settings.dateOfBirth')}
                               </label>
                               <div className="form-icon veterinary-form-icon">
                                 <input type="date" className="form-control veterinary-form-control" value={form.dob} onChange={onChange('dob')} disabled={isLoading || updateProfile.isPending} />
@@ -324,27 +326,27 @@ const ProfileSettings = () => {
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-phone me-1"></i>
-                                Phone Number
+                                {t('patient.settings.phone')}
                               </label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Enter your phone number" value={form.phone} onChange={onChange('phone')} disabled={isLoading || updateProfile.isPending} />
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.enterPhone')} value={form.phone} onChange={onChange('phone')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                           <div className="col-lg-4 col-md-6">
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-envelope me-1"></i>
-                                Email Address
+                                {t('patient.settings.email')}
                               </label>
-                              <input type="email" className="form-control veterinary-form-control" placeholder="Enter your email" value={form.email} disabled={true} />
+                              <input type="email" className="form-control veterinary-form-control" placeholder={t('patient.settings.enterEmail')} value={form.email} disabled={true} />
                             </div>
                           </div>
                           <div className="col-lg-4 col-md-6">
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-droplet me-1"></i>
-                                Blood Group
+                                {t('patient.settings.bloodGroup')}
                               </label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Enter blood group" value={form.bloodGroup} onChange={onChange('bloodGroup')} disabled={isLoading || updateProfile.isPending} />
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.enterBloodGroup')} value={form.bloodGroup} onChange={onChange('bloodGroup')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                         </div>
@@ -353,7 +355,7 @@ const ProfileSettings = () => {
                       <div className="setting-title veterinary-setting-title">
                         <h6>
                           <i className="fa-solid fa-location-dot me-2"></i>
-                          Address Information
+                          {t('patient.settings.addressInfo')}
                         </h6>
                       </div>
                       <div className="setting-card veterinary-setting-card">
@@ -362,54 +364,54 @@ const ProfileSettings = () => {
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-house me-1"></i>
-                                Address <span className="text-danger">*</span>
+                                {t('patient.settings.address')} <span className="text-danger">*</span>
                               </label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Enter your address" value={form.addressLine1} onChange={onChange('addressLine1')} disabled={isLoading || updateProfile.isPending} />
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.enterAddress')} value={form.addressLine1} onChange={onChange('addressLine1')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                           <div className="col-lg-12">
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-house me-1"></i>
-                                Address Line 2
+                                {t('patient.settings.addressLine2')}
                               </label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Apartment, suite, etc." value={form.addressLine2} onChange={onChange('addressLine2')} disabled={isLoading || updateProfile.isPending} />
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.apartment')} value={form.addressLine2} onChange={onChange('addressLine2')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                           <div className="col-md-6">
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-city me-1"></i>
-                                City
+                                {t('patient.settings.city')}
                               </label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Enter your city" value={form.city} onChange={onChange('city')} disabled={isLoading || updateProfile.isPending} />
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.enterCity')} value={form.city} onChange={onChange('city')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                           <div className="col-md-6">
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-map me-1"></i>
-                                State
+                                {t('patient.settings.state')}
                               </label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Enter your state" value={form.state} onChange={onChange('state')} disabled={isLoading || updateProfile.isPending} />
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.enterState')} value={form.state} onChange={onChange('state')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                           <div className="col-md-6">
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-globe me-1"></i>
-                                Country
+                                {t('patient.settings.country')}
                               </label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Enter your country" value={form.country} onChange={onChange('country')} disabled={isLoading || updateProfile.isPending} />
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.enterCountry')} value={form.country} onChange={onChange('country')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                           <div className="col-md-6">
                             <div className="mb-3">
                               <label className="form-label veterinary-form-label">
                                 <i className="fa-solid fa-envelope me-1"></i>
-                                Pincode
+                                {t('patient.settings.pincode')}
                               </label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Enter your pincode" value={form.zip} onChange={onChange('zip')} disabled={isLoading || updateProfile.isPending} />
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.enterPostal')} value={form.zip} onChange={onChange('zip')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                         </div>
@@ -418,27 +420,27 @@ const ProfileSettings = () => {
                       <div className="setting-title veterinary-setting-title">
                         <h6>
                           <i className="fa-solid fa-triangle-exclamation me-2"></i>
-                          Emergency Contact
+                          {t('patient.settings.emergencyContact')}
                         </h6>
                       </div>
                       <div className="setting-card veterinary-setting-card">
                         <div className="row">
                           <div className="col-md-4">
                             <div className="mb-3">
-                              <label className="form-label veterinary-form-label">Name</label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Emergency contact name" value={form.emergencyName} onChange={onChange('emergencyName')} disabled={isLoading || updateProfile.isPending} />
+                              <label className="form-label veterinary-form-label">{t('patient.settings.name')}</label>
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.emergencyName')} value={form.emergencyName} onChange={onChange('emergencyName')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                           <div className="col-md-4">
                             <div className="mb-3">
-                              <label className="form-label veterinary-form-label">Phone</label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Emergency contact phone" value={form.emergencyPhone} onChange={onChange('emergencyPhone')} disabled={isLoading || updateProfile.isPending} />
+                              <label className="form-label veterinary-form-label">{t('patient.settings.phone')}</label>
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.emergencyPhone')} value={form.emergencyPhone} onChange={onChange('emergencyPhone')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                           <div className="col-md-4">
                             <div className="mb-3">
-                              <label className="form-label veterinary-form-label">Relation</label>
-                              <input type="text" className="form-control veterinary-form-control" placeholder="Relation" value={form.emergencyRelation} onChange={onChange('emergencyRelation')} disabled={isLoading || updateProfile.isPending} />
+                              <label className="form-label veterinary-form-label">{t('patient.settings.relation')}</label>
+                              <input type="text" className="form-control veterinary-form-control" placeholder={t('patient.settings.relation')} value={form.emergencyRelation} onChange={onChange('emergencyRelation')} disabled={isLoading || updateProfile.isPending} />
                             </div>
                           </div>
                         </div>
@@ -446,10 +448,10 @@ const ProfileSettings = () => {
                       
                       <div className="modal-btn veterinary-form-actions text-end">
                         <a href="#" className="btn veterinary-btn-outline btn-md rounded-pill me-2" onClick={(e) => { e.preventDefault(); window.location.reload(); }}>
-                          <i className="fa-solid fa-times me-2"></i>Cancel
+                          <i className="fa-solid fa-times me-2"></i>{t('patient.settings.cancel')}
                         </a>
                         <button type="submit" className="btn veterinary-btn-primary btn-md rounded-pill" disabled={updateProfile.isPending || uploadProfileImage.isPending}>
-                          <i className="fa-solid fa-save me-2"></i>Save Changes
+                          <i className="fa-solid fa-save me-2"></i>{t('patient.settings.saveChanges')}
                         </button>
                       </div>
                     </form>

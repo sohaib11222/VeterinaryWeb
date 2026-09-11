@@ -8,6 +8,7 @@ import { toast } from 'react-toastify'
 import { useAuth } from '../../contexts/AuthContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const schema = yup.object({
   registrationCertificate: yup.mixed().required('Registration certificate is required'),
@@ -30,6 +31,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024
 const DoctorVerificationUpload = () => {
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState({})
   const { handleSubmit, formState: { errors }, setValue } = useForm({ resolver: yupResolver(schema) })
@@ -61,7 +63,7 @@ const DoctorVerificationUpload = () => {
 
   const onSubmit = async (data) => {
     if (!user?.isPhoneVerified) {
-      toast.error('Verify your phone number before uploading verification documents.')
+      toast.error(t('auth.verification.phoneTitle'))
       navigate('/doctor-phone-verification')
       return
     }
@@ -79,10 +81,10 @@ const DoctorVerificationUpload = () => {
       }
 
       await api.upload(API_ROUTES.UPLOAD.VETERINARIAN_DOCS, formData)
-      toast.success('Verification documents uploaded successfully!')
+      toast.success(t('auth.verification.documentsSuccess'))
       navigate('/pending-approval')
     } catch (error) {
-      toast.error(error?.message || 'Failed to upload documents. Please try again.')
+      toast.error(error?.message || t('auth.verification.documentsFailed'))
     } finally {
       setLoading(false)
     }
@@ -90,18 +92,18 @@ const DoctorVerificationUpload = () => {
 
   return (
     <div className="auth-pharmacy-flow auth-pharmacy-flow--documents">
-      <div className="auth-pharmacy-flow__steps" aria-label="Registration progress">
-        <span className="is-complete"><i className="fa-solid fa-check" /><b>Account</b></span>
-        <span className="is-complete"><i className="fa-solid fa-check" /><b>Phone verification</b></span>
-        <span className="is-active"><i className="fa-solid fa-file-shield" /><b>Documents</b></span>
-        <span><i className="fa-solid fa-circle-check" /><b>Approval</b></span>
+      <div className="auth-pharmacy-flow__steps" aria-label={t('auth.authLayout.featuresAria')}>
+        <span className="is-complete"><i className="fa-solid fa-check" /><b>{t('auth.verification.account')}</b></span>
+        <span className="is-complete"><i className="fa-solid fa-check" /><b>{t('auth.verification.phone')}</b></span>
+        <span className="is-active"><i className="fa-solid fa-file-shield" /><b>{t('auth.verification.documents')}</b></span>
+        <span><i className="fa-solid fa-circle-check" /><b>{t('auth.verification.approval')}</b></span>
       </div>
 
       <div className="auth-pharmacy-flow__panel">
         <div className="auth-pharmacy-flow__header">
           <div className="logo-icon"><i className="fa-solid fa-file-shield" /></div>
           <div>
-            <h3>Verify your veterinary credentials</h3>
+            <h3>{t('auth.authLayout.veterinaryTitle')}</h3>
             <p>Upload the required professional documents. The MyPetPlus team reviews them before approving your veterinary account.</p>
           </div>
         </div>
@@ -120,7 +122,7 @@ const DoctorVerificationUpload = () => {
                     <div className="auth-document-card__help">{file?.name || document.help}</div>
                     {errors?.[document.key] && <div className="text-danger small mt-1">{errors[document.key]?.message}</div>}
                   </div>
-                  <label htmlFor={document.key} className="btn btn-sm btn-outline-primary mb-0">{file ? 'Replace' : 'Choose file'}</label>
+                  <label htmlFor={document.key} className="btn btn-sm btn-outline-primary mb-0">{file ? t('common.save') : t('common.next')}</label>
                   <input type="file" id={document.key} className="d-none" accept={document.accept} onChange={(event) => handleFileChange(document.key, event)} />
                 </div>
               )
@@ -130,13 +132,13 @@ const DoctorVerificationUpload = () => {
           <div className="auth-document-footer mt-3">
             <div className="text-muted small"><i className="fa-solid fa-shield-halved me-2" />PDF, JPG, PNG, DOC, and DOCX files up to 10 MB. Your documents are used only for account verification.</div>
             <button type="submit" className="btn btn-primary-gradient" disabled={loading}>
-              {loading ? 'Uploading documents…' : 'Submit for verification'} <i className="fa-solid fa-arrow-right ms-2" />
+              {loading ? t('auth.verification.sending') : t('auth.verification.verifyContinue')} <i className="fa-solid fa-arrow-right ms-2" />
             </button>
           </div>
         </form>
       </div>
 
-      <div className="text-center mt-3"><Link to="/doctor-phone-verification" className="text-muted">Back to phone verification</Link></div>
+      <div className="text-center mt-3"><Link to="/doctor-phone-verification" className="text-muted">{t('auth.verification.backToLogin')}</Link></div>
     </div>
   )
 }

@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useVeterinarianAnnouncements, useUnreadAnnouncementCount } from '../../queries/announcementQueries'
 import { useMarkAnnouncementAsRead } from '../../mutations/announcementMutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const DoctorAnnouncements = () => {
+  const { language, t } = useLanguage()
   const { user } = useAuth()
   const [filter, setFilter] = useState('all') // all, unread, pinned
   const [page, setPage] = useState(1)
@@ -74,13 +76,13 @@ const DoctorAnnouncements = () => {
   const formatDate = (dateString) => {
     if (!dateString) return ''
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
+    return date.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })
   }
 
   const formatTime = (dateString) => {
     if (!dateString) return ''
     const date = new Date(dateString)
-    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    return date.toLocaleTimeString(language === 'it' ? 'it-IT' : 'en-US', { hour: '2-digit', minute: '2-digit' })
   }
 
   const getPriorityBadge = (priority) => {
@@ -112,9 +114,9 @@ const DoctorAnnouncements = () => {
   const handleMarkAsRead = async (announcementId) => {
     try {
       await markReadMutation.mutateAsync(announcementId)
-      toast.success('Announcement marked as read')
+      toast.success(t('doctorRemaining.announcements.markReadSuccess'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to mark as read')
+      toast.error(err?.message || t('doctorRemaining.announcements.markReadFailed'))
     }
   }
 
@@ -134,12 +136,12 @@ const DoctorAnnouncements = () => {
             <div className="dashboard-header">
               <div className="d-flex justify-content-between align-items-center">
                 <div>
-                  <h3>Announcements</h3>
-                  <p className="text-muted mb-0">Stay updated with platform news and updates</p>
+                  <h3>{t('doctorRemaining.announcements.title')}</h3>
+                  <p className="text-muted mb-0">{t('doctorRemaining.announcements.subtitle')}</p>
                 </div>
                 <div className="announcement-stats">
-                  <span className="badge bg-danger me-2">{unreadCount} Unread</span>
-                  <span className="badge bg-primary">{pinnedCount} Pinned</span>
+                  <span className="badge bg-danger me-2">{unreadCount} {t('doctorRemaining.announcements.unread')}</span>
+                  <span className="badge bg-primary">{pinnedCount} {t('doctorRemaining.announcements.pinned')}</span>
                 </div>
               </div>
             </div>
@@ -155,7 +157,7 @@ const DoctorAnnouncements = () => {
                       setPage(1)
                     }}
                   >
-                    All Announcements ({announcements.length})
+                    {t('doctorRemaining.announcements.all')} ({announcements.length})
                   </button>
                   <button
                     className={`btn btn-sm ${filter === 'unread' ? 'btn-primary' : 'btn-outline-primary'}`}
@@ -164,7 +166,7 @@ const DoctorAnnouncements = () => {
                       setPage(1)
                     }}
                   >
-                    Unread ({unreadCount})
+                    {t('doctorRemaining.announcements.unreadTab')} ({unreadCount})
                   </button>
                   <button
                     className={`btn btn-sm ${filter === 'pinned' ? 'btn-primary' : 'btn-outline-primary'}`}
@@ -173,7 +175,7 @@ const DoctorAnnouncements = () => {
                       setPage(1)
                     }}
                   >
-                    Pinned ({pinnedCount})
+                    {t('doctorRemaining.announcements.pinnedTab')} ({pinnedCount})
                   </button>
                 </div>
               </div>
@@ -185,7 +187,7 @@ const DoctorAnnouncements = () => {
                 <div className="card">
                   <div className="card-body text-center py-5">
                     <div className="spinner-border" role="status">
-                      <span className="visually-hidden">Loading...</span>
+                      <span className="visually-hidden">{t('doctorRemaining.announcements.loading')}</span>
                     </div>
                   </div>
                 </div>
@@ -193,8 +195,8 @@ const DoctorAnnouncements = () => {
                 <div className="card">
                   <div className="card-body text-center py-5">
                     <i className="fe fe-bell-off" style={{ fontSize: '64px', color: '#dee2e6' }}></i>
-                    <h5 className="mt-3">No announcements found</h5>
-                    <p className="text-muted">You're all caught up!</p>
+                    <h5 className="mt-3">{t('doctorRemaining.announcements.empty')}</h5>
+                    <p className="text-muted">{t('doctorRemaining.announcements.caughtUp')}</p>
                   </div>
                 </div>
               ) : (
@@ -213,26 +215,26 @@ const DoctorAnnouncements = () => {
                             <div>
                               <h5 className="mb-1">
                                 {announcement.isPinned && (
-                                  <i className="fe fe-pin text-primary me-2" title="Pinned"></i>
+                                  <i className="fe fe-pin text-primary me-2" title={t('doctorRemaining.announcements.pinnedTitle')}></i>
                                 )}
                                 {announcement.priority === 'URGENT' && (
-                                  <i className="fe fe-alert-circle text-danger me-2" title="Urgent"></i>
+                                  <i className="fe fe-alert-circle text-danger me-2" title={t('doctorRemaining.announcements.urgent')}></i>
                                 )}
                                 {announcement.title}
                                 {!announcement.isRead && (
-                                  <span className="badge bg-danger ms-2">New</span>
+                                  <span className="badge bg-danger ms-2">{t('doctorRemaining.announcements.new')}</span>
                                 )}
                               </h5>
                               <div className="d-flex align-items-center gap-2 mb-2">
                                 <span className={`badge ${getPriorityBadge(announcement.priority)}`}>
-                                  {announcement.priority}
+                                  {announcement.priority === 'URGENT' ? t('doctorRemaining.announcements.urgent') : announcement.priority === 'IMPORTANT' ? t('doctorStatus.important') : t('doctorStatus.normal')}
                                 </span>
                                 <span className={`badge ${getTypeBadge(announcement.announcementType)}`}>
-                                  {announcement.announcementType}
+                                  {announcement.announcementType === 'BROADCAST' ? t('doctorStatus.broadcast') : t('doctorStatus.targeted')}
                                 </span>
                                 <span className="text-muted small">
                                   <i className="fe fe-calendar me-1"></i>
-                                  {formatDate(announcement.createdAt)} at {formatTime(announcement.createdAt)}
+                                  {formatDate(announcement.createdAt)} {t('doctorRemaining.announcements.dateAt')} {formatTime(announcement.createdAt)}
                                 </span>
                               </div>
                             </div>
@@ -259,7 +261,7 @@ const DoctorAnnouncements = () => {
                                 className="btn btn-sm btn-outline-secondary"
                               >
                                 <i className="fe fe-paperclip me-1"></i>
-                                View Attachment
+                                {t('doctorRemaining.announcements.viewAttachment')}
                               </a>
                             </div>
                           )}
@@ -273,7 +275,7 @@ const DoctorAnnouncements = () => {
                                 className="btn btn-sm btn-outline-primary"
                               >
                                 <i className="fe fe-external-link me-1"></i>
-                                View Link
+                                {t('doctorRemaining.announcements.viewLink')}
                               </a>
                             </div>
                           )}
@@ -284,7 +286,7 @@ const DoctorAnnouncements = () => {
                               onClick={() => handleMarkAsRead(announcement._id)}
                               disabled={markReadMutation.isPending}
                             >
-                              Mark as Read
+                              {t('doctorRemaining.announcements.markRead')}
                             </button>
                           )}
                         </div>
@@ -305,12 +307,12 @@ const DoctorAnnouncements = () => {
                         onClick={() => handlePageChange(page - 1)}
                         disabled={page === 1}
                       >
-                        Previous
+                        {t('doctorRemaining.announcements.previous')}
                       </button>
                     </li>
                     <li className="page-item disabled">
                       <span className="page-link">
-                        Page {page} of {pagination.pages}
+                        {t('doctorRemaining.announcements.pageOf', { page, pages: pagination.pages })}
                       </span>
                     </li>
                     <li className={`page-item ${page === pagination.pages ? 'disabled' : ''}`}>
@@ -319,7 +321,7 @@ const DoctorAnnouncements = () => {
                         onClick={() => handlePageChange(page + 1)}
                         disabled={page === pagination.pages}
                       >
-                        Next
+                        {t('doctorRemaining.announcements.next')}
                       </button>
                     </li>
                   </ul>
@@ -334,10 +336,9 @@ const DoctorAnnouncements = () => {
                   <i className="fe fe-info"></i>
                 </div>
                 <div className="flex-grow-1 ms-3">
-                  <h6 className="alert-heading">About Announcements</h6>
+                  <h6 className="alert-heading">{t('doctorRemaining.announcements.aboutTitle')}</h6>
                   <p className="mb-0 small">
-                    Important announcements from the platform will appear here. Pinned announcements stay at the top, 
-                    and urgent announcements are highlighted. Make sure to read all announcements to stay updated.
+                    {t('doctorRemaining.announcements.aboutText')}
                   </p>
                 </div>
               </div>

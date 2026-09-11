@@ -4,8 +4,10 @@ import { toast } from 'react-toastify'
 import { usePets, useMedicalRecords, useUpcomingVaccinations, useVaccinations, useMyPrescriptions, downloadPrescriptionPdf } from '../../queries'
 import { useCreateMedicalRecordWithUpload, useDeleteMedicalRecord } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const MedicalRecords = () => {
+  const { language, t } = useLanguage()
   const [activeTab, setActiveTab] = useState('medical')
 
   const [search, setSearch] = useState('')
@@ -131,7 +133,7 @@ const MedicalRecords = () => {
     if (!d) return '—'
     const dt = new Date(d)
     if (Number.isNaN(dt.getTime())) return '—'
-    return dt.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    return dt.toLocaleDateString(language === 'it' ? 'it-IT' : 'en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
   }
 
   const resetAddForm = () => {
@@ -149,15 +151,15 @@ const MedicalRecords = () => {
     e.preventDefault()
 
     if (!addForm.petId) {
-      toast.error('Please select a pet')
+      toast.error(t('patient.medical.selectPetError'))
       return
     }
     if (!addForm.title.trim()) {
-      toast.error('Title is required')
+      toast.error(t('patient.medical.titleRequired'))
       return
     }
     if (!addForm.file) {
-      toast.error('File is required')
+      toast.error(t('patient.medical.fileRequired'))
       return
     }
 
@@ -169,21 +171,21 @@ const MedicalRecords = () => {
         recordType: addForm.recordType,
         file: addForm.file,
       })
-      toast.success('Medical record created')
+      toast.success(t('patient.medical.created'))
       setShowAddModal(false)
     } catch (err) {
-      toast.error(err?.message || 'Failed to create medical record')
+      toast.error(err?.message || t('patient.medical.createFailed'))
     }
   }
 
   const handleDelete = async (recordId) => {
-    const ok = window.confirm('Delete this record?')
+    const ok = window.confirm(t('patient.medical.deleteConfirm'))
     if (!ok) return
     try {
       await deleteRecord.mutateAsync(recordId)
-      toast.success('Medical record deleted')
+      toast.success(t('patient.medical.deleted'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to delete record')
+      toast.error(err?.message || t('patient.medical.deleteFailed'))
     }
   }
 
@@ -229,9 +231,9 @@ const MedicalRecords = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-file-medical me-3"></i>
-                    Pet Medical Records
+                    {t('patient.medical.title')}
                   </h2>
-                  <p className="dashboard-subtitle">Manage your pets' medical history and prescriptions</p>
+                  <p className="dashboard-subtitle">{t('patient.medical.subtitle')}</p>
                 </div>
               </div>
             </div>
@@ -247,17 +249,17 @@ const MedicalRecords = () => {
                           <ul className="nav patient-medical-tabs">
                             <li>
                               <a href="#" className={`nav-link veterinary-tab ${activeTab === 'medical' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleTabChange('medical') }} data-bs-toggle="tab" data-bs-target="#medical">
-                                <i className="fa-solid fa-notes-medical me-2"></i>Medical Records
+                                <i className="fa-solid fa-notes-medical me-2"></i>{t('patient.medical.medicalRecords')}
                               </a>
                             </li>
                             <li>
                               <a href="#" className={`nav-link veterinary-tab ${activeTab === 'prescription' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleTabChange('prescription') }} data-bs-toggle="tab" data-bs-target="#prescription">
-                                <i className="fa-solid fa-prescription me-2"></i>Prescriptions
+                                <i className="fa-solid fa-prescription me-2"></i>{t('patient.medical.prescriptions')}
                               </a>
                             </li>
                             <li>
                               <a href="#" className={`nav-link veterinary-tab ${activeTab === 'vaccinations' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleTabChange('vaccinations') }} data-bs-toggle="tab" data-bs-target="#vaccinations">
-                                <i className="fa-solid fa-syringe me-2"></i>Vaccinations
+                                <i className="fa-solid fa-syringe me-2"></i>{t('patient.medical.vaccinations')}
                               </a>
                             </li>
                           </ul>
@@ -269,7 +271,7 @@ const MedicalRecords = () => {
                             <input
                               type="text"
                               className="form-control"
-                              placeholder="Search pet records..."
+                              placeholder={t('patient.medical.search')}
                               value={search}
                               onChange={(e) => setSearch(e.target.value)}
                             />
@@ -285,7 +287,7 @@ const MedicalRecords = () => {
                                 setVaccinationPage(1)
                               }}
                             >
-                              <option value="">All Pets</option>
+                              <option value="">{t('patient.medical.allPets')}</option>
                               {pets.map((p) => (
                                 <option key={p._id} value={p._id}>
                                   {p.name}
@@ -295,7 +297,7 @@ const MedicalRecords = () => {
                           </div>
                           {activeTab === 'medical' && (
                             <button type="button" className="btn veterinary-btn-primary rounded-pill" onClick={openAddModal}>
-                              <i className="fa-solid fa-plus me-2"></i>Add Record
+                              <i className="fa-solid fa-plus me-2"></i>{t('patient.medical.addRecord')}
                             </button>
                           )}
                         </div>
@@ -312,15 +314,15 @@ const MedicalRecords = () => {
                   <div className="dashboard-card-body">
                     {upcomingVaccinations.length > 0 && (
                       <div className="mb-3">
-                        <h5 className="mb-2">Upcoming (Next 30 days)</h5>
+                        <h5 className="mb-2">{t('patient.medical.upcoming')}</h5>
                         <div className="table-responsive">
                           <table className="table table-center mb-0 veterinary-table medical-upcoming-table">
                             <thead>
                               <tr>
-                                <th>Pet</th>
-                                <th>Type</th>
-                                <th>Due</th>
-                                <th>Veterinarian</th>
+                                <th>{t('patient.appointment.pet')}</th>
+                                <th>{t('patient.reports.type')}</th>
+                                <th>{t('patient.medical.due')}</th>
+                                <th>{t('patient.appointment.veterinarian')}</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -330,7 +332,7 @@ const MedicalRecords = () => {
                                     <span className="badge veterinary-badge">
                                       <img
                                         src={getImageUrl(v.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
-                                        alt="Pet"
+                                        alt={t('patient.appointment.pet')}
                                         className="avatar avatar-xs me-1"
                                       />
                                       {v.petId?.name || '—'}
@@ -353,23 +355,23 @@ const MedicalRecords = () => {
                           <thead>
                             <tr>
                               <th>ID</th>
-                              <th>Pet</th>
-                              <th>Type</th>
-                              <th>Date</th>
-                              <th>Next Due</th>
-                              <th>Veterinarian</th>
-                              <th>Certificate</th>
-                              <th>Action</th>
+                              <th>{t('patient.appointment.pet')}</th>
+                              <th>{t('patient.reports.type')}</th>
+                              <th>{t('patient.reports.date')}</th>
+                              <th>{t('patient.medical.nextDue')}</th>
+                              <th>{t('patient.appointment.veterinarian')}</th>
+                              <th>{t('patient.medical.certificate')}</th>
+                              <th>{t('patient.action')}</th>
                             </tr>
                           </thead>
                           <tbody>
                             {isVaccinationsLoading ? (
                               <tr>
-                                <td colSpan={8} className="text-center py-4">Loading...</td>
+                                <td colSpan={8} className="text-center py-4">{t('common.loading', 'Loading…')}</td>
                               </tr>
                             ) : filteredVaccinations.length === 0 ? (
                               <tr>
-                                <td colSpan={8} className="text-center py-4">No vaccinations found</td>
+                                <td colSpan={8} className="text-center py-4">{t('patient.medical.noVaccinations')}</td>
                               </tr>
                             ) : (
                               filteredVaccinations.map((v) => (
@@ -383,7 +385,7 @@ const MedicalRecords = () => {
                                     <span className="badge veterinary-badge">
                                       <img
                                         src={getImageUrl(v.petId?.photo) || '/assets/img/doctors-dashboard/profile-01.jpg'}
-                                        alt="Pet"
+                                        alt={t('patient.appointment.pet')}
                                         className="avatar avatar-xs me-1"
                                       />
                                       {v.petId?.name || '—'}
@@ -395,14 +397,14 @@ const MedicalRecords = () => {
                                   <td data-label="Veterinarian">{v.veterinarianId?.name || '—'}</td>
                                   <td data-label="Certificate">
                                     {v.certificateUrl ? (
-                                      <a href={getImageUrl(v.certificateUrl) || '#'} target="_blank" rel="noreferrer" className="link-primary">View</a>
+                                      <a href={getImageUrl(v.certificateUrl) || '#'} target="_blank" rel="noreferrer" className="link-primary">{t('common.view', 'View')}</a>
                                     ) : (
                                       '—'
                                     )}
                                   </td>
                                   <td data-label="Actions">
                                     <div className="action-item veterinary-actions">
-                                      <a href="#" className="veterinary-action-btn" title="View" onClick={(e) => { e.preventDefault(); setViewVaccination(v) }}>
+                                      <a href="#" className="veterinary-action-btn" title={t('common.view', 'View')} onClick={(e) => { e.preventDefault(); setViewVaccination(v) }}>
                                         <i className="fa-solid fa-eye"></i>
                                       </a>
                                     </div>
@@ -420,7 +422,7 @@ const MedicalRecords = () => {
                         <ul>
                           <li>
                             <a href="#" className={`page-link veterinary-page-link prev ${vaccinationPage <= 1 ? 'disabled' : ''}`} onClick={handlePrevVaccinationPage}>
-                              <i className="fa-solid fa-chevron-left me-1"></i>Prev
+                              <i className="fa-solid fa-chevron-left me-1"></i>{t('patient.previous')}
                             </a>
                           </li>
                           <li>
@@ -430,7 +432,7 @@ const MedicalRecords = () => {
                           </li>
                           <li>
                             <a href="#" className={`page-link veterinary-page-link next ${vaccinationPage >= vaccinationsPagination.pages ? 'disabled' : ''}`} onClick={handleNextVaccinationPage}>
-                              Next<i className="fa-solid fa-chevron-right ms-1"></i>
+                              {t('patient.next')}<i className="fa-solid fa-chevron-right ms-1"></i>
                             </a>
                           </li>
                         </ul>
@@ -450,20 +452,20 @@ const MedicalRecords = () => {
                           <thead>
                             <tr>
                               <th>ID</th>
-                              <th>Date</th>
-                              <th>Pet</th>
-                              <th>Veterinarian</th>
-                              <th>Action</th>
+                              <th>{t('patient.reports.date')}</th>
+                              <th>{t('patient.appointment.pet')}</th>
+                              <th>{t('patient.appointment.veterinarian')}</th>
+                              <th>{t('patient.action')}</th>
                             </tr>
                           </thead>
                           <tbody>
                             {isPrescriptionsLoading ? (
                               <tr>
-                                <td colSpan={5} className="text-center py-4">Loading...</td>
+                                <td colSpan={5} className="text-center py-4">{t('common.loading', 'Loading…')}</td>
                               </tr>
                             ) : filteredPrescriptions.length === 0 ? (
                               <tr>
-                                <td colSpan={5} className="text-center py-4">No prescriptions found</td>
+                                <td colSpan={5} className="text-center py-4">{t('patient.medical.noPrescriptions')}</td>
                               </tr>
                             ) : (
                               filteredPrescriptions.map((rx) => (
@@ -480,13 +482,13 @@ const MedicalRecords = () => {
                                   <td data-label="Veterinarian">{rx.veterinarianId?.fullName || rx.veterinarianId?.name || '—'}</td>
                                   <td data-label="Actions">
                                     <div className="action-item veterinary-actions">
-                                      <Link to={`/patient/prescription?appointmentId=${rx.appointmentId?._id || rx.appointmentId}`} className="veterinary-action-btn" title="View">
+                                      <Link to={`/patient/prescription?appointmentId=${rx.appointmentId?._id || rx.appointmentId}`} className="veterinary-action-btn" title={t('common.view', 'View')}>
                                         <i className="fa-solid fa-eye"></i>
                                       </Link>
                                       <a
                                         href="#"
                                         className="veterinary-action-btn"
-                                        title="Download PDF"
+                                        title={t('patient.pdfDownload')}
                                         onClick={async (e) => {
                                           e.preventDefault()
                                           try {
@@ -501,7 +503,7 @@ const MedicalRecords = () => {
                                             a.remove()
                                             window.URL.revokeObjectURL(url)
                                           } catch (err) {
-                                            toast.error(err?.message || 'Failed to download PDF')
+                                            toast.error(err?.message || t('common.unableDownload', 'Unable to download PDF'))
                                           }
                                         }}
                                       >
@@ -531,22 +533,22 @@ const MedicalRecords = () => {
                           <thead>
                             <tr>
                               <th>ID</th>
-                              <th>Title</th>
-                              <th>Type</th>
-                              <th>Date</th>
-                              <th>Pet</th>
-                              <th>Description</th>
-                              <th>Action</th>
+                              <th>{t('patient.medical.recordTitle')}</th>
+                              <th>{t('patient.reports.type')}</th>
+                              <th>{t('patient.reports.date')}</th>
+                              <th>{t('patient.appointment.pet')}</th>
+                              <th>{t('patient.medical.description')}</th>
+                              <th>{t('patient.action')}</th>
                             </tr>
                           </thead>
                           <tbody>
                             {isLoading ? (
                               <tr>
-                                <td colSpan={7} className="text-center py-4">Loading...</td>
+                                <td colSpan={7} className="text-center py-4">{t('common.loading', 'Loading…')}</td>
                               </tr>
                             ) : filtered.length === 0 ? (
                               <tr>
-                                <td colSpan={7} className="text-center py-4">No medical records found</td>
+                                <td colSpan={7} className="text-center py-4">{t('patient.medical.noRecords')}</td>
                               </tr>
                             ) : (
                               filtered.map((record) => (
@@ -567,13 +569,13 @@ const MedicalRecords = () => {
                                   <td data-label="Description"><span className="veterinary-notes">{record.description || '—'}</span></td>
                                   <td data-label="Actions">
                                     <div className="action-item veterinary-actions">
-                                      <a href="#" className="veterinary-action-btn" title="View" onClick={(e) => { e.preventDefault(); setViewRecord(record) }}>
+                                      <a href="#" className="veterinary-action-btn" title={t('common.view', 'View')} onClick={(e) => { e.preventDefault(); setViewRecord(record) }}>
                                         <i className="fa-solid fa-eye"></i>
                                       </a>
-                                      <a href={getImageUrl(record.fileUrl) || '#'} target="_blank" rel="noreferrer" className="veterinary-action-btn" title="Download">
+                                      <a href={getImageUrl(record.fileUrl) || '#'} target="_blank" rel="noreferrer" className="veterinary-action-btn" title={t('patient.reports.download')}>
                                         <i className="fa-solid fa-download"></i>
                                       </a>
-                                      <a href="#" className="veterinary-action-btn text-danger" title="Delete" onClick={(e) => { e.preventDefault(); handleDelete(record._id) }}>
+                                      <a href="#" className="veterinary-action-btn text-danger" title={t('common.delete', 'Delete')} onClick={(e) => { e.preventDefault(); handleDelete(record._id) }}>
                                         <i className="fa-solid fa-trash"></i>
                                       </a>
                                     </div>
@@ -591,7 +593,7 @@ const MedicalRecords = () => {
                         <ul>
                           <li>
                             <a href="#" className={`page-link veterinary-page-link prev ${page <= 1 ? 'disabled' : ''}`} onClick={handlePrevPage}>
-                              <i className="fa-solid fa-chevron-left me-1"></i>Prev
+                              <i className="fa-solid fa-chevron-left me-1"></i>{t('patient.previous')}
                             </a>
                           </li>
                           <li>
@@ -601,7 +603,7 @@ const MedicalRecords = () => {
                           </li>
                           <li>
                             <a href="#" className={`page-link veterinary-page-link next ${page >= pagination.pages ? 'disabled' : ''}`} onClick={handleNextPage}>
-                              Next<i className="fa-solid fa-chevron-right ms-1"></i>
+                              {t('patient.next')}<i className="fa-solid fa-chevron-right ms-1"></i>
                             </a>
                           </li>
                         </ul>
@@ -653,6 +655,7 @@ const MedicalRecordModals = ({
   setViewRecord,
   formatDate,
 }) => {
+  const { t } = useLanguage()
   const fileUrl = viewRecord?.fileUrl ? getImageUrl(viewRecord.fileUrl) : null
 
   return (
@@ -664,15 +667,15 @@ const MedicalRecordModals = ({
             <div className="modal-dialog modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Add Medical Record</h5>
+                  <h5 className="modal-title">{t('patient.medical.addTitle')}</h5>
                   <button type="button" className="btn-close" onClick={() => setShowAddModal(false)}></button>
                 </div>
                 <form onSubmit={handleAddSubmit}>
                   <div className="modal-body">
                     <div className="mb-3">
-                      <label className="form-label">Pet <span className="text-danger">*</span></label>
+                      <label className="form-label">{t('patient.appointment.pet')} <span className="text-danger">*</span></label>
                       <select className="form-select" value={addForm.petId} onChange={(e) => setAddForm((p) => ({ ...p, petId: e.target.value }))}>
-                        <option value="">Select pet</option>
+                        <option value="">{t('patient.medical.selectPet')}</option>
                         {pets.map((p) => (
                           <option key={p._id} value={p._id}>
                             {p.name}
@@ -681,28 +684,28 @@ const MedicalRecordModals = ({
                       </select>
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Title <span className="text-danger">*</span></label>
+                      <label className="form-label">{t('patient.medical.recordTitle')} <span className="text-danger">*</span></label>
                       <input type="text" className="form-control" value={addForm.title} onChange={(e) => setAddForm((p) => ({ ...p, title: e.target.value }))} />
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Description</label>
+                      <label className="form-label">{t('patient.medical.description')}</label>
                       <textarea className="form-control" rows={3} value={addForm.description} onChange={(e) => setAddForm((p) => ({ ...p, description: e.target.value }))}></textarea>
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">Record Type</label>
+                      <label className="form-label">{t('patient.medical.recordType')}</label>
                       <select className="form-select" value={addForm.recordType} onChange={(e) => setAddForm((p) => ({ ...p, recordType: e.target.value }))}>
-                        <option value="GENERAL">GENERAL</option>
-                        <option value="LAB_REPORT">LAB_REPORT</option>
-                        <option value="XRAY">XRAY</option>
-                        <option value="VACCINATION">VACCINATION</option>
-                        <option value="SURGERY">SURGERY</option>
-                        <option value="WEIGHT">WEIGHT</option>
-                        <option value="PRESCRIPTION">PRESCRIPTION</option>
-                        <option value="OTHER">OTHER</option>
+                        <option value="GENERAL">{t('patient.medical.general')}</option>
+                        <option value="LAB_REPORT">{t('patient.medical.labReport')}</option>
+                        <option value="XRAY">{t('patient.medical.xray')}</option>
+                        <option value="VACCINATION">{t('patient.medical.vaccinations')}</option>
+                        <option value="SURGERY">{t('patient.medical.surgery')}</option>
+                        <option value="WEIGHT">{t('patient.medical.weight')}</option>
+                        <option value="PRESCRIPTION">{t('patient.medical.prescriptions')}</option>
+                        <option value="OTHER">{t('patient.medical.other')}</option>
                       </select>
                     </div>
                     <div className="mb-3">
-                      <label className="form-label">File <span className="text-danger">*</span></label>
+                      <label className="form-label">{t('patient.medical.file')} <span className="text-danger">*</span></label>
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -719,10 +722,10 @@ const MedicalRecordModals = ({
                   </div>
                   <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" onClick={() => setShowAddModal(false)}>
-                      Cancel
+                      {t('patient.settings.cancel')}
                     </button>
                     <button type="submit" className="btn btn-primary" disabled={createRecord.isPending}>
-                      {createRecord.isPending ? 'Uploading...' : 'Add Record'}
+                      {createRecord.isPending ? t('patient.medical.uploading') : t('patient.medical.addRecord')}
                     </button>
                   </div>
                 </form>
@@ -743,22 +746,22 @@ const MedicalRecordModals = ({
                   <button type="button" className="btn-close" onClick={() => setViewRecord(null)}></button>
                 </div>
                 <div className="modal-body">
-                  <div className="mb-2"><strong>Type:</strong> {viewRecord.recordType || 'GENERAL'}</div>
-                  <div className="mb-2"><strong>Pet:</strong> {viewRecord.petId?.name || '—'}</div>
-                  <div className="mb-2"><strong>Date:</strong> {formatDate(viewRecord.uploadedDate)}</div>
+                  <div className="mb-2"><strong>{t('patient.reports.type')}:</strong> {viewRecord.recordType || t('patient.medical.general')}</div>
+                  <div className="mb-2"><strong>{t('patient.appointment.pet')}:</strong> {viewRecord.petId?.name || '—'}</div>
+                  <div className="mb-2"><strong>{t('patient.reports.date')}:</strong> {formatDate(viewRecord.uploadedDate)}</div>
                   {viewRecord.description && (
                     <div className="mb-3">
-                      <strong>Description:</strong>
+                      <strong>{t('patient.medical.description')}:</strong>
                       <div className="mt-1">{viewRecord.description}</div>
                     </div>
                   )}
                   {fileUrl && (
                     <div className="d-flex gap-2 flex-wrap">
                       <a className="btn btn-sm btn-primary" href={fileUrl} target="_blank" rel="noreferrer">
-                        Download
+                        {t('patient.reports.download')}
                       </a>
                       <a className="btn btn-sm btn-outline-secondary" href={fileUrl} target="_blank" rel="noreferrer">
-                        Open
+                        {t('common.open', 'Open')}
                       </a>
                     </div>
                   )}
@@ -779,6 +782,7 @@ const VaccinationModals = ({
   setViewVaccination,
   formatDate,
 }) => {
+  const { t } = useLanguage()
   const certificateUrl = viewVaccination?.certificateUrl ? getImageUrl(viewVaccination.certificateUrl) : null
 
   return (
@@ -790,28 +794,28 @@ const VaccinationModals = ({
             <div className="modal-dialog modal-dialog-centered modal-lg" onClick={(e) => e.stopPropagation()}>
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">{viewVaccination.vaccinationType || 'Vaccination'}</h5>
+                  <h5 className="modal-title">{viewVaccination.vaccinationType || t('patient.medical.vaccinations')}</h5>
                   <button type="button" className="btn-close" onClick={() => setViewVaccination(null)}></button>
                 </div>
                 <div className="modal-body">
-                  <div className="mb-2"><strong>Pet:</strong> {viewVaccination.petId?.name || '—'}</div>
-                  <div className="mb-2"><strong>Date:</strong> {formatDate(viewVaccination.vaccinationDate)}</div>
-                  <div className="mb-2"><strong>Next Due:</strong> {formatDate(viewVaccination.nextDueDate)}</div>
-                  <div className="mb-2"><strong>Veterinarian:</strong> {viewVaccination.veterinarianId?.name || '—'}</div>
-                  <div className="mb-2"><strong>Batch Number:</strong> {viewVaccination.batchNumber || '—'}</div>
+                  <div className="mb-2"><strong>{t('patient.appointment.pet')}:</strong> {viewVaccination.petId?.name || '—'}</div>
+                  <div className="mb-2"><strong>{t('patient.reports.date')}:</strong> {formatDate(viewVaccination.vaccinationDate)}</div>
+                  <div className="mb-2"><strong>{t('patient.medical.nextDue')}:</strong> {formatDate(viewVaccination.nextDueDate)}</div>
+                  <div className="mb-2"><strong>{t('patient.appointment.veterinarian')}:</strong> {viewVaccination.veterinarianId?.name || '—'}</div>
+                  <div className="mb-2"><strong>{t('patient.medical.batchNumber')}:</strong> {viewVaccination.batchNumber || '—'}</div>
                   {viewVaccination.notes && (
                     <div className="mb-3">
-                      <strong>Notes:</strong>
+                      <strong>{t('patient.appointment.notes')}:</strong>
                       <div className="mt-1">{viewVaccination.notes}</div>
                     </div>
                   )}
                   {certificateUrl && (
                     <div className="d-flex gap-2 flex-wrap">
                       <a className="btn btn-sm btn-primary" href={certificateUrl} target="_blank" rel="noreferrer">
-                        Download Certificate
+                        {t('patient.medical.downloadCertificate')}
                       </a>
                       <a className="btn btn-sm btn-outline-secondary" href={certificateUrl} target="_blank" rel="noreferrer">
-                        Open
+                        {t('common.open', 'Open')}
                       </a>
                     </div>
                   )}

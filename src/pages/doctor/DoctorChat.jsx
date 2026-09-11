@@ -3,12 +3,14 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { useAppointment, useConversations, useMessages, useUnreadChatCount } from '../../queries'
 import { useGetOrCreateConversation, useMarkConversationRead, useSendMessage, useUploadChatFiles, useMarkConversationComplete } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const DoctorChat = () => {
   const { user } = useAuth()
+  const { t: translate, language } = useLanguage()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -178,8 +180,8 @@ const DoctorChat = () => {
     }
 
     setNewIncomingMessageCount((count) => count + addedMessages.length)
-    toast.info('New message received', { toastId: `chat-message-${conversationKey}` })
-  }, [messages, selectedConversationId, currentUserId])
+    toast.info(translate('doctorChat.newMessageReceived'), { toastId: `chat-message-${conversationKey}` })
+  }, [messages, selectedConversationId, currentUserId, translate])
 
   const handleMessagesScroll = () => {
     const container = messagesContainerRef.current
@@ -211,7 +213,7 @@ const DoctorChat = () => {
         {
           type: 'file',
           url: m.fileUrl,
-          name: m.fileName || 'File',
+          name: m.fileName || translate('doctorCommon.file'),
           size: null,
         },
       ]
@@ -234,7 +236,7 @@ const DoctorChat = () => {
     if (files.length === 0) return
 
     if (files.length > 10) {
-      toast.error('You can send up to 10 files at once.')
+      toast.error(translate('doctorChat.fileLimit'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
@@ -242,18 +244,18 @@ const DoctorChat = () => {
     const maxSize = 50 * 1024 * 1024
     const oversizedFiles = files.filter((f) => f.size > maxSize)
     if (oversizedFiles.length > 0) {
-      toast.error('Some files are too large. Maximum size is 50MB.')
+      toast.error(translate('doctorChat.fileSize'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
     if (!selectedConversationId || !selectedConversation || !currentUserId) {
-      toast.error('Please select a chat first')
+      toast.error(translate('doctorChat.selectChat'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
     if (isConversationCompleted) {
-      toast.info('This chat has been marked as completed')
+      toast.info(translate('doctorChat.completedInfo'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
@@ -271,7 +273,7 @@ const DoctorChat = () => {
       })
       const urls = res?.data?.urls || res?.urls || []
       if (!Array.isArray(urls) || urls.length !== files.length) {
-        throw new Error('One or more files could not be uploaded')
+        throw new Error(translate('doctorChat.uploadFailed'))
       }
       const uploaded = files.map((file, index) => ({
         type: file.type?.startsWith('image/') ? 'image' : 'file',
@@ -317,7 +319,7 @@ const DoctorChat = () => {
       setNewMessage('')
       scrollToBottom()
     } catch (err) {
-      toast.error(err?.message || 'Failed to upload/send files')
+      toast.error(err?.message || translate('doctorChat.uploadFailed'))
     } finally {
       setUploadingFiles(false)
       setUploadProgress(0)
@@ -383,7 +385,7 @@ const DoctorChat = () => {
           return next
         })
       } catch (err) {
-        const msg = err?.message || 'Unable to open chat for this appointment'
+        const msg = err?.message || translate('doctorChat.opening')
         const isTimeWindow =
           msg.includes('Communication will be available') ||
           msg.includes('appointment time') ||
@@ -434,7 +436,7 @@ const DoctorChat = () => {
     if (!dt) return ''
     const d = new Date(dt)
     if (Number.isNaN(d.getTime())) return ''
-    return d.toLocaleString(undefined, { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+    return d.toLocaleString(language === 'it' ? 'it-IT' : 'en-GB', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
   }
 
   const getConversationPeer = (c) => {
@@ -461,15 +463,15 @@ const DoctorChat = () => {
 
     const text = newMessage.trim()
     if (!text) {
-      toast.error('Please enter a message or select a file')
+      toast.error(translate('doctorChat.enterMessage'))
       return
     }
     if (!selectedConversationId || !selectedConversation || !currentUserId) {
-      toast.error('Please select a chat first')
+      toast.error(translate('doctorChat.selectChat'))
       return
     }
     if (isConversationCompleted) {
-      toast.info('This chat has been marked as completed')
+      toast.info(translate('doctorChat.completedInfo'))
       return
     }
 
@@ -498,18 +500,18 @@ const DoctorChat = () => {
       setNewMessage('')
       scrollToBottom()
     } catch (err) {
-      toast.error(err?.message || 'Failed to send message')
+      toast.error(err?.message || translate('doctorChat.sendFailed'))
     }
   }
 
   const handleMarkComplete = async () => {
     if (!selectedConversationId) return
-    if (!window.confirm('Mark this chat as completed? The pet owner will no longer be able to send messages.')) return
+    if (!window.confirm(translate('doctorChat.completeConfirm'))) return
     try {
       await markConversationComplete.mutateAsync(selectedConversationId)
-      toast.success('Chat marked as completed')
+      toast.success(translate('doctorChat.completedSuccess'))
     } catch (err) {
-      toast.error(err?.message || 'Failed to mark chat as completed')
+      toast.error(err?.message || translate('doctorChat.completeFailed'))
     }
   }
 
@@ -1015,9 +1017,9 @@ const DoctorChat = () => {
                 <div className="chat-list-header">
                   <div className="d-flex align-items-center justify-content-between mb-3">
                     <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate('/appointments')}>
-                      <i className="fa-solid fa-chevron-left me-1"></i> Back
+                      <i className="fa-solid fa-chevron-left me-1"></i> {translate('doctorChat.back')}
                     </button>
-                    <h4 className="mb-0">All Chats</h4>
+                    <h4 className="mb-0">{translate('doctorChat.allChats')}</h4>
                   </div>
                   <div className="chat-search-box">
                     <span className="form-control-feedback">
@@ -1025,7 +1027,7 @@ const DoctorChat = () => {
                     </span>
                     <input
                       type="text"
-                      placeholder="Search"
+                      placeholder={translate('doctorChat.search')}
                       className="form-control"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
@@ -1036,16 +1038,16 @@ const DoctorChat = () => {
                   {/* Pinned Chat Section */}
                   <div className="pinned-chat-section">
                     <div className="section-header">
-                      <h6>Pinned Chat</h6>
+                      <h6>{translate('doctorChat.pinned')}</h6>
                     </div>
                     {conversationsLoading ? (
-                      <div className="text-center py-3 text-muted">Loading...</div>
+                      <div className="text-center py-3 text-muted">{translate('doctorChat.loading')}</div>
                     ) : pinnedConversations.length === 0 ? (
-                      <div className="text-center py-3 text-muted">No chats</div>
+                      <div className="text-center py-3 text-muted">{translate('doctorChat.noChats')}</div>
                     ) : (
                       pinnedConversations.map((c) => {
                         const peer = getConversationPeer(c)
-                        const name = peer?.name || peer?.fullName || peer?.email || 'User'
+                        const name = peer?.name || peer?.fullName || peer?.email || translate('doctorChat.user')
                         const avatar = getImageUrl(peer?.profileImage) || '/assets/img/doctors-dashboard/profile-06.jpg'
                         const preview = c?.lastMessage?.message || c?.lastMessage?.fileName || '—'
                         const time = formatConversationTime(c)
@@ -1063,7 +1065,7 @@ const DoctorChat = () => {
                             }}
                           >
                             <div className="chat-item-avatar">
-                              <img src={avatar} alt="Avatar" />
+                                <img src={avatar} alt={translate('doctorChat.avatar')} />
                             </div>
                             <div className="chat-item-content">
                               <div className="chat-item-header">
@@ -1101,16 +1103,16 @@ const DoctorChat = () => {
                   {/* Recent Chat Section */}
                   <div className="recent-chat-section">
                     <div className="section-header">
-                      <h6>Recent Chat</h6>
+                      <h6>{translate('doctorChat.recent')}</h6>
                     </div>
                     {conversationsLoading ? (
-                      <div className="text-center py-3 text-muted">Loading...</div>
+                      <div className="text-center py-3 text-muted">{translate('doctorChat.loading')}</div>
                     ) : recentConversations.length === 0 ? (
-                      <div className="text-center py-3 text-muted">No more chats</div>
+                      <div className="text-center py-3 text-muted">{translate('doctorChat.noMoreChats')}</div>
                     ) : (
                       recentConversations.map((c) => {
                         const peer = getConversationPeer(c)
-                        const name = peer?.name || peer?.fullName || peer?.email || 'User'
+                        const name = peer?.name || peer?.fullName || peer?.email || translate('doctorChat.user')
                         const avatar = getImageUrl(peer?.profileImage) || '/assets/img/doctors-dashboard/profile-06.jpg'
                         const preview = c?.lastMessage?.message || c?.lastMessage?.fileName || '—'
                         const time = formatConversationTime(c)
@@ -1128,7 +1130,7 @@ const DoctorChat = () => {
                             }}
                           >
                             <div className="chat-item-avatar">
-                              <img src={avatar} alt="Avatar" />
+                                <img src={avatar} alt={translate('doctorChat.avatar')} />
                             </div>
                             <div className="chat-item-content">
                               <div className="chat-item-header">
@@ -1174,7 +1176,7 @@ const DoctorChat = () => {
                         type="button"
                         className="chat-mobile-back-button"
                         onClick={() => setIsMobileConversationOpen(false)}
-                        aria-label="Back to chats"
+                        aria-label={translate('doctorChat.backToChats')}
                       >
                         <i className="fa-solid fa-arrow-left"></i>
                       </button>
@@ -1185,7 +1187,7 @@ const DoctorChat = () => {
                               getImageUrl(getConversationPeer(selectedConversation)?.profileImage) ||
                               '/assets/img/doctors-dashboard/profile-06.jpg'
                             }
-                            alt="User"
+                            alt={translate('doctorChat.user')}
                           />
                         </div>
                         <div className="chat-details-user-info">
@@ -1193,28 +1195,29 @@ const DoctorChat = () => {
                             {getConversationPeer(selectedConversation)?.name ||
                               getConversationPeer(selectedConversation)?.fullName ||
                               getConversationPeer(selectedConversation)?.email ||
-                              'User'}
+                              translate('doctorChat.user')}
                           </h5>
                         </div>
                       </div>
                       <div className="chat-details-actions">
-                        <button type="button" title="Search">
+                        <button type="button" title={translate('doctorChat.searchAction')} aria-label={translate('doctorChat.searchAction')}>
                           <i className="fa-solid fa-magnifying-glass"></i>
                         </button>
-                        <button type="button" title="More options">
+                        <button type="button" title={translate('doctorChat.moreOptions')} aria-label={translate('doctorChat.moreOptions')}>
                           <i className="fa-solid fa-ellipsis-vertical"></i>
                         </button>
                         {selectedConversation?.conversationType === 'VETERINARIAN_PET_OWNER' &&
                           selectedConversation?.status !== 'COMPLETED' && (
                             <button
                               type="button"
-                              title="Mark as Completed"
+                              title={translate('doctorChat.markCompleted')}
+                              aria-label={translate('doctorChat.markCompleted')}
                               className="mark-complete-btn"
                               onClick={handleMarkComplete}
                               disabled={markConversationComplete.isPending}
                             >
                               <i className="fa-solid fa-check-circle"></i>
-                              <span>Mark Complete</span>
+                              <span>{translate('doctorChat.markComplete')}</span>
                             </button>
                           )}
                       </div>
@@ -1222,21 +1225,21 @@ const DoctorChat = () => {
 
                     {isConversationCompleted && (
                       <div className="alert alert-secondary rounded-0 mb-0 py-2 px-3" role="status">
-                        This chat was marked as completed. Messages and attachments are now read-only.
+                        {translate('doctorChat.completedNotice')}
                       </div>
                     )}
 
                     <div className="chat-messages-area" ref={messagesContainerRef} onScroll={handleMessagesScroll}>
                       {messagesLoading ? (
-                        <div className="text-center py-3 text-muted">Loading...</div>
+                        <div className="text-center py-3 text-muted">{translate('doctorChat.loading')}</div>
                       ) : messages.length === 0 ? (
-                        <div className="text-center py-3 text-muted">No messages yet</div>
+                        <div className="text-center py-3 text-muted">{translate('doctorChat.noMessages')}</div>
                       ) : (
                         messages.map((m) => {
                           const sender = m?.senderId
                           const senderId = sender?._id
                           const isOutgoing = currentUserId && senderId && String(senderId) === String(currentUserId)
-                          const senderName = sender?.name || sender?.fullName || sender?.email || 'User'
+                          const senderName = sender?.name || sender?.fullName || sender?.email || translate('doctorChat.user')
                           const senderAvatar = getImageUrl(sender?.profileImage) || (isOutgoing ? currentUserImage : '/assets/img/doctors-dashboard/profile-06.jpg')
                           const t = m?.createdAt ? new Date(m.createdAt) : null
                           const time = t && !Number.isNaN(t.getTime()) ? t.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : ''
@@ -1246,7 +1249,7 @@ const DoctorChat = () => {
                           return (
                             <div key={m._id} className={`chat-message ${isOutgoing ? 'outgoing' : 'incoming'}`}>
                               <div className="chat-message-avatar">
-                                <img src={senderAvatar} alt="Avatar" />
+                                <img src={senderAvatar} alt={translate('doctorChat.avatar')} />
                               </div>
                               <div className="chat-message-content">
                                 <div
@@ -1262,7 +1265,7 @@ const DoctorChat = () => {
                                     <div className="chat-attachments">
                                       {attachments.map((att, idx) => {
                                         const url = getImageUrl(att?.url)
-                                        const name = att?.name || att?.fileName || 'File'
+                                        const name = att?.name || att?.fileName || translate('doctorCommon.file')
                                         const size = formatFileSize(att?.size)
                                         const isImg = isImageAttachment(att)
 
@@ -1304,7 +1307,7 @@ const DoctorChat = () => {
                     {newIncomingMessageCount > 0 && (
                       <button type="button" className="new-chat-messages-button" onClick={jumpToLatestMessages}>
                         <i className="fa-solid fa-arrow-down"></i>
-                        {newIncomingMessageCount} new {newIncomingMessageCount === 1 ? 'message' : 'messages'}
+                        {translate('doctorChat.newMessage', { count: newIncomingMessageCount, label: translate(newIncomingMessageCount === 1 ? 'doctorChat.message' : 'doctorChat.messages') })}
                       </button>
                     )}
 
@@ -1313,7 +1316,8 @@ const DoctorChat = () => {
                       <div className="chat-input-actions">
                         <button
                           type="button"
-                          title="Attach"
+                          title={translate('doctorChat.attach')}
+                          aria-label={translate('doctorChat.attach')}
                           onClick={() => fileInputRef.current?.click()}
                           disabled={uploadingFiles || sendMessage.isPending || isConversationCompleted}
                         >
@@ -1331,7 +1335,7 @@ const DoctorChat = () => {
                       <input
                         type="text"
                         className="chat-input-field"
-                        placeholder={isConversationCompleted ? 'This chat has been marked as completed' : 'Type your message here...'}
+                        placeholder={isConversationCompleted ? translate('doctorChat.completedPlaceholder') : translate('doctorChat.messagePlaceholder')}
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyDown={handleMessageKeyDown}
@@ -1340,18 +1344,19 @@ const DoctorChat = () => {
                       <button
                         type="button"
                         className="chat-send-button"
-                        title="Send"
+                        title={translate('doctorChat.send')}
+                        aria-label={translate('doctorChat.send')}
                         onClick={handleSend}
                         disabled={!newMessage.trim() || sendMessage.isPending || uploadingFiles || isConversationCompleted}
                       >
                         <i className="fa-solid fa-paper-plane"></i>
                       </button>
-                      {uploadingFiles && <span className="chat-upload-status">Uploading {uploadProgress}%</span>}
+                      {uploadingFiles && <span className="chat-upload-status">{translate('doctorChat.upload', { progress: uploadProgress })}</span>}
                     </div>
                   </>
                 ) : (
                   <div className="d-flex align-items-center justify-content-center h-100 text-muted flex-column gap-2">
-                    {appointmentIdFromUrl && !conversationIdFromUrl ? <><i className="fa-solid fa-spinner fa-spin" />Opening chat…</> : 'Select a conversation'}
+                    {appointmentIdFromUrl && !conversationIdFromUrl ? <><i className="fa-solid fa-spinner fa-spin" />{translate('doctorChat.opening')}</> : translate('doctorChat.selectConversation')}
                   </div>
                 )}
               </div>

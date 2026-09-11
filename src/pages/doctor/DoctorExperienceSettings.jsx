@@ -4,11 +4,13 @@ import DoctorProfileTabs from '../../components/doctor/DoctorProfileTabs'
 import { useVeterinarianProfile } from '../../queries/veterinarianQueries'
 import { useUpdateVeterinarianProfile } from '../../mutations/veterinarianMutations'
 import { toast } from 'react-toastify'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { api } from '../../utils/api'
 import { API_ROUTES } from '../../utils/apiConfig'
 import { getNextTabPath } from '../../utils/profileSettingsTabs'
 
 const DoctorExperienceSettings = () => {
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const location = useLocation()
   const { data, isLoading } = useVeterinarianProfile()
@@ -64,7 +66,7 @@ const DoctorExperienceSettings = () => {
         experience: cleaned,
       })
 
-      toast.success('Experience updated successfully')
+      toast.success(t('doctorRemaining.experience.updated'))
 
       const refreshed = await api.get(API_ROUTES.VETERINARIANS.PROFILE)
       const nextProfile = refreshed?.data ?? refreshed
@@ -76,7 +78,7 @@ const DoctorExperienceSettings = () => {
         }
       }
     } catch (err) {
-      const message = err?.response?.data?.message || err?.message || 'Failed to update experience'
+      const message = err?.response?.data?.message || err?.message || t('doctorRemaining.experience.updateFailed')
       toast.error(message)
     }
   }
@@ -88,7 +90,7 @@ const DoctorExperienceSettings = () => {
         style={{ minHeight: '60vh' }}
       >
         <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('doctorRemaining.profile.loading')}</span>
         </div>
       </div>
     )
@@ -108,10 +110,10 @@ const DoctorExperienceSettings = () => {
                 <div className="veterinary-dashboard-header">
                   <h2 className="dashboard-title">
                     <i className="fa-solid fa-briefcase me-3"></i>
-                    Veterinary Experience
+                    {t('doctorRemaining.experience.title')}
                   </h2>
                   <p className="dashboard-subtitle">
-                    Manage your professional veterinary experience and work history
+                    {t('doctorRemaining.experience.subtitle')}
                   </p>
                 </div>
               </div>
@@ -130,7 +132,7 @@ const DoctorExperienceSettings = () => {
                         <div className="col-12 d-flex justify-content-between align-items-center">
                           <h5 className="card-title mb-0">
                             <i className="fa-solid fa-briefcase me-2"></i>
-                            Experience Entries
+                            {t('doctorRemaining.experience.section')}
                           </h5>
                           <button
                             type="button"
@@ -138,7 +140,7 @@ const DoctorExperienceSettings = () => {
                             onClick={addExperience}
                           >
                             <i className="fa-solid fa-plus me-2"></i>
-                            Add New Experience
+                            {t('doctorRemaining.experience.add')}
                           </button>
                         </div>
                       </div>
@@ -152,14 +154,14 @@ const DoctorExperienceSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-clinic-medical me-2"></i>
-                                      Hospital / Clinic Name
+                                      {t('doctorRemaining.experience.clinic')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={exp.hospital}
                                       onChange={(e) => handleChange(index, 'hospital', e.target.value)}
-                                      placeholder="e.g., MyPetPlus Veterinary Clinic"
+                                      placeholder={t('doctorRemaining.experience.clinicPlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -167,14 +169,14 @@ const DoctorExperienceSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-calendar-check me-2"></i>
-                                      From (Year)
+                                      {t('doctorRemaining.experience.from')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={exp.fromYear}
                                       onChange={(e) => handleChange(index, 'fromYear', e.target.value)}
-                                      placeholder="e.g., 2020"
+                                      placeholder={t('doctorRemaining.experience.fromPlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -182,14 +184,14 @@ const DoctorExperienceSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-calendar-times me-2"></i>
-                                      To (Year)
+                                      {t('doctorRemaining.experience.to')}
                                     </label>
                                     <input
                                       type="text"
                                       className="form-control veterinary-input"
                                       value={exp.toYear}
                                       onChange={(e) => handleChange(index, 'toYear', e.target.value)}
-                                      placeholder="e.g., 2023 or Present"
+                                      placeholder={t('doctorRemaining.experience.toPlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -197,7 +199,7 @@ const DoctorExperienceSettings = () => {
                                   <div className="form-wrap">
                                     <label className="col-form-label">
                                       <i className="fa-solid fa-user-tie me-2"></i>
-                                      Designation / Role
+                                      {t('doctorRemaining.experience.role')}
                                     </label>
                                     <input
                                       type="text"
@@ -206,7 +208,7 @@ const DoctorExperienceSettings = () => {
                                       onChange={(e) =>
                                         handleChange(index, 'designation', e.target.value)
                                       }
-                                      placeholder="e.g., Senior Veterinarian"
+                                      placeholder={t('doctorRemaining.experience.rolePlaceholder')}
                                     />
                                   </div>
                                 </div>
@@ -217,7 +219,7 @@ const DoctorExperienceSettings = () => {
                                     onClick={() => removeExperience(index)}
                                   >
                                     <i className="fa-solid fa-trash me-1"></i>
-                                    Remove
+                                    {t('doctorRemaining.experience.remove')}
                                   </button>
                                 </div>
                               </div>
@@ -233,7 +235,7 @@ const DoctorExperienceSettings = () => {
                           disabled={updateProfile.isPending}
                         >
                           <i className="fa-solid fa-save me-1"></i>
-                          {updateProfile.isPending ? 'Saving...' : 'Save Changes'}
+                          {updateProfile.isPending ? t('doctorRemaining.experience.saving') : t('doctorRemaining.experience.save')}
                         </button>
                       </div>
                     </form>

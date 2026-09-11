@@ -9,6 +9,7 @@ import { useProductPrescriptionEligibility } from '../../queries/productPrescrip
 import { useSubmitProductPrescriptionRequest } from '../../mutations/productPrescriptionRequestMutations'
 import { api } from '../../utils/api'
 import { API_ROUTES, getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const DetailRow = ({ label, value }) => {
   if (value === null || value === undefined || value === '') return null
@@ -22,15 +23,16 @@ const DetailRow = ({ label, value }) => {
   )
 }
 
-const variantLabel = (variant, fallback = 'Standard pack') => {
+const variantLabel = (variant, fallback, defaultUnit) => {
   if (variant?.name) return variant.name
   const strength = variant?.strengthValue ? `${variant.strengthValue} ${variant.strengthUnit || ''}`.trim() : ''
   const form = variant?.dosageForm || ''
-  const pack = variant?.unitsPerPack ? `${variant.unitsPerPack} ${variant.unitLabel || 'units'}` : ''
+  const pack = variant?.unitsPerPack ? `${variant.unitsPerPack} ${variant.unitLabel || defaultUnit}` : ''
   return [strength, form, pack].filter(Boolean).join(' · ') || fallback
 }
 
 const ProductDescription = () => {
+  const { t } = useLanguage()
   const { addToCart } = useCart()
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -50,7 +52,7 @@ const ProductDescription = () => {
     if (Array.isArray(product?.variants) && product.variants.length > 0) return product.variants
     if (!product) return []
     return [{
-      name: 'Standard pack',
+      name: t('shop.standardPack'),
       sku: product.sku,
       barcode: product.barcode,
       price: product.price,
@@ -113,7 +115,7 @@ const ProductDescription = () => {
     const next = quantity + delta
     if (next < 1) return
     if (selectedStock && next > selectedStock) {
-      toast.warning(`Only ${selectedStock} items available for this variant`)
+      toast.warning(t('shop.variantAvailability', { count: selectedStock }))
       return
     }
     setQuantity(next)
@@ -130,11 +132,11 @@ const ProductDescription = () => {
   const ensureAdd = (goCheckout) => {
     if (!product) return
     if (requiresPrescription && !canPurchase) {
-      toast.error('Upload a valid prescription and wait for Pharmacy approval before purchasing this medicine')
+      toast.error(t('shop.prescriptionBlocked'))
       return
     }
     if (!isInStock) {
-      toast.error('This product variant is out of stock')
+      toast.error(t('shop.outOfStockVariant'))
       return
     }
 
@@ -145,7 +147,7 @@ const ProductDescription = () => {
       return
     }
 
-    toast.success(`${quantity} × ${product.name}${selectedVariant ? ` (${variantLabel(selectedVariant)})` : ''} added to cart!`)
+    toast.success(t('shop.addedToCart', { quantity, name: `${product.name}${selectedVariant ? ` (${variantLabel(selectedVariant, t('shop.standardPack'), t('shop.units'))})` : ''}` }))
   }
 
   const handlePrescriptionFile = async (event) => {
@@ -153,17 +155,17 @@ const ProductDescription = () => {
     event.target.value = ''
     if (!file || !product) return
     if (!isPetOwner) {
-      toast.info('Please sign in as a pet owner to submit a prescription')
+      toast.info(t('shop.prescriptionLogin'))
       navigate('/login')
       return
     }
     if (file.size > 15 * 1024 * 1024) {
-      toast.error('Prescription file must be 15 MB or smaller')
+      toast.error(t('shop.prescriptionFileSize'))
       return
     }
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp']
     if (file.type && !allowedTypes.includes(file.type)) {
-      toast.error('Upload a PDF, JPG, PNG, or WebP prescription')
+      toast.error(t('shop.prescriptionFileType'))
       return
     }
 
@@ -174,7 +176,7 @@ const ProductDescription = () => {
       const uploadResponse = await api.upload(API_ROUTES.UPLOAD.PRODUCT_PRESCRIPTION, formData)
       const uploadPayload = uploadResponse?.data ?? uploadResponse
       const prescriptionUrl = uploadPayload?.data?.url || uploadPayload?.url
-      if (!prescriptionUrl) throw new Error('Prescription upload failed')
+      if (!prescriptionUrl) throw new Error(t('shop.prescriptionFailed'))
 
       await submitPrescriptionRequest.mutateAsync({
         productId: product._id || product.id,
@@ -183,9 +185,9 @@ const ProductDescription = () => {
         originalName: file.name,
         mimeType: file.type || null,
       })
-      toast.success('Prescription submitted. The Pharmacy will review it shortly.')
+      toast.success(t('shop.prescriptionSubmitted'))
     } catch (error) {
-      toast.error(error?.message || 'Could not submit your prescription')
+      toast.error(error?.message || t('shop.prescriptionFailed'))
     } finally {
       setIsUploadingPrescription(false)
     }
@@ -194,8 +196,8 @@ const ProductDescription = () => {
   if (productQuery.isLoading) {
     return (
       <>
-        <Breadcrumb title="Pharmacy" li1="Product Description" li2="Loading..." />
-        <div className="content"><div className="container"><div className="text-center py-5"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">Loading...</span></div></div></div></div>
+        <Breadcrumb title={t('shop.pharmacy')} li1={t('shop.details')} li2={t('shop.loading')} />
+        <div className="content"><div className="container"><div className="text-center py-5"><div className="spinner-border text-primary" role="status"><span className="visually-hidden">{t('shop.loading')}</span></div></div></div></div>
       </>
     )
   }
@@ -203,8 +205,8 @@ const ProductDescription = () => {
   if (productQuery.isError || !product) {
     return (
       <>
-        <Breadcrumb title="Pharmacy" li1="Product Description" li2="Not Found" />
-        <div className="content"><div className="container"><div className="alert alert-danger"><h5>Product Not Found</h5><p>The product you're looking for doesn't exist.</p><Link to="/product-all" className="btn btn-primary">Browse Products</Link></div></div></div>
+        <Breadcrumb title={t('shop.pharmacy')} li1={t('shop.details')} li2={t('common.notFound', 'Not found')} />
+        <div className="content"><div className="container"><div className="alert alert-danger"><h5>{t('shop.product')} {t('common.notFound', 'Not found')}</h5><p>{t('shop.noProducts')}</p><Link to="/product-all" className="btn btn-primary">{t('shop.browseProducts')}</Link></div></div></div>
       </>
     )
   }
@@ -212,13 +214,13 @@ const ProductDescription = () => {
   const productImage = getImageUrl(product?.images?.[0]) || '/assets/img/products/product.jpg'
   const selectedPack = [
     selectedVariant?.packageType,
-    selectedVariant?.unitsPerPack ? `${selectedVariant.unitsPerPack} ${selectedVariant.unitLabel || 'units'}` : '',
+    selectedVariant?.unitsPerPack ? `${selectedVariant.unitsPerPack} ${selectedVariant.unitLabel || t('shop.units')}` : '',
     selectedVariant?.packageDescription,
   ].filter(Boolean).join(' · ')
 
   return (
     <>
-      <Breadcrumb title="Pharmacy" li1="Product Description" li2={product?.name || 'Product'} />
+      <Breadcrumb title={t('shop.pharmacy')} li1={t('shop.details')} li2={product?.name || t('shop.product')} />
       <div className="content pharmacy-product-detail-mobile">
         <div className="container">
           <div className="row">
@@ -233,12 +235,12 @@ const ProductDescription = () => {
                       <div className="doc-info-cont product-cont">
                         <div className="d-flex align-items-center gap-2 flex-wrap mb-2">
                           <h4 className="doc-name mb-0">{product?.name}</h4>
-                          <span className={`badge ${isMedicine ? 'bg-primary' : 'bg-info text-dark'}`}>{isMedicine ? 'Veterinary medicine' : 'Parapharmacy product'}</span>
-                          {product?.requiresPrescription && <span className="badge bg-warning text-dark">Prescription required</span>}
+                          <span className={`badge ${isMedicine ? 'bg-primary' : 'bg-info text-dark'}`}>{isMedicine ? t('shop.medicine') : t('shop.parapharmacyProduct')}</span>
+                          {product?.requiresPrescription && <span className="badge bg-warning text-dark">{t('shop.prescriptionRequired')}</span>}
                         </div>
-                        {product?.brand && <p className="mb-2"><span className="text-muted">Brand </span>{product.brand}</p>}
-                        {product?.petStoreId?.name && <p className="mb-2"><span className="text-muted">Sold by </span>{product.petStoreId.name}</p>}
-                        <p>{product?.description || 'No description provided.'}</p>
+                        {product?.brand && <p className="mb-2"><span className="text-muted">{t('shop.brand')} </span>{product.brand}</p>}
+                        {product?.petStoreId?.name && <p className="mb-2"><span className="text-muted">{t('shop.soldBy')} </span>{product.petStoreId.name}</p>}
+                        <p>{product?.description || t('shop.noDescription')}</p>
                       </div>
                     </div>
                   </div>
@@ -247,29 +249,29 @@ const ProductDescription = () => {
 
               <div className="card">
                 <div className="card-body">
-                  <h3 className="mb-3">Product Details</h3>
+                  <h3 className="mb-3">{t('shop.details')}</h3>
                   <div className="widget about-widget mb-4">
-                    <h4 className="widget-title">Selected variant</h4>
+                    <h4 className="widget-title">{t('shop.selectedVariant')}</h4>
                     <div className="row product-detail-facts">
-                      <DetailRow label="Variant" value={variantLabel(selectedVariant)} />
-                      <DetailRow label="Strength" value={selectedVariant?.strengthValue ? `${selectedVariant.strengthValue} ${selectedVariant.strengthUnit || ''}`.trim() : null} />
-                      <DetailRow label={isMedicine ? 'Dosage form' : 'Product format'} value={selectedVariant?.dosageForm} />
-                      <DetailRow label="Package" value={selectedPack} />
-                      <DetailRow label="Variant SKU" value={selectedVariant?.sku || product?.sku} />
-                      <DetailRow label="Variant barcode" value={selectedVariant?.barcode || product?.barcode} />
+                      <DetailRow label={t('shop.variant')} value={variantLabel(selectedVariant, t('shop.standardPack'), t('shop.units'))} />
+                      <DetailRow label={t('shop.strength')} value={selectedVariant?.strengthValue ? `${selectedVariant.strengthValue} ${selectedVariant.strengthUnit || ''}`.trim() : null} />
+                      <DetailRow label={isMedicine ? t('shop.dosageForm') : t('shop.productFormat')} value={selectedVariant?.dosageForm} />
+                      <DetailRow label={t('shop.package')} value={selectedPack} />
+                      <DetailRow label={t('shop.variantSku')} value={selectedVariant?.sku || product?.sku} />
+                      <DetailRow label={t('shop.variantBarcode')} value={selectedVariant?.barcode || product?.barcode} />
                     </div>
                   </div>
 
                   {allVariants.length > 1 && (
                     <div className="widget about-widget mb-4">
-                      <h4 className="widget-title">Available variants</h4>
+                      <h4 className="widget-title">{t('shop.availableVariants')}</h4>
                       <div className="table-responsive">
                         <table className="table table-sm align-middle mb-0 product-variant-mobile-table">
-                          <thead><tr><th>Variant</th><th>Strength / format</th><th>Pack</th><th>Price</th><th>Status</th><th className="text-end">Select</th></tr></thead>
+                          <thead><tr><th>{t('shop.variant')}</th><th>{t('shop.strength')} / {t('shop.productFormat')}</th><th>{t('shop.package')}</th><th>{t('shop.price')}</th><th>{t('shop.status')}</th><th className="text-end">{t('shop.select')}</th></tr></thead>
                           <tbody>
                             {allVariants.map((variant, index) => {
                               const variantPrice = typeof variant.discountPrice === 'number' && variant.discountPrice > 0 ? variant.discountPrice : variant.price
-                              const variantPack = [variant.packageType, variant.unitsPerPack ? `${variant.unitsPerPack} ${variant.unitLabel || 'units'}` : ''].filter(Boolean).join(' · ')
+                              const variantPack = [variant.packageType, variant.unitsPerPack ? `${variant.unitsPerPack} ${variant.unitLabel || t('shop.units')}` : ''].filter(Boolean).join(' · ')
                               const variantId = String(variant._id || variant.id || 'legacy-default')
                               const isSelected = variantId === selectedVariantId
                               return <tr
@@ -287,12 +289,12 @@ const ProductDescription = () => {
                                 }}
                                 style={{ cursor: 'pointer' }}
                               >
-                                <td data-label="Variant">{variantLabel(variant, `Variant ${index + 1}`)}{variant.isDefault && <span className="badge bg-secondary ms-2">Default</span>}</td>
-                                <td data-label="Strength / format">{[variant.strengthValue ? `${variant.strengthValue} ${variant.strengthUnit || ''}`.trim() : '', variant.dosageForm].filter(Boolean).join(' · ') || '—'}</td>
-                                <td data-label="Pack">{variantPack || variant.packageDescription || '—'}</td>
-                                <td data-label="Price">€{Number(variantPrice || 0).toFixed(2)}</td>
-                                <td data-label="Availability">{variant.isActive === false ? 'Unavailable' : variant.stock > 0 ? `${variant.stock} in stock` : 'Out of stock'}</td>
-                                <td data-label="Select" className="text-end"><button type="button" className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-outline-primary'}`} onClick={(event) => { event.stopPropagation(); selectVariant(variant) }}>{isSelected ? 'Selected' : 'Choose'}</button></td>
+                                <td data-label={t('shop.variant')}>{variantLabel(variant, `${t('shop.variant')} ${index + 1}`, t('shop.units'))}{variant.isDefault && <span className="badge bg-secondary ms-2">{t('shop.default')}</span>}</td>
+                                <td data-label={`${t('shop.strength')} / ${t('shop.productFormat')}`}>{[variant.strengthValue ? `${variant.strengthValue} ${variant.strengthUnit || ''}`.trim() : '', variant.dosageForm].filter(Boolean).join(' · ') || '—'}</td>
+                                <td data-label={t('shop.package')}>{variantPack || variant.packageDescription || '—'}</td>
+                                <td data-label={t('shop.price')}>€{Number(variantPrice || 0).toFixed(2)}</td>
+                                <td data-label={t('shop.availability')}>{variant.isActive === false ? t('shop.unavailable') : variant.stock > 0 ? t('shop.inStock', { count: variant.stock }) : t('shop.outOfStock')}</td>
+                                <td data-label={t('shop.select')} className="text-end"><button type="button" className={`btn btn-sm ${isSelected ? 'btn-primary' : 'btn-outline-primary'}`} onClick={(event) => { event.stopPropagation(); selectVariant(variant) }}>{isSelected ? t('shop.selected') : t('shop.choose')}</button></td>
                               </tr>
                             })}
                           </tbody>
@@ -303,39 +305,39 @@ const ProductDescription = () => {
 
                   {isMedicine ? (
                     <div className="widget about-widget mb-4">
-                      <h4 className="widget-title">Medicine information</h4>
+                      <h4 className="widget-title">{t('shop.medicineInfo')}</h4>
                       <div className="row product-detail-facts">
-                        <DetailRow label="Active ingredient(s)" value={medicineDetails.activeIngredients} />
-                        <DetailRow label="Administration route" value={medicineDetails.administrationRoute} />
-                        <DetailRow label="Target species" value={medicineDetails.targetSpecies?.length ? medicineDetails.targetSpecies : product.petType} />
-                        <DetailRow label="Manufacturer" value={medicineDetails.manufacturer || product.manufacturer} />
-                        <DetailRow label="Indications / intended use" value={medicineDetails.indications} />
-                        <DetailRow label="Dosage and administration notes" value={medicineDetails.dosageInstructions} />
-                        <DetailRow label="Warnings / contraindications" value={medicineDetails.warnings} />
-                        <DetailRow label="Storage instructions" value={medicineDetails.storageInstructions} />
-                        <DetailRow label="AIC / authorization number" value={medicineDetails.aicNumber} />
-                        <DetailRow label="Authorization holder" value={medicineDetails.authorizationHolder} />
-                        {medicineDetails.leafletUrl && <div className="col-md-6 mb-3"><div className="text-muted small mb-1">Product leaflet</div><a href={medicineDetails.leafletUrl} target="_blank" rel="noreferrer">Open leaflet</a></div>}
+                        <DetailRow label={t('shop.activeIngredients')} value={medicineDetails.activeIngredients} />
+                        <DetailRow label={t('shop.administrationRoute')} value={medicineDetails.administrationRoute} />
+                        <DetailRow label={t('shop.targetSpecies')} value={medicineDetails.targetSpecies?.length ? medicineDetails.targetSpecies : product.petType} />
+                        <DetailRow label={t('shop.manufacturer')} value={medicineDetails.manufacturer || product.manufacturer} />
+                        <DetailRow label={t('shop.indications')} value={medicineDetails.indications} />
+                        <DetailRow label={t('shop.dosageNotes')} value={medicineDetails.dosageInstructions} />
+                        <DetailRow label={t('shop.warnings')} value={medicineDetails.warnings} />
+                        <DetailRow label={t('shop.storage')} value={medicineDetails.storageInstructions} />
+                        <DetailRow label={t('shop.authorizationNumber')} value={medicineDetails.aicNumber} />
+                        <DetailRow label={t('shop.authorizationHolder')} value={medicineDetails.authorizationHolder} />
+                        {medicineDetails.leafletUrl && <div className="col-md-6 mb-3"><div className="text-muted small mb-1">{t('shop.leaflet')}</div><a href={medicineDetails.leafletUrl} target="_blank" rel="noreferrer">{t('shop.openLeaflet')}</a></div>}
                       </div>
                     </div>
                   ) : (
                     <div className="widget about-widget mb-4">
-                      <h4 className="widget-title">Parapharmacy product information</h4>
+                      <h4 className="widget-title">{t('shop.parapharmacyInfo')}</h4>
                       <div className="row product-detail-facts">
-                        <DetailRow label="Product class" value={parapharmacyDetails.productClass} />
-                        <DetailRow label="Life stage" value={parapharmacyDetails.lifeStage} />
-                        <DetailRow label="Target species" value={parapharmacyDetails.targetSpecies?.length ? parapharmacyDetails.targetSpecies : product.petType} />
-                        <DetailRow label="Manufacturer" value={parapharmacyDetails.manufacturer || product.manufacturer} />
-                        <DetailRow label="Ingredients / composition" value={parapharmacyDetails.ingredients} />
-                        <DetailRow label="Allergen information" value={parapharmacyDetails.allergens} />
-                        <DetailRow label="Usage instructions" value={parapharmacyDetails.usageInstructions} />
-                        <DetailRow label="Warnings" value={parapharmacyDetails.warnings} />
-                        <DetailRow label="Storage instructions" value={parapharmacyDetails.storageInstructions} />
+                        <DetailRow label={t('shop.productClass')} value={parapharmacyDetails.productClass} />
+                        <DetailRow label={t('shop.lifeStage')} value={parapharmacyDetails.lifeStage} />
+                        <DetailRow label={t('shop.targetSpecies')} value={parapharmacyDetails.targetSpecies?.length ? parapharmacyDetails.targetSpecies : product.petType} />
+                        <DetailRow label={t('shop.manufacturer')} value={parapharmacyDetails.manufacturer || product.manufacturer} />
+                        <DetailRow label={t('shop.ingredients')} value={parapharmacyDetails.ingredients} />
+                        <DetailRow label={t('shop.allergenInfo')} value={parapharmacyDetails.allergens} />
+                        <DetailRow label={t('shop.usageInstructions')} value={parapharmacyDetails.usageInstructions} />
+                        <DetailRow label={t('shop.warnings')} value={parapharmacyDetails.warnings} />
+                        <DetailRow label={t('shop.storage')} value={parapharmacyDetails.storageInstructions} />
                       </div>
                     </div>
                   )}
 
-                  <div className="widget about-widget mb-0"><h4 className="widget-title">Description</h4><p className="mb-0">{product?.description || 'No description provided.'}</p></div>
+                  <div className="widget about-widget mb-0"><h4 className="widget-title">{t('shop.description')}</h4><p className="mb-0">{product?.description || t('shop.noDescription')}</p></div>
                 </div>
               </div>
             </div>
@@ -344,14 +346,14 @@ const ProductDescription = () => {
               <div className="card search-filter pharmacy-product-purchase-card"><div className="card-body">
                 {allVariants.length > 1 && (
                   <div className="mb-3">
-                    <label className="form-label">Choose a variant</label>
+                    <label className="form-label">{t('shop.chooseVariant')}</label>
                     <select className="form-select" value={selectedVariantId} onChange={(e) => selectVariant(allVariants.find((variant) => String(variant?._id || variant?.id || 'legacy-default') === e.target.value))}>
-                      {allVariants.map((variant, index) => <option key={variant._id || variant.id || index} value={String(variant._id || variant.id || 'legacy-default')}>{variantLabel(variant, `Variant ${index + 1}`)}{variant.isActive === false ? ' — unavailable' : ''}</option>)}
+                      {allVariants.map((variant, index) => <option key={variant._id || variant.id || index} value={String(variant._id || variant.id || 'legacy-default')}>{variantLabel(variant, `${t('shop.variant')} ${index + 1}`, t('shop.units'))}{variant.isActive === false ? ` — ${t('shop.unavailable').toLowerCase()}` : ''}</option>)}
                     </select>
                   </div>
                 )}
-                <div className="clini-infos mt-0"><h2>€{Number(selectedPrice || 0).toFixed(2)}{originalPrice !== null && <>{' '}<b className="text-lg strike">€{Number(originalPrice || 0).toFixed(2)}</b>{' '}<span className="text-lg text-success"><b>{discountPercent}% off</b></span></>}</h2></div>
-                <span className={`badge ${isInStock ? 'badge-primary' : 'badge-danger'}`}>{isInStock ? `${selectedStock} in stock` : 'Out of stock'}</span>
+                <div className="clini-infos mt-0"><h2>€{Number(selectedPrice || 0).toFixed(2)}{originalPrice !== null && <>{' '}<b className="text-lg strike">€{Number(originalPrice || 0).toFixed(2)}</b>{' '}<span className="text-lg text-success"><b>{t('shop.discount', { count: discountPercent })}</b></span></>}</h2></div>
+                <span className={`badge ${isInStock ? 'badge-primary' : 'badge-danger'}`}>{isInStock ? t('shop.inStock', { count: selectedStock }) : t('shop.outOfStock')}</span>
 
                 {requiresPrescription && (
                   <div className="mt-3 rounded-3 p-3" style={{ background: '#f4f8ff', border: '1px solid #cfe0ff' }}>
@@ -360,19 +362,19 @@ const ProductDescription = () => {
                         <i className="fa-solid fa-file-prescription"></i>
                       </div>
                       <div className="flex-grow-1">
-                        <div className="fw-semibold">Prescription required</div>
+                        <div className="fw-semibold">{t('shop.prescriptionRequired')}</div>
                         {prescriptionEligibilityQuery.isLoading ? (
-                          <div className="text-muted small mt-1">Checking your prescription status…</div>
+                          <div className="text-muted small mt-1">{t('shop.checkingPrescription')}</div>
                         ) : !isPetOwner ? (
-                          <div className="text-muted small mt-1">Sign in as a pet owner to upload a prescription and purchase this medicine.</div>
+                          <div className="text-muted small mt-1">{t('shop.prescriptionLoginHint')}</div>
                         ) : prescriptionStatus === 'APPROVED' ? (
-                          <div className="text-success small mt-1"><i className="fa-solid fa-circle-check me-1"></i>Approved — this variant is ready to purchase.</div>
+                          <div className="text-success small mt-1"><i className="fa-solid fa-circle-check me-1"></i>{t('shop.prescriptionApproved')}</div>
                         ) : prescriptionStatus === 'PENDING' ? (
-                          <div className="text-warning small mt-1"><i className="fa-solid fa-clock me-1"></i>Your prescription is under Pharmacy review.</div>
+                          <div className="text-warning small mt-1"><i className="fa-solid fa-clock me-1"></i>{t('shop.prescriptionPending')}</div>
                         ) : prescriptionStatus === 'REJECTED' ? (
-                          <div className="text-danger small mt-1"><i className="fa-solid fa-circle-exclamation me-1"></i>{prescriptionEligibility?.request?.reviewNotes || 'Your previous prescription was not approved. Upload a new file to try again.'}</div>
+                          <div className="text-danger small mt-1"><i className="fa-solid fa-circle-exclamation me-1"></i>{prescriptionEligibility?.request?.reviewNotes || t('shop.prescriptionRejected')}</div>
                         ) : (
-                          <div className="text-muted small mt-1">Upload a valid prescription for the selected variant. Purchase unlocks after Pharmacy approval.</div>
+                          <div className="text-muted small mt-1">{t('shop.prescriptionUploadHint')}</div>
                         )}
                       </div>
                     </div>
@@ -380,7 +382,7 @@ const ProductDescription = () => {
                       <>
                         <input ref={prescriptionInputRef} type="file" className="d-none" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" onChange={handlePrescriptionFile} />
                         <button type="button" className="btn btn-sm btn-primary w-100 mt-3" onClick={() => prescriptionInputRef.current?.click()} disabled={isUploadingPrescription || submitPrescriptionRequest.isPending}>
-                          <i className="fa-solid fa-upload me-2"></i>{isUploadingPrescription ? 'Uploading prescription…' : prescriptionStatus === 'REJECTED' ? 'Upload a new prescription' : 'Upload prescription'}
+                          <i className="fa-solid fa-upload me-2"></i>{isUploadingPrescription ? t('shop.uploadingPrescription') : prescriptionStatus === 'REJECTED' ? t('shop.uploadNewPrescription') : t('shop.uploadPrescription')}
                         </button>
                       </>
                     )}
@@ -395,17 +397,17 @@ const ProductDescription = () => {
 
                 <div className="clinic-details mt-4 rounded-3 p-2" style={{ background: '#f8fafc', border: '1px solid #e8eef6' }}><div className="clinic-booking d-grid" style={{ gap: 10 }}>
                   <button type="button" className="apt-btn shadow-sm" onClick={() => ensureAdd(false)} disabled={!isInStock || !canPurchase}>
-                    <i className="fa-solid fa-cart-plus me-2"></i>Add To Cart
+                    <i className="fa-solid fa-cart-plus me-2"></i>{t('shop.addToCart')}
                   </button>
                   <button type="button" className="btn btn-outline-primary shadow-sm" onClick={() => ensureAdd(true)} disabled={!isInStock || !canPurchase}>
-                    <i className="fa-solid fa-bag-shopping me-2"></i>Buy Now
+                    <i className="fa-solid fa-bag-shopping me-2"></i>{t('shop.buyNow')}
                   </button>
                 </div></div>
 
                 <div className="card flex-fill mt-4 mb-0"><ul className="list-group list-group-flush">
-                  <li className="list-group-item">SKU <span className="float-end">{selectedVariant?.sku || product?.sku || '—'}</span></li>
-                  <li className="list-group-item">Package <span className="float-end text-end" style={{ maxWidth: '60%' }}>{selectedPack || '—'}</span></li>
-                  {product?.category && <li className="list-group-item">Category <span className="float-end">{product.category}</span></li>}
+                  <li className="list-group-item">{t('shop.sku')} <span className="float-end">{selectedVariant?.sku || product?.sku || '—'}</span></li>
+                  <li className="list-group-item">{t('shop.package')} <span className="float-end text-end" style={{ maxWidth: '60%' }}>{selectedPack || '—'}</span></li>
+                  {product?.category && <li className="list-group-item">{t('shop.category')} <span className="float-end">{product.category}</span></li>}
                 </ul></div>
               </div></div>
             </div>

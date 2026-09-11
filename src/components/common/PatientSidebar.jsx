@@ -8,6 +8,7 @@ import { useOrders } from '../../queries/orderQueries'
 import { useRescheduleRequests } from '../../queries/scheduleQueries'
 import { useSupportTicketUnreadCount } from '../../queries/supportTicketQueries'
 import { getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const getPaginatedCount = (response) => {
   const outer = response?.data ?? response
@@ -17,6 +18,7 @@ const getPaginatedCount = (response) => {
 
 const PatientSidebar = () => {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const userId = user?.id || user?._id
   const { data: userRes } = useUserById(userId, { enabled: Boolean(userId) })
   const latestUser = userRes?.data?.data || userRes?.data || userRes || null
@@ -89,10 +91,10 @@ const PatientSidebar = () => {
               <Link to="/profile-settings">{displayName}</Link>
             </h3>
             <div className="patient-details">
-              <h5 className="mb-0">Pet Owner ID : {latestUser?._id || latestUser?.id || user?.id || user?._id || '—'}</h5>
+              <h5 className="mb-0">{t('patient.petOwnerId')} : {latestUser?._id || latestUser?.id || user?.id || user?._id || '—'}</h5>
             </div>
             <span className="badge veterinary-role-badge">
-              <i className="fa-solid fa-circle"></i>Pet Owner
+              <i className="fa-solid fa-circle"></i>{t('patient.petOwner')}
             </span>
           </div>
         </div>
@@ -105,14 +107,14 @@ const PatientSidebar = () => {
             <li className={isActive('/patient/dashboard') ? 'active' : ''}>
               <Link to="/patient/dashboard">
                 <i className="fa-solid fa-shapes"></i>
-                <span>My Pet Dashboard</span>
+                <span>{t('patient.dashboard')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive(['/patient-appointments', '/patient-appointments-grid', '/patient-upcoming-appointment', '/patient-completed-appointment', '/patient-cancelled-appointment', '/patient-appointment-details']) ? 'active' : ''}>
               <Link to="/patient-appointments">
                 <i className="fa-solid fa-calendar-days"></i>
-                <span>Pet Appointments</span>
+                <span>{t('patient.petAppointments')}</span>
                 {pendingAppointmentsCount > 0 && (
                   <small className="unread-msg veterinary-badge">{pendingAppointmentsCount}</small>
                 )}
@@ -122,7 +124,7 @@ const PatientSidebar = () => {
             <li className={isActive('/patient/reschedule-requests') ? 'active' : ''}>
               <Link to="/patient/reschedule-requests">
                 <i className="fa-solid fa-calendar-days"></i>
-                <span>Reschedule Requests</span>
+                <span>{t('patient.rescheduleRequests')}</span>
                 {pendingReschedulePaymentCount > 0 && (
                   <small className="unread-msg veterinary-badge">{pendingReschedulePaymentCount}</small>
                 )}
@@ -132,21 +134,21 @@ const PatientSidebar = () => {
             <li className={isActive('/favourites') ? 'active' : ''}>
               <Link to="/favourites">
                 <i className="fa-solid fa-star"></i>
-                <span>Favorite Veterinarians</span>
+                <span>{t('patient.favoriteVeterinariansMenu')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/dependent') ? 'active' : ''}>
               <Link to="/dependent">
                 <i className="fa-solid fa-dog"></i>
-                <span>My Pets</span>
+                <span>{t('patient.myPets')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/medical-records') ? 'active' : ''}>
               <Link to="/medical-records">
                 <i className="fa-solid fa-file-lines"></i>
-                <span>Pet Medical Records</span>
+                <span>{t('patient.medicalRecords')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
@@ -160,14 +162,14 @@ const PatientSidebar = () => {
             <li className={isActive('/patient-invoices') ? 'active' : ''}>
               <Link to="/patient-invoices">
                 <i className="fa-solid fa-file-invoice"></i>
-                <span>Veterinary Invoices</span>
+                <span>{t('patient.veterinaryInvoices')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/order-history') ? 'active' : ''}>
               <Link to="/order-history">
                 <i className="fa-solid fa-shopping-bag"></i>
-                <span>Pet Supply Orders</span>
+                <span>{t('patient.petSupplyOrders')}</span>
                 {pendingOrdersCount > 0 && (
                   <small className="unread-msg veterinary-badge">{pendingOrdersCount}</small>
                 )}
@@ -178,7 +180,7 @@ const PatientSidebar = () => {
             <li className={isActive('/patient-notifications') ? 'active' : ''}>
               <Link to="/patient-notifications">
                 <i className="fa-solid fa-bell"></i>
-                <span>Notifications</span>
+                <span>{t('patient.notifications')}</span>
                 {unreadNotifications > 0 && (
                   <small className="unread-msg veterinary-badge">{unreadNotifications}</small>
                 )}
@@ -187,7 +189,7 @@ const PatientSidebar = () => {
             <li className={isActive('/chat') ? 'active' : ''}>
               <Link to="/chat">
                 <i className="fa-solid fa-comments"></i>
-                <span>Veterinarian Messages</span>
+                <span>{t('patient.veterinarianMessages')}</span>
                 {unreadCount > 0 && (
                   <small className="unread-msg veterinary-badge">{unreadCount}</small>
                 )}
@@ -196,7 +198,7 @@ const PatientSidebar = () => {
             <li className={isActive('/patient/support-tickets') ? 'active' : ''}>
               <Link to="/patient/support-tickets">
                 <i className="fa-solid fa-headset"></i>
-                <span>Support Tickets</span>
+                <span>{t('patient.supportTickets')}</span>
                 {unreadSupportCount > 0 && (
                   <small className="unread-msg veterinary-badge">{unreadSupportCount}</small>
                 )}
@@ -207,28 +209,28 @@ const PatientSidebar = () => {
             <li className={isActive('/clinic-map') ? 'active' : ''}>
               <Link to="/clinic-map">
                 <i className="fa-solid fa-map-location-dot"></i>
-                <span>Nearby Clinics</span>
+                <span>{t('patient.nearbyClinics')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/weight-records') ? 'active' : ''}>
               <Link to="/weight-records">
                 <i className="fa-solid fa-weight-scale"></i>
-                <span>Weight Records</span>
+                <span>{t('patient.weightRecords')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className={isActive('/profile-settings') ? 'active' : ''}>
               <Link to="/profile-settings">
                 <i className="fa-solid fa-user-pen"></i>
-                <span>Account Settings</span>
+                <span>{t('patient.accountSettings')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>
             <li className="logout-item">
               <Link to="/login">
                 <i className="fa-solid fa-sign-out-alt"></i>
-                <span>Logout</span>
+                <span>{t('patient.logout')}</span>
                 <div className="menu-indicator"></div>
               </Link>
             </li>

@@ -7,33 +7,22 @@ import { useAuth } from '../../contexts/AuthContext'
 import { toast } from 'react-toastify'
 import AuthLayout from '../../layouts/AuthLayout'
 import InternationalPhoneInput, { isE164Phone } from '../../components/common/InternationalPhoneInput'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const vetRegisterBannerImage = '/assets/img/pharmacyregister.jpg'
-
-const schema = yup.object({
-  name: yup
-    .string()
-    .min(2, 'Full name must be at least 2 characters')
-    .required('Full name is required'),
-  email: yup.string().email('Invalid email').required('Email is required'),
-  phone: yup
-    .string()
-    .test('e164-phone', 'Enter a valid international phone number', isE164Phone)
-    .required('Phone is required'),
-  password: yup
-    .string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
-  password_confirmation: yup
-    .string()
-    .oneOf([yup.ref('password')], 'Passwords must match')
-    .required('Confirm password is required'),
-})
 
 const DoctorRegister = () => {
   const navigate = useNavigate()
   const { register: registerUser } = useAuth()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(false)
+  const schema = yup.object({
+    name: yup.string().min(2, t('auth.register.nameRequired')).required(t('auth.register.nameRequired')),
+    email: yup.string().email(t('auth.register.validEmail')).required(t('auth.register.emailRequired')),
+    phone: yup.string().test('e164-phone', t('auth.verification.invalidPhone'), isE164Phone).required(t('auth.register.phoneRequired')),
+    password: yup.string().min(6, t('auth.register.passwordMin')).required(t('auth.register.passwordRequired')),
+    password_confirmation: yup.string().oneOf([yup.ref('password')], t('auth.register.passwordMatch')).required(t('auth.register.confirmRequired')),
+  })
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
@@ -50,7 +39,7 @@ const DoctorRegister = () => {
       }
 
       const response = await registerUser(payload, 'doctor')
-      toast.success('Registration successful! Verify your phone number to continue.')
+      toast.success(`${t('auth.register.success')} ${t('auth.verification.phoneTitle')}.`)
 
       // Trigger first-time onboarding prompts after approval/login
       try {
@@ -66,7 +55,7 @@ const DoctorRegister = () => {
         navigate('/doctor/dashboard')
       }
     } catch (error) {
-      toast.error(error?.message || 'Registration failed')
+      toast.error(error?.message || t('auth.pharmacy.registrationFailed'))
     } finally {
       setLoading(false)
     }
@@ -95,8 +84,8 @@ const DoctorRegister = () => {
                       <div className="veterinary-banner-overlay">
                         <div className="veterinary-banner-content">
                           <i className="fa-solid fa-user-doctor fa-3x text-white mb-3"></i>
-                          <h4 className="text-white">Join Our Veterinary Team</h4>
-                          <p className="text-white">Become part of MyPetPlus's trusted veterinary network</p>
+                          <h4 className="text-white">{t('auth.doctor.bannerTitle')}</h4>
+                          <p className="text-white">{t('auth.doctor.bannerDescription')}</p>
                         </div>
                       </div>
                     </div>
@@ -108,39 +97,39 @@ const DoctorRegister = () => {
                           <i className="fa-solid fa-user-doctor fa-2x text-primary"></i>
                         </div>
                         <h3 className="veterinary-register-title">
-                          <i className="fa-solid fa-stethoscope me-2"></i>Veterinarian Register
+                          <i className="fa-solid fa-stethoscope me-2"></i>{t('auth.doctor.title')}
                         </h3>
-                        <p className="veterinary-register-subtitle">Join our professional veterinary network</p>
+                        <p className="veterinary-register-subtitle">{t('auth.doctor.subtitle')}</p>
                       </div>
                     </div>
                     <form className="auth-form-grid" onSubmit={handleSubmit(onSubmit)}>
                       <div className="mb-3 veterinary-form-group">
                         <label className="form-label veterinary-form-label">
-                          <i className="fa-solid fa-user me-2"></i>Full Name
+                          <i className="fa-solid fa-user me-2"></i>{t('auth.register.name')}
                         </label>
                         <input
                           type="text"
                           className={`form-control veterinary-form-control ${errors.name ? 'is-invalid' : ''}`}
-                          placeholder="Enter your full name"
+                          placeholder={t('auth.register.namePlaceholder')}
                           {...register('name')}
                         />
                         {errors.name && <div className="invalid-feedback veterinary-error-feedback">{errors.name.message}</div>}
                       </div>
                       <div className="mb-3 veterinary-form-group">
                         <label className="form-label veterinary-form-label">
-                          <i className="fa-solid fa-envelope me-2"></i>Email
+                          <i className="fa-solid fa-envelope me-2"></i>{t('auth.register.email')}
                         </label>
                         <input
                           type="email"
                           className={`form-control veterinary-form-control ${errors.email ? 'is-invalid' : ''}`}
-                          placeholder="Enter your email"
+                          placeholder={t('auth.register.emailPlaceholder')}
                           {...register('email')}
                         />
                         {errors.email && <div className="invalid-feedback veterinary-error-feedback">{errors.email.message}</div>}
                       </div>
                       <div className="mb-3 veterinary-form-group auth-form-grid__full">
                         <label className="form-label veterinary-form-label">
-                          <i className="fa-solid fa-phone me-2"></i>Phone Number
+                          <i className="fa-solid fa-phone me-2"></i>{t('auth.register.phone')}
                         </label>
                         <input type="hidden" {...register('phone')} />
                         <InternationalPhoneInput
@@ -148,20 +137,20 @@ const DoctorRegister = () => {
                           onChange={(phone) => setValue('phone', phone, { shouldDirty: true, shouldValidate: true })}
                           invalid={Boolean(errors.phone)}
                         />
-                        <small className="text-muted d-block mt-1">Your selected country code is included automatically for verification.</small>
+                        <small className="text-muted d-block mt-1">{t('auth.doctor.phoneHint')}</small>
                         {errors.phone && <div className="invalid-feedback veterinary-error-feedback">{errors.phone.message}</div>}
                       </div>
                       <div className="mb-3 veterinary-form-group">
                         <div className="form-group-flex">
                           <label className="form-label veterinary-form-label">
-                            <i className="fa-solid fa-lock me-2"></i>Create Password
+                            <i className="fa-solid fa-lock me-2"></i>{t('auth.register.password')}
                           </label>
                         </div>
                         <div className="pass-group veterinary-pass-group">
                           <input
                             type="password"
                             className={`form-control pass-input veterinary-form-control ${errors.password ? 'is-invalid' : ''}`}
-                            placeholder="Create a secure password"
+                            placeholder={t('auth.register.passwordPlaceholder')}
                             {...register('password')}
                           />
                         </div>
@@ -169,12 +158,12 @@ const DoctorRegister = () => {
                       </div>
                       <div className="mb-3 veterinary-form-group">
                         <label className="form-label veterinary-form-label">
-                          <i className="fa-solid fa-lock me-2"></i>Confirm Password
+                          <i className="fa-solid fa-lock me-2"></i>{t('auth.register.confirmPassword')}
                         </label>
                         <input
                           type="password"
                           className={`form-control veterinary-form-control ${errors.password_confirmation ? 'is-invalid' : ''}`}
-                          placeholder="Confirm your password"
+                          placeholder={t('auth.register.confirmPasswordPlaceholder')}
                           {...register('password_confirmation')}
                         />
                         {errors.password_confirmation && <div className="invalid-feedback veterinary-error-feedback">{errors.password_confirmation.message}</div>}
@@ -182,7 +171,7 @@ const DoctorRegister = () => {
                       <div className="mb-3 veterinary-register-btn-group auth-form-grid__full">
                         <button className="btn veterinary-btn-primary-gradient w-100 veterinary-doctor-register-btn" type="submit" disabled={loading}>
                           <i className="fa-solid fa-user-plus me-2"></i>
-                          {loading ? 'Registering...' : 'Join Veterinary Team'}
+                          {loading ? t('auth.doctor.submitting') : t('auth.doctor.submit')}
                         </button>
                       </div>
                       <div className="login-or veterinary-register-divider auth-form-grid__full">
@@ -194,27 +183,27 @@ const DoctorRegister = () => {
                       <div className="form-group text-center mb-3 veterinary-patient-register-group auth-form-grid__full">
                         <Link to="/register" className="btn veterinary-btn-outline-primary w-100 veterinary-patient-register-btn">
                           <i className="fa-solid fa-user me-2"></i>
-                          Register as Pet Owner
+                          {t('auth.doctor.petOwner')}
                         </Link>
                       </div>
                       <div className="account-signup veterinary-doctor-register-footer">
                         <p className="veterinary-footer-text">
                           <i className="fa-solid fa-sign-in-alt me-2"></i>
-                          Already have account? <Link to="/login" className="veterinary-login-link">Sign In</Link>
+                          {t('auth.pharmacy.alreadyHave')} <Link to="/login" className="veterinary-login-link">{t('common.signIn')}</Link>
                         </p>
                         <div className="veterinary-register-features mt-3">
                           <div className="row text-center">
                             <div className="col-4">
                               <i className="fa-solid fa-certificate text-success mb-2"></i>
-                              <p className="small mb-0">Verified</p>
+                              <p className="small mb-0">{t('auth.doctor.verified')}</p>
                             </div>
                             <div className="col-4">
                               <i className="fa-solid fa-stethoscope mb-2"></i>
-                              <p className="small mb-0">Clinical Care</p>
+                              <p className="small mb-0">{t('auth.doctor.clinicalCare')}</p>
                             </div>
                             <div className="col-4">
                               <i className="fa-solid fa-users text-info mb-2"></i>
-                              <p className="small mb-0">Network</p>
+                              <p className="small mb-0">{t('auth.doctor.network')}</p>
                             </div>
                           </div>
                         </div>

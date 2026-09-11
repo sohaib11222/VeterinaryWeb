@@ -7,6 +7,7 @@ import { useCreateProduct, useDeleteProduct, useUpdateProduct } from '../../muta
 import { toast } from 'react-toastify'
 import { api } from '../../utils/api'
 import { API_ROUTES, getImageUrl } from '../../utils/apiConfig'
+import { useLanguage } from '../../contexts/LanguageContext'
 
 const normalizeListPayload = (payload) => {
   const outer = payload?.data ?? payload
@@ -87,10 +88,11 @@ const variantLabel = (variant, fallback = 'Variant') => {
 }
 
 const PharmacyAdminProducts = () => {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const role = String(user?.role || '').toUpperCase()
   const isMedicineAccount = role !== 'PARAPHARMACY'
-  const accountLabel = isMedicineAccount ? 'Pharmacy' : 'Parapharmacy'
+  const accountLabel = isMedicineAccount ? t('pharmacyAdmin.nav.pharmacy') : t('pharmacyAdmin.nav.parapharmacy')
 
   const [isActiveFilter, setIsActiveFilter] = useState('all')
   const [mode, setMode] = useState('create')
@@ -208,9 +210,9 @@ const PharmacyAdminProducts = () => {
       setIsUploadingImages(true)
       const urls = await uploadProductImages(files)
       setForm((p) => ({ ...p, images: [...(p.images || []), ...urls] }))
-      toast.success('Images uploaded')
+      toast.success(t('pharmacyAdmin.products.imageUploaded'))
     } catch (error) {
-      toast.error(error?.message || 'Image upload failed')
+      toast.error(error?.message || t('pharmacyAdmin.products.imageUploadFailed'))
     } finally {
       setIsUploadingImages(false)
       e.target.value = ''
@@ -254,13 +256,13 @@ const PharmacyAdminProducts = () => {
     e.preventDefault()
 
     if (!canManageProducts) {
-      toast.error('Complete your profile and any required subscription before managing products')
+      toast.error(t('pharmacyAdmin.products.profileRequired'))
       return
     }
 
     const name = String(form.name || '').trim()
     if (!name) {
-      toast.error('Product name is required')
+      toast.error(t('pharmacyAdmin.products.nameRequired'))
       return
     }
 
@@ -309,17 +311,17 @@ const PharmacyAdminProducts = () => {
         }
       })
     } catch (error) {
-      toast.error(error?.message || 'Check the product variants')
+      toast.error(error?.message || t('pharmacyAdmin.products.variantsInvalid'))
       return
     }
 
     if (!variants.length) {
-      toast.error('Add at least one product variant')
+      toast.error(t('pharmacyAdmin.products.variantRequired'))
       return
     }
 
     if (isMedicineAccount && !String(form.medicine.activeIngredients || '').trim()) {
-      toast.error('Add the active ingredient(s) for this medicine')
+      toast.error(t('pharmacyAdmin.products.ingredientRequired'))
       return
     }
 
@@ -355,10 +357,10 @@ const PharmacyAdminProducts = () => {
     try {
       if (mode === 'edit' && editingId) {
         await updateMutation.mutateAsync({ productId: editingId, data: payload })
-        toast.success('Product updated')
+        toast.success(t('pharmacyAdmin.products.updated'))
       } else {
         await createMutation.mutateAsync(payload)
-        toast.success('Product created')
+        toast.success(t('pharmacyAdmin.products.created'))
       }
       resetForm()
       closeModal()
@@ -373,17 +375,17 @@ const PharmacyAdminProducts = () => {
   }
 
   const onDelete = async (productId) => {
-    const ok = window.confirm('Delete this product?')
+    const ok = window.confirm(t('pharmacyAdmin.products.confirmDelete'))
     if (!ok) return
 
     try {
       await deleteMutation.mutateAsync(productId)
-      toast.success('Product deleted')
+      toast.success(t('pharmacyAdmin.products.deleted'))
       if (editingId && productId === editingId) {
         resetForm()
       }
     } catch (error) {
-      toast.error(error?.message || 'Delete failed')
+      toast.error(error?.message || t('pharmacyAdmin.products.deleteFailed'))
     }
   }
 
@@ -391,9 +393,9 @@ const PharmacyAdminProducts = () => {
     <div className="pharmacy-admin-products-mobile">
       <div className="page-header">
         <div className="d-flex align-items-center justify-content-between flex-wrap gap-2">
-          <h3 className="page-title mb-0">My Products</h3>
+          <h3 className="page-title mb-0">{t('pharmacyAdmin.products.title')}</h3>
           <button type="button" className="btn btn-primary" onClick={openCreateModal} disabled={!canManageProducts}>
-            Add Product
+            {t('pharmacyAdmin.products.addNewProduct')}
           </button>
         </div>
       </div>
@@ -402,23 +404,23 @@ const PharmacyAdminProducts = () => {
         <div className="card mb-3">
           <div className="card-body d-flex align-items-center justify-content-between flex-wrap" style={{ gap: 12 }}>
             <div>
-              <div className="fw-bold">Subscription</div>
+              <div className="fw-bold">{t('pharmacyAdmin.products.subscription')}</div>
               {mySubscriptionQuery.isLoading ? (
-                <div className="text-muted small">Loading subscription status…</div>
+                <div className="text-muted small">{t('pharmacyAdmin.products.loadingSubscription')}</div>
               ) : mySubscriptionQuery.isError ? (
                 <div className="text-muted small">{mySubscriptionQuery.error?.message || 'Failed to load subscription status'}</div>
               ) : hasActiveSubscription ? (
-                <div className="text-muted small">Your subscription is active.</div>
+                <div className="text-muted small">{t('pharmacyAdmin.products.activeSubscription')}</div>
               ) : (
-                <div className="text-muted small">Your subscription is inactive. Subscribe to create and update products.</div>
+                <div className="text-muted small">{t('pharmacyAdmin.products.inactiveSubscription')}</div>
               )}
             </div>
             <div className="d-flex align-items-center" style={{ gap: 8 }}>
               <span className={`badge ${hasActiveSubscription ? 'bg-success' : 'bg-danger'}`}>
-                {hasActiveSubscription ? 'Active' : 'Inactive'}
+                {hasActiveSubscription ? t('pharmacyAdmin.products.active') : t('pharmacyAdmin.products.inactive')}
               </span>
               <Link to="/pharmacy-admin/subscription" className="btn btn-sm btn-outline-primary">
-                Manage
+                {t('pharmacyAdmin.dashboard.manage')}
               </Link>
             </div>
           </div>
@@ -428,24 +430,24 @@ const PharmacyAdminProducts = () => {
       {(role === 'PET_STORE' || role === 'PARAPHARMACY') && !setupQuery.isLoading && !canManageProducts && (
         <div className="alert alert-warning d-flex align-items-center justify-content-between flex-wrap gap-2">
           <span><i className="fa-solid fa-lock me-2"></i>Complete your profile{role === 'PET_STORE' ? ' and activate your subscription' : ''} to manage products.</span>
-          <Link to="/pharmacy-admin/dashboard" className="btn btn-sm btn-outline-dark">View setup</Link>
+          <Link to="/pharmacy-admin/dashboard" className="btn btn-sm btn-outline-dark">{t('pharmacyAdmin.products.viewSetup')}</Link>
         </div>
       )}
 
       <div className="card">
         <div className="card-body">
           <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-            <h5 className="mb-0">Product List</h5>
+            <h5 className="mb-0">{t('pharmacyAdmin.products.list')}</h5>
             <div style={{ minWidth: 220 }}>
-              <label className="form-label mb-1">Filter</label>
+              <label className="form-label mb-1">{t('pharmacyAdmin.products.filter')}</label>
               <select
                 className="form-select"
                 value={isActiveFilter}
                 onChange={(e) => setIsActiveFilter(e.target.value)}
               >
-                <option value="all">All</option>
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
+                <option value="all">{t('pharmacyAdmin.products.all')}</option>
+                <option value="true">{t('pharmacyAdmin.products.active')}</option>
+                <option value="false">{t('pharmacyAdmin.products.inactive')}</option>
               </select>
             </div>
           </div>
@@ -453,23 +455,23 @@ const PharmacyAdminProducts = () => {
           {myProductsQuery.isLoading ? (
             <div className="text-center py-4">
               <div className="spinner-border text-primary" role="status">
-                <span className="visually-hidden">Loading...</span>
+                <span className="visually-hidden">{t('pharmacyAdmin.products.loading')}</span>
               </div>
             </div>
           ) : myProductsQuery.isError ? (
             <div className="alert alert-danger">{myProductsQuery.error?.message || 'Failed to load products'}</div>
           ) : products.length === 0 ? (
-            <div className="alert alert-info mb-0">No products found.</div>
+            <div className="alert alert-info mb-0">{t('pharmacyAdmin.products.empty')}</div>
           ) : (
             <div className="table-responsive">
               <table className="table table-hover mb-0 pharmacy-admin-products-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Status</th>
-                    <th style={{ width: 160 }}>Action</th>
+                    <th>{t('pharmacyAdmin.products.name')}</th>
+                    <th>{t('pharmacyAdmin.products.price')}</th>
+                    <th>{t('pharmacyAdmin.products.stock')}</th>
+                    <th>{t('pharmacyAdmin.products.status')}</th>
+                    <th style={{ width: 160 }}>{t('pharmacyAdmin.products.action')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -481,12 +483,12 @@ const PharmacyAdminProducts = () => {
                     const effectivePrice = hasDiscount ? p.discountPrice : p?.price
                     return (
                       <tr key={id}>
-                        <td data-label="Product">
+                        <td data-label={t('pharmacyAdmin.products.name')}>
                           <div className="d-flex align-items-center" style={{ gap: 10 }}>
                             {imgSrc ? (
                               <img
                                 src={imgSrc}
-                                alt="product"
+                                alt={t('pharmacyAdmin.orderDetails.product')}
                                 style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }}
                                 onError={(e) => {
                                   e.currentTarget.onerror = null
@@ -504,7 +506,7 @@ const PharmacyAdminProducts = () => {
                             </div>
                           </div>
                         </td>
-                        <td data-label="Price">
+                        <td data-label={t('pharmacyAdmin.products.price')}>
                           <div className="fw-semibold">
                             {typeof effectivePrice === 'number' ? effectivePrice.toFixed(2) : effectivePrice}
                           </div>
@@ -514,18 +516,18 @@ const PharmacyAdminProducts = () => {
                             </div>
                           )}
                         </td>
-                        <td data-label="Stock">{p?.stock ?? 0}</td>
-                        <td data-label="Status">
+                        <td data-label={t('pharmacyAdmin.products.stock')}>{p?.stock ?? 0}</td>
+                        <td data-label={t('pharmacyAdmin.products.status')}>
                           {p?.isActive === false ? (
-                            <span className="badge bg-secondary">Inactive</span>
+                            <span className="badge bg-secondary">{t('pharmacyAdmin.products.inactive')}</span>
                           ) : (
-                            <span className="badge bg-success">Active</span>
+                            <span className="badge bg-success">{t('pharmacyAdmin.products.active')}</span>
                           )}
                         </td>
-                        <td data-label="Actions">
+                        <td data-label={t('pharmacyAdmin.products.action')}>
                           <div className="d-flex gap-2 pharmacy-product-actions">
                             <button type="button" className="btn btn-sm btn-outline-primary" onClick={() => startEdit(p)}>
-                              Edit
+                              {t('pharmacyAdmin.products.edit')}
                             </button>
                             <button
                               type="button"
@@ -533,7 +535,7 @@ const PharmacyAdminProducts = () => {
                               onClick={() => onDelete(id)}
                               disabled={deleteMutation.isPending}
                             >
-                              Delete
+                              {t('pharmacyAdmin.products.delete')}
                             </button>
                           </div>
                         </td>
@@ -564,11 +566,11 @@ const PharmacyAdminProducts = () => {
               <div className="modal-content">
                 <div className="modal-header">
                   <div>
-                    <h5 className="modal-title mb-1">{mode === 'edit' ? `Edit ${accountLabel} Product` : `Add ${accountLabel} Product`}</h5>
+                    <h5 className="modal-title mb-1">{mode === 'edit' ? `${t('pharmacyAdmin.products.editProduct')} ${accountLabel}` : `${t('pharmacyAdmin.products.addNewProduct')} ${accountLabel}`}</h5>
                     <div className="text-muted small">
                       {isMedicineAccount
-                        ? 'Record the medicine information once, then add each strength, pack, price, and quantity as a variant.'
-                        : 'Add the product information once, then add each size, format, pack, price, and quantity as a variant.'}
+                        ? t('pharmacyAdmin.products.variantHint')
+                        : t('pharmacyAdmin.products.variantHint')}
                     </div>
                   </div>
                   <button type="button" className="btn-close" onClick={closeModal}></button>
@@ -576,133 +578,133 @@ const PharmacyAdminProducts = () => {
                 <div className="modal-body">
                   <div className="text-muted small mb-3">
                     {role === 'PET_STORE'
-                      ? 'Pharmacy accounts require an active subscription to manage products.'
-                      : 'Parapharmacy accounts can manage products without a subscription.'}
+                      ? t('pharmacyAdmin.products.inactiveSubscription')
+                      : t('pharmacyAdmin.products.activeSubscription')}
                   </div>
 
                   <form onSubmit={onSubmit}>
                     <section className="border rounded p-3 mb-3">
                       <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h6 className="mb-0">Product basics</h6>
+                        <h6 className="mb-0">{t('pharmacyAdmin.products.basics')}</h6>
                         <span className={`badge ${isMedicineAccount ? 'bg-primary' : 'bg-info text-dark'}`}>
-                          {isMedicineAccount ? 'Medicine' : 'Parapharmacy product'}
+                          {isMedicineAccount ? t('pharmacyAdmin.products.medicineInfo') : t('pharmacyAdmin.products.parapharmacyInfo')}
                         </span>
                       </div>
                       <div className="row">
                         <div className="col-md-6 mb-3">
-                          <label className="form-label">Product name *</label>
-                          <input className="form-control" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder={isMedicineAccount ? 'e.g. Amoxicillin' : 'e.g. Omega-3 Skin & Coat Oil'} />
+                          <label className="form-label">{t('pharmacyAdmin.products.productName')}</label>
+                          <input className="form-control" value={form.name} onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} placeholder={t('pharmacyAdmin.products.placeholder', { value: isMedicineAccount ? 'Amoxicillin' : 'Omega-3 Skin & Coat Oil' })} />
                         </div>
                         <div className="col-md-3 mb-3">
-                          <label className="form-label">Brand</label>
+                          <label className="form-label">{t('pharmacyAdmin.products.brand')}</label>
                           <input className="form-control" value={form.brand} onChange={(e) => setForm((p) => ({ ...p, brand: e.target.value }))} />
                         </div>
                         <div className="col-md-3 mb-3">
-                          <label className="form-label">Manufacturer</label>
+                          <label className="form-label">{t('pharmacyAdmin.products.manufacturer')}</label>
                           <input className="form-control" value={form.manufacturer} onChange={(e) => setForm((p) => ({ ...p, manufacturer: e.target.value }))} />
                         </div>
                         <div className="col-md-4 mb-3">
-                          <label className="form-label">Category</label>
-                          <input className="form-control" value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} placeholder={isMedicineAccount ? 'Antibiotics, antiparasitics…' : 'Supplements, hygiene…'} />
+                          <label className="form-label">{t('pharmacyAdmin.products.category')}</label>
+                          <input className="form-control" value={form.category} onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))} placeholder={t('pharmacyAdmin.products.placeholder', { value: isMedicineAccount ? 'Antibiotics, antiparasitics…' : 'Supplements, hygiene…' })} />
                         </div>
                         <div className="col-md-4 mb-3">
-                          <label className="form-label">Sub-category</label>
+                          <label className="form-label">{t('pharmacyAdmin.products.subCategory')}</label>
                           <input className="form-control" value={form.subCategory} onChange={(e) => setForm((p) => ({ ...p, subCategory: e.target.value }))} />
                         </div>
                         <div className="col-md-4 mb-3">
-                          <label className="form-label">Product barcode / GTIN</label>
+                          <label className="form-label">{t('pharmacyAdmin.products.barcode')}</label>
                           <input className="form-control" value={form.barcode} onChange={(e) => setForm((p) => ({ ...p, barcode: e.target.value }))} />
                         </div>
                         <div className="col-md-6 mb-3">
-                          <label className="form-label">Target species</label>
+                          <label className="form-label">{t('pharmacyAdmin.products.species')}</label>
                           <select multiple className="form-select" value={form.petType} onChange={(e) => setForm((p) => ({ ...p, petType: Array.from(e.target.selectedOptions, (option) => option.value) }))} style={{ minHeight: 108 }}>
                             {speciesOptions.map((species) => <option key={species} value={species}>{species}</option>)}
                           </select>
-                          <div className="form-text">Hold Ctrl/Cmd to select more than one species.</div>
+                          <div className="form-text">{t('pharmacyAdmin.products.speciesHint')}</div>
                         </div>
                         <div className="col-md-6 mb-3">
-                          <label className="form-label">Product description</label>
-                          <textarea className="form-control" rows={4} value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} placeholder="Describe the product, what it is for, and any important product information." />
+                          <label className="form-label">{t('pharmacyAdmin.products.description')}</label>
+                          <textarea className="form-control" rows={4} value={form.description} onChange={(e) => setForm((p) => ({ ...p, description: e.target.value }))} placeholder={t('pharmacyAdmin.products.descriptionPlaceholder')} />
                         </div>
                       </div>
                     </section>
 
                     {isMedicineAccount ? (
                       <section className="border rounded p-3 mb-3">
-                        <h6 className="mb-3">Medicine information</h6>
+                          <h6 className="mb-3">{t('pharmacyAdmin.products.medicineInfo')}</h6>
                         <div className="row">
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Active ingredient(s) *</label>
-                            <input className="form-control" value={form.medicine.activeIngredients} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, activeIngredients: e.target.value } }))} placeholder="e.g. Amoxicillin trihydrate" />
+                            <label className="form-label">{t('pharmacyAdmin.products.activeIngredients')}</label>
+                            <input className="form-control" value={form.medicine.activeIngredients} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, activeIngredients: e.target.value } }))} placeholder={t('pharmacyAdmin.products.placeholder', { value: 'Amoxicillin trihydrate' })} />
                           </div>
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Administration route</label>
-                            <input className="form-control" value={form.medicine.administrationRoute} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, administrationRoute: e.target.value } }))} placeholder="e.g. Oral, topical, otic" />
+                            <label className="form-label">{t('pharmacyAdmin.products.administrationRoute')}</label>
+                            <input className="form-control" value={form.medicine.administrationRoute} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, administrationRoute: e.target.value } }))} placeholder={t('pharmacyAdmin.products.placeholder', { value: 'Oral, topical, otic' })} />
                           </div>
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Indications / intended use</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.indications')}</label>
                             <textarea className="form-control" rows={3} value={form.medicine.indications} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, indications: e.target.value } }))} />
                           </div>
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Dosage and administration notes</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.dosageNotes')}</label>
                             <textarea className="form-control" rows={3} value={form.medicine.dosageInstructions} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, dosageInstructions: e.target.value } }))} />
                           </div>
                           <div className="col-md-4 mb-3">
-                            <label className="form-label">AIC / authorization number</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.authorizationNumber')}</label>
                             <input className="form-control" value={form.medicine.aicNumber} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, aicNumber: e.target.value } }))} />
                           </div>
                           <div className="col-md-4 mb-3">
-                            <label className="form-label">Authorization holder</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.authorizationHolder')}</label>
                             <input className="form-control" value={form.medicine.authorizationHolder} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, authorizationHolder: e.target.value } }))} />
                           </div>
                           <div className="col-md-4 mb-3">
-                            <label className="form-label">Leaflet URL</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.leafletUrl')}</label>
                             <input type="url" className="form-control" value={form.medicine.leafletUrl} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, leafletUrl: e.target.value } }))} placeholder="https://…" />
                           </div>
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Warnings / contraindications</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.warnings')}</label>
                             <textarea className="form-control" rows={3} value={form.medicine.warnings} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, warnings: e.target.value } }))} />
                           </div>
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Storage instructions</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.storage')}</label>
                             <textarea className="form-control" rows={3} value={form.medicine.storageInstructions} onChange={(e) => setForm((p) => ({ ...p, medicine: { ...p.medicine, storageInstructions: e.target.value } }))} />
                           </div>
                         </div>
                       </section>
                     ) : (
                       <section className="border rounded p-3 mb-3">
-                        <h6 className="mb-3">Parapharmacy product information</h6>
+                        <h6 className="mb-3">{t('pharmacyAdmin.products.parapharmacyInfo')}</h6>
                         <div className="row">
                           <div className="col-md-4 mb-3">
-                            <label className="form-label">Product class</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.productClass')}</label>
                             <select className="form-select" value={form.parapharmacy.productClass} onChange={(e) => setForm((p) => ({ ...p, parapharmacy: { ...p.parapharmacy, productClass: e.target.value } }))}>
                               {['Supplement', 'Complementary feed', 'Hygiene', 'Dental care', 'Skin & coat', 'Ear & eye care', 'Grooming', 'Accessories', 'Other'].map((productClass) => <option key={productClass} value={productClass}>{productClass}</option>)}
                             </select>
                           </div>
                           <div className="col-md-4 mb-3">
-                            <label className="form-label">Life stage</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.lifeStage')}</label>
                             <select className="form-select" value={form.parapharmacy.lifeStage} onChange={(e) => setForm((p) => ({ ...p, parapharmacy: { ...p.parapharmacy, lifeStage: e.target.value } }))}>
                               {['All life stages', 'Puppy / kitten', 'Adult', 'Senior'].map((lifeStage) => <option key={lifeStage} value={lifeStage}>{lifeStage}</option>)}
                             </select>
                           </div>
                           <div className="col-md-4 mb-3">
-                            <label className="form-label">Allergen information</label>
-                            <input className="form-control" value={form.parapharmacy.allergens} onChange={(e) => setForm((p) => ({ ...p, parapharmacy: { ...p.parapharmacy, allergens: e.target.value } }))} placeholder="e.g. Contains fish" />
+                            <label className="form-label">{t('pharmacyAdmin.products.allergenInfo')}</label>
+                            <input className="form-control" value={form.parapharmacy.allergens} onChange={(e) => setForm((p) => ({ ...p, parapharmacy: { ...p.parapharmacy, allergens: e.target.value } }))} placeholder={t('pharmacyAdmin.products.placeholder', { value: 'Contains fish' })} />
                           </div>
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Ingredients / composition</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.ingredients')}</label>
                             <textarea className="form-control" rows={3} value={form.parapharmacy.ingredients} onChange={(e) => setForm((p) => ({ ...p, parapharmacy: { ...p.parapharmacy, ingredients: e.target.value } }))} />
                           </div>
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Usage instructions</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.usageInstructions')}</label>
                             <textarea className="form-control" rows={3} value={form.parapharmacy.usageInstructions} onChange={(e) => setForm((p) => ({ ...p, parapharmacy: { ...p.parapharmacy, usageInstructions: e.target.value } }))} />
                           </div>
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Warnings</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.warnings')}</label>
                             <textarea className="form-control" rows={3} value={form.parapharmacy.warnings} onChange={(e) => setForm((p) => ({ ...p, parapharmacy: { ...p.parapharmacy, warnings: e.target.value } }))} />
                           </div>
                           <div className="col-md-6 mb-3">
-                            <label className="form-label">Storage instructions</label>
+                            <label className="form-label">{t('pharmacyAdmin.products.storage')}</label>
                             <textarea className="form-control" rows={3} value={form.parapharmacy.storageInstructions} onChange={(e) => setForm((p) => ({ ...p, parapharmacy: { ...p.parapharmacy, storageInstructions: e.target.value } }))} />
                           </div>
                         </div>
@@ -712,10 +714,10 @@ const PharmacyAdminProducts = () => {
                     <section className="border rounded p-3 mb-3">
                       <div className="d-flex justify-content-between align-items-center gap-2 mb-2 flex-wrap">
                         <div>
-                          <h6 className="mb-1">Variants, packaging, and pricing</h6>
-                          <div className="text-muted small">Each variant can have its own strength or format, pack, price, and available quantity.</div>
+                          <h6 className="mb-1">{t('pharmacyAdmin.products.variantPricing')}</h6>
+                          <div className="text-muted small">{t('pharmacyAdmin.products.variantHint')}</div>
                         </div>
-                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={addVariant}>Add variant</button>
+                        <button type="button" className="btn btn-sm btn-outline-primary" onClick={addVariant}>{t('pharmacyAdmin.products.addVariant')}</button>
                       </div>
 
                       {form.variants.map((variant, index) => (
@@ -725,78 +727,78 @@ const PharmacyAdminProducts = () => {
                             <div className="d-flex align-items-center gap-3">
                               <div className="form-check mb-0">
                                 <input className="form-check-input" type="radio" name="defaultVariant" id={`default-variant-${index}`} checked={variant.isDefault} onChange={() => setDefaultVariant(index)} />
-                                <label className="form-check-label" htmlFor={`default-variant-${index}`}>Default</label>
+                                <label className="form-check-label" htmlFor={`default-variant-${index}`}>{t('pharmacyAdmin.products.default')}</label>
                               </div>
                               <div className="form-check mb-0">
                                 <input className="form-check-input" type="checkbox" id={`variant-active-${index}`} checked={variant.isActive !== false} onChange={(e) => updateVariant(index, { isActive: e.target.checked })} />
-                                <label className="form-check-label" htmlFor={`variant-active-${index}`}>Active</label>
+                                <label className="form-check-label" htmlFor={`variant-active-${index}`}>{t('pharmacyAdmin.products.active')}</label>
                               </div>
-                              <button type="button" className="btn btn-sm btn-outline-danger" disabled={form.variants.length === 1} onClick={() => removeVariant(index)}>Remove</button>
+                              <button type="button" className="btn btn-sm btn-outline-danger" disabled={form.variants.length === 1} onClick={() => removeVariant(index)}>{t('pharmacyAdmin.products.remove')}</button>
                             </div>
                           </div>
                           <div className="row">
                             <div className="col-md-4 mb-3">
-                              <label className="form-label">Variant label</label>
-                              <input className="form-control" value={variant.name} onChange={(e) => updateVariant(index, { name: e.target.value })} placeholder={isMedicineAccount ? 'e.g. 500 mg tablets' : 'e.g. 250 ml bottle'} />
+                              <label className="form-label">{t('pharmacyAdmin.products.variantLabel')}</label>
+                              <input className="form-control" value={variant.name} onChange={(e) => updateVariant(index, { name: e.target.value })} placeholder={t('pharmacyAdmin.products.placeholder', { value: isMedicineAccount ? '500 mg tablets' : '250 ml bottle' })} />
                             </div>
                             {isMedicineAccount && <>
                               <div className="col-md-2 mb-3">
-                                <label className="form-label">Strength</label>
+                                <label className="form-label">{t('pharmacyAdmin.products.strength')}</label>
                                 <input type="number" min="0" step="0.01" className="form-control" value={variant.strengthValue} onChange={(e) => updateVariant(index, { strengthValue: e.target.value })} placeholder="500" />
                               </div>
                               <div className="col-md-2 mb-3">
-                                <label className="form-label">Unit</label>
+                                <label className="form-label">{t('pharmacyAdmin.products.unit')}</label>
                                 <select className="form-select" value={variant.strengthUnit || 'mg'} onChange={(e) => updateVariant(index, { strengthUnit: e.target.value })}>
                                   {['mg', 'g', 'mcg', 'mg/ml', '%', 'IU', 'ml'].map((unit) => <option key={unit} value={unit}>{unit}</option>)}
                                 </select>
                               </div>
                             </>}
                             <div className={`mb-3 ${isMedicineAccount ? 'col-md-4' : 'col-md-4'}`}>
-                              <label className="form-label">{isMedicineAccount ? 'Dosage form' : 'Product format'}</label>
+                              <label className="form-label">{isMedicineAccount ? t('pharmacyAdmin.products.dosageForm') : t('pharmacyAdmin.products.productClass')}</label>
                               {isMedicineAccount ? (
                                 <select className="form-select" value={variant.dosageForm} onChange={(e) => updateVariant(index, { dosageForm: e.target.value })}>
                                   {medicineFormOptions.map((formType) => <option key={formType} value={formType}>{formType}</option>)}
                                 </select>
                               ) : (
-                                <input className="form-control" value={variant.dosageForm} onChange={(e) => updateVariant(index, { dosageForm: e.target.value })} placeholder="e.g. Liquid, wipes, chew" />
+                                <input className="form-control" value={variant.dosageForm} onChange={(e) => updateVariant(index, { dosageForm: e.target.value })} placeholder={t('pharmacyAdmin.products.placeholder', { value: 'Liquid, wipes, chew' })} />
                               )}
                             </div>
                             <div className="col-md-3 mb-3">
-                              <label className="form-label">Pack type</label>
+                              <label className="form-label">{t('pharmacyAdmin.products.packType')}</label>
                               <select className="form-select" value={variant.packageType} onChange={(e) => updateVariant(index, { packageType: e.target.value })}>
                                 {packageTypeOptions.map((packageType) => <option key={packageType} value={packageType}>{packageType}</option>)}
                               </select>
                             </div>
                             <div className="col-md-2 mb-3">
-                              <label className="form-label">Units / pack</label>
+                              <label className="form-label">{t('pharmacyAdmin.products.unitsPerPack')}</label>
                               <input type="number" min="0" step="1" className="form-control" value={variant.unitsPerPack} onChange={(e) => updateVariant(index, { unitsPerPack: e.target.value })} placeholder="30" />
                             </div>
                             <div className="col-md-2 mb-3">
-                              <label className="form-label">Unit label</label>
+                              <label className="form-label">{t('pharmacyAdmin.products.unitLabel')}</label>
                               <input className="form-control" value={variant.unitLabel} onChange={(e) => updateVariant(index, { unitLabel: e.target.value })} placeholder="tablets" />
                             </div>
                             <div className="col-md-5 mb-3">
-                              <label className="form-label">Pack description</label>
-                              <input className="form-control" value={variant.packageDescription} onChange={(e) => updateVariant(index, { packageDescription: e.target.value })} placeholder="e.g. Box of 3 blisters" />
+                              <label className="form-label">{t('pharmacyAdmin.products.packDescription')}</label>
+                              <input className="form-control" value={variant.packageDescription} onChange={(e) => updateVariant(index, { packageDescription: e.target.value })} placeholder={t('pharmacyAdmin.products.placeholder', { value: 'Box of 3 blisters' })} />
                             </div>
                             <div className="col-md-3 mb-3">
-                              <label className="form-label">Variant SKU</label>
+                              <label className="form-label">{t('pharmacyAdmin.products.variantSku')}</label>
                               <input className="form-control" value={variant.sku} onChange={(e) => updateVariant(index, { sku: e.target.value })} />
                             </div>
                             <div className="col-md-3 mb-3">
-                              <label className="form-label">Variant barcode</label>
+                              <label className="form-label">{t('pharmacyAdmin.products.variantBarcode')}</label>
                               <input className="form-control" value={variant.barcode} onChange={(e) => updateVariant(index, { barcode: e.target.value })} />
                             </div>
                             <div className="col-md-2 mb-3">
-                              <label className="form-label">Regular price *</label>
+                              <label className="form-label">{t('pharmacyAdmin.products.regularPrice')}</label>
                               <input type="number" min="0" step="0.01" className="form-control" value={variant.price} onChange={(e) => updateVariant(index, { price: e.target.value })} />
                             </div>
                             <div className="col-md-2 mb-3">
-                              <label className="form-label">Sale price</label>
+                              <label className="form-label">{t('pharmacyAdmin.products.salePrice')}</label>
                               <input type="number" min="0" step="0.01" className="form-control" value={variant.discountPrice} onChange={(e) => updateVariant(index, { discountPrice: e.target.value })} />
                             </div>
                             <div className="col-md-2 mb-3">
-                              <label className="form-label">Available quantity *</label>
+                              <label className="form-label">{t('pharmacyAdmin.products.availableQuantity')}</label>
                               <input type="number" min="0" step="1" className="form-control" value={variant.stock} onChange={(e) => updateVariant(index, { stock: e.target.value })} />
                             </div>
                           </div>
@@ -805,19 +807,19 @@ const PharmacyAdminProducts = () => {
                     </section>
 
                     <section className="border rounded p-3 mb-3">
-                      <h6 className="mb-3">Images and visibility</h6>
+                      <h6 className="mb-3">{t('pharmacyAdmin.products.imagesVisibility')}</h6>
                       <div className="row align-items-end">
                         <div className="col-md-8 mb-3">
-                          <label className="form-label">Product images</label>
+                          <label className="form-label">{t('pharmacyAdmin.products.productImages')}</label>
                           <input type="file" className="form-control" accept="image/*" multiple onChange={onSelectImages} disabled={isUploadingImages} />
-                          {isUploadingImages && <div className="text-muted small mt-1">Uploading…</div>}
+                          {isUploadingImages && <div className="text-muted small mt-1">{t('pharmacyAdmin.products.uploading')}</div>}
                           {Array.isArray(form.images) && form.images.length > 0 && (
                             <div className="d-flex flex-wrap mt-2" style={{ gap: 10 }}>
                               {form.images.map((url) => {
                                 const src = getImageUrl(url) || url
                                 return (
                                   <div key={url} style={{ position: 'relative' }}>
-                                    <img src={src} alt="product" style={{ width: 72, height: 72, borderRadius: 10, objectFit: 'cover' }} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = 'none' }} />
+                                    <img src={src} alt={t('pharmacyAdmin.orderDetails.product')} style={{ width: 72, height: 72, borderRadius: 10, objectFit: 'cover' }} onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.style.display = 'none' }} />
                                     <button type="button" className="btn btn-sm btn-danger" onClick={() => removeImage(url)} style={{ position: 'absolute', top: -8, right: -8, borderRadius: 999 }}>×</button>
                                   </div>
                                 )
@@ -828,13 +830,13 @@ const PharmacyAdminProducts = () => {
                         {isMedicineAccount && <div className="col-md-2 mb-3">
                           <div className="form-check">
                             <input className="form-check-input" type="checkbox" id="requiresPrescription" checked={form.requiresPrescription} onChange={(e) => setForm((p) => ({ ...p, requiresPrescription: e.target.checked }))} />
-                            <label className="form-check-label" htmlFor="requiresPrescription">Requires prescription</label>
+                            <label className="form-check-label" htmlFor="requiresPrescription">{t('pharmacyAdmin.products.requiresPrescription')}</label>
                           </div>
                         </div>}
                         <div className={`${isMedicineAccount ? 'col-md-2' : 'col-md-4'} mb-3`}>
                           <div className="form-check">
                             <input className="form-check-input" type="checkbox" id="isActive" checked={form.isActive} onChange={(e) => setForm((p) => ({ ...p, isActive: e.target.checked }))} />
-                            <label className="form-check-label" htmlFor="isActive">Visible and active</label>
+                            <label className="form-check-label" htmlFor="isActive">{t('pharmacyAdmin.products.visibleActive')}</label>
                           </div>
                         </div>
                       </div>
@@ -842,14 +844,14 @@ const PharmacyAdminProducts = () => {
 
                     <div className="d-flex justify-content-end gap-2">
                       <button type="button" className="btn btn-secondary" onClick={closeModal}>
-                        Cancel
+                        {t('pharmacyAdmin.products.cancel')}
                       </button>
                       <button
                         type="submit"
                         className="btn btn-primary"
                         disabled={!canManageProducts || isUploadingImages || createMutation.isPending || updateMutation.isPending}
                       >
-                        {mode === 'edit' ? 'Save Changes' : 'Create Product'}
+                        {mode === 'edit' ? t('pharmacyAdmin.products.save') : t('pharmacyAdmin.products.addNewProduct')}
                       </button>
                     </div>
                   </form>

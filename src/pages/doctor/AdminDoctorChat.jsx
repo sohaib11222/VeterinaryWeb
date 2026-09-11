@@ -4,11 +4,13 @@ import { toast } from 'react-toastify'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useAuth } from '../../contexts/AuthContext'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { useConversations, useMessages, useUnreadChatCount } from '../../queries'
 import { useGetOrCreateConversation, useMarkConversationRead, useSendMessage, useUploadChatFile } from '../../mutations'
 import { getImageUrl } from '../../utils/apiConfig'
 
 const AdminDoctorChat = ({ mode = 'doctor' }) => {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -23,9 +25,9 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
   const participantKey = isBusinessChat ? 'businessId' : 'veterinarianId'
   const accountLabel = isBusinessChat
     ? businessRole === 'PARAPHARMACY'
-      ? 'Parapharmacy'
-      : 'Pharmacy'
-    : 'Doctor'
+      ? t('pharmacyAdmin.nav.parapharmacy')
+      : t('pharmacyAdmin.nav.pharmacy')
+    : t('doctorPanel.veterinarian')
   const currentUserImage = getImageUrl(user?.profileImage) || '/assets/img/doctors-dashboard/doctor-profile-img.jpg'
 
   const messagesEndRef = useRef(null)
@@ -134,7 +136,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
       },
       onError: (err) => {
         lastMarkedReadConversationRef.current = null
-        toast.error(err?.message || 'Failed to mark messages as read')
+        toast.error(err?.message || t('doctorRemaining.adminChat.markReadFailed'))
       },
     })
   }, [markRead, queryClient, selectedConversation, selectedConversationId])
@@ -155,7 +157,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
         {
           type: 'file',
           url: m.fileUrl,
-          name: m.fileName || 'File',
+          name: m.fileName || t('doctorRemaining.adminChat.file'),
           size: null,
         },
       ]
@@ -175,7 +177,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
 
   const handleStartConversation = async () => {
     if (!currentUserId) {
-      toast.error('User not found')
+      toast.error(t('doctorRemaining.adminChat.userNotFound'))
       return
     }
     try {
@@ -185,18 +187,18 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
       const convId = conv?._id
       if (convId) setSelectedConversationId(convId)
     } catch (err) {
-      toast.error(err?.message || 'Unable to start admin chat')
+      toast.error(err?.message || t('doctorRemaining.adminChat.startFailed'))
     }
   }
 
   const handleSend = async () => {
     const text = newMessage.trim()
     if (!text) {
-      toast.error('Please enter a message or select a file')
+      toast.error(t('doctorRemaining.adminChat.enterMessage'))
       return
     }
     if (!currentUserId) {
-      toast.error('User not found')
+      toast.error(t('doctorRemaining.adminChat.userNotFound'))
       return
     }
 
@@ -210,7 +212,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
       setNewMessage('')
       scrollToBottom()
     } catch (err) {
-      toast.error(err?.message || 'Failed to send message')
+      toast.error(err?.message || t('doctorChat.sendFailed'))
     }
   }
 
@@ -221,13 +223,13 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
     const maxSize = 50 * 1024 * 1024
     const oversizedFiles = files.filter((f) => f.size > maxSize)
     if (oversizedFiles.length > 0) {
-      toast.error('Some files are too large. Maximum size is 50MB.')
+      toast.error(t('doctorRemaining.adminChat.fileLimit'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
 
     if (!currentUserId) {
-      toast.error('User not found')
+      toast.error(t('doctorRemaining.adminChat.userNotFound'))
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
@@ -253,7 +255,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
 
       const uploaded = (await Promise.all(uploadPromises)).filter(Boolean)
       if (uploaded.length === 0) {
-        toast.error('No files were uploaded successfully')
+        toast.error(t('doctorRemaining.adminChat.uploadNone'))
         return
       }
 
@@ -269,7 +271,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
       setNewMessage('')
       scrollToBottom()
     } catch (err) {
-      toast.error(err?.message || 'Failed to upload/send files')
+      toast.error(err?.message || t('doctorRemaining.adminChat.uploadFailed'))
     } finally {
       setUploadingFiles(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
@@ -590,25 +592,25 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                 <div className="chat-list-header">
                   <div className="d-flex align-items-center justify-content-between mb-3">
                     <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate(-1)}>
-                      <i className="fa-solid fa-chevron-left me-1"></i> Back
+                      <i className="fa-solid fa-chevron-left me-1"></i> {t('doctorRemaining.adminChat.back')}
                     </button>
-                    <h4 className="mb-0">Admin Chats</h4>
+                    <h4 className="mb-0">{t('doctorRemaining.adminChat.title')}</h4>
                   </div>
                 </div>
                 <div className="chat-list-content">
                   {conversationsLoading ? (
-                    <div className="text-center py-3 text-muted">Loading...</div>
+                    <div className="text-center py-3 text-muted">{t('doctorRemaining.adminChat.loading')}</div>
                   ) : adminConversations.length === 0 ? (
                     <div className="text-center py-3">
-                      <p className="text-muted mb-3">No admin conversations for this {accountLabel.toLowerCase()} yet</p>
+                      <p className="text-muted mb-3">{t('doctorRemaining.adminChat.empty', { account: accountLabel.toLowerCase() })}</p>
                       <button className="btn btn-primary" type="button" onClick={handleStartConversation}>
-                        Start Chat
+                        {t('doctorRemaining.adminChat.startChat')}
                       </button>
                     </div>
                   ) : (
                     adminConversations.map((c) => {
                       const adminUser = c?.adminId
-                      const name = adminUser?.name || adminUser?.fullName || adminUser?.email || 'Admin'
+                      const name = adminUser?.name || adminUser?.fullName || adminUser?.email || t('doctorRemaining.adminChat.admin')
                       const avatar = getImageUrl(adminUser?.profileImage) || '/assets/img/doctors-dashboard/profile-06.jpg'
                       const preview = c?.lastMessage?.message || '—'
                       const time = formatConversationTime(c)
@@ -627,7 +629,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                           }}
                         >
                           <div className="chat-item-avatar">
-                            <img src={avatar} alt="Avatar" />
+                            <img src={avatar} alt={t('doctorRemaining.adminChat.avatar')} />
                           </div>
                           <div className="chat-item-content">
                             <div className="chat-item-header">
@@ -656,7 +658,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                         type="button"
                         className="chat-mobile-back-button"
                         onClick={() => setIsMobileConversationOpen(false)}
-                        aria-label="Back to chats"
+                        aria-label={t('doctorRemaining.adminChat.back')}
                       >
                         <i className="fa-solid fa-arrow-left"></i>
                       </button>
@@ -664,7 +666,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                         <div className="chat-details-avatar">
                           <img
                             src={getImageUrl(selectedConversation?.adminId?.profileImage) || '/assets/img/doctors-dashboard/profile-06.jpg'}
-                            alt="User"
+                            alt={t('doctorRemaining.adminChat.user')}
                           />
                         </div>
                         <div className="chat-details-user-info">
@@ -672,7 +674,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                             {selectedConversation?.adminId?.name ||
                               selectedConversation?.adminId?.fullName ||
                               selectedConversation?.adminId?.email ||
-                              'Admin'}
+                              t('doctorRemaining.adminChat.admin')}
                           </h5>
                         </div>
                       </div>
@@ -680,26 +682,26 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
 
                     <div className="chat-messages-area" ref={messagesContainerRef}>
                       {messagesLoading ? (
-                        <div className="text-center py-3 text-muted">Loading...</div>
+                        <div className="text-center py-3 text-muted">{t('doctorRemaining.adminChat.loading')}</div>
                       ) : messages.length === 0 ? (
-                        <div className="text-center py-3 text-muted">No messages yet</div>
+                        <div className="text-center py-3 text-muted">{t('doctorRemaining.adminChat.noMessages')}</div>
                       ) : (
                         messages.map((m) => {
                           const sender = m?.senderId
                           const senderId = sender?._id
                           const isOutgoing = currentUserId && senderId && String(senderId) === String(currentUserId)
-                          const senderName = sender?.name || sender?.fullName || sender?.email || 'User'
+                          const senderName = sender?.name || sender?.fullName || sender?.email || t('doctorRemaining.adminChat.user')
                           const senderAvatar =
                             getImageUrl(sender?.profileImage) || (isOutgoing ? currentUserImage : '/assets/img/doctors-dashboard/profile-06.jpg')
-                          const t = m?.createdAt ? new Date(m.createdAt) : null
-                          const time = t && !Number.isNaN(t.getTime()) ? t.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : ''
+                          const messageDate = m?.createdAt ? new Date(m.createdAt) : null
+                          const time = messageDate && !Number.isNaN(messageDate.getTime()) ? messageDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) : ''
                           const body = m?.message || ''
                           const attachments = getMessageAttachments(m)
 
                           return (
                             <div key={m._id} className={`chat-message ${isOutgoing ? 'outgoing' : 'incoming'}`}>
                               <div className="chat-message-avatar">
-                                <img src={senderAvatar} alt="Avatar" />
+                                <img src={senderAvatar} alt={t('doctorRemaining.adminChat.avatar')} />
                               </div>
                               <div className="chat-message-content">
                                 <div className="chat-message-header" style={isOutgoing ? { justifyContent: 'flex-end' } : undefined}>
@@ -712,7 +714,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                                     <div className="chat-attachments">
                                       {attachments.map((att, idx) => {
                                         const url = getImageUrl(att?.url)
-                                        const name = att?.name || att?.fileName || 'File'
+                                        const name = att?.name || att?.fileName || t('doctorRemaining.adminChat.file')
                                         const size = formatFileSize(att?.size)
                                         const isImg = isImageAttachment(att)
 
@@ -755,7 +757,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                       <div className="chat-input-actions">
                         <button
                           type="button"
-                          title="Attach"
+                          title={t('doctorRemaining.adminChat.attach')}
                           onClick={() => fileInputRef.current?.click()}
                           disabled={uploadingFiles || sendMessage.isPending}
                         >
@@ -773,7 +775,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                       <input
                         type="text"
                         className="chat-input-field"
-                        placeholder="Type your message here..."
+                        placeholder={t('doctorRemaining.adminChat.messagePlaceholder')}
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyDown={(e) => {
@@ -787,7 +789,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                       <button
                         type="button"
                         className="chat-send-button"
-                        title="Send"
+                        title={t('doctorRemaining.adminChat.send')}
                         onClick={handleSend}
                         disabled={!newMessage.trim() || sendMessage.isPending || uploadingFiles}
                       >
@@ -796,7 +798,7 @@ const AdminDoctorChat = ({ mode = 'doctor' }) => {
                     </div>
                   </>
                 ) : (
-                  <div className="d-flex align-items-center justify-content-center h-100 text-muted">Select a conversation</div>
+                  <div className="d-flex align-items-center justify-content-center h-100 text-muted">{t('doctorRemaining.adminChat.selectConversation')}</div>
                 )}
               </div>
             </div>
