@@ -57,6 +57,7 @@ const Footer = () => {
                     <h2 className="footer-title">{t('home.company')}</h2>
                     <ul>
                       <li><Link to="/">{t('common.home')}</Link></li>
+                      <li><Link to="/about-us">{t('nav.aboutUs')}</Link></li>
                       <li><Link to="/search">{t('home.specialities')}</Link></li>
                       <li><Link to="/search">{t('home.consult')}</Link></li>
                     </ul>

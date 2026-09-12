@@ -85,6 +85,13 @@ const translations = {
     },
     nav: {
       doctors: 'Doctors',
+      veterinarians: 'Veterinarians',
+      myPanel: 'My Panel',
+      emergencyRoom: 'Emergency Room H24',
+      services: 'Services',
+      petShop: 'Pet Shop',
+      myPet: 'My Pet',
+      contacts: 'Contacts',
       doctorDashboard: 'Doctor Dashboard',
       appointments: 'Appointments',
       availableTiming: 'Available Timing',
@@ -257,6 +264,17 @@ const translations = {
       emergencyTitle: 'When your pet needs help, trusted care is close to you.',
       emergencyDescription: 'Find a qualified veterinarian for urgent support, advice, and the next available appointment. Search by service and location to find the right care for your pet.',
       findVeterinarian: 'Find a Veterinarian',
+      petShopEyebrow: 'PET SHOPS AND SPECIALTY STORES',
+      petShopTitle: 'Everything your pet needs, all in one place.',
+      petShopDescription: 'Discover pet shops and specialty stores near you: food, accessories, toys, hygiene products, and more for your pet’s well-being.',
+      findPetShop: 'Find a Pet Shop',
+      petShopImageAlt: 'Pet shop and specialty stores',
+      petShopFeaturesAlt: 'Quality food, accessories, toys, and hygiene care',
+      servicesSliderLabel: 'Featured pet services',
+      servicesSliderNavigation: 'Featured pet services navigation',
+      previousSlide: 'Previous slide',
+      nextSlide: 'Next slide',
+      goToSlide: 'Go to slide {number}',
       specializationsEyebrow: 'OUR SPECIALIZATIONS',
       browseSpecializations: 'Browse Specializations',
       specializationDescription: 'Find the right veterinarian for your pet',
@@ -836,6 +854,13 @@ const translations = {
     },
     nav: {
       doctors: 'Veterinari',
+      veterinarians: 'Veterinari',
+      myPanel: 'Il mio pannello',
+      emergencyRoom: 'Pronto soccorso H24',
+      services: 'Servizi',
+      petShop: 'Pet Shop',
+      myPet: 'Il mio animale',
+      contacts: 'Contatti',
       doctorDashboard: 'Dashboard veterinario',
       appointments: 'Appuntamenti',
       availableTiming: 'Orari disponibili',
@@ -939,6 +964,17 @@ const translations = {
       emergencyTitle: 'Quando il tuo animale ha bisogno, una cura affidabile è vicina a te.',
       emergencyDescription: 'Trova un veterinario qualificato per assistenza urgente, consigli e il primo appuntamento disponibile. Cerca per servizio e posizione la cura giusta per il tuo animale.',
       findVeterinarian: 'Trova un veterinario',
+      petShopEyebrow: 'PET SHOP E NEGOZI SPECIALIZZATI',
+      petShopTitle: 'Tutto ciò che serve al tuo animale, in un unico posto.',
+      petShopDescription: 'Scopri pet shop e negozi specializzati vicino a te: cibo, accessori, giochi, prodotti per l’igiene e molto altro per il benessere del tuo animale.',
+      findPetShop: 'Trova un pet shop',
+      petShopImageAlt: 'Pet shop e negozi specializzati',
+      petShopFeaturesAlt: 'Cibo di qualità, accessori, giochi e prodotti per l’igiene',
+      servicesSliderLabel: 'Servizi in evidenza per animali',
+      servicesSliderNavigation: 'Navigazione dei servizi in evidenza',
+      previousSlide: 'Slide precedente',
+      nextSlide: 'Slide successiva',
+      goToSlide: 'Vai alla slide {number}',
       specializationsEyebrow: 'LE NOSTRE SPECIALIZZAZIONI',
       browseSpecializations: 'Scopri le specializzazioni',
       specializationDescription: 'Trova il veterinario giusto per il tuo animale',
@@ -1420,7 +1456,12 @@ export const LanguageProvider = ({ children }) => {
     const variables = typeof variablesOrFallback === 'object' ? variablesOrFallback : maybeVariables
     const fallback = typeof variablesOrFallback === 'string' ? variablesOrFallback : key
     const translated = getByPath(translations[language], key) ?? getByPath(translations.en, key) ?? fallback
-    return String(translated).replace(/\{(\w+)\}/g, (_, name) => variables[name] ?? `{${name}}`)
+    const rendered = String(translated).replace(/\{(\w+)\}/g, (_, name) => variables[name] ?? `{${name}}`)
+    if (language !== 'it') return rendered
+    return rendered
+      .replace(/\bANIMALE\b/g, 'PET')
+      .replace(/\bAnimale\b/g, 'Pet')
+      .replace(/\banimale\b/g, 'pet')
   }, [language])
 
   const value = useMemo(() => ({

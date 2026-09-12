@@ -17,7 +17,6 @@ const Header = () => {
   const { user, logout } = useAuth()
   const { getCartItemCount } = useCart()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [openMobileSubmenu, setOpenMobileSubmenu] = useState(null)
   const { t } = useLanguage()
   const role = user?.role
   const userId = user?.id || user?._id
@@ -38,13 +37,37 @@ const Header = () => {
   }, [myPetStoreRes])
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/')
-  const isIndexPage = location.pathname === '/' || location.pathname === '/index'
-  const isPharmacyIndex = location.pathname === '/pharmacy-index'
+  const searchParams = new URLSearchParams(location.search)
+  const isEmergencySearch = location.pathname === '/search' && searchParams.get('isAvailableOnline') === 'true'
+  const isServicesSearch = location.pathname === '/search' && searchParams.get('service') === '1'
+  const isVeterinarian = role === ROLES.VETERINARIAN
+  const myPetDestination = {
+    [ROLES.VETERINARIAN]: '/doctor/dashboard',
+    [ROLES.PET_STORE]: '/pharmacy-admin/dashboard',
+    [ROLES.PARAPHARMACY]: '/pharmacy-admin/dashboard',
+    [ROLES.PET_SITTER]: '/pet-sitter/dashboard',
+    [ROLES.ADMIN]: '/admin/index_admin',
+  }[role] || '/patient/dashboard'
+  const hasOwnPanelNavigation = [
+    ROLES.VETERINARIAN,
+    ROLES.PET_STORE,
+    ROLES.PARAPHARMACY,
+    ROLES.PET_SITTER,
+  ].includes(role)
+  const veterinarianDestination = hasOwnPanelNavigation ? myPetDestination : '/search'
+  const isMyPetActive = (!user || role === ROLES.PET_OWNER) && isActive('/patient')
 
-  // Role-based visibility: show nav sections only if user has access (or not logged in = public)
-  const showDoctorsNav = !user || role === ROLES.VETERINARIAN
-  const showPatientsNav = !user || role === ROLES.PET_OWNER
-  const showPharmacyNav = !user || role === ROLES.PET_OWNER || role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY || role === ROLES.ADMIN
+  const publicNavItems = [
+    { id: 'home', to: '/', label: t('common.home'), active: location.pathname === '/' || location.pathname === '/index' },
+    ...(!isVeterinarian ? [{ id: 'emergency', to: '/search?isAvailableOnline=true', label: t('nav.emergencyRoom'), active: isEmergencySearch }] : []),
+    { id: 'veterinarians', to: veterinarianDestination, label: hasOwnPanelNavigation ? t('nav.myPanel') : t('nav.veterinarians'), active: !isEmergencySearch && !isServicesSearch && isActive(veterinarianDestination) },
+    { id: 'pharmacy', to: '/pharmacy-search', label: t('nav.pharmacy'), active: isActive('/pharmacy-search') },
+    { id: 'services', to: '/search?service=1', label: t('nav.services'), active: isServicesSearch },
+    { id: 'pet-shop', to: '/product-all', label: t('nav.petShop'), active: isActive('/product-all') },
+    ...(!hasOwnPanelNavigation ? [{ id: 'my-pet', to: myPetDestination, label: t('nav.myPet'), active: isMyPetActive }] : []),
+    { id: 'contacts', to: '/contact-us', label: t('nav.contacts'), active: isActive('/contact-us') },
+    ...(!user ? [{ id: 'pet-sitter', to: '/pet-sitter/register', label: t('nav.becomePetSitter'), active: isActive('/pet-sitter/register') }] : []),
+  ]
 
   const cartCount = role === ROLES.PET_OWNER ? getCartItemCount() : 0
 
@@ -89,16 +112,7 @@ const Header = () => {
 
   useEffect(() => {
     setIsMenuOpen(false)
-    setOpenMobileSubmenu(null)
   }, [location.pathname])
-
-  const toggleMobileSubmenu = (key) => (e) => {
-    if (typeof window === 'undefined') return
-    if (window.innerWidth > 991) return
-    e.preventDefault()
-    e.stopPropagation()
-    setOpenMobileSubmenu((prev) => (prev === key ? null : key))
-  }
 
   // Determine header class based on route
   const getHeaderClass = () => {
@@ -181,103 +195,6 @@ const Header = () => {
         // </div>
       )} */}
 
-      {/* Pharmacy Top Header */}
-      {isPharmacyIndex && (
-        <>
-          <div
-            className="top-header"
-          >
-            <div className="container">
-              <div className="row align-items-center">
-                <div className="col-md-6">
-                  <div className="special-offer-content">
-                    <p>Special offer! Get -20% off for first order with minimum <span>$200.00</span> in cart.</p>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="top-header-right">
-                    <ul className="nav">
-                      <li className="header-theme me-0 pe-0">
-                        <a href="javascript:void(0);" id="dark-mode-toggle" className="theme-toggle">
-                          <i className="isax isax-sun-1"></i>
-                        </a>
-                        <a href="javascript:void(0);" id="light-mode-toggle" className="theme-toggle activate">
-                          <i className="isax isax-moon"></i>
-                        </a>
-                      </li>
-                      <li>
-                        <div className="btn log-register">
-                          <Link to="/login" className="me-1">
-                            <span><i className="feather-user"></i></span> {t('common.signIn')}
-                          </Link> /
-                          <Link to="/register" className="ms-1">{t('common.signUp')}</Link>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="cart-section">
-            <div className="container">
-              <div className="row align-items-center">
-                <div className="col-md-3">
-                  <div className="cart-logo">
-                    <Link to="/">
-                      <img src="/assets/img/pet-logo.jpg" className="img-fluid" alt="Logo" />
-                    </Link>
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <div className="cart-search">
-                    <form action="/pharmacy-search">
-                      <div className="enter-pincode">
-                        <i className="feather-map-pin"></i>
-                        <div className="enter-pincode-input">
-                          <input type="text" className="form-control" placeholder="Enter Pincode" />
-                        </div>
-                      </div>
-                      <div className="cart-search-input">
-                        <input type="text" className="form-control" placeholder="Search for medicines, health products and more" />
-                      </div>
-                      <div className="cart-search-btn">
-                        <button type="submit" className="btn">
-                          <i className="feather-search"></i>
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-                <div className="col-md-3">
-                  <div className="shopping-cart-list">
-                    <ul className="nav">
-                      <li>
-                        <a href="javascript:void(0);">
-                          <img src="/assets/img/icons/cart-favourite.svg" alt="Img" />
-                        </a>
-                      </li>
-                      <li>
-                        <div className="shopping-cart-amount">
-                          <div className="shopping-cart-icon">
-                            <img src="/assets/img/icons/bag-2.svg" alt="Img" />
-                            <span>2</span>
-                          </div>
-                          <div className="shopping-cart-content">
-                            <p>Shopping cart</p>
-                            <h6>$57.00</h6>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
       <div
         className={`sidebar-overlay ${isMenuOpen ? 'opened' : ''}`}
         onClick={() => setIsMenuOpen(false)}
@@ -315,22 +232,6 @@ const Header = () => {
               </Link>
             </div>
 
-            {isPharmacyIndex && (
-              <div className="browse-categorie">
-                <div className="dropdown categorie-dropdown">
-                  <a href="javascript:void(0);" className="dropdown-toggle" data-bs-toggle="dropdown">
-                    <img src="/assets/img/icons/browse-categorie.svg" alt="Img" /> Browse Categories
-                  </a>
-                  <div className="dropdown-menu">
-                    <a className="dropdown-item" href="javascript:void(0);">Ayush</a>
-                    <a className="dropdown-item" href="javascript:void(0);">Covid Essentials</a>
-                    <a className="dropdown-item" href="javascript:void(0);">Devices</a>
-                    <a className="dropdown-item" href="javascript:void(0);">Glucometers</a>
-                  </div>
-                </div>
-              </div>
-            )}
-
             <div className={`main-menu-wrapper ${isMenuOpen ? 'menu-opened' : ''}`}>
               <div className="menu-header">
                 <Link to="/" className="menu-logo">
@@ -341,128 +242,11 @@ const Header = () => {
                 </a>
               </div>
               <ul className="main-nav">
-                {/* Home Menu */}
-                <li className={isActive('/') || location.pathname === '/index' ? 'active' : ''}>
-                  <Link to="/"><span>{t('common.home')}</span></Link>
-                </li>
-
-                {/* Doctors Menu - only for veterinarians (or public when not logged in) */}
-                {showDoctorsNav && (
-                  <li className={`has-submenu ${isActive('/doctor') || isActive('/appointments') ? 'active' : ''}`}>
-                    <a
-                      href="javascript:void(0);"
-                      onClick={toggleMobileSubmenu('doctors')}
-                      aria-expanded={openMobileSubmenu === 'doctors'}
-                    >
-                      {t('nav.doctors')} <i className="fas fa-chevron-down"></i>
-                    </a>
-                    <ul
-                      className="submenu"
-                      style={{ display: openMobileSubmenu === 'doctors' ? 'block' : undefined }}
-                    >
-                      {role === ROLES.VETERINARIAN && (
-                        <>
-                          <li><Link to="/doctor/dashboard">{t('nav.doctorDashboard')}</Link></li>
-                          <li><Link to="/appointments">{t('nav.appointments')}</Link></li>
-                          <li><Link to="/available-timings">{t('nav.availableTiming')}</Link></li>
-                          <li><Link to="/my-patients">{t('nav.myPets')}</Link></li>
-                          <li><Link to="/chat-doctor">{t('nav.chat')}</Link></li>
-                          <li><Link to="/invoices">{t('nav.invoices')}</Link></li>
-                          <li><Link to="/doctor-profile-settings">{t('nav.profileSettings')}</Link></li>
-                          <li><Link to="/reviews">{t('nav.reviews')}</Link></li>
-                        </>
-                      )}
-                      {!user && (
-                        <>
-                          <li><Link to="/doctor/dashboard">{t('nav.doctorDashboard')}</Link></li>
-                          <li><Link to="/appointments">{t('nav.appointments')}</Link></li>
-                          <li><Link to="/available-timings">{t('nav.availableTiming')}</Link></li>
-                          <li><Link to="/my-patients">{t('nav.myPets')}</Link></li>
-                          <li><Link to="/chat-doctor">{t('nav.chat')}</Link></li>
-                          <li><Link to="/doctor-profile-settings">{t('nav.profileSettings')}</Link></li>
-                          <li><Link to="/reviews">{t('nav.reviews')}</Link></li>
-                          <li><Link to="/doctor-register">{t('nav.doctorRegister')}</Link></li>
-                        </>
-                      )}
-                    </ul>
+                {publicNavItems.map((item) => (
+                  <li key={item.id} className={[item.active ? 'active' : '', item.id === 'emergency' ? 'nav-emergency' : ''].filter(Boolean).join(' ')}>
+                    <Link to={item.to} onClick={() => setIsMenuOpen(false)}>{item.label}</Link>
                   </li>
-                )}
-
-                {/* Patients Menu - only for pet owners (or public when not logged in) */}
-                {showPatientsNav && (
-                  <li className={`has-submenu ${isActive('/patient') || isActive('/search') || isActive('/booking') ? 'active' : ''}`}>
-                    <a
-                      href="javascript:void(0);"
-                      onClick={toggleMobileSubmenu('patients')}
-                      aria-expanded={openMobileSubmenu === 'patients'}
-                    >
-                      {t('nav.patients')} <i className="fas fa-chevron-down"></i>
-                    </a>
-                    <ul
-                      className="submenu"
-                      style={{ display: openMobileSubmenu === 'patients' ? 'block' : undefined }}
-                    >
-                      <li><Link to="/patient/dashboard">{t('nav.myPetDashboard')}</Link></li>
-
-                      <li>
-                        <Link to="/search">{t('nav.searchDoctor')}</Link>
-                        {/* <ul className="submenu inner-submenu">
-                        <li><Link to="/search">Search Doctor 1</Link></li>
-                        <li><Link to="/search-2">Search Doctor 2</Link></li>
-                      </ul> */}
-                      </li>
-                      <li><Link to="/pet-sitters">{t('nav.findPetSitters')}</Link></li>
-
-
-                      {/* <li><Link to="/checkout">Checkout</Link></li>
-                    <li><Link to="/booking-success">Booking Success</Link></li> */}
-                      <li><Link to="/favourites">{t('nav.favourites')}</Link></li>
-                      <li><Link to="/chat">{t('nav.chat')}</Link></li>
-                      <li><Link to="/profile-settings">{t('common.profileSettings')}</Link></li>
-                      <li><Link to="/change-password">{t('common.changePassword')}</Link></li>
-                    </ul>
-                  </li>
-                )}
-
-                {/* Pharmacy Menu - pet owners, pet store, admin (or public when not logged in) */}
-                {showPharmacyNav && (
-                  <li className={`has-submenu ${isActive('/pharmacy') || isActive('/product') || isActive('/cart') ? 'active' : ''}`}>
-                    <a
-                      href="javascript:void(0);"
-                      onClick={toggleMobileSubmenu('pharmacy')}
-                      aria-expanded={openMobileSubmenu === 'pharmacy'}
-                    >
-                      {t('nav.pharmacy')} <i className="fas fa-chevron-down"></i>
-                    </a>
-                    <ul
-                      className="submenu"
-                      style={{ display: openMobileSubmenu === 'pharmacy' ? 'block' : undefined }}
-                    >
-
-                      <li><Link to="/pharmacy-search">{t('nav.pharmacies')}</Link></li>
-                      <li><Link to="/product-all">{t('nav.products')}</Link></li>
-                      <li><Link to="/cart">{t('nav.cart')}</Link></li>
-                      {(role === ROLES.PET_STORE || role === ROLES.PARAPHARMACY) && (
-                        <li>
-                          <Link to="/pharmacy-admin/dashboard">
-                            {role === ROLES.PARAPHARMACY ? t('nav.parapharmacyDashboard') : t('nav.pharmacyDashboard')}
-                          </Link>
-                        </li>
-                      )}
-
-                    </ul>
-                  </li>
-                )}
-
-                {/* About Us */}
-                <li className={isActive('/about-us') ? 'active' : ''}>
-                  <Link to="/about-us">{t('nav.aboutUs')}</Link>
-                </li>
-
-                {/* Contact Us */}
-                <li className={isActive('/contact-us') ? 'active' : ''}>
-                  <Link to="/contact-us">{t('nav.contactUs')}</Link>
-                </li>
+                ))}
                 {user && (
                   <li className="mobile-menu-signout">
                     <button
@@ -477,7 +261,6 @@ const Header = () => {
                     </button>
                   </li>
                 )}
-                {!user && <li><Link to="/pet-sitter/register">{t('nav.becomePetSitter')}</Link></li>}
                 <li className="mobile-language-toggle">
                   <LanguageToggle />
                 </li>
