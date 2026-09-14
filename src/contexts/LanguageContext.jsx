@@ -1461,7 +1461,8 @@ export const LanguageProvider = ({ children }) => {
     return rendered
       .replace(/\bANIMALE\b/g, 'PET')
       .replace(/\bAnimale\b/g, 'Pet')
-      .replace(/\banimale\b/g, 'pet')
+      .replace(/\banimale\b/g, 'Pet')
+      .replace(/\bpet\b/gi, 'Pet')
   }, [language])
 
   const value = useMemo(() => ({

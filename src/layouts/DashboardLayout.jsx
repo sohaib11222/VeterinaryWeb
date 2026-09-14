@@ -45,6 +45,7 @@ const DashboardLayout = ({ children, breadcrumb }) => {
                         location.pathname === '/doctor-clinics-settings' ||
                         location.pathname === '/doctor-business-settings' ||
                         location.pathname === '/social-media'
+                        || location.pathname === '/doctor/services'
   const isPatientRoute = location.pathname.startsWith('/patient') ||
                         location.pathname === '/patient-appointments' ||
                         location.pathname === '/patient-appointments-grid' ||

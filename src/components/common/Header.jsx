@@ -62,7 +62,7 @@ const Header = () => {
     ...(!isVeterinarian ? [{ id: 'emergency', to: '/search?isAvailableOnline=true', label: t('nav.emergencyRoom'), active: isEmergencySearch }] : []),
     { id: 'veterinarians', to: veterinarianDestination, label: hasOwnPanelNavigation ? t('nav.myPanel') : t('nav.veterinarians'), active: !isEmergencySearch && !isServicesSearch && isActive(veterinarianDestination) },
     { id: 'pharmacy', to: '/pharmacy-search', label: t('nav.pharmacy'), active: isActive('/pharmacy-search') },
-    { id: 'services', to: '/search?service=1', label: t('nav.services'), active: isServicesSearch },
+    { id: 'services', to: '/services', label: t('nav.services'), active: isActive('/services') },
     { id: 'pet-shop', to: '/product-all', label: t('nav.petShop'), active: isActive('/product-all') },
     ...(!hasOwnPanelNavigation ? [{ id: 'my-pet', to: myPetDestination, label: t('nav.myPet'), active: isMyPetActive }] : []),
     { id: 'contacts', to: '/contact-us', label: t('nav.contacts'), active: isActive('/contact-us') },

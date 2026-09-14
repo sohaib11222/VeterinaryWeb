@@ -175,6 +175,9 @@ import Booking from './pages/booking/Booking'
 import BookingSuccess from './pages/booking/BookingSuccess'
 import Checkout from './pages/booking/Checkout'
 import Consultation from './pages/booking/Consultation'
+import ServicesPage from './pages/services/ServicesPage'
+import ServiceProvidersPage from './pages/services/ServiceProvidersPage'
+import ProviderServiceOfferings from './pages/services/ProviderServiceOfferings'
 
 // Pharmacy Pages
 import PharmacyIndex from './pages/pharmacy/PharmacyIndex'
@@ -391,6 +394,14 @@ function App() {
               element={
                 <ProtectedRoute role="VETERINARIAN" requireApproved={true}>
                   <DashboardLayout breadcrumb={{ title: "Doctor", li1: "Speciality & Services", li2: "Speciality & Services" }}><DoctorSpecialities /></DashboardLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/doctor/services"
+              element={
+                <ProtectedRoute role="VETERINARIAN" requireApproved={true}>
+                  <DashboardLayout breadcrumb={{ title: "Doctor", li1: "Services", li2: "Services I offer" }}><ProviderServiceOfferings /></DashboardLayout>
                 </ProtectedRoute>
               }
             />
@@ -638,6 +649,7 @@ function App() {
             <Route path="/pet-sitter-chat" element={<ProtectedRoute role="PET_OWNER"><LegacyPetSitterChatRedirect /></ProtectedRoute>} />
             <Route path="/pet-sitter/dashboard" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Dashboard", li2: "Overview" }}><PetSitterDashboard /></DashboardLayout></ProtectedRoute>} />
             <Route path="/pet-sitter/profile" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Profile", li2: "My Profile" }}><PetSitterProfileSettings /></DashboardLayout></ProtectedRoute>} />
+            <Route path="/pet-sitter/services" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Services", li2: "Services I offer" }}><ProviderServiceOfferings /></DashboardLayout></ProtectedRoute>} />
             <Route path="/pet-sitter/chats" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout><PetSitterChat /></DashboardLayout></ProtectedRoute>} />
             <Route path="/pet-sitter/change-password" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Settings", li2: "Change Password" }}><PetSitterChangePassword /></DashboardLayout></ProtectedRoute>} />
             <Route path="/pet-sitter/support-tickets" element={<ProtectedRoute role="PET_SITTER" requireApproved><DashboardLayout breadcrumb={{ title: "Pet Sitter", li1: "Support", li2: "Support Tickets" }}><SupportTickets /></DashboardLayout></ProtectedRoute>} />
@@ -977,6 +989,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/pharmacy-admin/services"
+              element={
+                <ProtectedRoute role={['PET_STORE', 'PARAPHARMACY']} requireApproved={true}>
+                  <DashboardLayout><ProviderServiceOfferings /></DashboardLayout>
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="/pharmacy-admin/change-password"
@@ -1042,6 +1062,8 @@ function App() {
             />
 
             {/* Search & Booking Routes - Public */}
+            <Route path="/services" element={<MainLayout><ServicesPage /></MainLayout>} />
+            <Route path="/services/:slug" element={<MainLayout><ServiceProvidersPage /></MainLayout>} />
             <Route path="/search" element={<MainLayout><Search /></MainLayout>} />
             <Route path="/search-2" element={<MainLayout><Search2 /></MainLayout>} />
             <Route path="/doctor-grid" element={<MainLayout><DoctorGrid /></MainLayout>} />

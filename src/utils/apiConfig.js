@@ -163,6 +163,16 @@ export const API_ROUTES = {
     UPLOAD_DOCUMENTS: '/pet-sitters/me/documents',
   },
 
+  PLATFORM_SERVICES: {
+    LIST: '/platform-services',
+    ADMIN_LIST: '/platform-services/admin/all',
+    CREATE: '/platform-services',
+    UPDATE: (id) => `/platform-services/${id}`,
+    DELETE: (id) => `/platform-services/${id}`,
+    MINE: '/platform-services/mine',
+    PROVIDERS: (slug) => `/platform-services/${encodeURIComponent(slug)}/providers`,
+  },
+
   PRODUCT_PRESCRIPTIONS: {
     BASE: '/product-prescription-requests',
     MINE: '/product-prescription-requests/mine',

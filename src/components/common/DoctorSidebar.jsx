@@ -265,6 +265,13 @@ const DoctorSidebar = () => {
                 <div className="menu-indicator"></div>
               </Link>
             </li>
+            <li className={isActive('/doctor/services') ? 'active' : ''}>
+              <Link to="/doctor/services">
+                <i className="fa-solid fa-handshake"></i>
+                <span>Services I Offer</span>
+                <div className="menu-indicator"></div>
+              </Link>
+            </li>
             <li className={isActive(['/doctor-profile-settings', '/doctor-experience-settings', '/doctor-education-settings', '/doctor-awards-settings', '/doctor-insurance-settings', '/doctor-clinics-settings', '/doctor-business-settings']) ? 'active' : ''}>
               <Link to="/doctor-profile-settings">
                 <i className="fa-solid fa-user-pen"></i>
