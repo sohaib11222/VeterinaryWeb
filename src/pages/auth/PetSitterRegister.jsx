@@ -162,7 +162,10 @@ const PetSitterRegister = () => {
               <div className="card-body p-3 p-md-4 p-lg-5">
                 <div className="text-center mb-4">
                   <span className="badge bg-primary-subtle text-primary mb-2">{t('auth.petSitter.registration')}</span>
-                  <h2 className="mb-1">{stepTitle}</h2>
+                  <h1 className="account-title veterinary-register-title mb-2">
+                    <i className="fa-solid fa-paw me-2"></i>{t('auth.petSitter.title')}
+                  </h1>
+                  <h2 className="pet-sitter-step-title mb-1">{stepTitle}</h2>
                   <p className="text-muted mb-0">{step === 1 ? t('auth.petSitter.createAccount') : step === 2 ? t('auth.petSitter.sentCode', { email: registeredEmail }) : step === 3 ? t('auth.petSitter.addInformation') : t('auth.petSitter.chooseServices')}</p>
                 </div>
 

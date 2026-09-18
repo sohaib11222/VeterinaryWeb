@@ -52,6 +52,8 @@ const Search = () => {
   const urlType = /^(pet[-_ ]?sitter|pet[-_ ]?sitters|sitter)s?$/i.test(requestedType) || isPetSitterSearch(urlSearch)
     ? PROVIDERS.PET_SITTERS
     : PROVIDERS.VETERINARIANS
+  const isEmergencySearch = urlAvailability && urlType === PROVIDERS.VETERINARIANS
+  const searchTitle = isEmergencySearch ? t('nav.emergencyRoom') : t('common.breadcrumb.findVeterinarians')
 
   const queryParams = useMemo(() => {
     const params = { page, limit }
@@ -184,9 +186,9 @@ const Search = () => {
 
   return (
     <>
-      <Breadcrumb title={t('patient.search.breadcrumb')} li2={t('patient.search.breadcrumb')} />
+      <Breadcrumb title={searchTitle} li2={searchTitle} />
       <section className="search-page-header"><div className="container">
-        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3"><h2 className="mb-0">{t('patient.search.heading')}</h2></div>
+        <div className="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3"><h2 className="mb-0">{searchTitle}</h2></div>
           <div className="btn-group mb-3" role="tablist" aria-label={t('common.searchProviders.providerType')}>
           <button type="button" role="tab" aria-selected={providerType === PROVIDERS.VETERINARIANS} className={`btn ${providerType === PROVIDERS.VETERINARIANS ? 'btn-primary' : 'btn-outline-primary'}`} onClick={() => handleProviderChange(PROVIDERS.VETERINARIANS)}>{t('common.searchProviders.veterinarians')}</button>
           <button type="button" role="tab" aria-selected={providerType === PROVIDERS.PET_SITTERS} className={`btn ${providerType === PROVIDERS.PET_SITTERS ? 'btn-primary' : 'btn-outline-primary'}`} onClick={() => handleProviderChange(PROVIDERS.PET_SITTERS)}>{t('common.searchProviders.petSitters')}</button>

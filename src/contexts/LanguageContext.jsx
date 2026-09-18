@@ -578,6 +578,7 @@ const translations = {
         checkNow: 'Check status now',
       },
       petSitter: {
+        title: 'Register Pet Sitter',
         registration: 'Pet Sitter registration',
         basicDetails: 'Basic details',
         verifyEmail: 'Verify your email',
@@ -1278,6 +1279,7 @@ const translations = {
         checkNow: 'Controlla ora lo stato',
       },
       petSitter: {
+        title: 'Registra pet sitter',
         registration: 'Registrazione pet sitter',
         basicDetails: 'Dati di base',
         verifyEmail: 'Verifica email',
