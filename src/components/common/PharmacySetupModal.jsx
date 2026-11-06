@@ -3,7 +3,7 @@ import { useLanguage } from '../../contexts/LanguageContext'
 
 const PharmacySetupModal = ({ setup, role }) => {
   const { t } = useLanguage()
-  const requirements = Array.isArray(setup.requirements) ? setup.requirements : []
+  const requirements = Array.isArray(setup?.requirements) ? setup.requirements : []
   // Public visibility also depends on administrator approval. This modal only
   // tracks the retailer's own onboarding requirements, so it must disappear
   // when those requirements are complete even if approval is still pending.
