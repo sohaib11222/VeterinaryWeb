@@ -2987,3 +2987,308 @@ body.home-hero-header-transparent .home-hero-v2 {
 @media (max-width: 991px) {
   .auth-shell__language-toggle { top: 16px; right: 18px; }
 }
+
+/* Homepage app download callout */
+.home-app-download {
+  position: relative;
+  overflow: hidden;
+  padding: 42px 0 78px;
+  background: #fff;
+}
+
+.home-app-download__panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(300px, .88fr);
+  align-items: center;
+  gap: clamp(30px, 7vw, 104px);
+  min-height: 420px;
+  overflow: hidden;
+  padding: clamp(34px, 5vw, 62px) clamp(28px, 6vw, 76px);
+  border: 1px solid rgba(22, 154, 143, .18);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 97% 13%, rgba(82, 221, 197, .24), transparent 25%),
+    radial-gradient(circle at 3% 96%, rgba(69, 132, 190, .19), transparent 27%),
+    linear-gradient(128deg, #073a4c 0%, #075e62 48%, #0a817b 100%);
+  box-shadow: 0 24px 54px rgba(7, 58, 76, .16);
+}
+
+.home-app-download__panel::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  opacity: .23;
+  background-image: radial-gradient(rgba(255,255,255,.46) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: linear-gradient(to right, #000 0%, transparent 73%);
+}
+
+.home-app-download__copy,
+.home-app-download__visual {
+  position: relative;
+  z-index: 1;
+}
+
+.home-app-download__copy { max-width: 610px; }
+
+.home-app-download__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #adf9e9;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .11em;
+}
+
+.home-app-download__eyebrow i { font-size: 14px; }
+
+.home-app-download__copy h2 {
+  max-width: 600px;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(30px, 3.4vw, 46px);
+  font-weight: 700;
+  line-height: 1.14;
+  letter-spacing: -.025em;
+}
+
+.home-app-download__copy > p {
+  max-width: 570px;
+  margin: 17px 0 0;
+  color: rgba(234, 255, 252, .86);
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.home-app-download__features {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 18px;
+  margin: 25px 0 28px;
+  padding: 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.home-app-download__features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.45;
+}
+
+.home-app-download__features i {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  margin-top: 1px;
+  border-radius: 50%;
+  color: #075e62;
+  background: #9cf2dc;
+  font-size: 9px;
+  flex: 0 0 auto;
+}
+
+.home-app-download__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 9px 16px 9px 13px;
+  border: 1px solid rgba(255,255,255,.74);
+  border-radius: 16px;
+  color: #073a4c;
+  background: #fff;
+  box-shadow: 0 12px 26px rgba(0, 26, 36, .16);
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.home-app-download__button:hover,
+.home-app-download__button:focus-visible {
+  color: #073a4c;
+  background: #dffbf3;
+  box-shadow: 0 16px 30px rgba(0, 26, 36, .24);
+  transform: translateY(-2px);
+}
+
+.home-app-download__button > .fa-android {
+  display: grid;
+  width: 37px;
+  height: 37px;
+  place-items: center;
+  border-radius: 11px;
+  color: #fff;
+  background: linear-gradient(135deg, #0a807a, #22b99e);
+  font-size: 21px;
+}
+
+.home-app-download__button span { display: grid; line-height: 1.15; text-align: left; }
+.home-app-download__button small { margin-bottom: 2px; color: #638087; font-size: 10px; font-weight: 700; }
+.home-app-download__button > .fa-arrow-down { margin-left: 4px; color: #0b8c85; font-size: 13px; }
+
+.home-app-download__visual {
+  display: grid;
+  min-height: 312px;
+  place-items: center;
+}
+
+.home-app-download__orbit {
+  position: absolute;
+  border: 1px solid rgba(192, 255, 241, .29);
+  border-radius: 50%;
+}
+
+.home-app-download__orbit--one { width: 314px; height: 314px; }
+.home-app-download__orbit--two { width: 254px; height: 254px; border-style: dashed; }
+
+.home-app-download__phone {
+  position: relative;
+  z-index: 2;
+  width: 186px;
+  padding: 10px;
+  border: 5px solid #e7f4f5;
+  border-radius: 31px;
+  background: #082f3e;
+  box-shadow: 0 20px 42px rgba(0, 23, 34, .42), inset 0 0 0 1px rgba(255,255,255,.32);
+  transform: rotate(5deg);
+}
+
+.home-app-download__speaker {
+  position: absolute;
+  z-index: 3;
+  top: 16px;
+  left: 50%;
+  width: 43px;
+  height: 5px;
+  border-radius: 99px;
+  background: #093244;
+  transform: translateX(-50%);
+}
+
+.home-app-download__screen {
+  min-height: 318px;
+  padding: 28px 13px 16px;
+  overflow: hidden;
+  border-radius: 19px;
+  background: linear-gradient(160deg, #f4fffc 0%, #d9f8f0 100%);
+}
+
+.home-app-download__screen-header { display: flex; align-items: center; gap: 8px; }
+.home-app-download__screen-header strong,
+.home-app-download__screen-header small { display: block; }
+.home-app-download__screen-header strong { color: #124b5c; font-size: 12px; font-weight: 800; }
+.home-app-download__screen-header small { margin-top: 1px; color: #59808a; font-size: 7px; }
+
+.home-app-download__mark {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 9px;
+  color: #fff;
+  background: linear-gradient(135deg, #07958b, #28c7a9);
+  font-size: 13px;
+}
+
+.home-app-download__pet-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 21px;
+  padding: 13px 10px;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(18, 81, 92, .1);
+}
+
+.home-app-download__pet-card > span {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border-radius: 10px;
+  color: #ef6d76;
+  background: #fff0f2;
+  font-size: 13px;
+}
+
+.home-app-download__pet-card small,
+.home-app-download__pet-card strong { display: block; }
+.home-app-download__pet-card small { color: #7e969c; font-size: 8px; }
+.home-app-download__pet-card strong { margin-top: 2px; color: #17495b; font-size: 10px; }
+
+.home-app-download__screen-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin-top: 18px;
+}
+
+.home-app-download__screen-actions span {
+  display: grid;
+  height: 51px;
+  place-items: center;
+  border-radius: 12px;
+  color: #07887f;
+  background: rgba(255,255,255,.78);
+  font-size: 16px;
+}
+
+.home-app-download__badge {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 3px solid rgba(255,255,255,.78);
+  border-radius: 14px;
+  color: #fff;
+  box-shadow: 0 9px 21px rgba(0, 38, 47, .23);
+}
+
+.home-app-download__badge--care { top: 26px; right: calc(50% - 128px); background: #ec7882; transform: rotate(12deg); }
+.home-app-download__badge--notification { right: calc(50% - 135px); bottom: 26px; background: #2babb0; transform: rotate(-10deg); }
+
+.footer-app-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 15px;
+  color: #d8fbf1;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.footer-app-download:hover,
+.footer-app-download:focus-visible { color: #72ead4; }
+.footer-app-download i { font-size: 17px; }
+
+@media (max-width: 991.98px) {
+  .home-app-download { padding: 24px 0 60px; }
+  .home-app-download__panel { grid-template-columns: 1fr; padding: 42px 42px 26px; }
+  .home-app-download__copy { max-width: none; }
+  .home-app-download__visual { min-height: 290px; }
+}
+
+@media (max-width: 575.98px) {
+  .home-app-download { padding-bottom: 44px; }
+  .home-app-download__panel { gap: 20px; padding: 32px 24px 20px; border-radius: 23px; }
+  .home-app-download__copy h2 { font-size: 29px; }
+  .home-app-download__copy > p { font-size: 14px; }
+  .home-app-download__features { grid-template-columns: 1fr; margin: 21px 0; }
+  .home-app-download__button { width: 100%; justify-content: center; }
+  .home-app-download__visual { min-height: 260px; transform: scale(.88); transform-origin: top center; margin-bottom: -27px; }
+}

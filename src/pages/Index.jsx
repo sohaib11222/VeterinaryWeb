@@ -11,6 +11,7 @@ import Blogsection from '../components/home/Blogsection'
 import Chooseus from '../components/home/Chooseus'
 import InsuranceCompaniesSection from '../components/home/InsuranceCompaniesSection'
 import EmergencyVeterinarianSection from '../components/home/EmergencyVeterinarianSection'
+import AppDownloadSection from '../components/home/AppDownloadSection'
 import Footer from '../components/common/Footer'
 import ProgressCircle from '../components/home/ProgressCircle'
 
@@ -141,6 +142,7 @@ const Index = () => {
       <InsuranceCompaniesSection />
       <Blogsection />
       <Chooseus />
+      <AppDownloadSection />
       <Footer />
       <ProgressCircle />
       </div>

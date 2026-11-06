@@ -3,11 +3,16 @@ import { useLanguage } from '../../contexts/LanguageContext'
 
 const PharmacySetupModal = ({ setup, role }) => {
   const { t } = useLanguage()
-  if (!setup || setup.isPublic) return null
+  const requirements = Array.isArray(setup.requirements) ? setup.requirements : []
+  // Public visibility also depends on administrator approval. This modal only
+  // tracks the retailer's own onboarding requirements, so it must disappear
+  // when those requirements are complete even if approval is still pending.
+  const setupCompleted = setup?.setupCompleted === true
+    || (requirements.length > 0 && requirements.every((requirement) => requirement?.complete))
+  if (!setup || setupCompleted) return null
 
   const isParapharmacy = String(role || '').toUpperCase() === 'PARAPHARMACY'
   const accountLabel = isParapharmacy ? t('pharmacyAdmin.setup.parapharmacy') : t('pharmacyAdmin.setup.pharmacy')
-  const requirements = Array.isArray(setup.requirements) ? setup.requirements : []
 
   return (
     <>

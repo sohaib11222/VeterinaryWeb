@@ -43,6 +43,7 @@ const PetSitterRegister = () => {
   const [verificationCode, setVerificationCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
+  const [deliveryFailed, setDeliveryFailed] = useState(false)
 
   const updateBasic = (key, value) => setBasic((current) => ({ ...current, [key]: value }))
   const updateDetails = (key, value) => setDetails((current) => ({ ...current, [key]: value }))
@@ -69,8 +70,14 @@ const PetSitterRegister = () => {
       const response = await registerPetSitter(body)
       const email = response?.email || response?.user?.email || basic.email.trim().toLowerCase()
       setRegisteredEmail(email)
+      const emailDeliveryFailed = response?.verificationEmailSent === false
+      setDeliveryFailed(emailDeliveryFailed)
       setStep(2)
-      toast.success(t('auth.petSitter.codeSent'))
+      if (emailDeliveryFailed) {
+        toast.info(t('auth.verifyEmail.deliveryUnavailable'))
+      } else {
+        toast.success(t('auth.petSitter.codeSent'))
+      }
     } catch (error) {
       toast.error(errorMessage(error, t('auth.petSitter.unableToCreate')))
     } finally {
@@ -101,6 +108,7 @@ const PetSitterRegister = () => {
     setResending(true)
     try {
       await resendEmailVerification(registeredEmail)
+      setDeliveryFailed(false)
       toast.success(t('auth.petSitter.resendSuccess'))
     } catch (error) {
       toast.error(errorMessage(error, t('auth.verifyEmail.resending')))
@@ -202,6 +210,7 @@ const PetSitterRegister = () => {
                 {step === 2 && (
                   <form onSubmit={verifyRegistrationEmail} className="mx-auto" style={{ maxWidth: 520 }}>
                     <div className="text-center mb-4"><i className="fa-solid fa-envelope-circle-check text-primary" style={{ fontSize: 48 }} /><p className="small text-muted mt-3 mb-0">{t('auth.petSitter.checkInbox')}</p></div>
+                    {deliveryFailed && <div className="alert alert-warning small" role="alert">{t('auth.verifyEmail.deliveryUnavailable')}</div>}
                     <label className="form-label">{t('auth.petSitter.verificationCode')}</label>
                     <input className="form-control form-control-lg text-center letter-spacing-2" inputMode="numeric" autoComplete="one-time-code" maxLength="6" value={verificationCode} onChange={(event) => setVerificationCode(event.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="000000" required />
                     <div className="d-flex justify-content-between align-items-center mt-4"><button type="button" className="btn btn-link px-0" onClick={() => setStep(1)}>{t('common.back')}</button><button className="btn btn-primary px-4" disabled={loading}>{loading ? t('auth.verification.verifying') : t('auth.petSitter.verifyContinue')} <i className="fa-solid fa-arrow-right ms-2" /></button></div>

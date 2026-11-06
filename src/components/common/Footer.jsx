@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useFooterOptions } from '../../queries/footerOptionQueries'
 import { useLanguage } from '../../contexts/LanguageContext'
+import { APP_DOWNLOAD_FILE_NAME, APP_DOWNLOAD_URL } from '../../constants/appDownload'
 
 const DEFAULT_FOOTER_OPTIONS = {
   address: '3556 Beech Street, USA',
@@ -103,6 +104,10 @@ const Footer = () => {
                     <button type="submit" className="btn">{t('home.footerSubmit')}</button>
                   </form>
                 </div>
+                <a className="footer-app-download" href={APP_DOWNLOAD_URL} download={APP_DOWNLOAD_FILE_NAME}>
+                  <i className="fa-brands fa-android" aria-hidden="true"></i>
+                  <span>{t('home.appDownloadFooter')}</span>
+                </a>
                 <div className="social-icon">
                   <ul>
                     {socialLinks.map((link, index) => (

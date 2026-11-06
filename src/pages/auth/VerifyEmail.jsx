@@ -16,6 +16,7 @@ const VerifyEmail = () => {
   const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [resending, setResending] = useState(false)
+  const [deliveryFailed, setDeliveryFailed] = useState(Boolean(location.state?.deliveryFailed))
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -55,6 +56,7 @@ const VerifyEmail = () => {
     setResending(true)
     try {
       await resendEmailVerification(normalizedEmail)
+      setDeliveryFailed(false)
       toast.success(t('auth.verifyEmail.resend'))
     } catch (error) {
       toast.error(error?.message || t('auth.verifyEmail.resending'))
@@ -79,6 +81,12 @@ const VerifyEmail = () => {
                     <h3>{t('auth.verifyEmail.title')}</h3>
                     <p>{t('auth.verifyEmail.subtitle')}</p>
                   </div>
+
+                  {deliveryFailed && (
+                    <div className="alert alert-warning small" role="alert">
+                      {t('auth.verifyEmail.deliveryUnavailable')}
+                    </div>
+                  )}
 
                   <form onSubmit={handleSubmit}>
                     <div className="mb-3">

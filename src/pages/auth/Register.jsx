@@ -35,9 +35,16 @@ const Register = () => {
       }
       const response = await registerUser(payload, 'patient')
       if (response?.requiresEmailVerification) {
-        toast.success(t('auth.verifyEmail.resend'))
+        if (response?.verificationEmailSent === false) {
+          toast.info(t('auth.verifyEmail.deliveryUnavailable'))
+        } else {
+          toast.success(t('auth.verifyEmail.resend'))
+        }
         navigate(`/verify-email?email=${encodeURIComponent(response.email || data.email)}`, {
-          state: { email: response.email || data.email },
+          state: {
+            email: response.email || data.email,
+            deliveryFailed: response?.verificationEmailSent === false,
+          },
         })
         return
       }
